@@ -1,0 +1,64 @@
+% 导言区：《近场动力学理论与数值方法》
+
+% ---------- 页面设置 ----------
+\usepackage[a4paper, top=2.5cm, bottom=2.5cm, left=3cm, right=2.5cm]{geometry}
+
+% ---------- 常用宏包 ----------
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{amsthm}
+\usepackage{graphicx}
+\usepackage[font=small,labelsep=quad]{caption}
+\graphicspath{{figures/}}
+\usepackage{booktabs}
+\usepackage{xcolor}
+\usepackage{enumitem}
+\usepackage{titlesec}
+\usepackage{fancyhdr}
+\usepackage{tikz}
+\usepackage{listings}
+\usepackage[colorlinks=true, linkcolor=blue, citecolor=blue, urlcolor=blue]{hyperref}
+
+% ---------- 章节标题样式 ----------
+\ctexset{
+  chapter = {
+    format = \centering\Huge\bfseries,
+    name   = {第,章},
+    number = \arabic{chapter},
+  },
+  section = {
+    format = \Large\bfseries,
+  },
+  subsection = {
+    format = \large\bfseries,
+  },
+}
+\captionsetup[figure]{name=图,labelsep=quad}
+\captionsetup[table]{name=表,labelsep=quad}
+
+% ---------- 页眉页脚 ----------
+\pagestyle{fancy}
+\fancyhf{}
+\fancyhead[C]{\leftmark}
+\fancyfoot[C]{\thepage}
+\setlength{\headheight}{13.6pt}
+
+% ---------- 定理环境 ----------
+\newtheorem{theorem}{定理}[chapter]
+\newtheorem{definition}{定义}[chapter]
+\newtheorem{lemma}{引理}[chapter]
+\newtheorem{remark}{注记}[chapter]
+\newtheorem{example}{例}[chapter]
+
+% ---------- 代码环境 ----------
+\lstset{
+  basicstyle       = \ttfamily\small,
+  keywordstyle     = \color{blue},
+  commentstyle     = \color{gray},
+  stringstyle      = \color{red},
+  frame            = single,
+  breaklines       = true,
+  numbers          = left,
+  numberstyle      = \tiny\color{gray},
+  showstringspaces = false,
+}

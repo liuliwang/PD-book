@@ -1,0 +1,434 @@
+\begin{thebibliography}{10}
+
+\bibitem{Agwai2011}
+A.~Agwai, I.~Guven, and E.~Madenci.
+\newblock Predicting crack propagation with peridynamics: A comparative study.
+\newblock {\em International Journal of Fracture}, 171(1):65--78, 2011.
+
+\bibitem{Aifantis1992}
+E.~C. Aifantis.
+\newblock On the role of gradients in the localization of deformation and
+  fracture.
+\newblock {\em International Journal of Engineering Science},
+  30(10):1279--1299, 1992.
+
+\bibitem{BazantBelytschko1985}
+Z.~P. Ba\v{z}ant and T.~B. Belytschko.
+\newblock Wave propagation in a strain-softening bar: Exact solution.
+\newblock {\em Journal of Engineering Mechanics}, 111(3):381--389, 1985.
+
+\bibitem{Bessa2014}
+M.~A. Bessa, J.~T. Foster, T.~Belytschko, and W.~K. Liu.
+\newblock A meshfree unification: reproducing kernel peridynamics.
+\newblock {\em Computational Mechanics}, 53(6):1251--1264, 2014.
+
+\bibitem{BobaruDuangpanya2010}
+F.~Bobaru and M.~Duangpanya.
+\newblock A peridynamic formulation for transient heat conduction in bodies
+  with evolving discontinuities.
+\newblock {\em Journal of Computational Physics}, 229(8):2764--2785, 2010.
+
+\bibitem{Bobaru2016}
+F.~Bobaru, J.~T. Foster, P.~H. Geubelle, and S.~A. Silling, editors.
+\newblock {\em Handbook of Peridynamic Modeling}.
+\newblock CRC Press, Boca Raton, 2016.
+
+\bibitem{BobaruHu2012}
+F.~Bobaru and W.~Hu.
+\newblock The meaning, selection, and use of the peridynamic horizon and its
+  relation to crack branching in brittle materials.
+\newblock {\em International Journal of Fracture}, 176(2):215--222, 2012.
+
+\bibitem{Bobaru2009}
+F.~Bobaru, M.~Yang, L.~F. Alves, S.~A. Silling, E.~Askari, and J.~Xu.
+\newblock Convergence, adaptive refinement, and scaling in 1d peridynamics.
+\newblock {\em International Journal for Numerical Methods in Engineering},
+  77(6):852--877, 2009.
+
+\bibitem{ChenBobaru2015}
+Z.~Chen and F.~Bobaru.
+\newblock Peridynamic modeling of pitting corrosion damage.
+\newblock {\em Journal of the Mechanics and Physics of Solids}, 78:352--381,
+  2015.
+
+\bibitem{Cosserat1909}
+E.~Cosserat and F.~Cosserat.
+\newblock {\em Th\'{e}orie des Corps D\'{e}formables}.
+\newblock Hermann et Fils, Paris, 1909.
+
+\bibitem{Diehl2022}
+P.~Diehl, R.~Lipton, T.~Wick, and M.~Tyagi.
+\newblock A comparative review of peridynamics and phase-field models for
+  engineering fracture mechanics.
+\newblock {\em Computational Mechanics}, 69(6):1259--1293, 2022.
+
+\bibitem{Diehl2019}
+P.~Diehl, S.~Prudhomme, and M.~L\'{e}vesque.
+\newblock A review of benchmark experiments for the validation of peridynamics
+  models.
+\newblock {\em Journal of Peridynamics and Nonlocal Modeling}, 1(1):14--35,
+  2019.
+
+\bibitem{Dimola2022}
+N.~Dimola, A.~Coclite, G.~Fanizza, and T.~Politi.
+\newblock Bond-based peridynamics, a survey prospecting nonlocal theories of
+  fluid-dynamics.
+\newblock {\em Advances in Continuous and Discrete Models}, 2022(1), 2022.
+
+\bibitem{Dipasquale2014}
+D.~Dipasquale, M.~Zaccariotto, and U.~Galvanetto.
+\newblock Crack propagation with adaptive grid refinement in 2d peridynamics.
+\newblock {\em International Journal of Fracture}, 190(1):1--22, 2014.
+
+\bibitem{Eringen1972}
+A.~C. Eringen.
+\newblock Linear theory of nonlocal elasticity and dispersion of plane waves.
+\newblock {\em International Journal of Engineering Science}, 10(5):425--435,
+  1972.
+
+\bibitem{Eringen1983}
+A.~C. Eringen.
+\newblock On differential equations of nonlocal elasticity and solutions of
+  screw dislocation and surface waves.
+\newblock {\em Journal of Applied Physics}, 54(9):4703--4710, 1983.
+
+\bibitem{EringenEdelen1972}
+A.~C. Eringen and D.~G.~B. Edelen.
+\newblock On nonlocal elasticity.
+\newblock {\em International Journal of Engineering Science}, 10(3):233--248,
+  1972.
+
+\bibitem{Eringen1977}
+A.~C. Eringen, C.~G. Speziale, and B.~S. Kim.
+\newblock Crack-tip problem in non-local elasticity.
+\newblock {\em Journal of the Mechanics and Physics of Solids}, 25(5):339--355,
+  1977.
+
+\bibitem{Foster2010}
+J.~T. Foster, S.~A. Silling, and W.~W. Chen.
+\newblock Viscoplasticity using peridynamics.
+\newblock {\em International Journal for Numerical Methods in Engineering},
+  81(10):1242--1258, 2010.
+
+\bibitem{Ganzenmuller2015}
+G.~C. Ganzenm\"uller, S.~Hiermaier, and M.~May.
+\newblock On the similarity of meshless discretizations of {Peridynamics} and
+  {Smooth-Particle Hydrodynamics}.
+\newblock {\em Computers \& Structures}, 150:71--78, 2015.
+
+\bibitem{Gerstle2007}
+W.~Gerstle, N.~Sau, and S.~Silling.
+\newblock Peridynamic modeling of concrete structures.
+\newblock {\em Nuclear Engineering and Design}, 237(12--13):1250--1258, 2007.
+
+\bibitem{Griffith1921}
+A.~A. Griffith.
+\newblock The phenomena of rupture and flow in solids.
+\newblock {\em Philosophical Transactions of the Royal Society of London,
+  Series A}, 221:163--198, 1921.
+
+\bibitem{HaBobaru2010}
+Y.~D. Ha and F.~Bobaru.
+\newblock Studies of dynamic crack propagation and crack branching with
+  peridynamics.
+\newblock {\em International Journal of Fracture}, 162(1--2):229--244, 2010.
+
+\bibitem{Han2016morphing}
+F.~Han, G.~Lubineau, Y.~Azdoud, and A.~Askari.
+\newblock A morphing approach to couple state-based peridynamics with classical
+  continuum mechanics.
+\newblock {\em Computer Methods in Applied Mechanics and Engineering},
+  301:1--10, 2016.
+
+\bibitem{Irwin1957}
+G.~R. Irwin.
+\newblock Analysis of stresses and strains near the end of a crack traversing a
+  plate.
+\newblock {\em Journal of Applied Mechanics}, 24:361--364, 1957.
+
+\bibitem{Javili2019}
+A.~Javili, A.~T. McBride, and P.~Steinmann.
+\newblock Continuum-kinematics-inspired peridynamics. mechanical problems.
+\newblock {\em Journal of the Mechanics and Physics of Solids}, 131:125--146,
+  2019.
+
+\bibitem{Kachanov1958}
+L.~M. Kachanov.
+\newblock Time of the rupture process under creep conditions.
+\newblock {\em Izvestiya Akademii Nauk SSSR, Otdelenie Tekhnicheskikh Nauk},
+  8:26--31, 1958.
+
+\bibitem{Kroner1967}
+E.~Kr\"{o}ner.
+\newblock Elasticity theory of materials with long range cohesive forces.
+\newblock {\em International Journal of Solids and Structures}, 3(5):731--742,
+  1967.
+
+\bibitem{LeBobaru2018}
+Q.~V. Le and F.~Bobaru.
+\newblock Surface corrections for peridynamic models in elasticity and
+  fracture.
+\newblock {\em Computational Mechanics}, 61(4):499--518, 2018.
+
+\bibitem{Littlewood2010}
+D.~J. Littlewood.
+\newblock Simulation of dynamic fracture using peridynamics, finite element
+  modeling, and contact.
+\newblock In {\em Proceedings of the ASME 2010 International Mechanical
+  Engineering Congress and Exposition}, Vancouver, Canada, 2010.
+\newblock IMECE2010-40621.
+
+\bibitem{Lubineau2012}
+G.~Lubineau, Y.~Azdoud, F.~Han, C.~Rey, and A.~Askari.
+\newblock A morphing strategy to couple non-local to local continuum mechanics.
+\newblock {\em Journal of the Mechanics and Physics of Solids},
+  60(6):1088--1102, 2012.
+
+\bibitem{Macek2007}
+R.~W. Macek and S.~A. Silling.
+\newblock Peridynamics via finite element analysis.
+\newblock {\em Finite Elements in Analysis and Design}, 43(15):1169--1178,
+  2007.
+
+\bibitem{Madenci2016}
+E.~Madenci, A.~Barut, and M.~Futch.
+\newblock Peridynamic differential operator and its applications.
+\newblock {\em Computer Methods in Applied Mechanics and Engineering},
+  304:408--451, 2016.
+
+\bibitem{Madenci2022}
+E.~Madenci, A.~Barut, E.~Willmarth, and N.~Phan.
+\newblock Peridynamics for data estimation, image compression/recovery, and
+  model reduction.
+\newblock {\em Journal of Peridynamics and Nonlocal Modeling}, 4(2):159--200,
+  2022.
+
+\bibitem{MadenciOterkus2014}
+E.~Madenci and E.~Oterkus.
+\newblock {\em Peridynamic Theory and Its Applications}.
+\newblock Springer, New York, 2014.
+
+\bibitem{Mindlin1964}
+R.~D. Mindlin.
+\newblock Micro-structure in linear elasticity.
+\newblock {\em Archive for Rational Mechanics and Analysis}, 16(1):51--78,
+  1964.
+
+\bibitem{Mitchell2015}
+J.~A. Mitchell, S.~A. Silling, and D.~J. Littlewood.
+\newblock A position-aware linear solid constitutive model for peridynamics.
+\newblock {\em Journal of Mechanics of Materials and Structures},
+  10(5):539--557, 2015.
+
+\bibitem{Oterkus2014}
+S.~Oterkus, E.~Madenci, and A.~Agwai.
+\newblock Fully coupled peridynamic thermomechanics.
+\newblock {\em Journal of the Mechanics and Physics of Solids}, 64:1--23, 2014.
+
+\bibitem{Ouchi2015}
+H.~Ouchi, A.~Katiyar, J.~York, J.~T. Foster, and M.~M. Sharma.
+\newblock A fully coupled porous flow and geomechanics model for fluid driven
+  cracks: a peridynamics approach.
+\newblock {\em Computational Mechanics}, 55(3):561--576, 2015.
+
+\bibitem{Parks2008}
+M.~L. Parks, R.~B. Lehoucq, S.~J. Plimpton, and S.~A. Silling.
+\newblock Implementing peridynamics within a molecular dynamics code.
+\newblock {\em Computer Physics Communications}, 179(11):777--783, 2008.
+
+\bibitem{Peridigm2012}
+M.~L. Parks, D.~J. Littlewood, J.~A. Mitchell, and S.~A. Silling.
+\newblock Peridigm users' guide.
+\newblock Technical Report SAND2012-7800, Sandia National Laboratories,
+  Albuquerque, NM, 2012.
+
+\bibitem{Peerlings1996}
+R.~H.~J. Peerlings, R.~de~Borst, W.~A.~M. Brekelmans, and J.~H.~P. de~Vree.
+\newblock Gradient enhanced damage for quasi-brittle materials.
+\newblock {\em International Journal for Numerical Methods in Engineering},
+  39(19):3391--3403, 1996.
+
+\bibitem{PijaudierCabotBazant1987}
+G.~Pijaudier-Cabot and Z.~P. Ba\v{z}ant.
+\newblock Nonlocal damage theory.
+\newblock {\em Journal of Engineering Mechanics}, 113(10):1512--1533, 1987.
+
+\bibitem{Ren2017dualhorizon}
+H.~Ren, X.~Zhuang, and T.~Rabczuk.
+\newblock Dual-horizon peridynamics: A stable solution to varying horizons.
+\newblock {\em Computer Methods in Applied Mechanics and Engineering},
+  318:762--782, 2017.
+
+\bibitem{Scabbia2024}
+F.~Scabbia, M.~Zaccariotto, and U.~Galvanetto.
+\newblock A general ordinary state-based peridynamic formulation for
+  anisotropic materials.
+\newblock {\em Computer Methods in Applied Mechanics and Engineering},
+  427:117059, 2024.
+
+\bibitem{SelesonLittlewood2016}
+P.~Seleson and D.~J. Littlewood.
+\newblock Convergence studies in meshfree peridynamic simulations.
+\newblock {\em Computers \& Mathematics with Applications}, 71(11):2432--2448,
+  2016.
+
+\bibitem{Seleson2009}
+P.~Seleson, M.~L. Parks, M.~Gunzburger, and R.~B. Lehoucq.
+\newblock Peridynamics as an upscaling of molecular dynamics.
+\newblock {\em Multiscale Modeling \& Simulation}, 8(1):204--227, 2009.
+
+\bibitem{Silling2000}
+S.~A. Silling.
+\newblock Reformulation of elasticity theory for discontinuities and long-range
+  forces.
+\newblock {\em Journal of the Mechanics and Physics of Solids}, 48(1):175--209,
+  2000.
+
+\bibitem{Silling2010}
+S.~A. Silling.
+\newblock Linearized theory of peridynamic states.
+\newblock {\em Journal of Elasticity}, 99(1):85--111, 2010.
+
+\bibitem{Silling2011coarsening}
+S.~A. Silling.
+\newblock A coarsening method for use in molecular dynamics and peridynamics.
+\newblock {\em Journal of the Mechanics and Physics of Solids},
+  59(5):1059--1075, 2011.
+
+\bibitem{Silling2017}
+S.~A. Silling.
+\newblock Stability of peridynamic correspondence material models and their
+  particle discretizations.
+\newblock {\em Computer Methods in Applied Mechanics and Engineering},
+  322:42--57, 2017.
+
+\bibitem{SillingAskari2014}
+S.~A. Silling and A.~Askari.
+\newblock Peridynamic model for fatigue cracking.
+\newblock Technical Report SAND2014-18590, Sandia National Laboratories,
+  Albuquerque, NM, 2014.
+
+\bibitem{SillingAskari2005}
+S.~A. Silling and E.~Askari.
+\newblock A meshfree method based on the peridynamic model of solid mechanics.
+\newblock {\em Computers \& Structures}, 83(17--18):1526--1535, 2005.
+
+\bibitem{Silling2007}
+S.~A. Silling, M.~Epton, O.~Weckner, J.~Xu, and E.~Askari.
+\newblock Peridynamic states and constitutive modeling.
+\newblock {\em Journal of Elasticity}, 88(2):151--184, 2007.
+
+\bibitem{SillingLehoucq2008}
+S.~A. Silling and R.~B. Lehoucq.
+\newblock Convergence of peridynamics to classical elasticity theory.
+\newblock {\em Journal of Elasticity}, 93(1):13--37, 2008.
+
+\bibitem{SillingLehoucq2010}
+S.~A. Silling and R.~B. Lehoucq.
+\newblock Peridynamic theory of solid mechanics.
+\newblock In {\em Advances in Applied Mechanics}, volume~44, pages 73--168.
+  Elsevier, 2010.
+
+\bibitem{SillingWeckner2010}
+S.~A. Silling, O.~Weckner, E.~Askari, and F.~Bobaru.
+\newblock Crack nucleation in a peridynamic solid.
+\newblock {\em International Journal of Fracture}, 162(1--2):219--227, 2010.
+
+\bibitem{SunFish2019}
+W.~Sun and J.~Fish.
+\newblock Superposition-based coupling of peridynamics and finite element
+  method.
+\newblock {\em Computational Mechanics}, 64(1):231--248, 2019.
+
+\bibitem{TupekRadovitzky2014}
+M.~R. Tupek and R.~Radovitzky.
+\newblock An extended constitutive correspondence formulation of peridynamics
+  based on nonlinear bond-strain measures.
+\newblock {\em Journal of the Mechanics and Physics of Solids}, 65:82--92,
+  2014.
+
+\bibitem{TupekRimoli2013}
+M.~R. Tupek, J.~J. Rimoli, and R.~Radovitzky.
+\newblock An approach for incorporating classical continuum damage models in
+  state-based peridynamics.
+\newblock {\em Computer Methods in Applied Mechanics and Engineering},
+  263:20--26, 2013.
+
+\bibitem{Vieira2024}
+F.~S. Vieira and A.~L. Ara\'ujo.
+\newblock An improved peridynamics density-based topology optimization
+  framework for compliance minimization.
+\newblock {\em Structural and Multidisciplinary Optimization}, 67(8):150, 2024.
+
+\bibitem{Voigt1887}
+W.~Voigt.
+\newblock Theoretische studien \"uber die elasticit\"atsverh\"altnisse der
+  krystalle.
+\newblock {\em Abhandlungen der K\"oniglichen Gesellschaft der Wissenschaften
+  zu G\"ottingen}, 34:3--52, 1887.
+
+\bibitem{Wang2019coupling}
+X.~Wang, S.~S. Kulkarni, and A.~Tabarraei.
+\newblock Concurrent coupling of peridynamics and classical elasticity for
+  elastodynamic problems.
+\newblock {\em Computer Methods in Applied Mechanics and Engineering},
+  344:251--275, 2019.
+
+\bibitem{WangZhou2016}
+Y.~Wang, X.~Zhou, and X.~Xu.
+\newblock Numerical simulation of propagation and coalescence of flaws in rock
+  materials under compressive loads using the extended non-ordinary state-based
+  peridynamics.
+\newblock {\em Engineering Fracture Mechanics}, 163:248--273, 2016.
+
+\bibitem{Warren2009}
+T.~L. Warren, S.~A. Silling, A.~Askari, O.~Weckner, M.~A. Epton, and J.~Xu.
+\newblock A non-ordinary state-based peridynamic method to model solid material
+  deformation and fracture.
+\newblock {\em International Journal of Solids and Structures},
+  46(5):1186--1195, 2009.
+
+\bibitem{WuRen2015}
+C.~T. Wu and B.~Ren.
+\newblock A stabilized non-ordinary state-based peridynamics for the nonlocal
+  ductile material failure analysis in metal machining process.
+\newblock {\em Computer Methods in Applied Mechanics and Engineering},
+  291:262--281, 2015.
+
+\bibitem{Xu2021}
+X.~Xu, M.~D'Elia, and J.~T. Foster.
+\newblock A machine-learning framework for peridynamic material models with
+  physical constraints.
+\newblock {\em Computer Methods in Applied Mechanics and Engineering},
+  386:114062, 2021.
+
+\bibitem{Zaccariotto2018}
+M.~Zaccariotto, T.~Mudric, D.~Tomasi, A.~Shojaei, and U.~Galvanetto.
+\newblock Coupling of fem meshes with peridynamic grids.
+\newblock {\em Computer Methods in Applied Mechanics and Engineering},
+  330:471--497, 2018.
+
+\bibitem{ZhouWang2016}
+X.~P. Zhou, Y.~T. Wang, and Q.~H. Qian.
+\newblock Numerical simulation of crack curving and branching in brittle
+  materials under dynamic loads using the extended non-ordinary state-based
+  peridynamics.
+\newblock {\em European Journal of Mechanics A/Solids}, 60:277--299, 2016.
+
+\bibitem{ZhuNi2017}
+Q.~Zhu and T.~Ni.
+\newblock Peridynamic formulations enriched with bond rotation effects.
+\newblock {\em International Journal of Engineering Science}, 121:118--129,
+  2017.
+
+\bibitem{ZhangHeng2022}
+张恒, 张雄, and 乔丕忠.
+\newblock 近场动力学在断裂力学领域的研究进展.
+\newblock {\em 力学进展}, 52(4):852--873, 2022.
+
+\bibitem{GuZhang2019}
+顾鑫, 章青, and E.~Madenci.
+\newblock 多物理场耦合作用分析的近场动力学理论与方法.
+\newblock {\em 力学进展}, 49(1):201910, 2019.
+
+\end{thebibliography}
