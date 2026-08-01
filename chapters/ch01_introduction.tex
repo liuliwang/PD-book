@@ -7,22 +7,25 @@
 
 \section{经典连续介质力学的局限与挑战}
 
-经典连续介质力学（classical continuum mechanics，简称 CCM）自 18 世纪以来一直是固体力学与工程分析的基石。它以两个基本假设为前提。一是连续性假设，认为材料占据的空间区域可以逐点定义密度、位移、应力等场量。二是局部作用假设，认为材料点只与其无穷小邻域内的物质发生相互作用，其力学状态完全由该点处的变形梯度决定。在这两个假设之下，线动量平衡可以写成含空间导数的偏微分方程
-\[
+经典连续介质力学（classical continuum mechanics，简称 CCM）自 18 世纪以来一直是固体力学与工程分析的基石。它以两个基本假设为前提。一是连续性假设，认为材料占据的空间区域可以逐点定义密度、位移、应力等场量。二是局部作用假设，认为材料点只与其无穷小邻域内的物质发生相互作用，其力学状态完全由该点处的变形梯度决定。在这两个假设之下，线动量平衡可以写成含空间导数的偏微分方程\eqref{eq:ccm-momentum}：
+\begin{equation}
   \nabla\cdot\boldsymbol{\sigma}+\mathbf{b}=\rho\ddot{\mathbf{u}}
-\]
+  \label{eq:ccm-momentum}
+\end{equation}
 其中 $\boldsymbol{\sigma}$ 为 Cauchy 应力张量，$\mathbf{b}$ 为体力密度，$\mathbf{u}$ 为位移场，$\rho$ 为质量密度。应力与应变通过本构方程相联系，工程问题大多借助有限元等数值方法求解这一局部微分方程系统。这套框架在结构分析中取得了巨大成功，但它的两个基本假设恰恰构成其处理断裂问题时困境的根源 \cite{Silling2000}。
 
 第一个困难来自位移场的不连续。断裂的本质是在材料中形成位移不连续面，即裂纹面。在不连续面上，位移对空间坐标的偏导数没有定义，而经典理论恰恰用这些偏导数来表示相邻材料点之间的相对位移与相互作用力。正如 Silling 所指出的 \cite{Silling2000}，固体力学中诸多基本问题恰恰以这种自发形成的不连续为核心，而连续介质力学的数学框架在某种程度上并不适合描述这类问题，因为沿不连续处所需的空间偏导数按定义不存在。传统的处理方式是把裂纹作为额外的人为对象引入：预先假定裂纹位置，将其表面设为自由边界，再附加专门的断裂准则决定其扩展。这种先假设、再验证的范式在裂纹路径未知、多裂纹相互作用或裂纹分叉的情形下变得极为困难。
 
-第二个困难是裂纹尖端场的奇异性。对线弹性材料中的平面裂纹，Irwin 的分析表明 \cite{Irwin1957}，裂纹尖端附近的应力场具有
-\[
+第二个困难是裂纹尖端场的奇异性。对线弹性材料中的平面裂纹，Irwin 的分析表明 \cite{Irwin1957}，裂纹尖端附近的应力场具有式\eqref{eq:crack-tip-singularity}的形式
+\begin{equation}
   \sigma_{ij}\sim\frac{K_I}{\sqrt{2\pi r}}\qquad(r\to 0)
-\]
-的形式，其中 $K_I$ 为 I 型应力强度因子，$r$ 为距裂尖的距离。当 $r$ 趋于零时，应力趋于无穷大，这在物理上不可接受。这一奇异性意味着经典弹性理论无法给出裂尖处的真实应力状态，必须借助应力强度因子或能量释放率等概念加以回避。Griffith 最早从能量角度建立了断裂准则 \cite{Griffith1921}，认为当裂纹扩展所释放的弹性能足以支付新表面所需的表面能时，裂纹发生失稳扩展。该准则给出的临界应力为
-\[
+  \label{eq:crack-tip-singularity}
+\end{equation}
+其中 $K_I$ 为 I 型应力强度因子，$r$ 为距裂尖的距离。当 $r$ 趋于零时，应力趋于无穷大，这在物理上不可接受。这一奇异性意味着经典弹性理论无法给出裂尖处的真实应力状态，必须借助应力强度因子或能量释放率等概念加以回避。Griffith 最早从能量角度建立了断裂准则 \cite{Griffith1921}，认为当裂纹扩展所释放的弹性能足以支付新表面所需的表面能时，裂纹发生失稳扩展。该准则给出的临界应力为式\eqref{eq:griffith-critical-stress}：
+\begin{equation}
   \sigma_c=\sqrt{\frac{2E\gamma}{\pi a}}
-\]
+  \label{eq:griffith-critical-stress}
+\end{equation}
 其中 $E$ 为弹性模量，$\gamma$ 为表面能密度，$a$ 为裂纹半长。这一公式同时暴露出 Griffith 准则的根本局限。当裂纹尺寸 $a$ 趋于零时，临界应力趋于无穷大，因此该准则无法回答无初始裂纹的完整构件在多大载荷下萌生裂纹这一基本问题。此外，它只能判定裂纹在什么条件下扩展，既不能预测扩展方向，也不能处理裂纹分叉、跳跃以及多裂纹之间的相互作用。Irwin 的应力强度因子方法 \cite{Irwin1957} 在工程上十分有效，但同样需要预知裂纹的几何与位置，本质上属于裂纹扩展准则而非裂纹萌生理论。裂纹尖端应力场的形式如图\ref{fig:crack-singularity}所示：当距裂纹尖端距离 $r \to 0$ 时，应力按 $r^{-1/2}$ 发散，这正是经典弹性理论预测的应力奇异性——裂纹尖端应力趋于无穷，在物理上并不合理。
 
 \begin{figure}[htbp]
@@ -70,14 +73,16 @@
 
 非局部思想在力学中由来已久，其源头可以追溯到 19 世纪。1887 年，Voigt 在晶体弹性的研究中引入比经典 Cauchy 理论更丰富的自由度描述 \cite{Voigt1887}。1909 年，Cosserat 兄弟在《可变形体的理论》（Th\'{e}orie des corps d\'{e}formables）中系统建立了微极连续体理论 \cite{Cosserat1909}，赋予材料点独立的转动自由度，使应力张量不再对称，并引入偶应力。这些工作在当时的框架内属于少数派，却为后来的微结构与梯度理论埋下了伏笔。
 
-现代非局部弹性理论的确立以 Kr\"{o}ner 1967 年的工作为标志 \cite{Kroner1967}。Kr\"{o}ner 提出了第一个长程内聚力弹性模型，材料点之间的相互作用不再局限于无穷小邻域，而是延伸到有限距离。此后，Eringen 及其合作者将这一思想发展为系统的理论体系。Eringen 与 Edelen 于 1972 年建立了非局部弹性的公理化框架 \cite{EringenEdelen1972}，同年 Eringen 给出线性非局部弹性理论，并研究了平面波的色散 \cite{Eringen1972}。在该框架中，应力被表述为整个定义域上应变的泛函，典型形式为
-\[
+现代非局部弹性理论的确立以 Kr\"{o}ner 1967 年的工作为标志 \cite{Kroner1967}。Kr\"{o}ner 提出了第一个长程内聚力弹性模型，材料点之间的相互作用不再局限于无穷小邻域，而是延伸到有限距离。此后，Eringen 及其合作者将这一思想发展为系统的理论体系。Eringen 与 Edelen 于 1972 年建立了非局部弹性的公理化框架 \cite{EringenEdelen1972}，同年 Eringen 给出线性非局部弹性理论，并研究了平面波的色散 \cite{Eringen1972}。在该框架中，应力被表述为整个定义域上应变的泛函，典型形式为式\eqref{eq:nonlocal-constitutive}：
+\begin{equation}
   \sigma_{ij}(\mathbf{x})=\int_V \alpha(|\mathbf{x}'-\mathbf{x}|)\,C_{ijkl}\,\varepsilon_{kl}(\mathbf{x}')\,dV'
-\]
-其中 $\alpha$ 为随距离衰减的衰减函数（attenuation function），即核函数，它刻画了长程相互作用的强度随距离的变化。当核函数退化为 Dirac 函数时，上式回到经典局部本构关系，可见经典理论是非局部理论的一个极限情形。1983 年，Eringen 进一步指出 \cite{Eringen1983}，若将积分核取为某个微分算子的 Green 函数，则上述积分型本构可以等价地写成微分形式，例如
-\[
+  \label{eq:nonlocal-constitutive}
+\end{equation}
+其中 $\alpha$ 为随距离衰减的衰减函数（attenuation function），即核函数，它刻画了长程相互作用的强度随距离的变化。当核函数退化为 Dirac 函数时，上式回到经典局部本构关系，可见经典理论是非局部理论的一个极限情形。1983 年，Eringen 进一步指出 \cite{Eringen1983}，若将积分核取为某个微分算子的 Green 函数，则上述积分型本构可以等价地写成微分形式，例如式\eqref{eq:nonlocal-differential}：
+\begin{equation}
   (1-l^2\nabla^2)\sigma_{ij}=C_{ijkl}\varepsilon_{kl}
-\]
+  \label{eq:nonlocal-differential}
+\end{equation}
 其中 $l$ 为材料内禀长度尺度（intrinsic length scale），即刻画微结构对力学行为影响范围的特征长度。经典本构中不含任何长度参数，应力仅取决于当前点的应变；内禀长度的引入使本构关系能够感知有限空间范围内的非局部效应，其值通常与晶格常数、晶粒尺寸等微结构尺度相联系。这一微分形式的非局部理论在纳米力学中获得了广泛应用。
 
 积分核与长度尺度的引入，使非局部理论能够描述经典理论无法刻画的尺度效应。原子晶格的色散关系对波数的依赖，在非局部弹性中通过核函数的 Fourier 变换自然浮现，而经典弹性理论只能描述长波极限行为。非局部理论还在位错芯结构、表面效应与纳米结构力学中得到了应用，其长度尺度 $l$ 通常与材料的微结构特征尺度相当。但核函数的具体形式及其参数缺乏来自底层物理的直接约束，往往需要借助实验或原子模拟加以标定，这成为非局部理论走向定量预测的一个障碍。
@@ -102,10 +107,11 @@
 
 \section{近场动力学的核心思想与基本特征}
 
-近场动力学的出发点是重新思考材料点如何感受周围环境。在经典理论中，材料点只与其无穷小邻域相互作用；在近场动力学中，材料点 $\mathbf{x}$ 与其近场范围（horizon）$\delta$ 之内的所有材料点 $\mathbf{x}'$ 相互作用，该相互作用由对力函数（pairwise force function）$\mathbf{f}$ 描述。运动方程为
-\[
+近场动力学的出发点是重新思考材料点如何感受周围环境。在经典理论中，材料点只与其无穷小邻域相互作用；在近场动力学中，材料点 $\mathbf{x}$ 与其近场范围（horizon）$\delta$ 之内的所有材料点 $\mathbf{x}'$ 相互作用，该相互作用由对力函数（pairwise force function）$\mathbf{f}$ 描述。运动方程为式\eqref{eq:pd-motion}：
+\begin{equation}
   \rho(\mathbf{x})\ddot{\mathbf{u}}(\mathbf{x},t)=\int_{H_{\mathbf{x}}}\mathbf{f}\big(\mathbf{u}(\mathbf{x}',t)-\mathbf{u}(\mathbf{x},t),\mathbf{x}'-\mathbf{x}\big)\,dV_{\mathbf{x}'}+\mathbf{b}(\mathbf{x},t)
-\]
+  \label{eq:pd-motion}
+\end{equation}
 其中 $H_{\mathbf{x}}$ 表示以 $\mathbf{x}$ 为中心、$\delta$ 为半径的球邻域，称为近场域（示意图见图\ref{fig:horizon-bond}）。与经典运动方程相比，上式唯一的区别在于以积分取代了应力的散度，但这一区别是本质性的：方程中不再出现任何空间导数。
 
 \begin{figure}[htbp]
@@ -141,14 +147,16 @@
 
 图\ref{fig:horizon-bond}展示了近场范围与键的基本几何关系。近场范围 $\delta$ 的物理含义是材料点间相互作用的特征距离。当 $\delta$ 趋于零时，相互作用退化为无穷小邻域内的局部作用，近场动力学方程在形式上回到经典理论 \cite{SillingLehoucq2008}，因此经典连续介质力学可以看作近场动力学在零近场范围极限下的特例。$\delta$ 也常与材料的微结构尺度相联系：对于多晶金属可取为晶粒尺寸的量级，对于混凝土可取为骨料尺寸的量级。实际应用中 $\delta$ 的选取还需兼顾数值收敛性，通常要求近场域内包含足够多的物质点 \cite{Bobaru2009,BobaruHu2012}。
 
-键（bond）是近场动力学的基本相互作用单元。连接 $\mathbf{x}$ 与 $\mathbf{x}'$ 的键在参考构型中的方向矢量记为 $\boldsymbol{\xi}=\mathbf{x}'-\mathbf{x}$，变形后的相对位移记为 $\boldsymbol{\eta}=\mathbf{u}(\mathbf{x}',t)-\mathbf{u}(\mathbf{x},t)$，键的伸长（stretch）定义为
-\[
+键（bond）是近场动力学的基本相互作用单元。连接 $\mathbf{x}$ 与 $\mathbf{x}'$ 的键在参考构型中的方向矢量记为 $\boldsymbol{\xi}=\mathbf{x}'-\mathbf{x}$，变形后的相对位移记为 $\boldsymbol{\eta}=\mathbf{u}(\mathbf{x}',t)-\mathbf{u}(\mathbf{x},t)$，键的伸长（stretch）定义为式\eqref{eq:stretch}：
+\begin{equation}
   s=\frac{|\boldsymbol{\xi}+\boldsymbol{\eta}|-|\boldsymbol{\xi}|}{|\boldsymbol{\xi}|}
-\]
-本构关系通过对力函数 $\mathbf{f}$ 描述。对线弹性微弹性材料，在小变形下对力函数可线性化为
-\[
+  \label{eq:stretch}
+\end{equation}
+本构关系通过对力函数 $\mathbf{f}$ 描述。对线弹性微弹性材料，在小变形下对力函数可线性化为式\eqref{eq:linearized-force}：
+\begin{equation}
   \mathbf{f}(\boldsymbol{\eta},\boldsymbol{\xi})\approx \mathbf{C}(\boldsymbol{\xi})\,\boldsymbol{\eta}
-\]
+  \label{eq:linearized-force}
+\end{equation}
 其中 $\mathbf{C}(\boldsymbol{\xi})$ 称为微观模量（micromodulus）函数，它描述了键的刚度随键长与方向的分布，其具体形式可通过令近场动力学的应变能密度在均匀变形下与经典应变能密度一致来确定 \cite{Silling2000,Silling2010}。
 
 近场动力学与经典理论的关系值得进一步说明。一方面，线性化后的近场动力学在大尺度行为上与经典线弹性理论一致 \cite{Silling2000,Silling2010}，这是它可以作为经典理论推广的根本原因。另一方面，两者在小尺度行为上存在差异，近场动力学具有固有的非线性色散特性，波速依赖波数，这一差异在冲击与高频波问题中不可忽略 \cite{SillingLehoucq2010}。此外，给定一个经典材料，可以构造出多个近场动力学材料在均匀变形下与其等价，即一个经典材料对应多个近场动力学材料，因此从经典参数到微观模量的映射并不唯一，需要额外的约定。
