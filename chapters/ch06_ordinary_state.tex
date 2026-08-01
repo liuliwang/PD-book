@@ -218,8 +218,124 @@
 % --- 本节说明：态型理论的难点在于理解“态”是定义在键矢量集合上的映射而非经典场量，尖括号 ⟨ξ⟩ 表示态对键的求值；运动方程中被积函数 T⟨ξ⟩−T′⟨−ξ⟩ 的结构来源是“x 对 x′ 的力”与“x′ 对 x 的力”的分开表述，键型为其成对特例；OSB 力态沿键方向但标量力态 t 依赖整个变形构型，这是解除泊松比限制的关键；膨胀 θ 是体积应变的非局部度量，系数 3/m 与空间维数有关（2D 为 2/m）；弹性态即应变能密度对变形态的 Fréchet 导数，与经典超弹性 σ=∂W/∂F 类比理解 ---
 
 \section{常规态型弹性本构模型}\label{sec:osb-elastic}
-\subsection{各向同性材料}
-\subsection{复合材料层合板}
+
+第\ref{sec:elastic-states}节建立的弹性态与膨胀概念，为构造常规态型弹性本构提供了完整的数学框架。本节首先建立三维各向同性材料的线性 OSB 弹性本构：从应变能密度函数出发，把伸长态分解为各向同性部分与偏部分，通过能量等效标定本构参数，得到标量力态的显式表达式，并给出二维平面应力与平面应变情形的对应公式（\ref{sec:osb-isotropic}节）；进而将这一框架推广到正交各向异性材料，建立单向纤维复合材料单层与层合板的 OSB 本构模型（\ref{sec:osb-composite}节）。本节公式均源自 Silling 等的态型理论原始文献 \cite{Silling2007}，二维情形依据 Le 与 Bobaru 的推导 \cite{LeBobaru2018Obj}，复合材料模型依据 Madenci 与 Oterkus 的专著 \cite{MadenciOterkus2014}。
+
+\subsection{各向同性材料}\label{sec:osb-isotropic}
+
+\ref{sec:elastic-states}节指出，弹性材料的力态等于应变能密度函数对变形态的 Fréchet 导数。对于线性各向同性材料，应变能密度只可能依赖伸长态的两种相互独立的标量度量：膨胀 $\theta$ 与偏伸长态。为此，将伸长态 $\underline{e}$ 分解为各向同性部分（isotropic part）$\underline{e}^{\mathrm{i}}$ 与偏部分（deviatoric part）$\underline{e}^{\mathrm{d}}$
+\begin{equation}
+  \underline{e}^{\mathrm{i}}\langle\boldsymbol{\xi}\rangle=\frac{1}{3}\theta\,|\boldsymbol{\xi}|,\qquad
+  \underline{e}^{\mathrm{d}}\langle\boldsymbol{\xi}\rangle=\underline{e}\langle\boldsymbol{\xi}\rangle-\frac{1}{3}\theta\,|\boldsymbol{\xi}|
+  \label{eq:deviatoric-extension}
+\end{equation}
+其中系数 $1/3$ 来自三维情形膨胀定义中式\eqref{eq:dilatation}的归一化（二维情形系数为 $1/2$，见下文）。各向同性部分描述纯体积变形，偏部分描述体积不变的形状变形；二者在态点积意义下正交，即 $\underline{e}^{\mathrm{i}}\cdot\underline{e}^{\mathrm{d}}=0$，这保证了应变能密度中体积项与偏项不耦合 \cite{Silling2007}。
+
+三维线性各向同性 OSB 材料的应变能密度函数取体积项与偏项之和
+\begin{equation}
+  W\bigl(\theta,\underline{e}^{\mathrm{d}}\bigr)=\frac{1}{2}k\theta^{2}+\frac{\alpha}{2}\,\omega\,\underline{e}^{\mathrm{d}}\cdot\underline{e}^{\mathrm{d}}
+  \label{eq:osb-strain-energy}
+\end{equation}
+其中 $k$ 为体积模量，$\alpha$ 为待定常数，$\omega$ 为权重函数，乘积 $\omega\,\underline{e}^{\mathrm{d}}$ 表示逐键相乘后的标量态（即 $(\omega\,\underline{e}^{\mathrm{d}})\langle\boldsymbol{\xi}\rangle=\omega(|\boldsymbol{\xi}|)\,\underline{e}^{\mathrm{d}}\langle\boldsymbol{\xi}\rangle$）。式\eqref{eq:osb-strain-energy}中体积项与经典弹性应变能密度 $k(\mathrm{tr}\,\boldsymbol{\varepsilon})^{2}/2$ 形式一致，偏项则是偏伸长态加权内积的线性函数，与经典偏应变能 $\mu\boldsymbol{\varepsilon}^{\mathrm{d}}:\boldsymbol{\varepsilon}^{\mathrm{d}}$ 相对应。
+
+由弹性材料定义式\eqref{eq:elastic-material}，标量力态 $\underline{t}$ 等于 $W$ 对伸长态 $\underline{e}$ 的 Fréchet 导数。对式\eqref{eq:osb-strain-energy}求导，注意到 $\delta\theta/\delta\underline{e}\langle\boldsymbol{\xi}\rangle=3\omega(|\boldsymbol{\xi}|)\,|\boldsymbol{\xi}|/m$（由式\eqref{eq:dilatation}）以及 $\delta\underline{e}^{\mathrm{d}}/\delta\underline{e}$ 的相应关系，得到
+\begin{equation}
+  \underline{t}\langle\boldsymbol{\xi}\rangle=\frac{3k\theta}{m}\,\omega(|\boldsymbol{\xi}|)\,|\boldsymbol{\xi}|+\alpha\,\omega(|\boldsymbol{\xi}|)\,\underline{e}^{\mathrm{d}}\langle\boldsymbol{\xi}\rangle
+  \label{eq:osb-t-general}
+\end{equation}
+常数 $\alpha$ 由能量等效确定：令 PD 应变能密度与经典线弹性应变能密度在均匀变形下相等。对均匀纯剪切变形，$\theta=0$，$\underline{e}^{\mathrm{d}}\neq\mathbf{0}$，比较式\eqref{eq:osb-strain-energy}与经典剪切应变能密度 $\mu\gamma^{2}$（$\gamma$ 为工程剪应变）可得 $\alpha=15\mu/m$，其中 $\mu$ 为剪切模量 \cite{Silling2007}。代入式\eqref{eq:osb-t-general}，得到三维线性各向同性 OSB 材料的标量力态
+\begin{equation}
+  \underline{t}\langle\boldsymbol{\xi}\rangle=\frac{3k\theta}{m}\,\omega(|\boldsymbol{\xi}|)\,|\boldsymbol{\xi}|+\frac{15\mu}{m}\,\omega(|\boldsymbol{\xi}|)\,\underline{e}^{\mathrm{d}}\langle\boldsymbol{\xi}\rangle
+  \label{eq:osb-3d}
+\end{equation}
+式\eqref{eq:osb-3d}连同式\eqref{eq:deviatoric-extension}、式\eqref{eq:dilatation}、式\eqref{eq:weighted-volume}构成完整的三维线性各向同性 OSB 本构。与键型 PMB 模型的微模量 $c$ 不同，式\eqref{eq:osb-3d}中体积项与偏项分别由 $k$ 与 $\mu$ 独立标定，二者互不约束，泊松比不再被固定——这正是\ref{sec:state-limits}节所述态型理论突破键型局限的关键所在。注意到当取权重函数 $\omega=1$、并令 $\underline{e}^{\mathrm{d}}\equiv\mathbf{0}$（即材料无剪切抗力，$\mu=0$）时，式\eqref{eq:osb-3d}退化为仅含体积项的流体型本构；而取 $k=5\mu/3$（对应 $\nu=1/4$）时体积项与偏项的组合恰好等价于键型理论的微模量标定，再次印证键型理论是态型理论的特例 \cite{Silling2007}。
+
+\begin{remark}
+  式\eqref{eq:osb-3d}中权重函数 $\omega(|\boldsymbol{\xi}|)$ 同时出现在膨胀定义式\eqref{eq:dilatation}与本构式\eqref{eq:osb-3d}中，其作用是对近场域内不同距离的键赋予不同权重。常用的选择是常数 $\omega=1$ 或线性衰减 $\omega=1-|\boldsymbol{\xi}|/\delta$。在均匀变形下，标量力态对应力的贡献与权重函数的具体形式无关（权重函数在分子分母中相消），因而本构参数 $k$、$\mu$ 的标定不依赖 $\omega$ 的选取；但权重函数影响表面效应的大小与数值离散的精度，其影响将在第 9、10 章讨论 \cite{Silling2007,LeBobaru2018Obj}。
+\end{remark}
+
+二维情形（板厚 $h$）的推导与三维完全类似，仅需将膨胀定义式\eqref{eq:dilatation}中的系数 $3/m$ 改为 $2/m$，并将式\eqref{eq:osb-3d}中的本构参数相应替换。Le 与 Bobaru 给出的二维线性各向同性 OSB 本构为 \cite{LeBobaru2018Obj}
+\begin{equation}
+  \underline{t}\langle\boldsymbol{\xi}\rangle=
+  \frac{2(2k-8\mu/3)\,\theta}{m}\,\omega(|\boldsymbol{\xi}|)\,|\boldsymbol{\xi}|+
+  \frac{8\mu}{m}\,\omega(|\boldsymbol{\xi}|)\,\underline{e}\langle\boldsymbol{\xi}\rangle
+  \qquad(\text{平面应力})
+  \label{eq:osb-2d-ps}
+\end{equation}
+\begin{equation}
+  \underline{t}\langle\boldsymbol{\xi}\rangle=
+  \frac{2(2k-5\mu/3)\,\theta}{m}\,\omega(|\boldsymbol{\xi}|)\,|\boldsymbol{\xi}|+
+  \frac{8\mu}{m}\,\omega(|\boldsymbol{\xi}|)\,\underline{e}\langle\boldsymbol{\xi}\rangle
+  \qquad(\text{平面应变})
+  \label{eq:osb-2d-pe}
+\end{equation}
+其中二维情形的膨胀定义为
+\begin{equation}
+  \theta=\frac{2}{m}\int_{H_{\mathbf{x}}}\omega(|\boldsymbol{\xi}|)\,|\boldsymbol{\xi}|\,\underline{e}\langle\boldsymbol{\xi}\rangle\,dV_{\mathbf{x}'}
+  \label{eq:dilatation-2d}
+\end{equation}
+（平面应变情形）；平面应力情形下式\eqref{eq:dilatation-2d}的归一系数 $2/m$ 需替换为 $2(2\nu-1)/\bigl((\nu-1)m\bigr)$，其中 $\nu$ 为泊松比 \cite{LeBobaru2018Obj}。式\eqref{eq:osb-2d-ps}与式\eqref{eq:osb-2d-pe}中体积项系数因平面应力与平面应变而不同，反映了厚度方向应力状态对二维等效本构的影响；偏项系数统一为 $8\mu/m$。这些二维公式在\ref{sec:osb-composite}节复合材料层合板模型以及第 9 章数值实现中将反复使用。
+
+\subsection{复合材料层合板}\label{sec:osb-composite}
+
+纤维增强复合材料由高刚度的纤维与相对柔性的基体复合而成，沿纤维方向与垂直于纤维方向的力学性能差异显著，属于典型的正交各向异性材料。键型理论在描述这类材料时遇到根本困难：由于成对相互作用假设，单层板四个独立弹性常数（$E_{11}$、$E_{22}$、$G_{12}$、$\nu_{12}$）被约化为两个，泊松比被固定为 $\nu_{12}=1/3$，剪切模量 $G_{12}$ 也受到 $G_{12}=E_{1}E_{2}/\bigl(3(E_{1}-E_{2}/9)\bigr)$ 的约束 \cite{OterkusMadenci2012,HuHaBobaru2012}。OSB 框架通过"体积—偏斜"双通道独立标定，天然解除了这一约束。Madenci 与 Oterkus 在专著中系统建立了正交各向异性材料的 OSB 本构，即所谓"普通态型层板理论"（ordinary state-based peridynamic laminated theory，OSB-PDLT），本节介绍其基本结构 \cite{MadenciOterkus2014}。
+
+考虑单向纤维复合材料单层板，取材料主方向：1 方向沿纤维方向，2 方向垂直于纤维方向（面内），板厚方向为 3 方向。与各向同性情形式\eqref{eq:osb-3d}不同，正交各向异性材料的膨胀 $\theta$ 不能简单地对伸长态做各向同性加权平均，因为沿不同方向的键对体积变形的贡献因材料方向而异。为此，OSB-PDLT 引入方向相关的影响函数 $\Lambda\langle\boldsymbol{\xi}\rangle$，定义为变形后键方向与参考键方向的夹角余弦
+\begin{equation}
+  \Lambda\langle\boldsymbol{\xi}\rangle=
+  \frac{\underline{\mathbf{Y}}\langle\boldsymbol{\xi}\rangle}{\bigl|\underline{\mathbf{Y}}\langle\boldsymbol{\xi}\rangle\bigr|}\cdot
+  \frac{\boldsymbol{\xi}}{|\boldsymbol{\xi}|}
+  \label{eq:lambda}
+\end{equation}
+即 $\Lambda\langle\boldsymbol{\xi}\rangle=\underline{\mathbf{M}}\langle\boldsymbol{\xi}\rangle\cdot\underline{\mathbf{X}}\langle\boldsymbol{\xi}\rangle/|\boldsymbol{\xi}|$。$\Lambda$ 度量键在变形过程中的方向偏转，对未变形状态 $\Lambda=1$。借助 $\Lambda$，膨胀修正为
+\begin{equation}
+  \theta=d\int_{H_{\mathbf{x}}}\Lambda\langle\boldsymbol{\xi}\rangle\,|\boldsymbol{\xi}|\,s\langle\boldsymbol{\xi}\rangle\,dV_{\mathbf{x}'}
+  \label{eq:osb-pdlt-dilatation}
+\end{equation}
+其中 $s=\underline{e}\langle\boldsymbol{\xi}\rangle/|\boldsymbol{\xi}|$ 为伸长率（见式\eqref{eq:extension-state}），$d$ 为本构参数。与式\eqref{eq:dilatation}相比，式\eqref{eq:osb-pdlt-dilatation}中被积函数多了方向因子 $\Lambda$，使沿不同方向的键对膨胀的贡献按其与变形方向的夹角加权，从而将各向异性纳入体积响应。
+
+OSB-PDLT 的标量力态由膨胀项与伸长项两部分组成，其键型区分体现在本构参数上。对单层板，键按其方向分为三类：沿纤维方向的纤维键（fiber bond）、沿横向的矩阵键（matrix bond）与其他方向的任意键。用选择函数 $\mu_{F}$、$\mu_{T}$ 标记键的类型（$\mu_{F}=1$ 表示纤维键，$\mu_{T}=1$ 表示矩阵键），标量力态写为
+\begin{equation}
+  \underline{t}\langle\boldsymbol{\xi}\rangle=
+  \frac{2\delta\,a\,d\,\Lambda\langle\boldsymbol{\xi}\rangle}{|\boldsymbol{\xi}|}\,\theta+
+  \Bigl(\mu_{F}\,b_{F}+b_{FT}+\mu_{T}\,b_{T}\Bigr)\,s\langle\boldsymbol{\xi}\rangle
+  \label{eq:osb-pdlt-force}
+\end{equation}
+其中 $a$、$d$、$b_{F}$、$b_{T}$、$b_{FT}$ 为材料本构参数，$\delta$ 为近场范围。式\eqref{eq:osb-pdlt-force}中第一项为膨胀项，其系数 $2\delta a d\Lambda/|\boldsymbol{\xi}|$ 与式\eqref{eq:osb-3d}的 $3k\omega|\boldsymbol{\xi}|/m$ 相对应，$\Lambda$ 的引入使膨胀项的贡献方向相关；第二项为伸长项，三个参数 $b_{F}$、$b_{T}$、$b_{FT}$ 分别标定纤维键、矩阵键与任意键的轴向刚度。
+
+本构参数由单层板工程常数确定。记平面应力状态下的缩减刚度（reduced stiffness）
+\begin{equation}
+  Q_{11}=\frac{E_{11}}{1-\nu_{12}\nu_{21}},\qquad
+  Q_{22}=\frac{E_{22}}{1-\nu_{12}\nu_{21}},\qquad
+  Q_{12}=\frac{\nu_{12}E_{22}}{1-\nu_{12}\nu_{21}},\qquad
+  Q_{66}=G_{12}
+  \label{eq:reduced-stiffness}
+\end{equation}
+其中 $E_{11}$、$E_{22}$ 为纤维方向与横向弹性模量，$G_{12}$ 为面内剪切模量，$\nu_{12}$、$\nu_{21}$ 为主次泊松比（满足 $E_{11}\nu_{21}=E_{22}\nu_{12}$）。Madenci 与 Oterkus 通过能量等效给出 \cite{MadenciOterkus2014}
+\begin{equation}
+  a=\frac{1}{2}\bigl(Q_{12}-Q_{66}\bigr),\qquad
+  d=\frac{2}{\pi h\delta^{3}}
+  \label{eq:osb-pdlt-params1}
+\end{equation}
+\begin{equation}
+  b_{F}=\frac{Q_{11}-Q_{12}-2Q_{66}}{2\delta\sum_{j} |\boldsymbol{\xi}_{j}|\,V_{j}}\,,
+  \qquad
+  b_{T}=\frac{Q_{22}-Q_{12}-2Q_{66}}{2\delta\sum_{j} |\boldsymbol{\xi}_{j}|\,V_{j}}\,,
+  \qquad
+  b_{FT}=\frac{6Q_{66}}{\pi h\delta^{4}}
+  \label{eq:osb-pdlt-params2}
+\end{equation}
+其中 $h$ 为板厚，式\eqref{eq:osb-pdlt-params2}中求和遍历近场域内全部纤维键（$b_{F}$）或全部矩阵键（$b_{T}$），$V_{j}$ 为键端点 $j$ 的体积。注意到 $b_{F}$、$b_{T}$ 的分母含求和项，这使式\eqref{eq:osb-pdlt-force}在均匀变形下能够精确复现经典层板理论的正交各向异性本构关系 \cite{MadenciOterkus2014}。
+
+\begin{remark}
+  式\eqref{eq:osb-pdlt-params1}中参数 $a$ 的正负取决于 $Q_{12}$ 与 $Q_{66}$ 的相对大小。对碳纤维增强复合材料，通常 $Q_{12}>Q_{66}$，$a>0$；而对某些 $G_{12}$ 较大的材料，$a$ 可能为负，此时膨胀项对力态的贡献反向。这是各向异性 OSB 本构与各向同性情形的显著差异之一，不影响本构的稳定性 \cite{MadenciOterkus2014}。
+\end{remark}
+
+层合板由多个不同纤维取向的单层板沿厚度方向铺叠而成。在 OSB-PDLT 框架中，层合板内每个物质点仍属于某一单层，该层以其材料主方向（纤维方向）定义本构参数；不同铺层的物质点共享同一近场域，但各自的键按所属层的材料主方向分类。因此，层合板的 OSB 本构是各单层本构的逐点装配：物质点 $\mathbf{x}$ 的本构参数（$a$、$b_{F}$、$b_{T}$ 等）由其所处铺层的纤维角 $\phi$ 决定，而膨胀式\eqref{eq:osb-pdlt-dilatation}的积分跨越铺层界面，在界面附近自然实现了层间载荷传递。层间界面本身可通过引入界面键（interlayer bond）的剪切与法向抗力来模拟分层（delamination），键型框架下的界面键模型见 \cite{OterkusMadenci2012}，其 OSB 推广见 \cite{MadenciOterkus2014}。OSB-PDLT 已成功应用于复合材料层合板的开孔拉伸强度预测 \cite{JiangWang2018} 与含切口加筋曲板的失效分析 \cite{Oterkus2012Combined}，各向异性材料的键型模型对比可参见 \cite{HuHaBobaru2012,Ghajari2014}。
+
+本节建立了常规态型弹性本构的完整体系：\ref{sec:osb-isotropic}节从应变能密度出发，通过"体积—偏斜"分解得到三维与二维线性各向同性 OSB 本构式\eqref{eq:osb-3d}—\eqref{eq:osb-2d-pe}；\ref{sec:osb-composite}节引入方向相关影响函数 $\Lambda$ 与键分类机制，将 OSB 框架推广到正交各向异性复合材料层合板，得到本构式\eqref{eq:osb-pdlt-force}及参数式\eqref{eq:osb-pdlt-params1}—\eqref{eq:osb-pdlt-params2}。这些弹性本构是\ref{sec:osb-plastic}节弹塑性模型与\ref{sec:strength-params}节强度参数确定的基础。弹性本构在均匀变形下的经典极限验证、以及与经典各向异性弹性理论的一致性分析将在第 8 章系统讨论。
+
+% --- 本节说明：6.2 的核心是"体积—偏斜"双通道本构：3D 下 t=(3kθ/m)ωx+(15μ/m)ωe^d（Silling 2007 式113），2D 下体积项系数因平面应力/平面应变而异（Le & Bobaru 2018），注意 2D 平面应力系数是 2(2k−8μ/3) 而非常被误写的 2(2k−μ)；复合材料 OSB-PDLT（Madenci & Oterkus 2014 第5章）通过方向因子 Λ（变形前后键方向夹角余弦）修正膨胀，并以 bF/bT/bFT 区分纤维键/矩阵键/任意键刚度；层合板按铺层纤维角逐点装配本构。键型复合材料（Oterkus & Madenci 2012 JMMS）受 ν12=1/3、G12 约束，这是推广到 OSB 的动机 ---
 
 \section{常规态型弹塑性模型}\label{sec:osb-plastic}
 \subsection{屈服函数与塑性流动法则}
