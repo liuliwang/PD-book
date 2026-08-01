@@ -3,11 +3,24 @@
 
 \section*{态型理论（第 6 章）}
 
-\begin{tabular}{@{}ll@{}}
+\begin{longtable}{@{}p{4.8cm}>{\raggedright\arraybackslash}p{10.2cm}@{}}
   $\underline{\mathbf{Y}}[\mathbf{x},t]\langle\boldsymbol{\xi}\rangle$ & 变形态（deformation state），$\boldsymbol{\xi}+\boldsymbol{\eta}=\mathbf{y}'-\mathbf{y}$ \\
   $\underline{\mathbf{T}}[\mathbf{x},t]\langle\boldsymbol{\xi}\rangle$ & 力态（force state），$\mathbf{x}$ 处力态在键 $\boldsymbol{\xi}$ 上的力密度取值 \\
   $\underline{t}$ & 标量力态（scalar force state） \\
   $\underline{e}^{\mathrm{i}}$，$\underline{e}^{\mathrm{d}}$ & 伸长态的\textbf{各向同性部分}（isotropic part）与\textbf{偏部分}（deviatoric part），$\underline{e}^{\mathrm{d}}=\underline{e}-\underline{e}^{\mathrm{i}}$ \\
+  $\underline{e}^{\mathrm{de}}$，$\underline{e}^{\mathrm{dp}}$ & 偏伸长态的弹性部分与\textbf{塑性部分}（plastic part），$\underline{e}^{\mathrm{d}}=\underline{e}^{\mathrm{de}}+\underline{e}^{\mathrm{dp}}$ \\
+  $\underline{t}^{\mathrm{d}}$ & 偏力态（deviatoric force state） \\
+  $\psi_{0}$ & 屈服常数（$\psi_{0}=25\sigma_{Y}^{2}/(8\pi\delta^{5})$，三维） \\
+  $f$ & 屈服函数（yield function） \\
+  $\lambda$ & 塑性乘子（plastic multiplier） \\
+  $\bar{\varepsilon}^{\mathrm{p}}$ & 等效塑性应变 \\
+  $H$ & 各向同性硬化模量（linear hardening modulus） \\
+  $s_{0}$，$s_{c}$ & 临界伸长率（critical stretch） \\
+  $G_{0}$，$G_{c}$ & 断裂能（能量释放率，fracture energy） \\
+  $K_{IC}$ & 临界应力强度因子（断裂韧度） \\
+  $\mu(\boldsymbol{\xi},t)$ & 键状态函数（bond status function），$\in\{0,1\}$ \\
+  $\varphi$ & 局部损伤（local damage） \\
+  $w_{c}$ & 临界键能量密度（critical energy density） \\
   $\underline{\mathbf{M}}\langle\boldsymbol{\xi}\rangle$ & 单位方向态，$\underline{\mathbf{Y}}\langle\boldsymbol{\xi}\rangle/|\underline{\mathbf{Y}}\langle\boldsymbol{\xi}\rangle|$ \\
   $\underline{\mathbf{X}}\langle\boldsymbol{\xi}\rangle$ & 参考位置态（reference position state），$\boldsymbol{\xi}$ \\
   $\underline{e}\langle\boldsymbol{\xi}\rangle$ & 伸长态（extension state），$|\underline{\mathbf{Y}}\langle\boldsymbol{\xi}\rangle|-|\underline{\mathbf{X}}\langle\boldsymbol{\xi}\rangle|=|\underline{\mathbf{Y}}\langle\boldsymbol{\xi}\rangle|-|\boldsymbol{\xi}|$ \\
@@ -28,7 +41,45 @@
   $\mathbf{y}(\mathbf{x},t)$ & 变形后位置，$\mathbf{x}+\mathbf{u}(\mathbf{x},t)$ \\
   $W$ & 应变能密度函数（以变形态为自变量） \\
   $\boldsymbol{\varepsilon}$ & 小应变张量 \\
-  $\mathbf{F}$ & 变形梯度 \\
-  $\mathcal{B}$ & 物体所占区域 \\
-\end{tabular}
+  $\mathbf{F}$ & 变形梯度（deformation gradient） \\
+  $\mathbf{K}$ & 形状张量（shape tensor），$\displaystyle\int_{H_{\mathbf{x}}}\omega\,\boldsymbol{\xi}\otimes\boldsymbol{\xi}\,dV_{\mathbf{x}'}$ \\
+  $\mathbf{P}$ & 第一 Piola–Kirchhoff 应力 \\
+  $\boldsymbol{\sigma}$ & Cauchy 应力 \\
+  $J$ & 变形梯度行列式，$J=\det\mathbf{F}$ \\
+  $\mathbf{E}$ & Green–Lagrange 应变张量，$\frac{1}{2}\bigl(\mathbf{F}^{\mathrm{T}}\mathbf{F}-\mathbf{I}\bigr)$ \\
+  $\mathbf{S}$ & 第二 Piola–Kirchhoff 应力 \\
+  $\mathbf{R}$，$\mathbf{U}$ & 极分解中的旋转张量与右伸长张量，$\mathbf{F}=\mathbf{R}\mathbf{U}$ \\
+  $\mathbf{D}$ & 变形率张量（stretching tensor） \\
+  $\mathbf{C}$ & 弹性刚度张量（四阶） \\
+  $\varepsilon^{(m)}\langle\boldsymbol{\xi}\rangle$ & 键应变度量（bond-strain measure），Seth–Hill 族在键层面的推广 \\
+  $c\langle\boldsymbol{\xi}\rangle$ & 键的 Cauchy–Green 型标量态 \\
+  $\underline{\mathbf{H}}\langle\boldsymbol{\xi}\rangle$ & 投影态（projection state），$\frac{5}{2}\frac{\boldsymbol{\xi}\otimes\boldsymbol{\xi}}{\boldsymbol{\xi}\cdot\boldsymbol{\xi}}-\frac{1}{2}\mathbf{I}$ \\
+\end{longtable}
 
+\section*{非常规态模型（第 7 章）}
+
+\begin{longtable}{@{}p{4.8cm}>{\raggedright\arraybackslash}p{10.2cm}@{}}
+  $\mathbf{N}(\mathbf{x}_j)$ & 应变—位移矩阵，$\boldsymbol{\varepsilon}(\mathbf{x}_j)=\mathbf{N}(\mathbf{x}_j)\mathbf{U}(\mathbf{x}_j)$（离散 NOSB） \\
+  $\mathbf{Q}(\mathbf{x}_j)$ & 键矢量—力态映射矩阵，编码 $\boldsymbol{\xi}\to\mathbf{K}^{-1}\boldsymbol{\xi}$（$3\times 6$） \\
+  $\mathbf{U}_{\mathrm{glob}}$，$\mathbf{F}_{\mathrm{ext}}$ & 整体节点位移向量、外载荷向量 \\
+  $\mathbf{K}_{\mathrm{glob}}$ & NOSB 整体刚度矩阵（对称正定，带宽约 $2\delta$） \\
+  $\mathbf{R}(\mathbf{U})$ & 残差向量（不平衡力向量），$\mathbf{F}_{\mathrm{ext}}-\mathbf{F}_{\mathrm{int}}(\mathbf{U})$ \\
+  $\mathbf{F}_{\mathrm{int}}$ & 节点内力向量 \\
+  $\mathbf{K}_{\mathrm{t}}$ & 切线刚度矩阵，$\partial\mathbf{F}_{\mathrm{int}}/\partial\mathbf{U}$ \\
+  $\mathbf{A}$ & 材料切线张量，$\partial\mathbf{P}/\partial\mathbf{F}$（含材料部分与初始应力部分） \\
+  $\underline{\mathbf{z}}\langle\boldsymbol{\xi}\rangle$ & 变形的非均匀部分（nonuniform part），$\underline{\mathbf{Y}}\langle\boldsymbol{\xi}\rangle-\mathbf{F}\boldsymbol{\xi}$，零能模式的度量 \\
+  $\Pi(\mathbf{y})$ & 弹性体总势能（零能模式稳定性分析） \\
+  $e(k)$ & 能量型谱度量（正弦位移场下高波数模式携带的能量） \\
+  $W^{s}(\underline{\mathbf{Y}})$ & 稳定化应变能密度，$\frac{1}{2}\int_{H_{\mathbf{x}}}\beta\,\underline{\mathbf{z}}\cdot\underline{\mathbf{z}}\,dV_{\mathbf{x}'}$ \\
+  $\beta$，$\gamma$ & 稳定化强度参数（$\beta=\gamma\omega$），$\gamma$ 由式 $\gamma=9\kappa\alpha/\bigl(\pi\int_0^\delta\omega r^4\,dr\bigr)$ 标定 \\
+  $\mathbf{x}_{s}$ & 应力点（stress point）位置（应力点法） \\
+  $\tilde{\mathbf{F}}\langle\boldsymbol{\xi}\rangle$ & 键关联变形梯度，在子近场域 $H_{\mathbf{x}}^{\boldsymbol{\xi}}$ 上构造 \\
+  $\mathbf{F}^{\mathrm{bond}}$ & 键级变形梯度（Breitzman–Dayal 能量平均方法） \\
+  $\mathbf{F}^{(1)}$，$\mathbf{F}^{(2)}$ & 高阶变形梯度（变形梯度的梯度，应变梯度类量） \\
+  $\boldsymbol{\Xi}^{ai}$，$\mathbf{A}^{aij}$，$V^{aijk}$ & CKP 参考构型相对度量：键矢量、面矢量、四面体体积 \\
+  $\boldsymbol{\xi}^{ai}$，$\mathbf{a}^{aij}$，$v^{aijk}$ & CKP 变形构型相对度量：键矢量、面矢量、四面体体积 \\
+  $\mathbf{T}_1^{ai}$，$\mathbf{T}_2^{ai}$，$\mathbf{T}_3^{ai}$ & CKP 一/二/三邻域力密度 \\
+  $\mathbf{L}(\mathbf{x},t)$ & 非局部速度梯度（半拉格朗日框架，当前构型） \\
+  $\varepsilon_{\mathrm{tol}}$ & 非线性迭代收敛容差 \\
+  $\mathcal{B}$ & 物体所占区域 \\
+\end{longtable}

@@ -11,6 +11,8 @@
 \usepackage[font=small,labelsep=quad]{caption}
 \graphicspath{{figures/}}
 \usepackage{booktabs}
+\usepackage{array}
+\usepackage{longtable}
 \usepackage{xcolor}
 \usepackage{enumitem}
 \usepackage{titlesec}
@@ -42,6 +44,8 @@
 \fancyhead[C]{\leftmark}
 \fancyfoot[C]{\thepage}
 \setlength{\headheight}{13.6pt}
+% 允许行在极端情况下略超理想宽度，吸收长公式/引用造成的 Overfull
+\setlength{\emergencystretch}{2em}
 
 % ---------- 定理环境 ----------
 \newtheorem{theorem}{定理}[chapter]
