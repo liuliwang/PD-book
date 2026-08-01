@@ -44,6 +44,9 @@
     \filldraw[red] (1.7,0.8) circle (2pt);
     \filldraw[red] (-0.65,1.65) circle (2pt);
     \filldraw[red] (-1.2,-1.15) circle (2pt);
+    \node[red, below] at (1.7,0.62) {$\mathbf{y}'_1$};
+    \node[red, above] at (-0.65,1.8) {$\mathbf{y}'_2$};
+    \node[red, below] at (-1.2,-1.3) {$\mathbf{y}'_3$};
     % 标注
     \node[above] at (0.75,0.45) {$\boldsymbol{\xi}_1$};
     \node[red, above] at (1.15,0.55) {$\underline{\mathbf{Y}}\langle\boldsymbol{\xi}_1\rangle$};
@@ -94,7 +97,7 @@
 \[
   (\underline{\mathbf{A}}\otimes\underline{\mathbf{B}})\langle\boldsymbol{\xi}\rangle=\underline{\mathbf{A}}\langle\boldsymbol{\xi}\rangle\otimes\underline{\mathbf{B}}\langle\boldsymbol{\xi}\rangle
 \]
-其值为二阶张量，可用于构造形状张量等二阶量（第 7 章）。此外还常用到两类特殊态：单位态（identity state）$\underline{\mathbf{I}}$ 与标量单位态 $\underline{1}$，满足 $\underline{\mathbf{I}}\langle\boldsymbol{\xi}\rangle=\boldsymbol{\xi}$、$\underline{1}\langle\boldsymbol{\xi}\rangle=1$；零态（zero state）$\underline{\mathbf{0}}$ 满足 $\underline{\mathbf{0}}\langle\boldsymbol{\xi}\rangle=\mathbf{0}$。借助这些记号，伸长态可写为 $\underline{e}=|\underline{\mathbf{Y}}|-|\underline{\mathbf{I}}|$，形式更为简洁 \cite{Silling2007,MadenciOterkus2014}。
+其值为二阶张量，可用于构造形状张量等二阶量（第 7 章）。此外还常用到两类特殊态：参考位置态（reference position state）$\underline{\mathbf{X}}$ 与标量单位态（identity state）$\underline{1}$，满足 $\underline{\mathbf{X}}\langle\boldsymbol{\xi}\rangle=\boldsymbol{\xi}$、$\underline{1}\langle\boldsymbol{\xi}\rangle=1$；零态（zero state）$\underline{\mathbf{0}}$ 满足 $\underline{\mathbf{0}}\langle\boldsymbol{\xi}\rangle=\mathbf{0}$ \cite{Silling2007}。借助这些记号，伸长态可写为 $\underline{e}=|\underline{\mathbf{Y}}|-|\underline{\mathbf{X}}|$，形式更为简洁 \cite{Silling2007,MadenciOterkus2014}。
 
 \begin{remark}
   态与经典张量场的区别值得反复强调。应力张量 $\boldsymbol{\sigma}(\mathbf{x})$ 在点 $\mathbf{x}$ 处取值，是局部对象；而态 $\underline{\mathbf{T}}[\mathbf{x},t]$ 是对一族键取值的映射，是整体对象。态理论之所以能解除键型理论的成对性限制，根源正在于本构关系可以同时“看见”近场域内的全部键，而这一点在经典的场量表述中是无法实现的。
@@ -119,7 +122,7 @@
 \]
 代入式\eqref{eq:state-motion}后即回到键型运动方程。可见键型理论是态型理论在成对性约束下的特例，态型运动方程在形式上包含了键型运动方程 \cite{Silling2007}。
 
-式\eqref{eq:state-motion}的守恒性质值得说明。无外载荷时，将式\eqref{eq:state-motion}对全物体 $\mathcal{B}$（物体所占区域）积分，并交换积分变量 $\mathbf{x}\leftrightarrow\mathbf{x}'$，可知双重积分中两项
+式\eqref{eq:state-motion}的守恒性质值得说明。无外载荷时，将式\eqref{eq:state-motion}对全物体 $\mathcal{B}$（物体所占区域）积分，并交换积分变量 $\mathbf{x}\leftrightarrow\mathbf{x}'$（交换后近场域随之由 $H_{\mathbf{x}}$ 变为 $H_{\mathbf{x}'}$，积分区域因 $|\mathbf{x}'-\mathbf{x}|\le\delta$ 的对称性保持不变），可知双重积分中两项
 \[
   \int_{\mathcal{B}}\int_{H_{\mathbf{x}}}\underline{\mathbf{T}}[\mathbf{x},t]\langle\boldsymbol{\xi}\rangle\,dV_{\mathbf{x}'}\,dV
   \quad\text{与}\quad
@@ -129,7 +132,7 @@
 
 \subsection{常规态型与非常规态型}\label{sec:osb-nosb}
 
-力态与变形后键方向的关系，是划分态型理论类型的首要判据。若力态 $\underline{\mathbf{T}}\langle\boldsymbol{\xi}\rangle$ 与变形态 $\underline{\mathbf{Y}}\langle\boldsymbol{\xi}\rangle$ 共线，即力的方向恒沿变形后键的方向，则称为常规态型（ordinary state-based，OSB）。此时力态可以写成
+力态与变形后键方向的关系，是划分态型理论类型的首要判据 \cite{Silling2007}。若力态 $\underline{\mathbf{T}}\langle\boldsymbol{\xi}\rangle$ 与变形态 $\underline{\mathbf{Y}}\langle\boldsymbol{\xi}\rangle$ 共线，即力的方向恒沿变形后键的方向，则称为常规态型（ordinary state-based，OSB；第 1 章亦称常规态基理论，记作 OSB-PD）。此时力态可以写成
 \begin{equation}
   \underline{\mathbf{T}}\langle\boldsymbol{\xi}\rangle=\underline{t}\langle\boldsymbol{\xi}\rangle\,\underline{\mathbf{M}}\langle\boldsymbol{\xi}\rangle
   \label{eq:osb-force}
@@ -142,7 +145,7 @@
 
 式\eqref{eq:osb-force}的意义在于：OSB 保留了“力沿键方向”这一键型特征，因而断键准则、损伤描述等基于键方向的概念可以延续使用；但 $\underline{t}$ 的取值不再受成对势约束，可以随族内其他键的变形而变，因此体积模量与剪切模量可以独立标定，泊松比限制被彻底解除。事实上，当取 $\underline{t}=cs/2$（其中 $c$ 为微模量，$s$ 为伸长率）时，式\eqref{eq:osb-force}回到键型 PMB 模型的力态表述，再次印证了键型理论是态型理论的特例 \cite{Silling2007}。本章后续各节（\ref{sec:osb-elastic}节弹性本构、\ref{sec:osb-plastic}节弹塑性、\ref{sec:strength-params}节强度参数）讨论的都是常规态型理论。
 
-若力态不要求与变形后键方向共线，即允许键上传递偏离键方向的力，则称为非常规态型（non-ordinary state-based，NOSB）。非常规态型可以描述键上的剪切与转动传递，其典型实现是本构对应（constitutive correspondence）机制：通过非局部变形梯度构造近似经典应力张量，把经典连续介质力学的本构模型直接嵌入态型框架，此时力态的方向与大小都由经典应力张量决定，一般不再沿键方向 \cite{Silling2007,Javili2019}。本构对应机制及其数值实现将在第 7 章详细讨论。图\ref{fig:osb-nosb}对比了两类态型的力方向特征：常规态型的力恒沿变形后键方向，非常规态型的力可以偏离键方向。
+若力态不要求与变形后键方向共线，即允许键上传递偏离键方向的力，则称为非常规态型（non-ordinary state-based，NOSB；第 1 章亦称非常规态基理论，记作 NOSB-PD）。非常规态型可以描述键上的剪切与转动传递，其典型实现是本构对应（constitutive correspondence）机制：通过非局部变形梯度构造近似经典应力张量，把经典连续介质力学的本构模型直接嵌入态型框架，此时力态的方向与大小都由经典应力张量决定，一般不再沿键方向 \cite{Silling2007,Javili2019}。本构对应机制及其数值实现将在第 7 章详细讨论。图\ref{fig:osb-nosb}对比了两类态型的力方向特征：常规态型的力恒沿变形后键方向，非常规态型的力可以偏离键方向。
 
 \begin{figure}[htbp]
   \centering
@@ -169,7 +172,7 @@
   \label{fig:osb-nosb}
 \end{figure}
 
-两类态型在数学结构与数值性质上也有重要差异。OSB 的力沿键方向，其弹性本构可以由一个标量势函数（应变能密度）导出，结构简单、稳定性好；NOSB 由于引入了类似经典应力张量的中间量，本构表达灵活，但可能产生零能模式（zero-energy mode）等数值失稳问题 \cite{Javili2019}。这些差异将在本章后续节与第 7 章中逐步展开。
+两类态型在数学结构与数值性质上也有重要差异。OSB 的力沿键方向，其弹性本构可以由一个标量势函数（应变能密度）导出，结构简单、稳定性好；NOSB 由于引入了类似经典应力张量的中间量，本构表达灵活，但可能产生零能模式（zero-energy mode）等数值失稳问题 \cite{Javili2019,Silling2017}。这些差异将在本章后续节与第 7 章中逐步展开。
 
 \subsection{弹性态与本构概念}\label{sec:elastic-states}
 
@@ -208,11 +211,11 @@
 \]
 即均匀小变形下膨胀恰等于经典体积应变。可见膨胀把近场域内键的伸长信息压缩为一个标量，表征材料点的体积变形状态。式\eqref{eq:dilatation}中的系数 $3/m$ 对应三维情形，二维情形的系数为 $2/m$，将在\ref{sec:osb-elastic}节给出 \cite{MadenciOterkus2014}。
 
-膨胀概念的引入使 OSB 本构可以沿“体积—偏斜”两条通道分别标定：标量力态 $\underline{t}$ 中的膨胀项由体积模量与剪切模量的组合 $3k-5\mu$ 标定，伸长态项由剪切模量 $\mu$ 标定（其中 $k$ 为体积模量，$\mu$ 为剪切模量），从而实现了\ref{sec:state-limits}节指出的体积变形与剪切变形的独立响应。这一本构的具体形式将在\ref{sec:osb-elastic}节给出，其线性化分析可参见 \cite{Silling2010,SillingLehoucq2010}；关于态型理论更为系统的综述性论述见文献 \cite{Bobaru2016}。
+膨胀概念的引入使 OSB 本构可以沿“体积—偏斜”两条通道分别标定：标量力态 $\underline{t}$ 中的膨胀项由体积模量与剪切模量的组合 $3k-5\mu$ 标定，伸长态项由剪切模量 $\mu$ 标定（其中 $k$ 为体积模量，$\mu$ 为剪切模量）\cite{Silling2007}，从而实现了\ref{sec:state-limits}节指出的体积变形与剪切变形的独立响应。这一本构的具体形式将在\ref{sec:osb-elastic}节给出，其线性化分析可参见 \cite{Silling2010,SillingLehoucq2010}；关于态型理论更为系统的综述性论述见文献 \cite{Bobaru2016}。
 
 本节建立了态型理论的基本概念与数学框架：态的定义与运算提供了描述非局部变形与受力的语言，态型运动方程式\eqref{eq:state-motion}取代键型方程成为核心方程，OSB 与 NOSB 的分类界定了本构模型的构造范围，弹性态、简单材料与膨胀则奠定了本构理论的基础。\ref{sec:osb-elastic}节将在此基础上建立线性各向同性 OSB 弹性本构并推广到复合材料层合板，\ref{sec:osb-plastic}节讨论弹塑性模型，\ref{sec:strength-params}节讨论材料强度参数的确定。
 
-% --- 本节说明：态型理论的难点在于理解"态"是定义在键矢量集合上的映射而非经典场量，尖括号 ⟨ξ⟩ 表示态对键的求值；运动方程中被积函数 T⟨ξ⟩−T′⟨−ξ⟩ 的结构来源是"x 对 x′ 的力"与"x′ 对 x 的力"的分开表述，键型为其成对特例；OSB 力态沿键方向但标量力态 t 依赖整个变形构型，这是解除泊松比限制的关键；膨胀 θ 是体积应变的非局部度量，系数 3/m 与空间维数有关（2D 为 2/m）；弹性态即应变能密度对变形态的 Fréchet 导数，与经典超弹性 σ=∂W/∂F 类比理解 ---
+% --- 本节说明：态型理论的难点在于理解“态”是定义在键矢量集合上的映射而非经典场量，尖括号 ⟨ξ⟩ 表示态对键的求值；运动方程中被积函数 T⟨ξ⟩−T′⟨−ξ⟩ 的结构来源是“x 对 x′ 的力”与“x′ 对 x 的力”的分开表述，键型为其成对特例；OSB 力态沿键方向但标量力态 t 依赖整个变形构型，这是解除泊松比限制的关键；膨胀 θ 是体积应变的非局部度量，系数 3/m 与空间维数有关（2D 为 2/m）；弹性态即应变能密度对变形态的 Fréchet 导数，与经典超弹性 σ=∂W/∂F 类比理解 ---
 
 \section{常规态型弹性本构模型}\label{sec:osb-elastic}
 \subsection{各向同性材料}
