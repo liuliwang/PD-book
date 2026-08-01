@@ -44,6 +44,7 @@ xelatex main.tex
 - **页面边距**：上下右 2.5cm，左 3cm
 - **页眉**：居中显示当前章名（`\leftmark`）；页脚：居中页码
 - **图注格式**：`caption` 宏包配置，`labelsep=quad`（编号与文字间无冒号，用空格分隔）
+- **目录深度**：`tocdepth=1`（仅显示章+节，不显示三级标题）。由于 `titlesec` 宏包会覆盖标准 LaTeX 的 `tocdepth` 行为，preamble.tex 中已通过 `\addcontentsline` 补丁在写入 `.toc` 时过滤 subsection 条目。如需调整目录深度，请勿仅修改 `\setcounter{tocdepth}{}`，需同步检查补丁逻辑。
 - **占位待替换**：`frontmatter/titlepage.tex` 中"作者姓名"
 
 ## 插图规范

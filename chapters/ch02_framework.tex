@@ -1,21 +1,373 @@
 % 第2章 近场动力学基本理论框架
 \chapter{近场动力学基本理论框架}
 
-\section{基本概念：物质点、键、近场域与族}
+第1章回答了"为什么需要近场动力学"以及"近场动力学是什么"这两个基本问题，给出了近场动力学的物理图像与发展脉络。本章将建立近场动力学的严格数学框架。首先定义物质点、键、近场域与族等基本概念（2.1节），进而建立键的运动学描述（2.2节），给出受力描述与运动方程（2.3节），引入近场动力学状态的概念（2.4节），定义应变能密度（2.5节），讨论守恒律的相容性条件（2.6节），最后给出临界伸长率与断键准则（2.7节）以及初始条件与体积约束（2.8节）。
 
-\section{变形描述：键的运动学}
+\section{物质点、键、近场域与族}
+
+近场动力学理论的构造始于对连续体的离散化描述。与经典连续介质力学将材料视为无穷小体积元的集合不同，近场动力学将连续体离散为一组具有有限体积的物质点，每个物质点与其近场范围内的所有其他物质点通过键发生相互作用。本节严格定义这四个基本概念，为后续的运动学和本构分析奠定基础。
+
+\textbf{物质点。}
+在近场动力学中，连续体 $\mathcal{B}$ 被离散为一组物质点（material point）。每个物质点占据有限的体积 $\Delta V$，承载质量、位移、速度等物理量。物质点用其在参考构型 $\Omega_0$ 中的位置矢量 $\mathbf{x}$ 唯一标识。需要强调的是，近场动力学中的物质点是一个连续介质层面的概念：它既不是单个原子或分子，也不是有限元中的积分点，而是一个介观尺度的代表性体积元，其尺寸远大于原子间距但远小于宏观结构尺度 \cite{Silling2000,Seleson2009}。在 $t$ 时刻，物质点 $\mathbf{x}$ 运动到当前位置
+\begin{equation}
+  \mathbf{y}(\mathbf{x}, t) = \mathbf{x} + \mathbf{u}(\mathbf{x}, t)
+  \label{eq:deformation-map}
+\end{equation}
+其中 $\mathbf{u}(\mathbf{x}, t)$ 为位移矢量，$\mathbf{y}(\mathbf{x}, t)$ 为当前构型 $\Omega(t)$ 中的位置。式 \eqref{eq:deformation-map} 定义的映射 $\mathbf{y}: \Omega_0 \to \Omega(t)$ 称为变形映射（deformation map），与经典连续介质力学中的定义一致。图 \ref{fig:material-point} 示意了连续体的物质点离散化以及参考构型与当前构型之间的对应关系。
+
+\begin{figure}[htbp]
+  \centering
+  \begin{tikzpicture}[scale=0.85]
+    % 参考构型
+    \draw[thick] (0,0) rectangle (4,3);
+    \node[below] at (2,-0.3) {(a) 参考构型 $\Omega_0$};
+    % 物质点网格
+    \foreach \x in {0.5,1.0,1.5,2.0,2.5,3.0,3.5} {
+      \foreach \y in {0.5,1.0,1.5,2.0,2.5} {
+        \filldraw[gray!50] (\x,\y) circle (1.5pt);
+      }
+    }
+    % 中心点及其近场域
+    \filldraw[red] (2.0,1.5) circle (3pt);
+    \draw[dashed, thick, red] (2.0,1.5) circle (1.2);
+    \node[red, right] at (2.05,1.55) {$\mathbf{x}$};
+    \node[red, above] at (2.0,2.75) {$\delta$};
+    % 当前构型
+    \begin{scope}[xshift=6.5cm]
+      % 变形后的外形
+      \draw[thick] (0.2,0.1) .. controls (1,0.3) and (3,0.2) .. (4.3,0.0)
+        -- (4.1,3.1) .. controls (3,2.8) and (1,3.2) .. (0.0,3.0) -- cycle;
+      \node[below] at (2,-0.3) {(b) 当前构型 $\Omega(t)$};
+      % 变形后的物质点
+      \foreach \x/\dx/\y/\dy in {0.5/0.05/0.5/0.02, 1.0/0.12/1.0/0.05, 1.5/0.15/1.5/0.08, 2.0/0.2/2.0/0.1, 2.5/0.18/2.5/0.12, 3.0/0.1/0.5/-0.03, 3.5/0.08/1.0/0.04, 0.5/0.06/2.0/0.15, 1.5/0.1/1.0/0.06, 2.5/0.15/1.5/0.09, 3.0/0.12/2.0/0.11, 3.5/0.07/2.5/0.08, 1.0/0.1/2.5/0.13, 2.0/0.18/1.0/0.07, 3.5/0.09/1.5/0.05} {
+        \filldraw[gray!50] ({\x+\dx},{\y+\dy}) circle (1.5pt);
+      }
+      % 中心点
+      \filldraw[red] (2.2,1.6) circle (3pt);
+      \draw[dashed, thick, red] (2.2,1.6) circle (1.2);
+      \node[red, right] at (2.25,1.65) {$\mathbf{y}$};
+    \end{scope}
+    % 箭头
+    \draw[-Stealth, very thick] (4.3,1.5) -- (5.8,1.5);
+    \node[above] at (5.05,1.5) {$\mathbf{y}=\mathbf{x}+\mathbf{u}$};
+  \end{tikzpicture}
+  \caption{连续体的物质点离散化，参考构型中的物质点 $\mathbf{x}$ 经变形映射运动到当前构型中的 $\mathbf{y}(\mathbf{x},t)$，虚线圆表示以 $\mathbf{x}$ 为中心的近场域}
+  \label{fig:material-point}
+\end{figure}
+
+\textbf{键。}
+近场动力学的基本相互作用单元是键（bond）。连接物质点 $\mathbf{x}$ 与 $\mathbf{x}'$ 的键由参考构型中的相对位置矢量
+\begin{equation}
+  \boldsymbol{\xi} = \mathbf{x}' - \mathbf{x}, \qquad |\boldsymbol{\xi}| \leq \delta
+  \label{eq:bond-vector}
+\end{equation}
+标识。变形后，两个物质点分别运动到 $\mathbf{y}(\mathbf{x},t)$ 和 $\mathbf{y}(\mathbf{x}',t)$，键的当前相对位置矢量为
+\begin{equation}
+  \mathbf{y}(\mathbf{x}',t) - \mathbf{y}(\mathbf{x},t) = \boldsymbol{\xi} + \boldsymbol{\eta}(\mathbf{x},\mathbf{x}',t)
+  \label{eq:bond-deformed}
+\end{equation}
+其中
+\begin{equation}
+  \boldsymbol{\eta}(\mathbf{x},\mathbf{x}',t) = \mathbf{u}(\mathbf{x}',t) - \mathbf{u}(\mathbf{x},t)
+  \label{eq:relative-displacement}
+\end{equation}
+称为相对位移矢量（relative displacement vector）。键的伸长（stretch）定义为键长度变化的相对度量：
+\begin{equation}
+  s = \frac{|\boldsymbol{\xi} + \boldsymbol{\eta}| - |\boldsymbol{\xi}|}{|\boldsymbol{\xi}|}
+  \label{eq:bond-stretch}
+\end{equation}
+伸长 $s$ 是一个无量纲量，$s > 0$ 表示键被拉伸，$s < 0$ 表示键被压缩，$s = 0$ 表示键长度不变。键的伸长是近场动力学中最基本的变形度量，本构关系通常以伸长的函数描述键力。图 \ref{fig:bond-geometry} 示意了键在参考构型与当前构型中的几何关系。
+
+\begin{figure}[htbp]
+  \centering
+  \begin{tikzpicture}[scale=1.0]
+    % 参考构型
+    \filldraw[thick, fill=blue!5] (-0.5,-1.5) rectangle (3.5,1.5);
+    \node[below] at (1.5,-1.8) {(a) 参考构型};
+    \filldraw (0,0) circle (3pt) node[below left] {$\mathbf{x}$};
+    \filldraw (2.5,1.0) circle (3pt) node[above right] {$\mathbf{x}'$};
+    \draw[thick, -Stealth, blue] (0,0) -- (2.5,1.0);
+    \node[blue, above] at (1.25,0.5) {$\boldsymbol{\xi} = \mathbf{x}' - \mathbf{x}$};
+    % 当前构型
+    \begin{scope}[xshift=6cm]
+      \filldraw[thick, fill=red!5] (-0.5,-1.5) rectangle (3.5,1.5);
+      \node[below] at (1.5,-1.8) {(b) 当前构型};
+      \filldraw (0.3,-0.2) circle (3pt) node[below left] {$\mathbf{y}(\mathbf{x})$};
+      \filldraw (2.8,0.8) circle (3pt) node[above right] {$\mathbf{y}(\mathbf{x}')$};
+      % 原始位置（虚线）
+      \draw[dashed, gray] (0.3,-0.2) -- (2.8,0.8);
+      \node[gray, below] at (1.55,0.3) {$\boldsymbol{\xi}$};
+      % 变形后
+      \draw[thick, -Stealth, red] (0.3,-0.2) -- (2.8,0.8);
+      \node[red, above] at (1.55,0.35) {$\boldsymbol{\xi}+\boldsymbol{\eta}$};
+      % 位移
+      \draw[thick, -Stealth, green!60!black] (0,0) -- (0.3,-0.2);
+      \node[green!60!black, left] at (-0.05,-0.1) {$\mathbf{u}(\mathbf{x})$};
+      \draw[thick, -Stealth, green!60!black] (2.5,1.0) -- (2.8,0.8);
+      \node[green!60!black, right] at (2.85,0.9) {$\mathbf{u}(\mathbf{x}')$};
+    \end{scope}
+  \end{tikzpicture}
+  \caption{键的几何定义，(a) 参考构型中键矢量 $\boldsymbol{\xi}$，(b) 当前构型中键矢量变为 $\boldsymbol{\xi}+\boldsymbol{\eta}$，绿色箭头为各物质点的位移}
+  \label{fig:bond-geometry}
+\end{figure}
+
+\textbf{近场域与近场范围。}
+近场动力学区别于经典连续介质力学的核心特征在于非局部相互作用。物质点 $\mathbf{x}$ 的近场域（neighborhood）定义为
+\begin{equation}
+  \mathcal{H}_{\mathbf{x}} = \{\mathbf{x}' \in \mathcal{B} : |\mathbf{x}' - \mathbf{x}| \leq \delta\}
+  \label{eq:horizon}
+\end{equation}
+即以 $\mathbf{x}$ 为中心、$\delta$ 为半径的球形区域，其中 $\delta$ 称为近场范围（horizon）。近场范围 $\delta$ 是近场动力学中最重要的参数之一，其物理含义可从三个层面理解。
+
+第一，$\delta$ 定义了相互作用的截断距离。与经典理论中物质点仅与无穷小邻域内的物质作用不同，近场动力学中物质点与距离不超过 $\delta$ 的所有物质点直接相互作用。当 $\delta \to 0$ 时，相互作用退化为无穷小邻域内的局部作用，近场动力学方程在形式上回到经典连续介质力学 \cite{SillingLehoucq2008}。因此，经典连续介质力学可以视为近场动力学在零近场范围极限下的特例。
+
+第二，$\delta$ 是一个内禀材料长度尺度（intrinsic length scale）。它刻画了材料点对其周围环境"感知"的范围，与材料的微结构特征尺度相关联：对于多晶金属可取为晶粒尺寸的量级，对于混凝土可取为骨料尺寸的量级 \cite{BobaruHu2012}。$\delta$ 的引入使近场动力学能够自然地描述尺度效应，这是经典理论所不具备的。
+
+第三，$\delta$ 的选取需要兼顾物理合理性与数值收敛性。Bobaru 等 \cite{Bobaru2009} 的研究表明，近场域内应包含足够多的物质点以保证积分求积的精度。实际应用中，通常要求近场域内沿某一方向包含的物质点数 $m = \delta / \Delta x$（$\Delta x$ 为离散间距）不小于 3。Bobaru 与 Hu \cite{BobaruHu2012} 进一步指出，$\delta$ 并非越小越好：过小的 $\delta$ 虽然使非局部效应减弱、结果接近经典理论，但会增大色散误差并加剧表面效应；过大的 $\delta$ 则引入过强的非局部效应，使结果偏离经典行为。
+
+\textbf{族。}
+物质点 $\mathbf{x}$ 的族（family）定义为近场域 $\mathcal{H}_{\mathbf{x}}$ 内所有与 $\mathbf{x}$ 存在键连接的物质点的集合，记为 $\mathcal{F}_{\mathbf{x}}$。在未发生损伤的完整构型中，族与近场域重合：
+\begin{equation}
+  \mathcal{F}_{\mathbf{x}} = \{\mathbf{x}' \in \mathcal{B} : |\mathbf{x}' - \mathbf{x}| \leq \delta\} = \mathcal{H}_{\mathbf{x}}
+  \label{eq:family}
+\end{equation}
+当键发生断裂时，断裂的键从族中移除，族随之缩小。族的引入为描述损伤演化提供了自然的数学工具：物质点 $\mathbf{x}$ 的损伤程度可以用已断裂键数与总键数之比来度量。
+
+族的另一个重要性质是对称性：若 $\mathbf{x}' \in \mathcal{F}_{\mathbf{x}}$，则 $\mathbf{x} \in \mathcal{F}_{\mathbf{x}'}$。这一对称性保证了键力的互等性，进而保证线动量和角动量的自动守恒 \cite{Silling2000,SillingLehoucq2010}。当近场范围随位置变化时（变近场域情形），对称性可能被破坏，此时需要特殊的处理以保证力平衡 \cite{Ren2017dualhorizon}。
+
+图 \ref{fig:horizon-family} 示意了近场域与族的概念。物质点 $\mathbf{x}$ 位于中心，虚线圆表示近场域 $\mathcal{H}_{\mathbf{x}}$，圆内的所有物质点构成 $\mathbf{x}$ 的族。注意靠近边界的物质点 $\mathbf{x}_b$，其近场域被物体表面截断，近场域不完整，这一现象称为表面效应（surface effect），将在第 10 章详细讨论。
+
+\begin{figure}[htbp]
+  \centering
+  \begin{tikzpicture}[scale=0.9]
+    % 物体边界
+    \draw[thick] (-3.5,-2.5) rectangle (3.5,2.5);
+    % 中心点 x 的近场域
+    \filldraw[blue!5] (0,0) circle (2);
+    \draw[dashed, thick, blue] (0,0) circle (2);
+    \filldraw[red] (0,0) circle (3pt) node[below left, red] {$\mathbf{x}$};
+    % 族内的点
+    \foreach \x/\y in {0.8/0.5, -0.6/1.2, 1.5/-0.3, -1.2/-0.8, 0.3/-1.5, -1.5/0.3, 1.0/1.3, -0.3/0.8, 1.6/0.8, -0.9/-1.4} {
+      \filldraw[blue!70] (\x,\y) circle (2pt);
+      \draw[thin, blue!40] (0,0) -- (\x,\y);
+    }
+    % δ 标注
+    \draw[thick, -Stealth, blue] (0,0) -- (1.41,1.41);
+    \node[blue, above] at (0.7,0.85) {$\delta$};
+    % 标签
+    \node[blue, above right] at (1.4,1.4) {$\mathcal{H}_{\mathbf{x}}$};
+    % 族外的点
+    \filldraw[gray!50] (2.8,1.5) circle (2pt) node[above right, gray] {$\mathbf{x}''$};
+    \filldraw[gray!50] (-2.5,-1.8) circle (2pt);
+    % 边界附近的点
+    \filldraw[green!60!black] (3.0,0) circle (3pt) node[right, green!60!black] {$\mathbf{x}_b$};
+    \draw[dashed, thick, green!60!black] (3.0,0) circle (2);
+    \node[green!60!black, below] at (3.0,-2.1) {近场域被截断};
+    % 标注
+    \node[below] at (0,-2.8) {近场域与族的概念示意};
+  \end{tikzpicture}
+  \caption{近场域与族的概念示意，中心物质点 $\mathbf{x}$ 的近场域 $\mathcal{H}_{\mathbf{x}}$（蓝色虚线圆）内所有物质点构成其族，绿色点 $\mathbf{x}_b$ 位于边界附近，其近场域被物体表面截断}
+  \label{fig:horizon-family}
+\end{figure}
+
+\begin{remark}
+  物质点、键、近场域与族这四个概念构成了近场动力学的几何基础。物质点是离散化的基本单元，键是相互作用的基本载体，近场域定义了相互作用的时空范围，族则记录了当前时刻仍然有效的相互作用集合。四者的关系可以概括为：物质点通过键与族内的其他物质点相互作用，相互作用的范围由近场域限定，近场域的大小由近场范围 $\delta$ 决定。后续各节将在此基础上建立运动学和受力描述。
+\end{remark}
+
+\section{键的运动学}
+
+在2.1节中，我们定义了键的参考构型矢量 $\boldsymbol{\xi}$、当前构型矢量 $\boldsymbol{\xi}+\boldsymbol{\eta}$ 以及键的伸长 $s$。本节将进一步建立键变形的严格数学描述，引入变形状态的概念，并讨论其与经典连续介质力学中变形梯度的关系。
+
+\subsection{变形状态}
+
+经典连续介质力学中，物质点 $\mathbf{x}$ 处的变形由变形梯度张量 $\mathbf{F}(\mathbf{x},t) = \partial\mathbf{y}/\partial\mathbf{x}$ 完全描述。然而，当变形不连续（如出现裂纹）时，变形梯度在数学上不再良定义。近场动力学通过引入\textbf{变形状态}（deformation state）的概念，避免了这一问题 \cite{Silling2007,SillingLehoucq2010}。
+
+物质点 $\mathbf{x}$ 在时刻 $t$ 的变形状态 $\underline{\mathbf{Y}}[\mathbf{x},t]$ 是一个矢量状态（vector state），它将族 $\mathcal{H}_{\mathbf{x}}$ 中的每一个键 $\boldsymbol{\xi}$ 映射到其在当前构型中的像：
+\begin{equation}
+  \underline{\mathbf{Y}}[\mathbf{x},t]\langle\boldsymbol{\xi}\rangle = \mathbf{y}(\mathbf{x}+\boldsymbol{\xi},t) - \mathbf{y}(\mathbf{x},t), \qquad \forall\,\boldsymbol{\xi}\in\mathcal{H}_{\mathbf{x}}
+  \label{eq:deformation-state}
+\end{equation}
+其中尖括号 $\langle\cdot\rangle$ 表示状态所作用的键矢量，以区别于状态本身可能依赖的其他变量（如位置 $\mathbf{x}$ 和时间 $t$）。结合式 \eqref{eq:deformation-map}，变形状态可改写为
+\begin{equation}
+  \underline{\mathbf{Y}}[\mathbf{x},t]\langle\boldsymbol{\xi}\rangle = \boldsymbol{\xi} + \boldsymbol{\eta}(\mathbf{x},\mathbf{x}+\boldsymbol{\xi},t)
+  \label{eq:deformation-state-displacement}
+\end{equation}
+变形状态 $\underline{\mathbf{Y}}$ 包含了物质点 $\mathbf{x}$ 的族内所有键的变形信息，其角色类似于经典理论中的变形梯度 $\mathbf{F}$。关键区别在于：变形梯度是局部量，要求变形场充分光滑；而变形状态是非局部量，即使变形不连续（如裂纹穿过近场域）仍然良定义。
+
+\begin{remark}
+  变形状态的引入是近场动力学理论的核心创新之一。它使得本构关系可以表达为变形状态的函数，而非变形梯度的函数，从而自然地处理不连续变形问题。这一思想最早由 Silling 等 \cite{Silling2007} 在建立状态型近场动力学（state-based peridynamics）时系统提出。
+\end{remark}
+
+\subsection{键伸长与键方向}
+
+键的伸长 $s$ 是变形状态的最基本标量度量。由式 \eqref{eq:bond-stretch}，键 $\boldsymbol{\xi}$ 的伸长定义为
+\begin{equation}
+  s = \frac{|\underline{\mathbf{Y}}\langle\boldsymbol{\xi}\rangle| - |\boldsymbol{\xi}|}{|\boldsymbol{\xi}|} = \frac{|\boldsymbol{\xi}+\boldsymbol{\eta}| - |\boldsymbol{\xi}|}{|\boldsymbol{\xi}|}
+  \label{eq:stretch-restate}
+\end{equation}
+伸长 $s$ 是一个无量纲量，表征键的相对长度变化。在键型近场动力学（bond-based peridynamics）中，键力仅依赖于伸长 $s$，这是最简单的本构假设。
+
+变形后键的单位方向矢量定义为
+\begin{equation}
+  \mathbf{M} = \frac{\underline{\mathbf{Y}}\langle\boldsymbol{\xi}\rangle}{|\underline{\mathbf{Y}}\langle\boldsymbol{\xi}\rangle|} = \frac{\boldsymbol{\xi}+\boldsymbol{\eta}}{|\boldsymbol{\xi}+\boldsymbol{\eta}|}
+  \label{eq:bond-direction}
+\end{equation}
+参考构型中键的单位方向矢量为
+\begin{equation}
+  \mathbf{m} = \frac{\boldsymbol{\xi}}{|\boldsymbol{\xi}|}
+  \label{eq:bond-direction-ref}
+\end{equation}
+键的方向变化 $\mathbf{M} - \mathbf{m}$ 反映了键的旋转。在键型理论中，键力沿当前方向 $\mathbf{M}$ 作用，这保证了力的成对性（pairwise force），进而自动满足线动量和角动量守恒 \cite{Silling2000}。
+
+\subsection{伸长与经典应变的关系}
+
+为建立近场动力学与经典连续介质力学的联系，考虑小变形情形。假设位移场 $\mathbf{u}$ 充分光滑，对 $\mathbf{u}(\mathbf{x}+\boldsymbol{\xi},t)$ 在 $\mathbf{x}$ 处进行 Taylor 展开：
+\begin{equation}
+  \mathbf{u}(\mathbf{x}+\boldsymbol{\xi},t) = \mathbf{u}(\mathbf{x},t) + \nabla\mathbf{u}(\mathbf{x},t)\cdot\boldsymbol{\xi} + \mathcal{O}(|\boldsymbol{\xi}|^2)
+  \label{eq:taylor-displacement}
+\end{equation}
+其中 $\nabla\mathbf{u}$ 为位移梯度张量，分量形式为 $(\nabla\mathbf{u})_{ij} = \partial u_i/\partial x_j$。代入相对位移的定义式 \eqref{eq:relative-displacement}，得
+\begin{equation}
+  \boldsymbol{\eta} = \nabla\mathbf{u}\cdot\boldsymbol{\xi} + \mathcal{O}(|\boldsymbol{\xi}|^2)
+  \label{eq:eta-gradient}
+\end{equation}
+变形后键的长度平方为
+\begin{equation}
+  |\boldsymbol{\xi}+\boldsymbol{\eta}|^2 = (\boldsymbol{\xi}+\boldsymbol{\eta})\cdot(\boldsymbol{\xi}+\boldsymbol{\eta}) = |\boldsymbol{\xi}|^2 + 2\boldsymbol{\xi}\cdot\boldsymbol{\eta} + |\boldsymbol{\eta}|^2
+  \label{eq:deformed-length-sq}
+\end{equation}
+在小变形假设下（$|\boldsymbol{\eta}|\ll|\boldsymbol{\xi}|$），忽略高阶项 $|\boldsymbol{\eta}|^2$，并将式 \eqref{eq:eta-gradient} 代入，得
+\begin{equation}
+  |\boldsymbol{\xi}+\boldsymbol{\eta}|^2 \approx |\boldsymbol{\xi}|^2 + 2\boldsymbol{\xi}\cdot(\nabla\mathbf{u}\cdot\boldsymbol{\xi}) = |\boldsymbol{\xi}|^2\left(1 + 2\frac{\boldsymbol{\xi}\cdot(\nabla\mathbf{u}\cdot\boldsymbol{\xi})}{|\boldsymbol{\xi}|^2}\right)
+  \label{eq:deformed-length-approx}
+\end{equation}
+利用近似 $\sqrt{1+\epsilon}\approx 1+\epsilon/2$（$|\epsilon|\ll 1$），键的伸长可近似为
+\begin{equation}
+  s \approx \frac{\boldsymbol{\xi}\cdot(\nabla\mathbf{u}\cdot\boldsymbol{\xi})}{|\boldsymbol{\xi}|^2} = \mathbf{m}\cdot(\nabla\mathbf{u}\cdot\mathbf{m})
+  \label{eq:stretch-small}
+\end{equation}
+其中 $\mathbf{m} = \boldsymbol{\xi}/|\boldsymbol{\xi}|$ 为参考构型中键的单位方向矢量。将位移梯度分解为对称部分（应变张量 $\boldsymbol{\varepsilon}$）和反对称部分（旋转张量 $\boldsymbol{\omega}$）：
+\begin{equation}
+  \nabla\mathbf{u} = \boldsymbol{\varepsilon} + \boldsymbol{\omega}, \qquad \boldsymbol{\varepsilon} = \frac{1}{2}(\nabla\mathbf{u}+\nabla\mathbf{u}^T), \qquad \boldsymbol{\omega} = \frac{1}{2}(\nabla\mathbf{u}-\nabla\mathbf{u}^T)
+  \label{eq:strain-rotation}
+\end{equation}
+由于 $\mathbf{m}\cdot(\boldsymbol{\omega}\cdot\mathbf{m}) = 0$（反对称张量的二次型为零），式 \eqref{eq:stretch-small} 进一步简化为
+\begin{equation}
+  s \approx \mathbf{m}\cdot(\boldsymbol{\varepsilon}\cdot\mathbf{m}) = \varepsilon_{ij}\,m_i\,m_j
+  \label{eq:stretch-strain}
+\end{equation}
+式 \eqref{eq:stretch-strain} 揭示了键伸长的物理意义：在小变形情况下，键的伸长等于应变张量 $\boldsymbol{\varepsilon}$ 在键方向 $\mathbf{m}$ 上的投影。这一关系建立了近场动力学与经典连续介质力学之间的桥梁。
+
+\subsection{变形状态与变形梯度的联系}
+
+当近场范围 $\delta\to 0$ 时，近场动力学应退化为经典连续介质力学。Silling 与 Lehoucq \cite{SillingLehoucq2008} 严格证明了这一极限过程。考虑均匀变形场 $\mathbf{y}(\mathbf{x}) = \mathbf{F}_0\cdot\mathbf{x}$，其中 $\mathbf{F}_0$ 为常变形梯度张量。此时变形状态为
+\begin{equation}
+  \underline{\mathbf{Y}}\langle\boldsymbol{\xi}\rangle = \mathbf{y}(\mathbf{x}+\boldsymbol{\xi}) - \mathbf{y}(\mathbf{x}) = \mathbf{F}_0\cdot(\mathbf{x}+\boldsymbol{\xi}) - \mathbf{F}_0\cdot\mathbf{x} = \mathbf{F}_0\cdot\boldsymbol{\xi}
+  \label{eq:uniform-deformation}
+\end{equation}
+即变形状态线性地作用于键矢量，其作用方式与变形梯度张量完全一致。对于一般的非均匀变形场，在 $\delta\to 0$ 的极限下，变形状态在局部趋于 $\mathbf{F}(\mathbf{x})\cdot\boldsymbol{\xi}$，其中 $\mathbf{F}(\mathbf{x})$ 为经典变形梯度。
+
+更一般地，可以定义非局部变形梯度（nonlocal deformation gradient）作为变形状态的体积平均：
+\begin{equation}
+  \tilde{\mathbf{F}}(\mathbf{x},t) = \frac{1}{|\mathcal{H}_{\mathbf{x}}|}\int_{\mathcal{H}_{\mathbf{x}}} \underline{\mathbf{Y}}[\mathbf{x},t]\langle\boldsymbol{\xi}\rangle\otimes\frac{\boldsymbol{\xi}}{|\boldsymbol{\xi}|^2}\,\mathrm{d}V_{\boldsymbol{\xi}}
+  \label{eq:nonlocal-F}
+\end{equation}
+其中 $|\mathcal{H}_{\mathbf{x}}| = \int_{\mathcal{H}_{\mathbf{x}}}\mathrm{d}V_{\boldsymbol{\xi}}$ 为近场域的体积。可以证明，当 $\delta\to 0$ 时，$\tilde{\mathbf{F}}\to\mathbf{F}$。这一非局部变形梯度在状态型近场动力学的本构建模中具有重要应用，它提供了将经典本构模型引入近场动力学框架的途径 \cite{Silling2007,Warren2009}。
+
+\begin{figure}[htbp]
+  \centering
+  \begin{tikzpicture}[scale=0.95]
+    % 参考构型
+    \filldraw[thick, fill=blue!5] (-0.5,-2) rectangle (3.5,2);
+    \node[below] at (1.5,-2.3) {(a) 参考构型};
+    % 中心点
+    \filldraw (1.5,0) circle (3pt) node[below left] {$\mathbf{x}$};
+    % 近场域边界
+    \draw[dashed, thick, blue] (1.5,0) circle (1.5);
+    % 键
+    \foreach \angle/\len in {0/1.2, 30/1.0, 60/1.3, 90/1.1, 120/1.2, 150/1.0, 180/1.3, 210/1.1, 240/1.2, 270/1.0, 300/1.3, 330/1.1} {
+      \pgfmathsetmacro{\x}{1.5 + \len*cos(\angle)}
+      \pgfmathsetmacro{\y}{\len*sin(\angle)}
+      \filldraw[gray!60] (\x,\y) circle (1.5pt);
+      \draw[thin, blue!50] (1.5,0) -- (\x,\y);
+    }
+    % 标注一个键
+    \draw[thick, -Stealth, red] (1.5,0) -- (2.7,0);
+    \node[red, above] at (2.1,0) {$\boldsymbol{\xi}$};
+    % 当前构型
+    \begin{scope}[xshift=6.5cm]
+      \filldraw[thick, fill=red!5] (-0.5,-2) rectangle (3.5,2);
+      \node[below] at (1.5,-2.3) {(b) 当前构型};
+      % 中心点
+      \filldraw (1.7,0.1) circle (3pt) node[below left] {$\mathbf{y}(\mathbf{x})$};
+      % 变形后的键（示意）
+      \foreach \angle/\len/\dlen in {0/1.2/0.3, 30/1.0/0.2, 60/1.3/0.4, 90/1.1/0.1, 120/1.2/0.2, 150/1.0/0.15, 180/1.3/0.35, 210/1.1/0.25, 240/1.2/0.3, 270/1.0/0.2, 300/1.3/0.4, 330/1.1/0.15} {
+        \pgfmathsetmacro{\newlen}{\len+\dlen}
+        \pgfmathsetmacro{\x}{1.7 + \newlen*cos(\angle+5)}
+        \pgfmathsetmacro{\y}{0.1 + \newlen*sin(\angle+5)}
+        \filldraw[gray!60] (\x,\y) circle (1.5pt);
+        \draw[thin, red!50] (1.7,0.1) -- (\x,\y);
+      }
+      % 标注变形后的键
+      \draw[thick, -Stealth, red] (1.7,0.1) -- (3.2,0.2);
+      \node[red, above] at (2.45,0.15) {$\boldsymbol{\xi}+\boldsymbol{\eta}$};
+      % 原始位置（虚线）
+      \draw[dashed, gray] (1.7,0.1) -- (2.9,0.1);
+      \node[gray, below] at (2.3,-0.05) {$\boldsymbol{\xi}$};
+    \end{scope}
+    % 箭头
+    \draw[-Stealth, very thick] (3.8,0) -- (5.5,0);
+    \node[above] at (4.65,0) {变形};
+  \end{tikzpicture}
+  \caption{变形状态的示意，(a) 参考构型中物质点 $\mathbf{x}$ 的近场域及其键，(b) 当前构型中键的变形，变形状态 $\underline{\mathbf{Y}}$ 将每个键 $\boldsymbol{\xi}$ 映射到其变形后的像 $\boldsymbol{\xi}+\boldsymbol{\eta}$}
+  \label{fig:deformation-state}
+\end{figure}
+
+\subsection{客观性与刚体运动}
+
+本构关系必须满足客观性（objectivity）原则，即材料的力学响应不应受刚体运动的影响。在近场动力学中，这一要求表现为：若变形场叠加一个刚体运动，变形状态和键伸长应保持不变。
+
+设变形场 $\mathbf{y}(\mathbf{x},t)$ 叠加一个刚体运动，得到新的变形场
+\begin{equation}
+  \mathbf{y}^*(\mathbf{x},t) = \mathbf{Q}(t)\cdot\mathbf{y}(\mathbf{x},t) + \mathbf{c}(t)
+  \label{eq:rigid-motion}
+\end{equation}
+其中 $\mathbf{Q}(t)$ 为正交旋转张量（$\mathbf{Q}^T\mathbf{Q}=\mathbf{I}$，$\det\mathbf{Q}=1$），$\mathbf{c}(t)$ 为常平移矢量。新变形场对应的变形状态为
+\begin{align}
+  \underline{\mathbf{Y}}^*\langle\boldsymbol{\xi}\rangle &= \mathbf{y}^*(\mathbf{x}+\boldsymbol{\xi},t) - \mathbf{y}^*(\mathbf{x},t) \notag \\
+  &= \mathbf{Q}\cdot[\mathbf{y}(\mathbf{x}+\boldsymbol{\xi},t) - \mathbf{y}(\mathbf{x},t)] \notag \\
+  &= \mathbf{Q}\cdot\underline{\mathbf{Y}}\langle\boldsymbol{\xi}\rangle
+  \label{eq:Y-star}
+\end{align}
+变形后键的长度为
+\begin{equation}
+  |\underline{\mathbf{Y}}^*\langle\boldsymbol{\xi}\rangle| = |\mathbf{Q}\cdot\underline{\mathbf{Y}}\langle\boldsymbol{\xi}\rangle| = |\underline{\mathbf{Y}}\langle\boldsymbol{\xi}\rangle|
+  \label{eq:length-invariant}
+\end{equation}
+其中最后一步利用了正交变换保持向量长度不变的性质。因此，键伸长 $s$ 在刚体运动下保持不变：
+\begin{equation}
+  s^* = \frac{|\underline{\mathbf{Y}}^*\langle\boldsymbol{\xi}\rangle| - |\boldsymbol{\xi}|}{|\boldsymbol{\xi}|} = \frac{|\underline{\mathbf{Y}}\langle\boldsymbol{\xi}\rangle| - |\boldsymbol{\xi}|}{|\boldsymbol{\xi}|} = s
+  \label{eq:stretch-objective}
+\end{equation}
+这一性质保证了以键伸长为基本变量的本构模型自动满足客观性要求。
+
+\begin{remark}
+  键的运动学建立了近场动力学与经典连续介质力学之间的桥梁。变形状态 $\underline{\mathbf{Y}}$ 是非局部的变形度量，即使在不连续变形下仍然良定义；键伸长 $s$ 是最基本的标量变形度量，在小变形下退化为经典应变在键方向上的投影。客观性要求保证了本构模型不受刚体运动的影响。这些运动学概念为后续建立受力描述和本构关系奠定了基础。
+\end{remark}
 
 \section{受力描述与运动方程}
 
 \section{近场动力学状态}
 
-\section{应变能密度与能量守恒}
+\section{应变能密度}
 
 \section{守恒律的相容性条件}
 \subsection{线动量守恒}
 \subsection{角动量守恒}
 \subsection{能量守恒}
 
-\section{损伤与破坏：临界伸长率与断键准则}
+\section{临界伸长率与断键准则}
 
-\section{非局部边界条件}
+\section{初始条件与体积约束}
+\subsection{初始条件}
+\subsection{体积约束}

@@ -33,6 +33,33 @@
     format = \large\bfseries,
   },
 }
+% ---------- 目录深度设置 ----------
+\setcounter{tocdepth}{1}
+% Patch \addcontentsline to respect tocdepth at write time
+% (titlesec writes all levels to .toc by design; this patch filters at write time)
+\makeatletter
+\def\pd@toclevel@section{1}
+\def\pd@toclevel@subsection{2}
+\def\pd@toclevel@subsubsection{3}
+\def\pd@toclevel@paragraph{4}
+\def\pd@toclevel@subparagraph{5}
+\let\pd@addcontentsline@orig\addcontentsline
+\renewcommand{\addcontentsline}[3]{%
+  \def\pd@tmpa{#1}%
+  \def\pd@tmpb{toc}%
+  \ifx\pd@tmpa\pd@tmpb
+    \@ifundefined{pd@toclevel@#2}{%
+      \pd@addcontentsline@orig{#1}{#2}{#3}%
+    }{%
+      \ifnum\@nameuse{pd@toclevel@#2}>\c@tocdepth\relax\else
+        \pd@addcontentsline@orig{#1}{#2}{#3}%
+      \fi
+    }%
+  \else
+    \pd@addcontentsline@orig{#1}{#2}{#3}%
+  \fi
+}
+\makeatother
 \captionsetup[figure]{name=图,labelsep=quad}
 \captionsetup[table]{name=表,labelsep=quad}
 
