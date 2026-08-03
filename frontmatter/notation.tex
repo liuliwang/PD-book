@@ -1,6 +1,40 @@
 % 符号表
 \chapter{符号表}
 
+\section*{第 2 章 基本概念}
+
+{\small
+\begin{tabular}{@{}p{0.22\textwidth}@{}p{0.65\textwidth}@{}}
+  $\mathcal{B}$ & 物体所占区域 \\
+  $\rho(\mathbf{x})$ & 质量密度 \\
+  $\mathbf{x}$ & 物质点在参考构型中的位置 \\
+  $\mathbf{u}(\mathbf{x},t)$ & 位移场 \\
+  $\mathbf{y}(\mathbf{x},t)=\mathbf{x}+\mathbf{u}(\mathbf{x},t)$ & 变形后位置 \\
+  $\boldsymbol{\xi}=\mathbf{x}'-\mathbf{x}$ & 参考构型相对位置矢量 \\
+  $\boldsymbol{\eta}=\mathbf{u}(\mathbf{x}',t)-\mathbf{u}(\mathbf{x},t)$ & 相对位移矢量 \\
+  $\mathbf{f}(\boldsymbol{\eta},\boldsymbol{\xi})$ & 对力函数（pairwise force function） \\
+  $\mathbf{b}(\mathbf{x},t)$ & 体力密度 \\
+  $\delta$ & 近场范围（horizon） \\
+  $H_{\mathbf{x}}$ & 近场域，$H_{\mathbf{x}}=\{\mathbf{x}'\in\mathcal{B}:|\mathbf{x}'-\mathbf{x}|\le\delta\}$ \\
+  $\mathcal{F}_{\mathbf{x}}$ & 族，$\mathcal{F}_{\mathbf{x}}=\{\mathbf{x}'\in H_{\mathbf{x}}:\mathbf{x}'\neq\mathbf{x}\}$ \\
+  $dV_{\mathbf{x}'}$ & 参考构型中物质点 $\mathbf{x}'$ 处的体积微元 \\
+  $s$ & 伸长率（stretch），$s=(|\boldsymbol{\xi}+\boldsymbol{\eta}|-|\boldsymbol{\xi}|)/|\boldsymbol{\xi}|$ \\
+  $\boldsymbol{\eta}_{\parallel}$，$\boldsymbol{\eta}_{\perp}$ & 相对位移的轴向分量与偏斜分量，$\boldsymbol{\eta}=\boldsymbol{\eta}_{\parallel}+\boldsymbol{\eta}_{\perp}$（式\eqref{eq:eta-decomp}） \\
+  $\mathbf{R}$ & 刚性旋转张量（用于客观性讨论，式\eqref{eq:rigid-motion}） \\
+  $w(\boldsymbol{\eta},\boldsymbol{\xi})$ & 成对势（pairwise potential），$\mathbf{f}=\partial w/\partial\boldsymbol{\eta}$（式\eqref{eq:pairwise-force-potential}） \\
+  $W(\mathbf{x},t)$ & 应变能密度（strain energy density），$W=\tfrac{1}{2}\int_{H_{\mathbf{x}}} w\, dV_{\boldsymbol{\xi}}$（式\eqref{eq:strain-energy}；态型形式见式\eqref{eq:state-strain-energy}） \\
+  $\mathbf{C}(\boldsymbol{\xi})$ & 微模量张量（micromodulus tensor），线性化对力函数 $\mathbf{f}\approx\mathbf{C}(\boldsymbol{\xi})\boldsymbol{\eta}$（式\eqref{eq:micro-modulus}；态型标量形式 $c$ 见第 6 章） \\
+  $s_c$ & 临界伸长率（critical stretch），键保持承载的最大伸长率（式\eqref{eq:critical-stretch}） \\
+  $\mu(\boldsymbol{\xi},t)$ & 断键历史变量（damage history variable），$\in\{0,1\}$（式\eqref{eq:history-variable}） \\
+  $\varphi(\mathbf{x},t)$ & 损伤变量（damage variable），近场域内已断键的比例（式\eqref{eq:damage-variable}） \\
+  $g_0(\boldsymbol{\xi})$ & 单键断裂能密度（单位 J/m$^6$），$g_0=\int_0^{\infty}\mathbf{f}\cdot d\boldsymbol{\eta}=w_0(\boldsymbol{\xi})$（式\eqref{eq:bond-fracture-energy}） \\
+  $G_c$ & 断裂韧度（fracture toughness），单位裂纹面能量（J/m$^2$），由 $s_c$ 标定（式\eqref{eq:gc-definition}） \\
+  $\mathbf{t}(\mathbf{x})$ & 经典连续介质力学的面力（surface traction），N/m$^2$（式\eqref{eq:force-conversion}） \\
+  $\mathbf{b}_{\text{eff}}(\mathbf{x})$ & 等效体力层（equivalent body force layer），PD 中代替面力施加于边界薄层（式\eqref{eq:uniform-body-force}） \\
+  $\hat{\mathbf{n}}$ & 物体边界外法向单位矢量 \\
+\end{tabular}
+}
+
 \section*{态型理论（第 6 章）}
 
 \begin{tabular}{@{}ll@{}}
