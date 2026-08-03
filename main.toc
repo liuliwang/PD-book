@@ -44,10 +44,10 @@
 \contentsline {section}{\numberline {2.7}损伤与破坏：临界伸长率与断键准则}{29}{section.2.7}%
 \contentsline {subsection}{\numberline {2.7.1}临界伸长率与断键准则}{29}{subsection.2.7.1}%
 \contentsline {subsection}{\numberline {2.7.2}损伤变量}{30}{subsection.2.7.2}%
-\contentsline {subsection}{\numberline {2.7.3}临界伸长率与断裂韧度的标定关系}{30}{subsection.2.7.3}%
-\contentsline {section}{\numberline {2.8}非局部边界条件}{31}{section.2.8}%
+\contentsline {subsection}{\numberline {2.7.3}临界伸长率与断裂韧度的标定关系}{31}{subsection.2.7.3}%
+\contentsline {section}{\numberline {2.8}非局部边界条件}{32}{section.2.8}%
 \contentsline {subsection}{\numberline {2.8.1}经典面力到体积力层的转换}{32}{subsection.2.8.1}%
-\contentsline {subsection}{\numberline {2.8.2}表面效应的数学表述}{32}{subsection.2.8.2}%
+\contentsline {subsection}{\numberline {2.8.2}表面效应的数学表述}{33}{subsection.2.8.2}%
 \contentsline {subsection}{\numberline {2.8.3}表面效应的修正方法}{33}{subsection.2.8.3}%
 \contentsline {chapter}{\numberline {第3章\hspace {.3em}}经典连续介质力学与近场动力学的联系}{35}{chapter.3}%
 \contentsline {section}{\numberline {3.1}局部极限：近场动力学向经典理论的退化}{35}{section.3.1}%
