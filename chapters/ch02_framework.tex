@@ -21,7 +21,7 @@
     % 左 panel：经典局部模型——相互作用限于无穷小邻域，状态由场量决定
     \begin{scope}
       \draw[dashed, thick] (0,0) circle (0.7);
-      \node[above] at (0,0.95) {无穷小邻域};
+      \node[above] at (0,0.8) {无穷小邻域};
       \filldraw (0,0) circle (2.5pt) node[below left] {$\mathbf{x}$};
       \filldraw (0.52,0.3) circle (1.8pt);
       \draw[gray, thin] (0,0) -- (0.52,0.3);
@@ -32,8 +32,8 @@
       \filldraw[gray] (-1.3,0.95) circle (1.8pt);
       \filldraw[gray] (1.25,-0.9) circle (1.8pt);
       \filldraw[gray] (-1.4,-0.75) circle (1.8pt);
-      \node[blue, right] at (1.0,0.0) {$\boldsymbol{\sigma}$、$\nabla\mathbf{u}$};
-      \node at (0,-2.4) {（a）经典局部模型};
+      \node[blue, above right] at (0.1,0.28) {$\boldsymbol{\sigma},\nabla\mathbf{u}$};
+      \node at (0,-2.7) {（a）经典局部模型};
     \end{scope}
     % 右 panel：近场动力学非局部模型——通过键与 $\delta$ 内远处物质点直接作用
     \begin{scope}[xshift=6cm]
@@ -41,19 +41,18 @@
       \node[above] at (0,2.25) {$H_{\mathbf{x}}$};
       \filldraw (0,0) circle (2.5pt) node[below left] {$\mathbf{x}$};
       \filldraw (1.7,0.9) circle (2pt) node[above right] {$\mathbf{x}'$};
-      \draw[thick, {Stealth}-{Stealth}] (0,0) -- (1.7,0.9);
-      \node[blue, above] at (0.85,0.45) {$\mathbf{f}$};
+      \draw[thick] (0,0) -- (1.7,0.9);
+      \draw[->, blue, thick] (0.47,0.31) -- (1.17,0.69) node[midway, above] {$\mathbf{f}$};
       \filldraw (-1.3,1.4) circle (2pt);
-      \draw[thick] (0,0) -- (-1.3,1.4);
+      \draw[->, gray, dashed] (0,0) -- (-1.3,1.4) node[midway, above, sloped] {$\boldsymbol{\xi}$};
       \filldraw (0.9,-1.7) circle (2pt);
       \draw[thick] (0,0) -- (0.9,-1.7);
       \filldraw (-1.7,-1.0) circle (2pt);
       \draw[thick] (0,0) -- (-1.7,-1.0);
-      \node[below] at (-0.85,-0.5) {$\boldsymbol{\xi}$};
-      \node[above right] at (1.35,1.35) {$\delta$};
+      \draw[dash dot, gray, thin] (0,0) -- (2.0,0) node[midway, below] {$\delta$};
       % 近场域外灰色点：无直接相互作用
       \filldraw[gray] (2.95,1.15) circle (1.8pt);
-      \node at (1.0,-2.7) {（b）近场动力学非局部模型};
+      \node at (0,-2.7) {（b）近场动力学非局部模型};
     \end{scope}
   \end{tikzpicture}
   \caption{经典局部模型与近场动力学非局部模型的物质点相互作用方式对比}
@@ -66,16 +65,15 @@
 \[
   \boldsymbol{\xi}=\mathbf{x}'-\mathbf{x}
 \]
-变形后，物质点 $\mathbf{x}$ 的位置为 $\mathbf{y}(\mathbf{x},t)=\mathbf{x}+\mathbf{u}(\mathbf{x},t)$，其中 $\mathbf{u}(\mathbf{x},t)$ 为位移场。两物质点之间的相对位移矢量记为
+如图\ref{fig:bond-geometry}(a)所示，参考构型中两物质点的相对位置由 $\boldsymbol{\xi}$ 确定，其模 $|\boldsymbol{\xi}|$ 即为键的参考长度。变形后，物质点 $\mathbf{x}$ 的位移记为 $\mathbf{u}(\mathbf{x},t)$，其中 $\mathbf{u}(\mathbf{x},t)$ 为位移场。两物质点之间的相对位移矢量记为
 \[
   \boldsymbol{\eta}=\mathbf{u}(\mathbf{x}',t)-\mathbf{u}(\mathbf{x},t)
 \]
-于是键的当前长度为 $|\boldsymbol{\xi}+\boldsymbol{\eta}|$，参考长度为 $|\boldsymbol{\xi}|$。键的伸长率（bond stretch）定义为
+如图\ref{fig:bond-geometry}(b)所示，变形后两点分别运动到 $\mathbf{y}=\mathbf{x}+\mathbf{u}(\mathbf{x},t)$ 与 $\mathbf{y}'=\mathbf{x}'+\mathbf{u}(\mathbf{x}',t)$，相对位移矢量 $\boldsymbol{\eta}$ 使键矢量变为 $\boldsymbol{\xi}+\boldsymbol{\eta}$；图中以灰色虚线标出变形前的参考位置，以便与变形后的实际位置形成直观对比，蓝色箭头则示意了相对位移 $\boldsymbol{\eta}$ 的方向与大小。于是键的当前长度为 $|\boldsymbol{\xi}+\boldsymbol{\eta}|$，参考长度为 $|\boldsymbol{\xi}|$。键的伸长率（bond stretch）定义为
 \begin{equation}
   s = \frac{|\boldsymbol{\xi} + \boldsymbol{\eta}| - |\boldsymbol{\xi}|}{|\boldsymbol{\xi}|}
   \label{eq:bond-stretch}
 \end{equation}
-其推导已在第 1 章 1.4 节给出，此处不再重复。键的几何关系如图\ref{fig:bond-geometry}所示：参考构型中两物质点的相对位置由 $\boldsymbol{\xi}$ 确定，变形后的当前构型中该量变为 $\boldsymbol{\xi}+\boldsymbol{\eta}$。键的伸长率 $s$ 由式\eqref{eq:bond-stretch}定义，其三种典型状态——拉伸、参考长度与压缩——如图\ref{fig:bond-stretch-states}所示。
 
 \begin{figure}[htbp]
   \centering
@@ -104,6 +102,8 @@
   \caption{键的几何关系：(a) 参考构型；(b) 变形构型}
   \label{fig:bond-geometry}
 \end{figure}
+
+其推导已在第 1 章 1.4 节给出，此处不再重复。键的伸长率 $s$ 由式\eqref{eq:bond-stretch}定义，其三种典型状态——拉伸、参考长度与压缩——如图\ref{fig:bond-stretch-states}所示。当 $s>0$ 时键被拉长，变形后长度大于参考长度；$s=0$ 时键保持参考长度不变，两点间距离与变形前完全一致；$s<0$ 时键被压缩，变形后长度小于参考长度。这三种状态分别对应 $|\boldsymbol{\xi}+\boldsymbol{\eta}|>|\boldsymbol{\xi}|$、$|\boldsymbol{\xi}+\boldsymbol{\eta}|=|\boldsymbol{\xi}|$ 与 $|\boldsymbol{\xi}+\boldsymbol{\eta}|<|\boldsymbol{\xi}|$ 三种几何关系，为后续建立本构模型与损伤准则提供了直观的几何图像。
 
 \begin{figure}[htbp]
   \centering
