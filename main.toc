@@ -18,11 +18,11 @@
 \contentsline {subsection}{\numberline {2.1.1}物质点}{15}{subsection.2.1.1}%
 \contentsline {subsection}{\numberline {2.1.2}键}{16}{subsection.2.1.2}%
 \contentsline {subsection}{\numberline {2.1.3}近场域}{17}{subsection.2.1.3}%
-\contentsline {subsection}{\numberline {2.1.4}族}{17}{subsection.2.1.4}%
-\contentsline {subsection}{\numberline {2.1.5}运动方程总览}{17}{subsection.2.1.5}%
+\contentsline {subsection}{\numberline {2.1.4}族}{18}{subsection.2.1.4}%
+\contentsline {subsection}{\numberline {2.1.5}运动方程总览}{18}{subsection.2.1.5}%
 \contentsline {section}{\numberline {2.2}变形描述：键的运动学}{19}{section.2.2}%
 \contentsline {subsection}{\numberline {2.2.1}参考构型与变形构型}{19}{subsection.2.2.1}%
-\contentsline {subsection}{\numberline {2.2.2}相对位移的轴向—偏斜分解}{19}{subsection.2.2.2}%
+\contentsline {subsection}{\numberline {2.2.2}相对位移的轴向—偏斜分解}{20}{subsection.2.2.2}%
 \contentsline {subsection}{\numberline {2.2.3}小变形近似}{20}{subsection.2.2.3}%
 \contentsline {subsection}{\numberline {2.2.4}键伸长的客观性}{20}{subsection.2.2.4}%
 \contentsline {section}{\numberline {2.3}受力描述与运动方程}{21}{section.2.3}%
@@ -31,12 +31,12 @@
 \contentsline {subsection}{\numberline {2.3.3}运动方程的量纲与线性化}{22}{subsection.2.3.3}%
 \contentsline {section}{\numberline {2.4}近场动力学状态}{23}{section.2.4}%
 \contentsline {subsection}{\numberline {2.4.1}键基理论的局限}{23}{subsection.2.4.1}%
-\contentsline {subsection}{\numberline {2.4.2}态的概念与基本定义}{23}{subsection.2.4.2}%
+\contentsline {subsection}{\numberline {2.4.2}态的概念与基本定义}{24}{subsection.2.4.2}%
 \contentsline {subsection}{\numberline {2.4.3}态型运动方程}{24}{subsection.2.4.3}%
 \contentsline {section}{\numberline {2.5}应变能密度与能量守恒}{25}{section.2.5}%
 \contentsline {subsection}{\numberline {2.5.1}应变能密度的物理意义}{25}{subsection.2.5.1}%
 \contentsline {subsection}{\numberline {2.5.2}能量平衡}{25}{subsection.2.5.2}%
-\contentsline {subsection}{\numberline {2.5.3}正定性与稳定性}{25}{subsection.2.5.3}%
+\contentsline {subsection}{\numberline {2.5.3}正定性与稳定性}{26}{subsection.2.5.3}%
 \contentsline {section}{\numberline {2.6}守恒律的相容性条件}{26}{section.2.6}%
 \contentsline {subsection}{\numberline {2.6.1}线动量守恒}{26}{subsection.2.6.1}%
 \contentsline {subsection}{\numberline {2.6.2}角动量守恒}{27}{subsection.2.6.2}%
@@ -47,7 +47,7 @@
 \contentsline {subsection}{\numberline {2.7.3}临界伸长率与断裂韧度的标定关系}{31}{subsection.2.7.3}%
 \contentsline {section}{\numberline {2.8}非局部边界条件}{32}{section.2.8}%
 \contentsline {subsection}{\numberline {2.8.1}经典面力到体积力层的转换}{32}{subsection.2.8.1}%
-\contentsline {subsection}{\numberline {2.8.2}表面效应的数学表述}{33}{subsection.2.8.2}%
+\contentsline {subsection}{\numberline {2.8.2}表面效应的数学表述}{32}{subsection.2.8.2}%
 \contentsline {subsection}{\numberline {2.8.3}表面效应的修正方法}{33}{subsection.2.8.3}%
 \contentsline {chapter}{\numberline {第3章\hspace {.3em}}经典连续介质力学与近场动力学的联系}{35}{chapter.3}%
 \contentsline {section}{\numberline {3.1}局部极限：近场动力学向经典理论的退化}{35}{section.3.1}%
