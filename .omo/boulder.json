@@ -1,115 +1,139 @@
 {
   "schema_version": 2,
-  "active_work_id": "add-figures-ch02-sec1-e55b5a58",
+  "active_work_id": "ch02-format-optimize-39312dfc",
   "works": {
-    "add-figures-ch02-sec1-e55b5a58": {
-      "work_id": "add-figures-ch02-sec1-e55b5a58",
-      "active_plan": "D:\\PD-book\\.omo\\plans\\add-figures-ch02-sec1.md",
-      "plan_name": "add-figures-ch02-sec1",
+    "ch02-format-optimize-39312dfc": {
+      "work_id": "ch02-format-optimize-39312dfc",
+      "active_plan": "D:\\PD-book\\.omo\\plans\\ch02-format-optimize.md",
+      "plan_name": "ch02-format-optimize",
       "status": "completed",
-      "started_at": "2026-08-03T03:32:42.147Z",
-      "updated_at": "2026-08-03T04:19:02.422Z",
+      "started_at": "2026-08-03T07:53:51.226Z",
+      "updated_at": "2026-08-03T08:23:08.424Z",
       "session_ids": [
-        "opencode:ses_03a5f116cffeK5Qou13QtjeKjU"
+        "opencode:ses_0396ddff2ffeokQUtXRfs6vLFo"
       ],
       "session_origins": {
-        "opencode:ses_03a5f116cffeK5Qou13QtjeKjU": "direct"
+        "opencode:ses_0396ddff2ffeokQUtXRfs6vLFo": "direct"
       },
       "agent": "atlas",
       "task_sessions": {
         "todo:1": {
           "task_key": "todo:1",
           "task_label": "1",
-          "task_title": "**Subfigure labels (a)/(b) relocated from LEFT side to BELOW each panel, centered**",
-          "session_id": "opencode:ses_03a2af79affeeUoV30MIg2NNpA",
+          "task_title": "2.1 → 2.2: `\\section{变形描述：键的运动学}` at line 203 (section 2.1 ends with the remark at lines 199-201)",
+          "session_id": "opencode:ses_03960fdc2ffemSd6KeHl8hBrFq",
           "agent": "Sisyphus-Junior",
-          "category": "quick",
-          "started_at": "2026-08-03T03:40:56.560Z",
-          "ended_at": "2026-08-03T04:16:04.004Z",
-          "elapsed_ms": 2107444,
+          "started_at": "2026-08-03T07:57:52.846Z",
+          "ended_at": "2026-08-03T08:03:12.241Z",
+          "elapsed_ms": 319395,
           "status": "completed",
-          "updated_at": "2026-08-03T04:16:04.004Z"
+          "updated_at": "2026-08-03T08:03:12.241Z"
         },
-        "final-wave:f1": {
-          "task_key": "final-wave:f1",
-          "task_label": "F1",
-          "task_title": "Plan compliance audit: 对比最终 ch02_framework.tex 与 Scope（Must have 和 Must NOT have 全部满足？是否有溢出修改？）。用 `git diff` 确认仅 ch02_framework.tex 被修改。",
-          "session_id": "opencode:ses_03a433e1dffeNo8orHwKfy7J5R",
-          "agent": "multimodal-looker",
-          "updated_at": "2026-08-03T03:52:48.750Z",
-          "started_at": "2026-08-03T03:51:50.140Z",
+        "todo:3": {
+          "task_key": "todo:3",
+          "task_label": "3",
+          "task_title": "ch02_framework.tex: 积分孤立短段落 — 将孤立1-2行短段融入邻近段落（定位约5处），恢复叙事连贯性",
+          "session_id": "opencode:ses_03960fdc2ffemSd6KeHl8hBrFq",
+          "agent": "Sisyphus-Junior",
+          "updated_at": "2026-08-03T08:12:47.383Z",
+          "started_at": "2026-08-03T08:10:23.553Z",
           "status": "completed",
-          "ended_at": "2026-08-03T03:52:48.750Z",
-          "elapsed_ms": 58610
+          "ended_at": "2026-08-03T08:12:47.383Z",
+          "elapsed_ms": 143830
         },
-        "final-wave:f5": {
-          "task_key": "final-wave:f5",
-          "task_label": "F5",
-          "task_title": "修复后质量审查：xelatex ×2 编译通过，main.pdf 中图 2.1 的 (a)(b) 标签在子图正下方居中，η 公式与三态标签无重叠，ξ/|ξ| 标签与键线间距 ≥4pt。用 multimodal-looker 目视确认。",
-          "session_id": "opencode:ses_03a29167affe5Bv900hW4TQcEa",
-          "agent": "multimodal-looker",
-          "started_at": "2026-08-03T04:18:17.227Z",
+        "todo:4": {
+          "task_key": "todo:4",
+          "task_label": "4",
+          "task_title": "ch02_framework.tex: 精简remark布局 — 8条remark中保留约4条最具洞察性的（2.2节客观性、2.3节分子动力学类比、2.6节守恒律、2.7节微观涌现），其余4条融入正文",
+          "session_id": "opencode:ses_03960fdc2ffemSd6KeHl8hBrFq",
+          "agent": "Sisyphus-Junior",
+          "updated_at": "2026-08-03T08:18:07.869Z",
+          "started_at": "2026-08-03T08:17:09.282Z",
           "status": "completed",
-          "updated_at": "2026-08-03T04:19:02.422Z",
-          "ended_at": "2026-08-03T04:19:02.422Z",
-          "elapsed_ms": 45195
+          "ended_at": "2026-08-03T08:18:07.869Z",
+          "elapsed_ms": 58587
+        },
+        "todo:5": {
+          "task_key": "todo:5",
+          "task_label": "5",
+          "task_title": "ch02_framework.tex: 增加章末收尾段落 — 在2.8节末尾（最后一条remark之后）增加收尾段落，回扣章首路线图、衔接第3章",
+          "session_id": "opencode:ses_03960fdc2ffemSd6KeHl8hBrFq",
+          "agent": "Sisyphus-Junior",
+          "category": "writing",
+          "updated_at": "2026-08-03T08:21:06.490Z",
+          "started_at": "2026-08-03T08:20:55.195Z",
+          "status": "completed",
+          "ended_at": "2026-08-03T08:21:06.490Z",
+          "elapsed_ms": 11295
         }
       },
-      "ended_at": "2026-08-03T03:55:18.782Z",
-      "elapsed_ms": 1356635
+      "ended_at": "2026-08-03T08:23:08.424Z",
+      "elapsed_ms": 1757198
     }
   },
-  "active_plan": "D:\\PD-book\\.omo\\plans\\add-figures-ch02-sec1.md",
-  "started_at": "2026-08-03T03:32:42.147Z",
+  "active_plan": "D:\\PD-book\\.omo\\plans\\ch02-format-optimize.md",
+  "started_at": "2026-08-03T07:53:51.226Z",
   "status": "completed",
-  "updated_at": "2026-08-03T04:19:02.422Z",
+  "updated_at": "2026-08-03T08:23:08.424Z",
   "session_ids": [
-    "opencode:ses_03a5f116cffeK5Qou13QtjeKjU"
+    "opencode:ses_0396ddff2ffeokQUtXRfs6vLFo"
   ],
   "session_origins": {
-    "opencode:ses_03a5f116cffeK5Qou13QtjeKjU": "direct"
+    "opencode:ses_0396ddff2ffeokQUtXRfs6vLFo": "direct"
   },
-  "plan_name": "add-figures-ch02-sec1",
+  "plan_name": "ch02-format-optimize",
   "task_sessions": {
     "todo:1": {
       "task_key": "todo:1",
       "task_label": "1",
-      "task_title": "**Subfigure labels (a)/(b) relocated from LEFT side to BELOW each panel, centered**",
-      "session_id": "opencode:ses_03a2af79affeeUoV30MIg2NNpA",
+      "task_title": "2.1 → 2.2: `\\section{变形描述：键的运动学}` at line 203 (section 2.1 ends with the remark at lines 199-201)",
+      "session_id": "opencode:ses_03960fdc2ffemSd6KeHl8hBrFq",
       "agent": "Sisyphus-Junior",
-      "category": "quick",
-      "started_at": "2026-08-03T03:40:56.560Z",
-      "ended_at": "2026-08-03T04:16:04.004Z",
-      "elapsed_ms": 2107444,
+      "started_at": "2026-08-03T07:57:52.846Z",
+      "ended_at": "2026-08-03T08:03:12.241Z",
+      "elapsed_ms": 319395,
       "status": "completed",
-      "updated_at": "2026-08-03T04:16:04.004Z"
+      "updated_at": "2026-08-03T08:03:12.241Z"
     },
-    "final-wave:f1": {
-      "task_key": "final-wave:f1",
-      "task_label": "F1",
-      "task_title": "Plan compliance audit: 对比最终 ch02_framework.tex 与 Scope（Must have 和 Must NOT have 全部满足？是否有溢出修改？）。用 `git diff` 确认仅 ch02_framework.tex 被修改。",
-      "session_id": "opencode:ses_03a433e1dffeNo8orHwKfy7J5R",
-      "agent": "multimodal-looker",
-      "updated_at": "2026-08-03T03:52:48.750Z",
-      "started_at": "2026-08-03T03:51:50.140Z",
+    "todo:3": {
+      "task_key": "todo:3",
+      "task_label": "3",
+      "task_title": "ch02_framework.tex: 积分孤立短段落 — 将孤立1-2行短段融入邻近段落（定位约5处），恢复叙事连贯性",
+      "session_id": "opencode:ses_03960fdc2ffemSd6KeHl8hBrFq",
+      "agent": "Sisyphus-Junior",
+      "updated_at": "2026-08-03T08:12:47.383Z",
+      "started_at": "2026-08-03T08:10:23.553Z",
       "status": "completed",
-      "ended_at": "2026-08-03T03:52:48.750Z",
-      "elapsed_ms": 58610
+      "ended_at": "2026-08-03T08:12:47.383Z",
+      "elapsed_ms": 143830
     },
-    "final-wave:f5": {
-      "task_key": "final-wave:f5",
-      "task_label": "F5",
-      "task_title": "修复后质量审查：xelatex ×2 编译通过，main.pdf 中图 2.1 的 (a)(b) 标签在子图正下方居中，η 公式与三态标签无重叠，ξ/|ξ| 标签与键线间距 ≥4pt。用 multimodal-looker 目视确认。",
-      "session_id": "opencode:ses_03a29167affe5Bv900hW4TQcEa",
-      "agent": "multimodal-looker",
-      "started_at": "2026-08-03T04:18:17.227Z",
+    "todo:4": {
+      "task_key": "todo:4",
+      "task_label": "4",
+      "task_title": "ch02_framework.tex: 精简remark布局 — 8条remark中保留约4条最具洞察性的（2.2节客观性、2.3节分子动力学类比、2.6节守恒律、2.7节微观涌现），其余4条融入正文",
+      "session_id": "opencode:ses_03960fdc2ffemSd6KeHl8hBrFq",
+      "agent": "Sisyphus-Junior",
+      "updated_at": "2026-08-03T08:18:07.869Z",
+      "started_at": "2026-08-03T08:17:09.282Z",
       "status": "completed",
-      "updated_at": "2026-08-03T04:19:02.422Z",
-      "ended_at": "2026-08-03T04:19:02.422Z",
-      "elapsed_ms": 45195
+      "ended_at": "2026-08-03T08:18:07.869Z",
+      "elapsed_ms": 58587
+    },
+    "todo:5": {
+      "task_key": "todo:5",
+      "task_label": "5",
+      "task_title": "ch02_framework.tex: 增加章末收尾段落 — 在2.8节末尾（最后一条remark之后）增加收尾段落，回扣章首路线图、衔接第3章",
+      "session_id": "opencode:ses_03960fdc2ffemSd6KeHl8hBrFq",
+      "agent": "Sisyphus-Junior",
+      "category": "writing",
+      "updated_at": "2026-08-03T08:21:06.490Z",
+      "started_at": "2026-08-03T08:20:55.195Z",
+      "status": "completed",
+      "ended_at": "2026-08-03T08:21:06.490Z",
+      "elapsed_ms": 11295
     }
   },
   "agent": "atlas",
-  "ended_at": "2026-08-03T03:55:18.782Z",
-  "elapsed_ms": 1356635
+  "ended_at": "2026-08-03T08:23:08.424Z",
+  "elapsed_ms": 1757198
 }

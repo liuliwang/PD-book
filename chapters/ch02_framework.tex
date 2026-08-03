@@ -3,6 +3,8 @@
 
 \leavevmode\usetikzlibrary{arrows.meta, positioning, calc}
 
+第1章以科普的口吻介绍了近场动力学的基本思想与历史背景，本章的任务则是建立其严格的数学理论框架。为此，本章首先给出物质点、键、近场域与族四个基本概念的定义与物理含义（2.1节），进而建立参考构型与变形构型下的位移与伸长描述（2.2节），并引入点对力函数与微弹性材料模型刻画物质点间的相互作用（2.3节）。在此基础上，本章将近场动力学的描述从键基模型推广到态基模型，引入近场动力学状态的概念（2.4节），并建立应变能密度与能量守恒的严格表述（2.5节），进而推导线动量、角动量与能量守恒律的相容性条件（2.6节）。随后，本章引入临界伸长准则与损伤变量，建立损伤与破坏的描述框架（2.7节），最后讨论非局部边界条件的处理与表面效应的修正方法（2.8节）。本章的目的不在于穷尽所有本构模型的细节，而在于构建一个自洽、完备且与经典力学相容的理论基础。第1章的定性描述将在本章得到严格的数学表述，而本章所建立的理论框架将为第3章分析近场动力学与经典连续介质力学的关系奠定基础。
+
 \section{基本概念：物质点、键、近场域与族}
 
 第 1 章以科普的口吻给出了近场动力学的运动方程与键伸长公式，本章的任务则是建立严格的理论框架。为此，首先需要明确四个相互关联的基本概念：物质点（material point）、键（bond）、近场域（horizon）与族（family）。它们构成全书讨论的语言基础，后续各节对变形、受力、守恒律与本构的描述都建立在这四个概念之上。本节依次给出它们的严格定义，并说明其物理含义与相互关系。
@@ -23,9 +25,7 @@
 \[
   \boldsymbol{\eta}=\mathbf{u}(\mathbf{x}',t)-\mathbf{u}(\mathbf{x},t)
 \]
-于是键的当前长度为 $|\boldsymbol{\xi}+\boldsymbol{\eta}|$，参考长度为 $|\boldsymbol{\xi}|$。键的伸长（stretch）定义为 $s=(|\boldsymbol{\xi}+\boldsymbol{\eta}|-|\boldsymbol{\xi}|)/|\boldsymbol{\xi}|$，其推导已在第 1 章 1.4 节给出，此处不再重复。
-
-键的几何关系与运动学量如图\ref{fig:bond-kinematics}所示：参考构型中两物质点的相对位置由 $\boldsymbol{\xi}$ 确定，变形后的当前构型中该量变为 $\boldsymbol{\xi}+\boldsymbol{\eta}$，键的伸长根据 $s=(|\boldsymbol{\xi}+\boldsymbol{\eta}|-|\boldsymbol{\xi}|)/|\boldsymbol{\xi}|$ 计算。
+于是键的当前长度为 $|\boldsymbol{\xi}+\boldsymbol{\eta}|$，参考长度为 $|\boldsymbol{\xi}|$。键的伸长（stretch）定义为 $s=(|\boldsymbol{\xi}+\boldsymbol{\eta}|-|\boldsymbol{\xi}|)/|\boldsymbol{\xi}|$，其推导已在第 1 章 1.4 节给出，此处不再重复。键的几何关系与运动学量如图\ref{fig:bond-kinematics}所示：参考构型中两物质点的相对位置由 $\boldsymbol{\xi}$ 确定，变形后的当前构型中该量变为 $\boldsymbol{\xi}+\boldsymbol{\eta}$，键的伸长根据 $s=(|\boldsymbol{\xi}+\boldsymbol{\eta}|-|\boldsymbol{\xi}|)/|\boldsymbol{\xi}|$ 计算。
 
 \begin{figure}[htbp]
   \centering
@@ -105,9 +105,7 @@
   \mathcal{F}_{\mathbf{x}}=\left\{\mathbf{x}'\in H_{\mathbf{x}}:\mathbf{x}'\neq\mathbf{x}\right\}
   \label{eq:family}
 \end{equation}
-由式\eqref{eq:family}定义的族与近场域是两个既有联系又有区别的概念：近场域 $H_{\mathbf{x}}$ 是几何区域，刻画了相互作用的范围；族 $\mathcal{F}_{\mathbf{x}}$ 是点集，刻画了参与相互作用的物质点及其相互作用关系。在态基理论（第 6 章）中，族的概念被推广为状态（state）作用的定义域。需要指出的是，位于物体边界附近的物质点，其近场域被物体边界截断，族不完整，导致其有效刚度与内部物质点存在差异，这一现象称为表面效应（surface effect），其处理详见第 10 章 \cite{LeBobaru2018,Mitchell2015}。
-
-图\ref{fig:boundary-truncation}对比了内部物质点与边界附近物质点在近场域与族上的差异：边界附近的物质点其近场域被物体边界截断，族不完整，导致有效刚度与内部物质点存在差异。
+由式\eqref{eq:family}定义的族与近场域是两个既有联系又有区别的概念：近场域 $H_{\mathbf{x}}$ 是几何区域，刻画了相互作用的范围；族 $\mathcal{F}_{\mathbf{x}}$ 是点集，刻画了参与相互作用的物质点及其相互作用关系。在态基理论（第 6 章）中，族的概念被推广为状态（state）作用的定义域。需要指出的是，位于物体边界附近的物质点，其近场域被物体边界截断，族不完整，导致其有效刚度与内部物质点存在差异，这一现象称为表面效应（surface effect），其处理详见第 10 章 \cite{LeBobaru2018,Mitchell2015}。图\ref{fig:boundary-truncation}对比了内部物质点与边界附近物质点在近场域与族上的差异：边界附近的物质点其近场域被物体边界截断，族不完整，导致有效刚度与内部物质点存在差异。
 
 \begin{figure}[htbp]
   \centering
@@ -192,11 +190,7 @@
   \rho(\mathbf{x})\ddot{\mathbf{u}}(\mathbf{x},t)=\int_{\mathcal{F}_{\mathbf{x}}}\mathbf{f}(\boldsymbol{\eta},\boldsymbol{\xi})\,dV_{\mathbf{x}'}+\mathbf{b}(\mathbf{x},t)
   \label{eq:motion}
 \end{equation}
-其中 $\mathbf{b}(\mathbf{x},t)$ 为体力密度。式\eqref{eq:motion}表明，物质点所受的合力等于其族内所有键力之和（以积分表示）加上体力。该方程与第 1 章 1.4 节给出的 $H_{\mathbf{x}}$ 版本一致，此处以族 $\mathcal{F}_{\mathbf{x}}$ 表述，以突出族的概念。运动方程的详细推导与受力描述见 2.3 节。
-
-\begin{remark}
-  本节引入的四个基本概念具有清晰的层级关系：物质点是描述的主体，键是物质点之间相互作用的单元，近场域是相互作用发生的几何范围，族是参与相互作用的物质点集合。理解这一层级关系是掌握近场动力学理论框架的前提。下一节将进入运动学描述，讨论键的变形与伸长。
-\end{remark}
+其中 $\mathbf{b}(\mathbf{x},t)$ 为体力密度。式\eqref{eq:motion}表明，物质点所受的合力等于其族内所有键力之和（以积分表示）加上体力。该方程与第 1 章 1.4 节给出的 $H_{\mathbf{x}}$ 版本一致，此处以族 $\mathcal{F}_{\mathbf{x}}$ 表述，以突出族的概念。运动方程的详细推导与受力描述见 2.3 节。需要强调的是，本节引入的四个基本概念具有清晰的层级关系：物质点是描述的主体，键是物质点之间相互作用的单元，近场域是相互作用发生的几何范围，族是参与相互作用的物质点集合。理解这一层级关系是掌握近场动力学理论框架的前提。
 
 \section{变形描述：键的运动学}
 
@@ -464,11 +458,7 @@
 \[
   \underline{\mathbf{T}}\langle\boldsymbol{\xi}\rangle=\tfrac{1}{2}\,\mathbf{f}(\boldsymbol{\eta},\boldsymbol{\xi})
 \]
-代入态型运动方程，利用反作用条件 \eqref{eq:reaction} 即可还原键基运动方程 \eqref{eq:motion}。系数 $1/2$ 的来源仍是"每键被两点共享"：在态型表述中，$\mathbf{x}$ 贡献 $\underline{\mathbf{T}}\langle\boldsymbol{\xi}\rangle=\mathbf{f}/2$，$\mathbf{x}'$ 贡献 $\underline{\mathbf{T}}'\langle-\boldsymbol{\xi}\rangle=-\mathbf{f}/2$，两者之差为 $\mathbf{f}$，与键基方程一致。
-
-\begin{remark}
-  态型运动方程中"力态差" $\underline{\mathbf{T}}\langle\boldsymbol{\xi}\rangle-\underline{\mathbf{T}}'\langle-\boldsymbol{\xi}\rangle$ 代替了键基方程中的单力 $\mathbf{f}$，这一形式变化看似微小，意义却深远：它把"成对力"解耦为两个独立的"单端力态"，使本构函数可以独立地依赖每端的变形状态。这一解耦是态型理论突破泊松比限制的数学根源，也是 2.6 节守恒律证明需要重新审视的起点 \cite{Silling2007,SillingLehoucq2010}。
-\end{remark}
+代入态型运动方程，利用反作用条件 \eqref{eq:reaction} 即可还原键基运动方程 \eqref{eq:motion}。系数 $1/2$ 的来源仍是"每键被两点共享"：在态型表述中，$\mathbf{x}$ 贡献 $\underline{\mathbf{T}}\langle\boldsymbol{\xi}\rangle=\mathbf{f}/2$，$\mathbf{x}'$ 贡献 $\underline{\mathbf{T}}'\langle-\boldsymbol{\xi}\rangle=-\mathbf{f}/2$，两者之差为 $\mathbf{f}$，与键基方程一致。值得指出的是，态型运动方程中"力态差" $\underline{\mathbf{T}}\langle\boldsymbol{\xi}\rangle-\underline{\mathbf{T}}'\langle-\boldsymbol{\xi}\rangle$ 代替了键基方程中的单力 $\mathbf{f}$，这一形式变化看似微小，意义却深远：它把"成对力"解耦为两个独立的"单端力态"，使本构函数可以独立地依赖每端的变形状态。这一解耦是态型理论突破泊松比限制的数学根源，也是 2.6 节守恒律证明需要重新审视的起点 \cite{Silling2007,SillingLehoucq2010}。
 
 \section{应变能密度与能量守恒}
 
@@ -514,15 +504,11 @@
   \int_{\mathcal{B}}\int_{\mathcal{H}_{\mathbf{x}}}\boldsymbol{\eta}\cdot\mathbf{C}(\boldsymbol{\xi})\,\boldsymbol{\eta}\,\mathrm{d}V'\mathrm{d}V\geq 0
   \label{eq:stability}
 \end{equation}
-式\eqref{eq:stability}是近场动力学线性稳定性的判据。对常规态型本构，稳定性分析涉及力态对变形态的二阶变分，其完整理论见文献 \cite{Silling2017}。材料失稳（如屈曲、剪切带）对应 $W$ 的二阶变分出现负特征值，是近场动力学分析材料破坏与不稳定性的能量基础。
-
-\begin{remark}
-  能量平衡 \eqref{eq:energy-balance} 与正定性 \eqref{eq:positive-definite} 一起，构成了近场动力学能量分析的两条主线：前者保证机械能守恒，后者保证平衡稳定。二者均依赖成对势的对称性 \eqref{eq:potential-symmetry}，而对称性又与反作用条件 \eqref{eq:reaction} 等价——这揭示了近场动力学各公理之间的内在联系：动量守恒（反作用）、能量守恒（对称势）、稳定性（正定势）环环相扣。
-\end{remark}
+式\eqref{eq:stability}是近场动力学线性稳定性的判据。对常规态型本构，稳定性分析涉及力态对变形态的二阶变分，其完整理论见文献 \cite{Silling2017}。材料失稳（如屈曲、剪切带）对应 $W$ 的二阶变分出现负特征值，是近场动力学分析材料破坏与不稳定性的能量基础。需要指出的是，能量平衡 \eqref{eq:energy-balance} 与正定性 \eqref{eq:positive-definite} 一起，构成了近场动力学能量分析的两条主线：前者保证机械能守恒，后者保证平衡稳定。二者均依赖成对势的对称性 \eqref{eq:potential-symmetry}，而对称性又与反作用条件 \eqref{eq:reaction} 等价——这揭示了近场动力学各公理之间的内在联系：动量守恒（反作用）、能量守恒（对称势）、稳定性（正定势）环环相扣。
 
 \section{守恒律的相容性条件}
 
-连续介质力学的守恒律——线动量、角动量、能量守恒——在近场动力学中并不自动成立，而是要求对力函数（或力态）满足特定的相容性条件。本节严格证明：反作用条件 \eqref{eq:reaction} 是线动量守恒的充要条件；反作用加中心力条件 \eqref{eq:central-force} 是角动量守恒的充要条件；成对势的对称性 \eqref{eq:potential-symmetry} 是能量守恒的充要条件。这三个定理揭示了 2.1 节公理的物理必然性，也为第 6 章态型本构的公理化提供基础 \cite{SillingLehoucq2010}。
+2.5 节建立了应变能密度与能量平衡的表述，并指出能量守恒要求成对势满足对称性条件。然而，连续介质力学的守恒律——线动量、角动量、能量守恒——在近场动力学中并不自动成立，而是要求对力函数（或力态）满足特定的相容性条件。本节严格证明：反作用条件 \eqref{eq:reaction} 是线动量守恒的充要条件；反作用加中心力条件 \eqref{eq:central-force} 是角动量守恒的充要条件；成对势的对称性 \eqref{eq:potential-symmetry} 是能量守恒的充要条件。这三个定理揭示了 2.1 节公理的物理必然性，也为第 6 章态型本构的公理化提供基础 \cite{SillingLehoucq2010}。
 
 \subsection{线动量守恒}
 
@@ -606,11 +592,7 @@
   反向命题：若式\eqref{eq:angular-momentum}对任意 $\mathbf{b}$ 成立，取 $\mathbf{b}=\mathbf{0}$，则式\eqref{eq:moment-central}为零对任意变形成立，推出 $(\boldsymbol{\xi}+\boldsymbol{\eta})\times\mathbf{f}=\mathbf{0}$。
 \end{proof}
 
-定理 \ref{thm:angular-momentum} 揭示了中心力条件 \eqref{eq:central-force} 的必然性：反作用条件只保证成对力矩的"等大反向"部分相消（式\eqref{eq:moment-symmetry}），但力矩相消后仍残留一个由力臂 $\boldsymbol{\xi}+\boldsymbol{\eta}$ 与力 $\mathbf{f}$ 不共线产生的项（式\eqref{eq:moment-central}）；只有中心力条件使力沿力臂方向，才能使该残留项为零。这就是 2.1 节指出"中心力条件比反作用更强"的严格含义。
-
-\begin{remark}
-  定理 \ref{thm:angular-momentum} 中角动量以变形后位置 $\mathbf{y}$ 而非参考位置 $\mathbf{x}$ 定义，这一点至关重要。若以 $\mathbf{x}$ 定义角动量，则换元后 $\mathbf{y}(\mathbf{x})-\mathbf{y}(\mathbf{x}')$ 退化为 $-\boldsymbol{\xi}$，中心力条件将变为 $\boldsymbol{\xi}\times\mathbf{f}=\mathbf{0}$（力沿参考键方向），比式\eqref{eq:central-force}（力沿变形后键方向）更强且物理不合理。以 $\mathbf{y}$ 定义保证了中心力条件与变形构型一致。
-\end{remark}
+定理 \ref{thm:angular-momentum} 揭示了中心力条件 \eqref{eq:central-force} 的必然性：反作用条件只保证成对力矩的"等大反向"部分相消（式\eqref{eq:moment-symmetry}），但力矩相消后仍残留一个由力臂 $\boldsymbol{\xi}+\boldsymbol{\eta}$ 与力 $\mathbf{f}$ 不共线产生的项（式\eqref{eq:moment-central}）；只有中心力条件使力沿力臂方向，才能使该残留项为零。这就是 2.1 节指出"中心力条件比反作用更强"的严格含义。需要特别指出的是，定理 \ref{thm:angular-momentum} 中角动量以变形后位置 $\mathbf{y}$ 而非参考位置 $\mathbf{x}$ 定义，这一点至关重要。若以 $\mathbf{x}$ 定义角动量，则换元后 $\mathbf{y}(\mathbf{x})-\mathbf{y}(\mathbf{x}')$ 退化为 $-\boldsymbol{\xi}$，中心力条件将变为 $\boldsymbol{\xi}\times\mathbf{f}=\mathbf{0}$（力沿参考键方向），比式\eqref{eq:central-force}（力沿变形后键方向）更强且物理不合理。以 $\mathbf{y}$ 定义保证了中心力条件与变形构型一致。
 
 \subsection{能量守恒}
 
@@ -661,7 +643,7 @@
 
 \section{损伤与破坏：临界伸长率与断键准则}
 
-近场动力学相对于经典连续介质力学的最大优势之一，在于它不需要外部断裂准则——损伤与破坏从本构方程中自然涌现。经典线弹性断裂力学（linear elastic fracture mechanics，LEFM）需要预先指定裂纹面与裂纹扩展方向，连续损伤力学（continuum damage mechanics，CDM）则需要外部损伤演化律，二者均把断裂行为的描述外置于本构方程。近场动力学则不同：键的断裂由材料常数级（标量 $s_c$）的简单规则控制，复杂的裂纹路径通过族内各键是否断裂的统计涌现，无需预置裂纹面，也无需外部演化律。本节建立键基理论的损伤描述：2.7.1 节引入临界伸长率与断键准则，2.7.2 节定义局部损伤变量 $\varphi$，2.7.3 节推导临界伸长率 $s_c$ 与断裂韧度 $G_c$ 的标定关系，为第 4 章原型微弹性（prototype microelastic brittle，PMB）本构的工程化应用奠定基础。
+2.6 节严格证明了线动量、角动量与能量守恒的相容性条件，确立了本构方程必须满足的基本约束。在此基础之上，本节讨论材料的损伤与破坏问题：近场动力学相对于经典连续介质力学的最大优势之一，在于它不需要外部断裂准则——损伤与破坏从本构方程中自然涌现。经典线弹性断裂力学（linear elastic fracture mechanics，LEFM）需要预先指定裂纹面与裂纹扩展方向，连续损伤力学（continuum damage mechanics，CDM）则需要外部损伤演化律，二者均把断裂行为的描述外置于本构方程。近场动力学则不同：键的断裂由材料常数级（标量 $s_c$）的简单规则控制，复杂的裂纹路径通过族内各键是否断裂的统计涌现，无需预置裂纹面，也无需外部演化律。本节建立键基理论的损伤描述：2.7.1 节引入临界伸长率与断键准则，2.7.2 节定义局部损伤变量 $\varphi$，2.7.3 节推导临界伸长率 $s_c$ 与断裂韧度 $G_c$ 的标定关系，为第 4 章原型微弹性（prototype microelastic brittle，PMB）本构的工程化应用奠定基础。
 
 \subsection{临界伸长率与断键准则}
 
@@ -685,9 +667,7 @@ $\mu$ 不可逆：键一旦断裂便永久失去承载能力，这与脆性材�
   \label{eq:damaged-pairwise-force}
   \tilde{\mathbf{f}}(\boldsymbol{\eta},\boldsymbol{\xi},t) \;=\; \mu(\boldsymbol{\xi},t)\,\mathbf{f}(\boldsymbol{\eta},\boldsymbol{\xi}),
 \end{equation}
-即断键后该键对运动方程 \eqref{eq:motion} 不再有贡献。式\eqref{eq:damaged-pairwise-force} 仍满足反作用条件 \eqref{eq:reaction}（因为 $\mu(\boldsymbol{\xi},t)$ 关于 $\boldsymbol{\xi}\to-\boldsymbol{\xi}$ 对称），故线动量守恒在断键后仍成立（见定理 \ref{thm:linear-momentum}）；中心力条件 \eqref{eq:central-force} 同样保留。注意 $\mu$ 依赖于历史最大伸长率而非当前值，因此断键准则在时间上是路径相关的，运动方程 \eqref{eq:motion} 中的 $\mathbf{f}$ 在严格意义下应替换为 $\tilde{\mathbf{f}}$。
-
-图\ref{fig:force-stretch} 给出对力函数 $|\mathbf{f}|$ 与伸长率 $s$ 的关系示意：在 $s\in[0,s_c)$ 区间键完好，$|\mathbf{f}|$ 由本构关系（如线性微弹性 \eqref{eq:linear-force} 或第 4 章 PMB 本构）确定；在 $s=s_c$ 处 $|\mathbf{f}|$ 骤降为零，表示断键；在 $s>s_c$ 区间 $|\mathbf{f}|\equiv 0$，键永久失效。卸载路径（图中虚线箭头）沿着相同的本构曲线返回原点，但 $\mu$ 已置零，下次加载时该键不再承载。
+即断键后该键对运动方程 \eqref{eq:motion} 不再有贡献。式\eqref{eq:damaged-pairwise-force} 仍满足反作用条件 \eqref{eq:reaction}（因为 $\mu(\boldsymbol{\xi},t)$ 关于 $\boldsymbol{\xi}\to-\boldsymbol{\xi}$ 对称），故线动量守恒在断键后仍成立（见定理 \ref{thm:linear-momentum}）；中心力条件 \eqref{eq:central-force} 同样保留。注意 $\mu$ 依赖于历史最大伸长率而非当前值，因此断键准则在时间上是路径相关的，运动方程 \eqref{eq:motion} 中的 $\mathbf{f}$ 在严格意义下应替换为 $\tilde{\mathbf{f}}$。图\ref{fig:force-stretch} 给出对力函数 $|\mathbf{f}|$ 与伸长率 $s$ 的关系示意：在 $s\in[0,s_c)$ 区间键完好，$|\mathbf{f}|$ 由本构关系（如线性微弹性 \eqref{eq:linear-force} 或第 4 章 PMB 本构）确定；在 $s=s_c$ 处 $|\mathbf{f}|$ 骤降为零，表示断键；在 $s>s_c$ 区间 $|\mathbf{f}|\equiv 0$，键永久失效。卸载路径（图中虚线箭头）沿着相同的本构曲线返回原点，但 $\mu$ 已置零，下次加载时该键不再承载。
 
 \begin{figure}[htbp]
   \centering
@@ -725,9 +705,7 @@ $\mu$ 不可逆：键一旦断裂便永久失去承载能力，这与脆性材�
 \end{equation}
 其中 $V_{H_{\mathbf{x}}} = \int_{H_{\mathbf{x}}} dV_{\boldsymbol{\xi}}$ 为近场域 $H_{\mathbf{x}}$ 的体积（三维为 $\frac{4}{3}\pi\delta^3$，二维为 $\pi\delta^2$）。由定义知 $0\leqslant\varphi\leqslant 1$：$\varphi=0$ 表示所有键完好，$\varphi=1$ 表示该物质点的族内所有键均已断裂、该点完全失去承载能力。
 
-损伤变量 $\varphi$ 与连续损伤力学的 Kachanov 变量（见 1.2 节对 \cite{Kachanov1958} 的讨论）在数学形式上类似，但二者有本质区别。CDM 中损伤变量是本构方程的状态变量，其演化律由外部经验关系（如 $\dot{D}=f(\sigma)$）给出，演化律的形式与参数高度依赖材料与加载条件。而 PD 中 $\varphi$ 是从微观量 $\mu$ 经积分涌现的导出量，本构方程只控制单键的力-伸长关系，断键准则 \eqref{eq:history-variable} 是材料常数级的简单规则，$\varphi$ 的空间分布与时间演化完全由运动方程 \eqref{eq:motion} 的求解自动给出。这正是 PD 相对 CDM 的根本优势：损伤演化从微观规则涌现，无需外部唯象律。
-
-需要特别注意的是边界附近的损伤读数。如 2.1 节图\ref{fig:boundary-truncation} 所示，边界附近物质点的族不完整（$V_{H_{\mathbf{x}}}$ 小于内部物质点），即便所有键都完好，$\varphi$ 也不能直接与内部物质点比较——这是近场动力学表面效应的根源，其严格分析与修正方法留待第 10 章讨论。
+损伤变量 $\varphi$ 与连续损伤力学的 Kachanov 变量（见 1.2 节对 \cite{Kachanov1958} 的讨论）在数学形式上类似，但二者有本质区别。CDM 中损伤变量是本构方程的状态变量，其演化律由外部经验关系（如 $\dot{D}=f(\sigma)$）给出，演化律的形式与参数高度依赖材料与加载条件。而 PD 中 $\varphi$ 是从微观量 $\mu$ 经积分涌现的导出量，本构方程只控制单键的力-伸长关系，断键准则 \eqref{eq:history-variable} 是材料常数级的简单规则，$\varphi$ 的空间分布与时间演化完全由运动方程 \eqref{eq:motion} 的求解自动给出。这正是 PD 相对 CDM 的根本优势：损伤演化从微观规则涌现，无需外部唯象律。需要特别注意的是边界附近的损伤读数：如 2.1 节图\ref{fig:boundary-truncation} 所示，边界附近物质点的族不完整（$V_{H_{\mathbf{x}}}$ 小于内部物质点），即便所有键都完好，$\varphi$ 也不能直接与内部物质点比较——这是近场动力学表面效应的根源，其严格分析与修正方法留待第 10 章讨论。
 
 \subsection{临界伸长率与断裂韧度的标定关系}
 
@@ -769,7 +747,7 @@ $\mu$ 不可逆：键一旦断裂便永久失去承载能力，这与脆性材�
 
 \section{非局部边界条件}
 
-近场动力学运动方程 \eqref{eq:motion} 是积分形式，不含空间导数，因此经典连续介质力学中基于面力 $\mathbf{t}=\boldsymbol{\sigma}\mathbf{n}$（单位 N/m$^2$，作用在物体表面 $\partial\mathcal{B}$）的边界条件不直接适用——PD 的载荷与约束必须通过体力密度 $\mathbf{b}$（单位 N/m$^3$）的形式施加。本节讨论 PD 中边界条件的处理：2.8.1 节建立经典面力到等效体力层的转换关系，2.8.2 节给出表面效应的数学表述（边界附近物质点族不完整导致刚度软化，已在 2.1 节图\ref{fig:boundary-truncation} 几何上指明），2.8.3 节简述三类常用修正方法并预告第 10 章的详细讨论。
+2.7 节建立了损伤与断键准则，给出了材料破坏的完整描述。在建立了运动方程、守恒律和损伤模型之后，本节转向最后一个基本问题——边界条件的处理：近场动力学运动方程 \eqref{eq:motion} 是积分形式，不含空间导数，因此经典连续介质力学中基于面力 $\mathbf{t}=\boldsymbol{\sigma}\mathbf{n}$（单位 N/m$^2$，作用在物体表面 $\partial\mathcal{B}$）的边界条件不直接适用——PD 的载荷与约束必须通过体力密度 $\mathbf{b}$（单位 N/m$^3$）的形式施加。本节讨论 PD 中边界条件的处理：2.8.1 节建立经典面力到等效体力层的转换关系，2.8.2 节给出表面效应的数学表述（边界附近物质点族不完整导致刚度软化，已在 2.1 节图\ref{fig:boundary-truncation} 几何上指明），2.8.3 节简述三类常用修正方法并预告第 10 章的详细讨论。
 
 \subsection{经典面力到体积力层的转换}
 
@@ -785,9 +763,7 @@ $\mu$ 不可逆：键一旦断裂便永久失去承载能力，这与脆性材�
 \end{equation}
 其中 $\mathbf{x}_{\text{proj}}(\mathbf{x})$ 为 $\mathbf{x}$ 在表面 $\partial\mathcal{B}$ 上的投影点。式\eqref{eq:uniform-body-force} 仅当面力分布沿表面变化缓慢（特征尺度 $\gg\delta$）时近似成立；对集中载荷或快速变化的面力，需沿表面与厚度方向分别调整 $\mathbf{b}_{\text{eff}}$ 的分布形式。
 
-约束边界（位移边界条件）的处理类似：经典力学中 $\mathbf{u}|_{\partial\mathcal{B}}=\bar{\mathbf{u}}$ 的位移边界，在 PD 中通过在边界薄层施加体力约束 $\mathbf{b}_{\text{eff}}=-k\bigl(\mathbf{u}-\bar{\mathbf{u}}\bigr)$ 实现，其中 $k$ 为足够大的反馈系数（penalty 系数），以保证薄层内位移近似等于给定位移 $\bar{\mathbf{u}}$。
-
-图\ref{fig:boundary-force-conversion} 对比了经典面力与 PD 等效体力层两种边界载荷施加方式：左侧为经典力学中面力 $\mathbf{t}$ 直接作用于表面；右侧为 PD 中体力 $\mathbf{b}_{\text{eff}}$ 分布在厚度 $\delta$ 的边界薄层内；二者通过 \eqref{eq:force-conversion} 的面积分-体积分等效关系联系。
+约束边界（位移边界条件）的处理类似：经典力学中 $\mathbf{u}|_{\partial\mathcal{B}}=\bar{\mathbf{u}}$ 的位移边界，在 PD 中通过在边界薄层施加体力约束 $\mathbf{b}_{\text{eff}}=-k\bigl(\mathbf{u}-\bar{\mathbf{u}}\bigr)$ 实现，其中 $k$ 为足够大的反馈系数（penalty 系数），以保证薄层内位移近似等于给定位移 $\bar{\mathbf{u}}$。图\ref{fig:boundary-force-conversion} 对比了经典面力与 PD 等效体力层两种边界载荷施加方式：左侧为经典力学中面力 $\mathbf{t}$ 直接作用于表面；右侧为 PD 中体力 $\mathbf{b}_{\text{eff}}$ 分布在厚度 $\delta$ 的边界薄层内；二者通过 \eqref{eq:force-conversion} 的面积分-体积分等效关系联系。
 
 \begin{figure}[htbp]
   \centering
@@ -847,8 +823,6 @@ $\mu$ 不可逆：键一旦断裂便永久失去承载能力，这与脆性材�
   \item \textbf{短程力修正}（short-range force correction）：在运动方程中附加一项仅作用于边界薄层的中心力，强制边界位移场匹配经典弹性解的边界条件。形式上即为在 \eqref{eq:motion} 中加入修正项 $\mathbf{f}_{\text{corr}}$，其参数由经典弹性表面位移反演得到。
 \end{enumerate}
 
-三类方法的精度、适用范围与计算成本各有侧重：刚度修正实现简单但精度受边界几何限制；虚拟层方法通用但需外推；短程力修正精度高但参数标定复杂。Le 与 Bobaru 在 \cite{LeBobaru2018} 中通过数值算例系统比较了上述方法的精度，建议根据问题特点（边界几何、载荷类型、物体尺寸与 $\delta$ 之比）选择合适方法。第 10 章将专门讨论各类边界效应修正方法的严格推导、数值实现与工程算例。
+三类方法的精度、适用范围与计算成本各有侧重：刚度修正实现简单但精度受边界几何限制；虚拟层方法通用但需外推；短程力修正精度高但参数标定复杂。Le 与 Bobaru 在 \cite{LeBobaru2018} 中通过数值算例系统比较了上述方法的精度，建议根据问题特点（边界几何、载荷类型、物体尺寸与 $\delta$ 之比）选择合适方法。第 10 章将专门讨论各类边界效应修正方法的严格推导、数值实现与工程算例。需要强调的是，近场动力学的边界处理体现了非局部理论的本质特征：载荷与约束不是施加在零测度的表面（$\partial\mathcal{B}$），而是分布在近场尺度 $\delta$ 的有限厚度层内。这一特征使 PD 自然回避了经典连续介质力学中面力奇异性（如裂纹尖端 $\sigma\sim r^{-1/2}$）的数学困难——载荷总分布在有限体积内，奇异性被近场尺度正则化；但同时也带来边界附近响应偏离经典解的"表面效应"代价。在数值实现中合理选择边界修正方法是 PD 工程应用的关键，第 10 章将给出完整的方法论与算例。
 
-\begin{remark}
-  近场动力学的边界处理体现了非局部理论的本质特征：载荷与约束不是施加在零测度的表面（$\partial\mathcal{B}$），而是分布在近场尺度 $\delta$ 的有限厚度层内。这一特征使 PD 自然回避了经典连续介质力学中面力奇异性（如裂纹尖端 $\sigma\sim r^{-1/2}$）的数学困难——载荷总分布在有限体积内，奇异性被近场尺度正则化；但同时也带来边界附近响应偏离经典解的"表面效应"代价。在数值实现中合理选择边界修正方法是 PD 工程应用的关键，第 10 章将给出完整的方法论与算例。
-\end{remark}
+本章从物质点、键、近场域与族四个基本概念出发，依次建立了运动学描述、受力描述、态基推广、能量表述与守恒律相容性条件，进而引入损伤与破坏准则，最后处理了非局部边界条件——至此构成一个自洽、完备且与经典力学相容的理论框架。本章的目的不在于穷尽所有本构模型的细节，而在于为后续章节奠定统一的语言基础与严格的数学表述。第1章的定性描述在本章得到了系统的数学化，而本章所建立的理论框架将直接服务于第3章对近场动力学与经典连续介质力学关系的深入分析，在那里本章的公理与假设将在与经典理论的对比中得到进一步验证与阐释。
