@@ -1,64 +1,66 @@
 {
   "schema_version": 2,
-  "active_work_id": "ch02-section-2-2-terminology-fix-78422b2e",
+  "active_work_id": "optimize-fig-22-reference-deformation-f4856229",
   "works": {
-    "ch02-section-2-2-terminology-fix-78422b2e": {
-      "work_id": "ch02-section-2-2-terminology-fix-78422b2e",
-      "active_plan": "D:\\PD-book\\.omo\\plans\\ch02-section-2.2-terminology-fix.md",
-      "plan_name": "ch02-section-2.2-terminology-fix",
+    "optimize-fig-22-reference-deformation-f4856229": {
+      "work_id": "optimize-fig-22-reference-deformation-f4856229",
+      "active_plan": "D:\\PD-book\\.omo\\plans\\optimize-fig-22-reference-deformation.md",
+      "plan_name": "optimize-fig-22-reference-deformation",
       "status": "completed",
-      "started_at": "2026-08-04T06:59:36.557Z",
-      "updated_at": "2026-08-04T08:30:00.000Z",
+      "started_at": "2026-08-04T10:05:07.440Z",
+      "updated_at": "2026-08-04T18:10:36.996Z",
+      "ended_at": "2026-08-04T18:10:36.996Z",
+      "elapsed_ms": 329572,
       "session_ids": [
-        "opencode:ses_0347bb386ffenjjHUCtC3IMfvz"
+        "opencode:ses_033f48de5ffev4tzjf9BrPtcgN"
       ],
       "session_origins": {
-        "opencode:ses_0347bb386ffenjjHUCtC3IMfvz": "direct"
+        "opencode:ses_033f48de5ffev4tzjf9BrPtcgN": "direct"
       },
       "agent": "atlas",
-      "ended_at": "2026-08-04T08:30:00.000Z",
-      "elapsed_ms": 5424000,
       "task_sessions": {
-        "final-wave:f1": {
-          "task_key": "final-wave:f1",
-          "task_label": "F1",
-          "task_title": "全文 grep 确认2.2节内\"伸长 \"（空格）出现次数为0",
-          "session_id": "opencode:ses_034207b55ffe4LsSZ9nrfhVuY0",
+        "todo:1": {
+          "task_key": "todo:1",
+          "task_label": "1",
+          "task_title": "补全右栏 y(x',t) 对应点及变形键表示（关键遗漏）",
+          "session_id": "opencode:ses_033c37506ffeLX1tK5mINRY6rJ",
           "agent": "Sisyphus-Junior",
-          "category": "quick",
-          "started_at": "2026-08-04T08:19:13.257Z",
+          "category": "visual-engineering",
+          "updated_at": "2026-08-04T10:10:24.781Z",
+          "started_at": "2026-08-04T10:08:24.515Z",
           "status": "completed",
-          "updated_at": "2026-08-04T08:26:58.837Z",
-          "ended_at": "2026-08-04T08:26:58.836Z",
-          "elapsed_ms": 465579
+          "ended_at": "2026-08-04T10:10:24.781Z",
+          "elapsed_ms": 120266
         }
       }
     }
   },
-  "active_plan": "D:\\PD-book\\.omo\\plans\\ch02-section-2.2-terminology-fix.md",
-  "started_at": "2026-08-04T06:59:36.557Z",
+  "active_plan": "D:\\PD-book\\.omo\\plans\\optimize-fig-22-reference-deformation.md",
+  "started_at": "2026-08-04T10:05:07.440Z",
   "status": "completed",
-  "updated_at": "2026-08-04T08:26:58.837Z",
+  "updated_at": "2026-08-04T18:10:36.996Z",
+  "ended_at": "2026-08-04T18:10:36.996Z",
+  "elapsed_ms": 329572,
   "session_ids": [
-    "opencode:ses_0347bb386ffenjjHUCtC3IMfvz"
+    "opencode:ses_033f48de5ffev4tzjf9BrPtcgN"
   ],
   "session_origins": {
-    "opencode:ses_0347bb386ffenjjHUCtC3IMfvz": "direct"
+    "opencode:ses_033f48de5ffev4tzjf9BrPtcgN": "direct"
   },
-  "plan_name": "ch02-section-2.2-terminology-fix",
+  "plan_name": "optimize-fig-22-reference-deformation",
   "task_sessions": {
-    "final-wave:f1": {
-      "task_key": "final-wave:f1",
-      "task_label": "F1",
-      "task_title": "全文 grep 确认2.2节内\"伸长 \"（空格）出现次数为0",
-      "session_id": "opencode:ses_034207b55ffe4LsSZ9nrfhVuY0",
+    "todo:1": {
+      "task_key": "todo:1",
+      "task_label": "1",
+      "task_title": "补全右栏 y(x',t) 对应点及变形键表示（关键遗漏）",
+      "session_id": "opencode:ses_033c37506ffeLX1tK5mINRY6rJ",
       "agent": "Sisyphus-Junior",
-      "category": "quick",
-      "started_at": "2026-08-04T08:19:13.257Z",
+      "category": "visual-engineering",
+      "updated_at": "2026-08-04T10:10:24.781Z",
+      "started_at": "2026-08-04T10:08:24.515Z",
       "status": "completed",
-      "updated_at": "2026-08-04T08:26:58.837Z",
-      "ended_at": "2026-08-04T08:26:58.836Z",
-      "elapsed_ms": 465579
+      "ended_at": "2026-08-04T10:10:24.781Z",
+      "elapsed_ms": 120266
     }
   },
   "agent": "atlas"
