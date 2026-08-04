@@ -1,137 +1,65 @@
 {
   "schema_version": 2,
-  "active_work_id": "adjust-fig24-hx-label-1c8497af",
+  "active_work_id": "ch02-section-2-2-terminology-fix-78422b2e",
   "works": {
-    "remove-fig26-family-horizon-1c8497af": {
-      "work_id": "remove-fig26-family-horizon-1c8497af",
-      "active_plan": "D:\\PD-book\\.omo\\plans\\remove-fig26-family-horizon.md",
-      "plan_name": "remove-fig26-family-horizon",
+    "ch02-section-2-2-terminology-fix-78422b2e": {
+      "work_id": "ch02-section-2-2-terminology-fix-78422b2e",
+      "active_plan": "D:\\PD-book\\.omo\\plans\\ch02-section-2.2-terminology-fix.md",
+      "plan_name": "ch02-section-2.2-terminology-fix",
       "status": "completed",
-      "started_at": "2026-08-04T02:20:34.617Z",
-      "updated_at": "2026-08-04T02:33:12.000Z",
-      "completed_at": "2026-08-04T02:34:00.000Z",
+      "started_at": "2026-08-04T06:59:36.557Z",
+      "updated_at": "2026-08-04T08:30:00.000Z",
       "session_ids": [
-        "opencode:ses_03572953fffeOGFccd5beU6LIB"
+        "opencode:ses_0347bb386ffenjjHUCtC3IMfvz"
       ],
       "session_origins": {
-        "opencode:ses_03572953fffeOGFccd5beU6LIB": "direct"
+        "opencode:ses_0347bb386ffenjjHUCtC3IMfvz": "direct"
       },
       "agent": "atlas",
-      "ended_at": "2026-08-04T02:33:12.000Z",
-      "elapsed_ms": 757383
-    },
-    "adjust-fig24-hx-label-1c8497af": {
-      "work_id": "adjust-fig24-hx-label-1c8497af",
-      "active_plan": "D:\\PD-book\\.omo\\plans\\adjust-fig24-hx-label.md",
-      "plan_name": "adjust-fig24-hx-label",
-      "status": "completed",
-      "started_at": "2026-08-04T04:48:42.429Z",
-      "updated_at": "2026-08-04T05:23:59.573Z",
-      "completed_at": "2026-08-04T05:23:20.949Z",
-      "session_ids": [
-        "opencode:ses_035730de3ffey6pDDvYoOG4Fz2"
-      ],
-      "session_origins": {
-        "opencode:ses_035730de3ffey6pDDvYoOG4Fz2": "direct"
-      },
-      "agent": "atlas",
+      "ended_at": "2026-08-04T08:30:00.000Z",
+      "elapsed_ms": 5424000,
       "task_sessions": {
-        "todo:1": {
-          "task_key": "todo:1",
-          "task_label": "1",
-          "task_title": "修改 ch02_framework.tex:205 的 $H_{\\mathbf{x}}$（完整）标签坐标 (2,2.95)→(2,3.1) 并编译验证",
-          "session_id": "opencode:ses_034e45b5dffe3dkeIEWfh0BKv0",
-          "agent": "Sisyphus-Junior",
-          "category": "quick",
-          "updated_at": "2026-08-04T04:51:37.789Z",
-          "started_at": "2026-08-04T04:50:57.381Z",
-          "status": "completed",
-          "ended_at": "2026-08-04T04:51:37.789Z",
-          "elapsed_ms": 40408
-        },
         "final-wave:f1": {
           "task_key": "final-wave:f1",
           "task_label": "F1",
-          "task_title": "Plan compliance audit",
-          "session_id": "opencode:ses_034cbc292ffe3MYQ9YPKEIJrxV",
-          "agent": "multimodal-looker",
-          "started_at": "2026-08-04T04:52:24.951Z",
-          "status": "completed",
-          "updated_at": "2026-08-04T05:23:20.949Z",
-          "ended_at": "2026-08-04T05:23:20.949Z",
-          "elapsed_ms": 1855998
-        },
-        "todo:2": {
-          "task_key": "todo:2",
-          "task_label": "2",
-          "task_title": "修改 ch02_framework.tex:228 的 $H_{\\mathbf{x}}$（截断）标签坐标 (0.7,2.95)→(0.7,3.1) 并编译验证（用户补充需求：b 子图标签与 a 对称上调）",
-          "session_id": "opencode:ses_034ccf722ffelMrvDdC1Hb4dNV",
+          "task_title": "全文 grep 确认2.2节内\"伸长 \"（空格）出现次数为0",
+          "session_id": "opencode:ses_034207b55ffe4LsSZ9nrfhVuY0",
           "agent": "Sisyphus-Junior",
           "category": "quick",
-          "updated_at": "2026-08-04T05:16:56.030Z",
-          "started_at": "2026-08-04T05:16:28.201Z",
+          "started_at": "2026-08-04T08:19:13.257Z",
           "status": "completed",
-          "ended_at": "2026-08-04T05:16:56.030Z",
-          "elapsed_ms": 27829
+          "updated_at": "2026-08-04T08:26:58.837Z",
+          "ended_at": "2026-08-04T08:26:58.836Z",
+          "elapsed_ms": 465579
         }
-      },
-      "ended_at": "2026-08-04T05:23:59.573Z",
-      "elapsed_ms": 2117144
+      }
     }
   },
-  "active_plan": "D:\\PD-book\\.omo\\plans\\adjust-fig24-hx-label.md",
-  "started_at": "2026-08-04T04:48:42.429Z",
+  "active_plan": "D:\\PD-book\\.omo\\plans\\ch02-section-2.2-terminology-fix.md",
+  "started_at": "2026-08-04T06:59:36.557Z",
   "status": "completed",
-  "updated_at": "2026-08-04T05:23:59.573Z",
-  "completed_at": "2026-08-04T05:23:20.949Z",
+  "updated_at": "2026-08-04T08:26:58.837Z",
   "session_ids": [
-    "opencode:ses_035730de3ffey6pDDvYoOG4Fz2"
+    "opencode:ses_0347bb386ffenjjHUCtC3IMfvz"
   ],
   "session_origins": {
-    "opencode:ses_035730de3ffey6pDDvYoOG4Fz2": "direct"
+    "opencode:ses_0347bb386ffenjjHUCtC3IMfvz": "direct"
   },
-  "plan_name": "adjust-fig24-hx-label",
-  "agent": "atlas",
+  "plan_name": "ch02-section-2.2-terminology-fix",
   "task_sessions": {
-    "todo:1": {
-      "task_key": "todo:1",
-      "task_label": "1",
-      "task_title": "修改 ch02_framework.tex:205 的 $H_{\\mathbf{x}}$（完整）标签坐标 (2,2.95)→(2,3.1) 并编译验证",
-      "session_id": "opencode:ses_034e45b5dffe3dkeIEWfh0BKv0",
-      "agent": "Sisyphus-Junior",
-      "category": "quick",
-      "updated_at": "2026-08-04T04:51:37.789Z",
-      "started_at": "2026-08-04T04:50:57.381Z",
-      "status": "completed",
-      "ended_at": "2026-08-04T04:51:37.789Z",
-      "elapsed_ms": 40408
-    },
     "final-wave:f1": {
       "task_key": "final-wave:f1",
       "task_label": "F1",
-      "task_title": "Plan compliance audit",
-      "session_id": "opencode:ses_034cbc292ffe3MYQ9YPKEIJrxV",
-      "agent": "multimodal-looker",
-      "started_at": "2026-08-04T04:52:24.951Z",
-      "status": "completed",
-      "updated_at": "2026-08-04T05:23:20.949Z",
-      "ended_at": "2026-08-04T05:23:20.949Z",
-      "elapsed_ms": 1855998
-    },
-    "todo:2": {
-      "task_key": "todo:2",
-      "task_label": "2",
-      "task_title": "修改 ch02_framework.tex:228 的 $H_{\\mathbf{x}}$（截断）标签坐标 (0.7,2.95)→(0.7,3.1) 并编译验证（用户补充需求：b 子图标签与 a 对称上调）",
-      "session_id": "opencode:ses_034ccf722ffelMrvDdC1Hb4dNV",
+      "task_title": "全文 grep 确认2.2节内\"伸长 \"（空格）出现次数为0",
+      "session_id": "opencode:ses_034207b55ffe4LsSZ9nrfhVuY0",
       "agent": "Sisyphus-Junior",
       "category": "quick",
-      "updated_at": "2026-08-04T05:16:56.030Z",
-      "started_at": "2026-08-04T05:16:28.201Z",
+      "started_at": "2026-08-04T08:19:13.257Z",
       "status": "completed",
-      "ended_at": "2026-08-04T05:16:56.030Z",
-      "elapsed_ms": 27829
+      "updated_at": "2026-08-04T08:26:58.837Z",
+      "ended_at": "2026-08-04T08:26:58.836Z",
+      "elapsed_ms": 465579
     }
   },
-  "ended_at": "2026-08-04T05:23:59.573Z",
-  "elapsed_ms": 2117144
+  "agent": "atlas"
 }

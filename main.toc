@@ -24,7 +24,7 @@
 \contentsline {subsection}{\numberline {2.2.1}参考构型与变形构型}{19}{subsection.2.2.1}%
 \contentsline {subsection}{\numberline {2.2.2}相对位移的轴向—偏斜分解}{20}{subsection.2.2.2}%
 \contentsline {subsection}{\numberline {2.2.3}小变形近似}{20}{subsection.2.2.3}%
-\contentsline {subsection}{\numberline {2.2.4}键伸长的客观性}{21}{subsection.2.2.4}%
+\contentsline {subsection}{\numberline {2.2.4}键伸长率的客观性}{21}{subsection.2.2.4}%
 \contentsline {section}{\numberline {2.3}受力描述与运动方程}{21}{section.2.3}%
 \contentsline {subsection}{\numberline {2.3.1}对力函数的物理意义}{21}{subsection.2.3.1}%
 \contentsline {subsection}{\numberline {2.3.2}微弹性材料与成对势}{22}{subsection.2.3.2}%
