@@ -3,21 +3,21 @@
 
 \section{非常规态型建模框架}\label{sec:nosb-framework}
 
-第 6 章建立的常规态型（OSB）理论保留了“力沿键方向”的特征，虽然通过标量力态对近场域内全部键变形的依赖解除了泊松比限制，但键上仍只能传递轴向力。非常规态型（non-ordinary state-based，NOSB；第 1 章亦称非常规态基理论，记作 NOSB-PD）则彻底放弃这一限制：力态 $\underline{\mathbf{T}}\langle\boldsymbol{\xi}\rangle$ 的方向与大小都可以偏离键的方向，从而允许键上传递剪切与转动作用。本节建立 NOSB 建模框架：首先说明 NOSB 的核心思想与动机，指出其与经典连续介质力学的天然联系（\ref{sec:nosb-motivation}节）；进而引入形状张量与非局部变形梯度，建立“由键变形构造经典应变度量”的桥梁（\ref{sec:shape-tensor}节）；然后给出 NOSB 力态的构造——本构对应（constitutive correspondence）机制，并分析其守恒性质（\ref{sec:correspondence}节）；最后梳理 NOSB 理论的发展脉络（\ref{sec:nosb-history}节）。本节内容源自 Silling 等的原始文献 \cite{Silling2007}，守恒律的严格处理见 \cite{SillingLehoucq2010}。
+第 6 章建立的常规态型（OSB）理论保留了"力沿键方向"的特征，虽然通过标量力态对近场域内全部键变形的依赖解除了泊松比限制，但键上仍只能传递轴向力。非常规态型（non-ordinary state-based，NOSB；第 1 章亦称非常规态基理论，记作 NOSB-PD）则彻底放弃这一限制：力态 $\underline{\mathbf{T}}\langle\boldsymbol{\xi}\rangle$ 的方向与大小都可以偏离键的方向，从而允许键上传递剪切与转动作用。本节建立 NOSB 建模框架：首先说明 NOSB 的核心思想与动机，指出其与经典连续介质力学的天然联系（\ref{sec:nosb-motivation}节）；进而引入形状张量与非局部变形梯度，建立"由键变形构造经典应变度量"的桥梁（\ref{sec:shape-tensor}节）；然后给出 NOSB 力态的构造——本构对应（constitutive correspondence）机制，并分析其守恒性质（\ref{sec:correspondence}节）；最后梳理 NOSB 理论的发展脉络（\ref{sec:nosb-history}节）。本节内容源自 Silling 等的原始文献 \cite{Silling2007}，守恒律的严格处理见 \cite{SillingLehoucq2010}。
 
 \subsection{NOSB 的动机与核心思想}\label{sec:nosb-motivation}
 
-回顾 6.1 节，OSB 的力态取 $\underline{\mathbf{T}}\langle\boldsymbol{\xi}\rangle=\underline{t}\langle\boldsymbol{\xi}\rangle\,\underline{\mathbf{M}}\langle\boldsymbol{\xi}\rangle$，其中 $\underline{\mathbf{M}}$ 为变形后键方向的单位态，标量力态 $\underline{t}$ 虽可依赖整个变形构型，但力的方向恒沿变形后键的方向。这带来一个结构性限制：材料点间的相互作用始终是“轴向”的，键上不存在切向力。尽管 OSB 通过体积—偏斜双通道标定解除了泊松比限制，但对于需要显式描述剪切与转动传递的复杂本构（如各向异性塑性、损伤演化、多相材料），在键方向坐标系中表述本构关系仍不自然 \cite{Silling2007}。
+回顾 6.1 节，OSB 的力态取 $\underline{\mathbf{T}}\langle\boldsymbol{\xi}\rangle=\underline{t}\langle\boldsymbol{\xi}\rangle\,\underline{\mathbf{M}}\langle\boldsymbol{\xi}\rangle$，其中 $\underline{\mathbf{M}}$ 为变形后键方向的单位态，标量力态 $\underline{t}$ 虽可依赖整个变形构型，但力的方向恒沿变形后键的方向。这带来一个结构性限制：材料点间的相互作用始终是"轴向"的，键上不存在切向力。尽管 OSB 通过体积—偏斜双通道标定解除了泊松比限制，但对于需要显式描述剪切与转动传递的复杂本构（如各向异性塑性、损伤演化、多相材料），在键方向坐标系中表述本构关系仍不自然 \cite{Silling2007}。
 
-NOSB 的核心思想是放弃“力沿键方向”这一约束，允许力态取任意方向：
+NOSB 的核心思想是放弃"力沿键方向"这一约束，允许力态取任意方向：
 \begin{equation}
   \underline{\mathbf{T}}\langle\boldsymbol{\xi}\rangle=\omega(|\boldsymbol{\xi}|)\,\mathbf{P}\,\mathbf{K}^{-1}\boldsymbol{\xi}
   \label{eq:nosb-force-state}
 \end{equation}
-其中 $\omega$ 为权重函数，$\mathbf{K}$ 为形状张量，$\mathbf{P}$ 为第一 Piola–Kirchhoff 应力张量。式\eqref{eq:nosb-force-state}的右端 $\mathbf{P}\mathbf{K}^{-1}\boldsymbol{\xi}$ 是一个二阶张量与矢量的乘积，其结果一般不再平行于 $\boldsymbol{\xi}$，这正是 NOSB 与 OSB 的本质区别：键上的力由材料点处的应力张量决定，而非由键自身的伸长决定 \cite{Silling2007,Warren2009}。这种结构使 NOSB 具有两个显著优点：其一，经典连续介质力学中成熟的应力—应变本构关系可以直接嵌入近场动力学框架，无需像 OSB 那样重新构造态型本构；其二，本构的适用范围不受泊松比限制，各向异性、塑性、损伤等复杂材料行为均可描述 \cite{Warren2009,Breitenfeld2014}。
+其中 $\omega$ 为权重函数，$\mathbf{K}$ 为形状张量，$\mathbf{P}$ 为第一 Piola–Kirchhoff 应力张量。式\eqref{eq:nosb-force-state}的右端 $\mathbf{P}\mathbf{K}^{-1}\boldsymbol{\xi}$ 是一个二阶张量与矢量的乘积，其结果一般不再平行于 $\boldsymbol{\xi}$，这正是 NOSB 与 OSB 的本质区别：键上的力由材料点处的应力张量决定，而非由键自身的伸长率决定 \cite{Silling2007,Warren2009}。这种结构使 NOSB 具有两个显著优点：其一，经典连续介质力学中成熟的应力—应变本构关系可以直接嵌入近场动力学框架，无需像 OSB 那样重新构造态型本构；其二，本构的适用范围不受泊松比限制，各向异性、塑性、损伤等复杂材料行为均可描述 \cite{Warren2009,Breitenfeld2014}。
 
 \begin{remark}
-  NOSB 与经典连续介质力学的关系需要特别强调。式\eqref{eq:nosb-force-state}表明，NOSB 材料点的受力完全由该点的应力张量 $\mathbf{P}$ 决定，而 $\mathbf{P}$ 又由非局部变形梯度经经典本构关系确定（见\ref{sec:correspondence}节）。因此，NOSB 可以被理解为“用经典本构关系装备了近场动力学运动学”的理论：运动学是非局部的（以键变形为基本变量），而本构是经典的（以应力张量为响应量）。这种“非局部运动学 + 经典本构”的组合，使得 NOSB 能够直接继承经典力学百年积累的本构理论 \cite{Silling2007,SillingLehoucq2010}。
+  NOSB 与经典连续介质力学的关系需要特别强调。式\eqref{eq:nosb-force-state}表明，NOSB 材料点的受力完全由该点的应力张量 $\mathbf{P}$ 决定，而 $\mathbf{P}$ 又由非局部变形梯度经经典本构关系确定（见\ref{sec:correspondence}节）。因此，NOSB 可以被理解为"用经典本构关系装备了近场动力学运动学"的理论：运动学是非局部的（以键变形为基本变量），而本构是经典的（以应力张量为响应量）。这种"非局部运动学 + 经典本构"的组合，使得 NOSB 能够直接继承经典力学百年积累的本构理论 \cite{Silling2007,SillingLehoucq2010}。
 \end{remark}
 
 \subsection{形状张量与变形梯度}\label{sec:shape-tensor}
@@ -29,7 +29,7 @@ NOSB 的核心思想是放弃“力沿键方向”这一约束，允许力态取
   \mathbf{K}=\int_{H_{\mathbf{x}}}\omega(|\boldsymbol{\xi}|)\,\boldsymbol{\xi}\otimes\boldsymbol{\xi}\,dV_{\mathbf{x}'}
   \label{eq:shape-tensor}
 \end{equation}
-其中 $\omega(|\boldsymbol{\xi}|)$ 为权重函数，$\boldsymbol{\xi}=\mathbf{x}'-\mathbf{x}$ 为键矢量 \cite{Silling2007}。式\eqref{eq:shape-tensor}的物理意义可以理解为近场域的“几何惯性矩”：它度量了近场域内键矢量在方向与长度上的分布。由于权重函数 $\omega$ 只依赖 $|\boldsymbol{\xi}|$，对均匀且各向同性的近场域，$\mathbf{K}$ 是各向同性的二阶张量，$\mathbf{K}\propto\mathbf{I}$；对近边界处的非对称近场域，$\mathbf{K}$ 偏离各向同性，这为第 10 章讨论的表面效应埋下了伏笔。形状张量 $\mathbf{K}$ 对称正定，故其逆存在 \cite{Silling2007}。
+其中 $\omega(|\boldsymbol{\xi}|)$ 为权重函数，$\boldsymbol{\xi}=\mathbf{x}'-\mathbf{x}$ 为键矢量 \cite{Silling2007}。式\eqref{eq:shape-tensor}的物理意义可以理解为近场域的"几何惯性矩"：它度量了近场域内键矢量在方向与长度上的分布。由于权重函数 $\omega$ 只依赖 $|\boldsymbol{\xi}|$，对均匀且各向同性的近场域，$\mathbf{K}$ 是各向同性的二阶张量，$\mathbf{K}\propto\mathbf{I}$；对近边界处的非对称近场域，$\mathbf{K}$ 偏离各向同性，这为第 10 章讨论的表面效应埋下了伏笔。形状张量 $\mathbf{K}$ 对称正定，故其逆存在 \cite{Silling2007}。
 
 借助形状张量，非局部变形梯度定义为变形后键矢量与参考键矢量张量积的加权积分右乘 $\mathbf{K}^{-1}$
 \begin{equation}
@@ -37,10 +37,10 @@ NOSB 的核心思想是放弃“力沿键方向”这一约束，允许力态取
   \underline{\mathbf{Y}}\langle\boldsymbol{\xi}\rangle\otimes\boldsymbol{\xi}\,dV_{\mathbf{x}'}\right]\mathbf{K}^{-1}
   \label{eq:nonlocal-deformation-gradient}
 \end{equation}
-其中 $\underline{\mathbf{Y}}\langle\boldsymbol{\xi}\rangle$ 为变形态（见式\eqref{eq:deformation-state}）\cite{Silling2007}。式\eqref{eq:nonlocal-deformation-gradient}可以理解为“对近场域内键变形的加权最小二乘拟合”：在均匀变形 $\underline{\mathbf{Y}}\langle\boldsymbol{\xi}\rangle=\mathbf{F}_{0}\boldsymbol{\xi}$ 下，式\eqref{eq:nonlocal-deformation-gradient}精确给出 $\mathbf{F}=\mathbf{F}_{0}$；对一般非均匀变形，$\mathbf{F}$ 是在最小二乘意义下最接近真实局部变形梯度的近似。这一性质保证了非局部变形梯度在均匀变形情形下与经典变形梯度严格一致，是 NOSB 能够精确恢复经典本构响应的关键。
+其中 $\underline{\mathbf{Y}}\langle\boldsymbol{\xi}\rangle$ 为变形态（见式\eqref{eq:deformation-state}）\cite{Silling2007}。式\eqref{eq:nonlocal-deformation-gradient}可以理解为"对近场域内键变形的加权最小二乘拟合"：在均匀变形 $\underline{\mathbf{Y}}\langle\boldsymbol{\xi}\rangle=\mathbf{F}_{0}\boldsymbol{\xi}$ 下，式\eqref{eq:nonlocal-deformation-gradient}精确给出 $\mathbf{F}=\mathbf{F}_{0}$；对一般非均匀变形，$\mathbf{F}$ 是在最小二乘意义下最接近真实局部变形梯度的近似。这一性质保证了非局部变形梯度在均匀变形情形下与经典变形梯度严格一致，是 NOSB 能够精确恢复经典本构响应的关键。
 
 \begin{remark}
-  式\eqref{eq:nonlocal-deformation-gradient}的加权最小二乘解释值得展开。变形后键矢量 $\underline{\mathbf{Y}}\langle\boldsymbol{\xi}\rangle$ 与参考键矢量 $\boldsymbol{\xi}$ 的关系在均匀变形下为 $\underline{\mathbf{Y}}\langle\boldsymbol{\xi}\rangle=\mathbf{F}_{0}\boldsymbol{\xi}$。对一般变形，可以寻找使泛函 $\int_{H_{\mathbf{x}}}\omega\,|\underline{\mathbf{Y}}\langle\boldsymbol{\xi}\rangle-\mathbf{F}\boldsymbol{\xi}|^{2}\,dV_{\mathbf{x}'}$ 最小的张量 $\mathbf{F}$。由变分原理，极值条件正是式\eqref{eq:nonlocal-deformation-gradient}。因此，非局部变形梯度是近场域内所有键的变形信息在二阶张量空间中的最优线性近似——它把一族键的整体变形“压缩”成一个变形梯度，从而允许经典本构直接作用其上 \cite{Silling2007}。
+  式\eqref{eq:nonlocal-deformation-gradient}的加权最小二乘解释值得展开。变形后键矢量 $\underline{\mathbf{Y}}\langle\boldsymbol{\xi}\rangle$ 与参考键矢量 $\boldsymbol{\xi}$ 的关系在均匀变形下为 $\underline{\mathbf{Y}}\langle\boldsymbol{\xi}\rangle=\mathbf{F}_{0}\boldsymbol{\xi}$。对一般变形，可以寻找使泛函 $\int_{H_{\mathbf{x}}}\omega\,|\underline{\mathbf{Y}}\langle\boldsymbol{\xi}\rangle-\mathbf{F}\boldsymbol{\xi}|^{2}\,dV_{\mathbf{x}'}$ 最小的张量 $\mathbf{F}$。由变分原理，极值条件正是式\eqref{eq:nonlocal-deformation-gradient}。因此，非局部变形梯度是近场域内所有键的变形信息在二阶张量空间中的最优线性近似——它把一族键的整体变形"压缩"成一个变形梯度，从而允许经典本构直接作用其上 \cite{Silling2007}。
 \end{remark}
 
 \subsection{本构对应与力态构造}\label{sec:correspondence}
@@ -50,40 +50,86 @@ NOSB 的核心思想是放弃“力沿键方向”这一约束，允许力态取
   W(\underline{\mathbf{Y}})=\Psi\bigl(\mathbf{F}(\underline{\mathbf{Y}})\bigr)
   \label{eq:correspondence-energy}
 \end{equation}
-其中 $\mathbf{F}(\underline{\mathbf{Y}})$ 由式\eqref{eq:nonlocal-deformation-gradient}给出。对式\eqref{eq:correspondence-energy}关于 $\underline{\mathbf{Y}}$ 求 Fréchet 导数，得到力态式\eqref{eq:nosb-force-state}，其中第一 Piola–Kirchhoff 应力
+其中 $\mathbf{F}(\underline{\mathbf{Y}})$ 由式\eqref{eq:nonlocal-deformation-gradient}给出。本构对应的核心步骤是求式\eqref{eq:correspondence-energy}关于变形态 $\underline{\mathbf{Y}}$ 的 Fréchet 导数以获得力态。力态的变分定义为：对任意的变形态变分 $\delta\underline{\mathbf{Y}}\langle\boldsymbol{\xi}\rangle$，应变能密度的一阶变分等于力态与键变形变分的内积在近场域上的积分
+\begin{equation}
+  \delta W=\int_{H_{\mathbf{x}}}\underline{\mathbf{T}}\langle\boldsymbol{\xi}\rangle\cdot\delta\underline{\mathbf{Y}}\langle\boldsymbol{\xi}\rangle\,dV_{\mathbf{x}'}
+  \label{eq:frechet-def}
+\end{equation}
+式\eqref{eq:frechet-def}是态型理论中力态的定义式，与经典连续介质力学中 $\mathbf{P}=\partial\Psi/\partial\mathbf{F}$ 的变分定义完全平行 \cite{Silling2007}。由复合函数求导的链式法则，对应能量式\eqref{eq:correspondence-energy}的一阶变分为
+\begin{equation}
+  \delta W=\mathbf{P}:\delta\mathbf{F}
+  \label{eq:frechet-chain}
+\end{equation}
+其中第一 Piola–Kirchhoff 应力
 \begin{equation}
   \mathbf{P}=\frac{\partial\Psi(\mathbf{F})}{\partial\mathbf{F}}
   \label{eq:piola-stress}
 \end{equation}
-由经典超弹性本构给出 \cite{Silling2007}。式\eqref{eq:correspondence-energy}—\eqref{eq:piola-stress}构成 NOSB 本构对应的完整机制：经典应变能密度 $\Psi$（或其派生的应力 $\mathbf{P}$）通过式\eqref{eq:correspondence-energy}、式\eqref{eq:piola-stress}与式\eqref{eq:nosb-force-state}转化为态型表述。
+由经典超弹性本构给出 \cite{Silling2007}。另一方面，非局部变形梯度式\eqref{eq:nonlocal-deformation-gradient}对 $\underline{\mathbf{Y}}$ 是线性的，故其变分可直接写出
+\begin{equation}
+  \delta\mathbf{F}=\left[\int_{H_{\mathbf{x}}}\omega(|\boldsymbol{\xi}|)\,
+  \delta\underline{\mathbf{Y}}\langle\boldsymbol{\xi}\rangle\otimes\boldsymbol{\xi}\,dV_{\mathbf{x}'}\right]\mathbf{K}^{-1}
+  \label{eq:frechet-df}
+\end{equation}
+将式\eqref{eq:frechet-df}代入式\eqref{eq:frechet-chain}，利用二阶张量点积恒等式 $\mathbf{A}:(\mathbf{B}\mathbf{C})=(\mathbf{A}\mathbf{C}^{\mathrm{T}}):\mathbf{B}$，并注意到形状张量 $\mathbf{K}$ 的对称性（$\mathbf{K}=\mathbf{K}^{\mathrm{T}}$，从而 $\mathbf{K}^{-\mathrm{T}}=\mathbf{K}^{-1}$），得
+\begin{equation}
+  \delta W=\int_{H_{\mathbf{x}}}\omega(|\boldsymbol{\xi}|)\,
+  \delta\underline{\mathbf{Y}}\langle\boldsymbol{\xi}\rangle\cdot\bigl(\mathbf{P}\,\mathbf{K}^{-1}\boldsymbol{\xi}\bigr)\,dV_{\mathbf{x}'}
+  \label{eq:frechet-result}
+\end{equation}
+对比式\eqref{eq:frechet-result}与式\eqref{eq:frechet-def}，由变分引理（$\delta\underline{\mathbf{Y}}\langle\boldsymbol{\xi}\rangle$ 在近场域内可任意选取）立即得到力态式\eqref{eq:nosb-force-state}。式\eqref{eq:frechet-def}—\eqref{eq:frechet-result}给出了力态构造的完整推导：式\eqref{eq:nosb-force-state}中的权重函数 $\omega$ 来自式\eqref{eq:nonlocal-deformation-gradient}的积分核，$\mathbf{K}^{-1}\boldsymbol{\xi}$ 来自形状张量的对称性，$\mathbf{P}$ 则来自经典本构的应力响应——三个要素恰好对应"非局部运动学 + 经典本构"的完整链条。至此，式\eqref{eq:correspondence-energy}—\eqref{eq:piola-stress}构成 NOSB 本构对应的完整机制：经典应变能密度 $\Psi$（或其派生的应力 $\mathbf{P}$）通过式\eqref{eq:correspondence-energy}、式\eqref{eq:frechet-chain}与式\eqref{eq:nosb-force-state}转化为态型表述。
 
 对于以 Cauchy 应力 $\boldsymbol{\sigma}$ 表述的经典本构（工程中最常用），第一 Piola–Kirchhoff 应力与 Cauchy 应力通过 Piola 变换联系
 \begin{equation}
   \mathbf{P}=J\boldsymbol{\sigma}\mathbf{F}^{-\mathrm{T}},\qquad J=\det\mathbf{F}
   \label{eq:piola-cauchy}
 \end{equation}
-其中 $J=\det\mathbf{F}$ 为变形梯度行列式 \cite{Silling2007,SillingLehoucq2010}。将式\eqref{eq:piola-cauchy}代入式\eqref{eq:nosb-force-state}，可用 Cauchy 应力直接构造力态。实际工程中，计算流程为：由式\eqref{eq:nonlocal-deformation-gradient}求 $\mathbf{F}$ → 由经典本构（如线弹性、$J_{2}$ 塑性、超弹性等）求 $\boldsymbol{\sigma}$ 或 $\mathbf{P}$ → 由式\eqref{eq:nosb-force-state}构造力态 → 代入态型运动方程求解。值得注意的是，这一流程中本构部分完全沿用经典理论，因此第 6 章建立的经典塑性、粘塑性等模型（如 Foster 等的粘塑性模型 \cite{Foster2010}）可以不经改写直接嵌入 NOSB。
+其中 $J=\det\mathbf{F}$ 为变形梯度行列式 \cite{Silling2007,SillingLehoucq2010}。式\eqref{eq:piola-cauchy}可由 Nanson 公式导出：设参考构型中面元 $\mathrm{d}A$ 的单位法向为 $\mathbf{N}$，变形后该面元变为 $\mathrm{d}a$、单位法向为 $\mathbf{n}$，Nanson 公式给出 $\mathbf{n}\,\mathrm{d}a=J\mathbf{F}^{-\mathrm{T}}\mathbf{N}\,\mathrm{d}A$。同一面元上的力在两种构型中的表述必须相等，即 $\mathbf{P}\mathbf{N}\,\mathrm{d}A=\boldsymbol{\sigma}\mathbf{n}\,\mathrm{d}a=J\boldsymbol{\sigma}\mathbf{F}^{-\mathrm{T}}\mathbf{N}\,\mathrm{d}A$，此式对任意 $\mathbf{N}$ 成立，故 $\mathbf{P}=J\boldsymbol{\sigma}\mathbf{F}^{-\mathrm{T}}$ \cite{Silling2007}。将式\eqref{eq:piola-cauchy}代入式\eqref{eq:nosb-force-state}，可用 Cauchy 应力直接构造力态。实际工程中，计算流程为：由式\eqref{eq:nonlocal-deformation-gradient}求 $\mathbf{F}$ → 由经典本构（如线弹性、$J_{2}$ 塑性、超弹性等）求 $\boldsymbol{\sigma}$ 或 $\mathbf{P}$ → 由式\eqref{eq:nosb-force-state}构造力态 → 代入态型运动方程求解。值得注意的是，这一流程中本构部分完全沿用经典理论，因此第 6 章建立的经典塑性、粘塑性等模型（如 Foster 等的粘塑性模型 \cite{Foster2010}）可以不经改写直接嵌入 NOSB。
 
 \begin{remark}
-  本构对应的名称源于 Silling 2007 的严格定义：若在均匀变形 $\underline{\mathbf{Y}}\langle\boldsymbol{\xi}\rangle=\mathbf{F}\boldsymbol{\xi}$ 下，近场动力学应变能密度与经典应变能密度满足 $W(\underline{\mathbf{Y}})=\Psi(\mathbf{F})$，则称该近场动力学材料在 $\mathbf{F}$ 处与经典材料对应 \cite{Silling2007}。式\eqref{eq:correspondence-energy}构造的本构满足这一定义，故称为“对应材料”。本构对应是嵌入经典本构的一般机制——原则上它也可用于构造 OSB 型对应材料，但式\eqref{eq:nosb-force-state}构造的力态实践中通常非常规（$\mathbf{P}\mathbf{K}^{-1}\boldsymbol{\xi}$ 一般不平行于 $\boldsymbol{\xi}$），故本构对应与 NOSB 在应用中常视为同义。
+  本构对应的名称源于 Silling 2007 的严格定义：若在均匀变形 $\underline{\mathbf{Y}}\langle\boldsymbol{\xi}\rangle=\mathbf{F}\boldsymbol{\xi}$ 下，近场动力学应变能密度与经典应变能密度满足 $W(\underline{\mathbf{Y}})=\Psi(\mathbf{F})$，则称该近场动力学材料在 $\mathbf{F}$ 处与经典材料对应 \cite{Silling2007}。式\eqref{eq:correspondence-energy}构造的本构满足这一定义，故称为"对应材料"。本构对应是嵌入经典本构的一般机制——原则上它也可用于构造 OSB 型对应材料，但式\eqref{eq:nosb-force-state}构造的力态实践中通常非常规（$\mathbf{P}\mathbf{K}^{-1}\boldsymbol{\xi}$ 一般不平行于 $\boldsymbol{\xi}$），故本构对应与 NOSB 在应用中常视为同义。
 \end{remark}
 
-NOSB 的守恒性质值得专门讨论。线动量守恒对任意力态自动成立（见 6.1 节）。角动量守恒则需要额外条件：由式\eqref{eq:nosb-force-state}代入角动量平衡条件 $\int_{H_{\mathbf{x}}}\underline{\mathbf{Y}}\langle\boldsymbol{\xi}\rangle\times\underline{\mathbf{T}}\langle\boldsymbol{\xi}\rangle\,dV_{\mathbf{x}'}=\mathbf{0}$（见第 2 章与文献 \cite{SillingLehoucq2010}），利用式\eqref{eq:nonlocal-deformation-gradient}与式\eqref{eq:piola-cauchy}可得
+NOSB 的守恒性质值得专门讨论。线动量守恒对任意力态自动成立（见 6.1 节）。角动量守恒则需要额外条件。角动量平衡条件要求近场域内各键上的力对 $\mathbf{x}$ 的力矩总和为零（见第 2 章与文献 \cite{SillingLehoucq2010}）
+\begin{equation}
+  \int_{H_{\mathbf{x}}}\underline{\mathbf{Y}}\langle\boldsymbol{\xi}\rangle\times\underline{\mathbf{T}}\langle\boldsymbol{\xi}\rangle\,dV_{\mathbf{x}'}=\mathbf{0}
+  \label{eq:angmom-balance}
+\end{equation}
+把力态式\eqref{eq:nosb-force-state}与本构对应所考察的均匀变形关系 $\underline{\mathbf{Y}}\langle\boldsymbol{\xi}\rangle=\mathbf{F}\boldsymbol{\xi}$ 代入式\eqref{eq:angmom-balance}，其被积函数的第 $i$ 个分量用置换符号 $\epsilon_{ijk}$ 写为
+\begin{equation}
+  \bigl[\underline{\mathbf{Y}}\times\underline{\mathbf{T}}\bigr]_{i}
+  =\epsilon_{ijk}\,F_{jl}\xi_{l}\,P_{km}K^{-1}_{mn}\xi_{n}
+  \label{eq:angmom-component}
+\end{equation}
+其中 $F_{jl}$、$P_{km}$、$K^{-1}_{mn}$ 分别为 $\mathbf{F}$、$\mathbf{P}$、$\mathbf{K}^{-1}$ 的分量，并采用重复下标求和约定。式\eqref{eq:angmom-component}对近场域积分时，$\mathbf{F}$、$\mathbf{P}$、$\mathbf{K}^{-1}$ 均与 $\boldsymbol{\xi}$ 无关，可提出积分号外，于是角动量平衡式\eqref{eq:angmom-balance}的第 $i$ 个分量化为
+\begin{equation}
+  L_{i}=\epsilon_{ijk}\,F_{jl}P_{km}K^{-1}_{mn}
+  \underbrace{\int_{H_{\mathbf{x}}}\omega\,\xi_{l}\xi_{n}\,dV_{\mathbf{x}'}}_{K_{ln}}
+  =\epsilon_{ijk}\,F_{jl}P_{km}\,\delta_{ml}
+  =\epsilon_{ijk}\,F_{jl}P_{kl}
+  \label{eq:angmom-computation}
+\end{equation}
+其中 $\int_{H_{\mathbf{x}}}\omega\,\xi_{l}\xi_{n}\,dV_{\mathbf{x}'}=K_{ln}$ 正是形状张量式\eqref{eq:shape-tensor}的分量；$K^{-1}_{mn}K_{ln}=\delta_{ml}$ 来自 $\mathbf{K}^{-1}\mathbf{K}=\mathbf{I}$ 与 $\mathbf{K}$ 的对称性。式\eqref{eq:angmom-computation}右端即 $\epsilon_{ijk}(\mathbf{F}\mathbf{P}^{\mathrm{T}})_{jk}$，其为零等价于二阶张量 $\mathbf{F}\mathbf{P}^{\mathrm{T}}$ 的反对称部分消失，即
 \begin{equation}
   \mathbf{P}\mathbf{F}^{\mathrm{T}}=\mathbf{F}\mathbf{P}^{\mathrm{T}}
   \label{eq:pf-symmetric}
 \end{equation}
-即 $\mathbf{P}\mathbf{F}^{\mathrm{T}}$ 必须是对称张量。式\eqref{eq:pf-symmetric}等价于 Cauchy 应力 $\boldsymbol{\sigma}=\mathbf{J}^{-1}\mathbf{P}\mathbf{F}^{\mathrm{T}}$ 的对称性 $\boldsymbol{\sigma}=\boldsymbol{\sigma}^{\mathrm{T}}$ \cite{TupekRadovitzky2014}。对客观超弹性本构，应变能密度的客观性（旋转不变性）保证 $\mathbf{P}\mathbf{F}^{\mathrm{T}}$ 自动对称，故 NOSB 角动量守恒自动满足；但对非客观本构（如某些非对称应力表述），角动量守恒可能被违反，需在使用时验证 \cite{Silling2007,TupekRadovitzky2014}。
+换言之，$\mathbf{P}\mathbf{F}^{\mathrm{T}}$ 必须是对称张量。进一步，由式\eqref{eq:piola-cauchy}得式\eqref{eq:pf-cauchy}
+\begin{equation}
+  \mathbf{P}\mathbf{F}^{\mathrm{T}}=J\boldsymbol{\sigma}
+  \label{eq:pf-cauchy}
+\end{equation}
+故式\eqref{eq:pf-symmetric}等价于 Cauchy 应力 $\boldsymbol{\sigma}=\boldsymbol{\sigma}^{\mathrm{T}}$ 的对称性 \cite{TupekRadovitzky2014}。对客观超弹性本构，应变能密度的客观性（旋转不变性）保证 $\mathbf{P}\mathbf{F}^{\mathrm{T}}$ 自动对称，故 NOSB 角动量守恒自动满足；但对非客观本构（如某些非对称应力表述），角动量守恒可能被违反，需在使用时验证 \cite{Silling2007,TupekRadovitzky2014}。
 
 \begin{remark}
-  NOSB 的角动量守恒条件式\eqref{eq:pf-symmetric}与经典连续介质力学完全一致——这正是本构对应的“红利”：由于本构层面完全沿用经典理论，经典理论中保证角动量守恒的条件（Cauchy 应力对称性）在 NOSB 中依然有效。这与 OSB 需要专门构造满足角动量条件的力态形成鲜明对比。然而，NOSB 也付出代价：其离散形式可能出现零能模式（zero-energy mode）失稳，即位移场存在不产生力态响应的变形模式。这一数值不稳定问题及其控制策略将在本章后续节详细讨论 \cite{Silling2017}。
+  NOSB 的角动量守恒条件式\eqref{eq:pf-symmetric}与经典连续介质力学完全一致——这正是本构对应的"红利"：由于本构层面完全沿用经典理论，经典理论中保证角动量守恒的条件（Cauchy 应力对称性）在 NOSB 中依然有效。这与 OSB 需要专门构造满足角动量条件的力态形成鲜明对比。然而，NOSB 也付出代价：其离散形式可能出现零能模式（zero-energy mode）失稳，即位移场存在不产生力态响应的变形模式。这一数值不稳定问题及其控制策略将在本章后续节详细讨论 \cite{Silling2017}。
 \end{remark}
 
 \subsection{NOSB 理论的发展脉络}\label{sec:nosb-history}
 
-NOSB 理论的发展沿“理论奠基—首次实现—工程应用—稳定性修正”的轨迹展开。理论层面，Silling 等 2007 年在态型理论原始文献中系统建立了 NOSB 的数学框架：定义非常规材料（Definition 8.4）、引入本构对应机制（第 12 节）并给出经典材料模型的适配方法（第 18 节）\cite{Silling2007}。实现层面，Warren 等 2009 年首次将 NOSB 方法用于固体材料变形与断裂的数值模拟，通过极分解处理有限转动、引入弹塑性本构，验证了 NOSB 摆脱泊松比限制的能力 \cite{Warren2009}。此后，Foster 等 2010 年在本构对应框架下建立了粘塑性模型，用于金属的率相关塑性变形分析 \cite{Foster2010}；Silling 与 Lehoucq 的专著级综述系统整理了态型理论的守恒律与本构对应（其第 4.11 节“由经典材料导出的近场动力学材料”是 correspondence 的权威综述）\cite{SillingLehoucq2010}。在稳定性方面，Silling 2017 年从势能最小化出发分析了对应材料模型的稳定性，指出零能模式失稳的根源并给出修正方案，为 NOSB 的可靠数值实现奠定了基础 \cite{Silling2017}。
+NOSB 理论的发展沿"理论奠基—首次实现—工程应用—稳定性修正"的轨迹展开。理论层面，Silling 等 2007 年在态型理论原始文献中系统建立了 NOSB 的数学框架：定义非常规材料（Definition 8.4）、引入本构对应机制（第 12 节）并给出经典材料模型的适配方法（第 18 节）\cite{Silling2007}。实现层面，Warren 等 2009 年首次将 NOSB 方法用于固体材料变形与断裂的数值模拟，通过极分解处理有限转动、引入弹塑性本构，验证了 NOSB 摆脱泊松比限制的能力 \cite{Warren2009}。此后，Foster 等 2010 年在本构对应框架下建立了粘塑性模型，用于金属的率相关塑性变形分析 \cite{Foster2010}；Silling 与 Lehoucq 的专著级综述系统整理了态型理论的守恒律与本构对应（其第 4.11 节"由经典材料导出的近场动力学材料"是 correspondence 的权威综述）\cite{SillingLehoucq2010}。在稳定性方面，Silling 2017 年从势能最小化出发分析了对应材料模型的稳定性，指出零能模式失稳的根源并给出修正方案，为 NOSB 的可靠数值实现奠定了基础 \cite{Silling2017}。
 
-本节建立了非常规态型建模框架：\ref{sec:nosb-motivation}节阐明 NOSB 允许任意方向力态、直接嵌入经典本构的核心思想；\ref{sec:shape-tensor}节给出形状张量式\eqref{eq:shape-tensor}与非局部变形梯度式\eqref{eq:nonlocal-deformation-gradient}，建立键变形到经典应变度量的桥梁；\ref{sec:correspondence}节给出本构对应机制式\eqref{eq:correspondence-energy}—\eqref{eq:piola-cauchy}，构造力态式\eqref{eq:nosb-force-state}，并分析了角动量守恒条件式\eqref{eq:pf-symmetric}；\ref{sec:nosb-history}节梳理了 NOSB 的发展脉络。本节建立的框架是后续各节的基础：\ref{sec:nosb-deformation-gradient}节将进一步讨论变形梯度与对应模型的细节，\ref{sec:zero-energy}节起分析零能模式与稳定化策略。
+本节建立了非常规态型建模框架：\ref{sec:nosb-motivation}节阐明 NOSB 允许任意方向力态、直接嵌入经典本构的核心思想；\ref{sec:shape-tensor}节给出形状张量式\eqref{eq:shape-tensor}与非局部变形梯度式\eqref{eq:nonlocal-deformation-gradient}，建立键变形到经典应变度量的桥梁；\ref{sec:correspondence}节给出本构对应机制式\eqref{eq:correspondence-energy}—\eqref{eq:piola-cauchy}，通过 Fréchet 导数严格推导出力态式\eqref{eq:nosb-force-state}，并导出了角动量守恒条件式\eqref{eq:pf-symmetric}；\ref{sec:nosb-history}节梳理了 NOSB 的发展脉络。本节建立的框架是后续各节的基础：\ref{sec:nosb-deformation-gradient}节将进一步讨论变形梯度与对应模型的细节，\ref{sec:zero-energy}节起分析零能模式与稳定化策略。
 
 % --- 本节说明：7.1 是 NOSB 开篇，核心是“非局部运动学 + 经典本构”：形状张量 K=∫ω(ξ⊗ξ)dV（Silling 2007 式17）度量近场域几何；非局部变形梯度 F=[∫ω(Y⊗ξ)dV]K⁻¹（式134）是键变形对变形梯度的加权最小二乘近似（均匀变形下精确）；本构对应：经典 Ψ(F) 经 P=∂Ψ/∂F（式139）与 T⟨ξ⟩=ωPK⁻¹ξ（式142）嵌入 PD；P=JσF⁻ᵀ（式143）连接 PK1 与 Cauchy 应力。角动量守恒条件 = PFᵀ 对称（=Cauchy 应力对称），客观超弹性自动满足。注意 Silling 2007 原文符号：σ 记 PK1、τ 记 Cauchy，与本书 P/σ 约定相反。文献：Warren2009 是 IJSS 46(5):1186-1195（非 JMPS）；Foster2010 是 IJNME 81(10):1242-1258（非 JMPS）；零能模式预告（Silling2017）---
 
@@ -93,7 +139,7 @@ NOSB 理论的发展沿“理论奠基—首次实现—工程应用—稳定性
 
 \subsection{非局部变形梯度的性质}\label{sec:fg-properties}
 
-非局部变形梯度式\eqref{eq:nonlocal-deformation-gradient}与经典变形梯度在性质上有两个重要区别：其一，式\eqref{eq:nonlocal-deformation-gradient}是近场域内键变形的加权平均，因此对非均匀变形给出的是“最优线性近似”而非精确值；其二，式\eqref{eq:nonlocal-deformation-gradient}的定义依赖形状张量 $\mathbf{K}$ 的可逆性，而 $\mathbf{K}$ 由近场域的几何构型决定。本节考察这些性质，为后续本构嵌入提供基础。
+非局部变形梯度式\eqref{eq:nonlocal-deformation-gradient}与经典变形梯度在性质上有两个重要区别：其一，式\eqref{eq:nonlocal-deformation-gradient}是近场域内键变形的加权平均，因此对非均匀变形给出的是"最优线性近似"而非精确值；其二，式\eqref{eq:nonlocal-deformation-gradient}的定义依赖形状张量 $\mathbf{K}$ 的可逆性，而 $\mathbf{K}$ 由近场域的几何构型决定。本节考察这些性质，为后续本构嵌入提供基础。
 
 首先考虑均匀变形下的精确性。若近场域内各键经历相同的均匀变形，即 $\underline{\mathbf{Y}}\langle\boldsymbol{\xi}\rangle=\mathbf{F}_{0}\boldsymbol{\xi}$ 对一切 $\boldsymbol{\xi}\in H_{\mathbf{x}}$ 成立，则代入式\eqref{eq:nonlocal-deformation-gradient}得
 \begin{equation}
@@ -102,7 +148,7 @@ NOSB 理论的发展沿“理论奠基—首次实现—工程应用—稳定性
   =\mathbf{F}_{0}
   \label{eq:fg-uniform}
 \end{equation}
-即在均匀变形下非局部变形梯度与经典变形梯度严格一致 \cite{Silling2007}。这一性质是 7.1 节所指“最小二乘拟合”的严格表述：式\eqref{eq:fg-uniform}表明对应材料在均匀变形下精确恢复经典响应，这是 NOSB 能够嵌入经典本构而不引入模型误差的根本保证 \cite{Silling2007,SillingLehoucq2010}。
+即在均匀变形下非局部变形梯度与经典变形梯度严格一致 \cite{Silling2007}。这一性质是 7.1 节所指"最小二乘拟合"的严格表述：式\eqref{eq:fg-uniform}表明对应材料在均匀变形下精确恢复经典响应，这是 NOSB 能够嵌入经典本构而不引入模型误差的根本保证 \cite{Silling2007,SillingLehoucq2010}。
 
 其次考察其客观性与坐标不变性。经典变形梯度 $\mathbf{F}$ 在刚体转动 $\mathbf{Q}$ 作用下按 $\mathbf{F}\to\mathbf{Q}\mathbf{F}$ 变换。非局部变形梯度式\eqref{eq:nonlocal-deformation-gradient}同样满足这一变换规律：若变形态整体叠加转动 $\underline{\mathbf{Y}}\to\mathbf{Q}\underline{\mathbf{Y}}$，则
 \begin{equation}
@@ -111,20 +157,41 @@ NOSB 理论的发展沿“理论奠基—首次实现—工程应用—稳定性
   =\mathbf{Q}\mathbf{F}
   \label{eq:fg-objective}
 \end{equation}
-即非局部变形梯度与经典变形梯度具有相同的旋转变换规律 \cite{Silling2007}。这保证了嵌入 NOSB 的经典本构（若其自身满足客观性）整体上保持客观性。进一步地，式\eqref{eq:fg-objective}的推导仅用了张量积与积分的线性性，不依赖坐标系的选取，故非局部变形梯度是坐标无关（coordinate-free）的场量 \cite{Silling2007,SillingLehoucq2010}。此外，若权重函数 $\omega$ 只依赖 $|\boldsymbol{\xi}|$，则形状张量 $\mathbf{K}\propto\mathbf{I}$，非局部变形梯度式\eqref{eq:nonlocal-deformation-gradient}退化为
+即非局部变形梯度与经典变形梯度具有相同的旋转变换规律 \cite{Silling2007}。这保证了嵌入 NOSB 的经典本构（若其自身满足客观性）整体上保持客观性。进一步地，式\eqref{eq:fg-objective}的推导仅用了张量积与积分的线性性，不依赖坐标系的选取，故非局部变形梯度是坐标无关（coordinate-free）的场量 \cite{Silling2007,SillingLehoucq2010}。此外，若权重函数 $\omega$ 只依赖 $|\boldsymbol{\xi}|$ 且近场域完整（材料点远离自由表面），则形状张量式\eqref{eq:shape-tensor}退化为各向同性张量
 \begin{equation}
-  \mathbf{F}=\frac{\int_{H_{\mathbf{x}}}\omega\,\underline{\mathbf{Y}}\langle\boldsymbol{\xi}\rangle\otimes\boldsymbol{\xi}\,dV_{\mathbf{x}'}}{\int_{H_{\mathbf{x}}}\omega\,|\boldsymbol{\xi}|^{2}\,dV_{\mathbf{x}'}}
+  \mathbf{K}=k\,\mathbf{I},\qquad
+  k=\frac{1}{3}\int_{H_{\mathbf{x}}}\omega(|\boldsymbol{\xi}|)\,|\boldsymbol{\xi}|^{2}\,dV_{\mathbf{x}'}
+  \label{eq:shape-tensor-isotropic}
+\end{equation}
+其中常数 $k$ 由对式\eqref{eq:shape-tensor}两边取迹确定：$\operatorname{tr}\mathbf{K}=3k=\int_{H_{\mathbf{x}}}\omega\,\operatorname{tr}(\boldsymbol{\xi}\otimes\boldsymbol{\xi})\,dV_{\mathbf{x}'}=\int_{H_{\mathbf{x}}}\omega\,|\boldsymbol{\xi}|^{2}\,dV_{\mathbf{x}'}$（利用了 $\operatorname{tr}(\boldsymbol{\xi}\otimes\boldsymbol{\xi})=|\boldsymbol{\xi}|^{2}$）。式\eqref{eq:shape-tensor-isotropic}表明，各向同性近场域中 $\mathbf{K}^{-1}$ 退化为标量 $3/\int\omega|\boldsymbol{\xi}|^{2}dV$，代入式\eqref{eq:nonlocal-deformation-gradient}得
+\begin{equation}
+  \mathbf{F}=\frac{3\int_{H_{\mathbf{x}}}\omega(|\boldsymbol{\xi}|)\,
+  \underline{\mathbf{Y}}\langle\boldsymbol{\xi}\rangle\otimes\boldsymbol{\xi}\,dV_{\mathbf{x}'}}
+  {\int_{H_{\mathbf{x}}}\omega(|\boldsymbol{\xi}|)\,|\boldsymbol{\xi}|^{2}\,dV_{\mathbf{x}'}}
   \label{eq:fg-isotropic-k}
 \end{equation}
-即在各向同性近场域中，式\eqref{eq:nonlocal-deformation-gradient}中的 $\mathbf{K}^{-1}$ 退化为标量 $1/\int\omega|\boldsymbol{\xi}|^{2}dV$ \cite{Silling2007,QueirugaMoridis2017}。式\eqref{eq:fg-isotropic-k}在实现上更为简便，但须注意其仅在近场域完整且各向同性时严格成立——靠近自由表面时近场域不完整，$\mathbf{K}$ 偏离各向同性，此时应保留张量形式的式\eqref{eq:nonlocal-deformation-gradient} \cite{LeBobaru2018}。
+即在各向同性近场域中，式\eqref{eq:nonlocal-deformation-gradient}中的 $\mathbf{K}^{-1}$ 退化为标量 $3/\int\omega|\boldsymbol{\xi}|^{2}dV$ \cite{Silling2007,QueirugaMoridis2017}（一般 $n$ 维情形的退化因子为 $n$：二维为 $2$、一维为 $1$，本例三维故为 $3$）。式\eqref{eq:fg-isotropic-k}在实现上更为简便，但须注意其仅在近场域完整且各向同性时严格成立——靠近自由表面时近场域不完整，$\mathbf{K}$ 偏离各向同性，此时应保留张量形式的式\eqref{eq:nonlocal-deformation-gradient} \cite{LeBobaru2018}。
 
 \begin{remark}
   客观性与坐标不变性是 NOSB 理论自洽性的基础。经典连续介质力学中，变形梯度在刚体转动下的变换规律由运动学的客观性原理（见第 3 章）决定，本构响应必须与之协调。式\eqref{eq:fg-objective}表明非局部变形梯度继承了这一变换规律，因此凡是由经典本构关系 $W=W(\mathbf{F})$ 或 $\mathbf{P}=\mathbf{P}(\mathbf{F})$ 构造的对应材料，其客观性自动满足 \cite{Silling2007}。Silling 2007 在态型理论的框架内系统证明了客观性的充分条件：力态满足 $\hat{\underline{\mathbf{T}}}(\mathbf{Q}\circ\underline{\mathbf{Y}})=\mathbf{Q}\circ\hat{\underline{\mathbf{T}}}(\underline{\mathbf{Y}})$，其中 $\mathbf{Q}\circ$ 表示对变形态整体施加转动 \cite{Silling2007}。对应材料力态式\eqref{eq:nosb-force-state}满足这一条件，故对应材料是客观的 \cite{Silling2007,LeBobaru2018Obj}。
 \end{remark}
 
-\textbf{可逆性要求。}式\eqref{eq:nonlocal-deformation-gradient}的构造要求形状张量 $\mathbf{K}$ 可逆。$\mathbf{K}$ 是近场域内全部键矢量 $\boldsymbol{\xi}\otimes\boldsymbol{\xi}$ 的加权积分，其正定性要求近场域内的键矢量张成整个三维空间。具体而言，三维情形下每个材料点至少需要三个非共面的邻居，二维情形至少需要两个非共线的邻居；否则 $\mathbf{K}$ 奇异，非局部变形梯度无法定义 \cite{Warren2009}。这一可逆性要求与有限元中单元形状的“非退化”要求类似，但源于近场域的几何构型而非网格拓扑。对边界附近的材料点，近场域被截断，$\mathbf{K}$ 仍可能正定（只要非共面键足够多），但数值上接近奇异，会放大误差——这是 NOSB 表面效应（surface effect）的来源之一，第 10 章将详细讨论 \cite{LeBobaru2018}。
+\textbf{可逆性要求。}式\eqref{eq:nonlocal-deformation-gradient}的构造要求形状张量 $\mathbf{K}$ 可逆。$\mathbf{K}$ 是近场域内全部键矢量 $\boldsymbol{\xi}\otimes\boldsymbol{\xi}$ 的加权积分，其正定性要求近场域内的键矢量张成整个三维空间。具体而言，三维情形下每个材料点至少需要三个非共面的邻居，二维情形至少需要两个非共线的邻居；否则 $\mathbf{K}$ 奇异，非局部变形梯度无法定义 \cite{Warren2009}。这一可逆性要求与有限元中单元形状的"非退化"要求类似，但源于近场域的几何构型而非网格拓扑。对边界附近的材料点，近场域被截断，$\mathbf{K}$ 仍可能正定（只要非共面键足够多），但数值上接近奇异，会放大误差——这是 NOSB 表面效应（surface effect）的来源之一，第 10 章将详细讨论 \cite{LeBobaru2018}。
 
-\textbf{与非均匀变形的关系。}对一般非均匀变形，非局部变形梯度式\eqref{eq:nonlocal-deformation-gradient}是近场域内键变形的加权平均，相当于对真实变形梯度的空间平均。设真实变形梯度场为 $\mathbf{F}^{\mathrm{true}}(\mathbf{x}')$，则式\eqref{eq:nonlocal-deformation-gradient}可以看作 $\mathbf{F}^{\mathrm{true}}$ 在近场域上的某种加权平均（具体权重取决于 $\omega$ 与积分格式）。这意味着 NOSB 的变形度量本身携带了非局部信息：变形梯度在空间上被光滑化，其波长小于 $\delta$ 的空间振荡被抹平 \cite{SillingLehoucq2010,QueirugaMoridis2017}。这一性质与键型理论中位移场的非局部平均相呼应，也是 NOSB 能够描述裂纹等不连续变形而不需要显式追踪裂纹面的原因之一。但相应地，对应材料对波长小于 $\delta$ 的变形模式的响应会被削弱，这正是零能模式失稳的根源之一，将在 \ref{sec:zero-energy}节详细分析 \cite{Silling2017}。
+\textbf{与非均匀变形的关系。}对一般非均匀变形，非局部变形梯度式\eqref{eq:nonlocal-deformation-gradient}是近场域内键变形的加权平均，相当于对真实变形梯度场的空间光滑化。这一光滑化可以用 Taylor 展开定量刻画：设真实变形梯度场 $\mathbf{F}^{\mathrm{true}}$ 在材料点 $\mathbf{x}$ 附近光滑，则近场域内各键的变形后矢量展开为
+\begin{equation}
+  \underline{\mathbf{Y}}\langle\boldsymbol{\xi}\rangle
+  =\mathbf{F}^{\mathrm{true}}(\mathbf{x})\,\boldsymbol{\xi}
+  +\frac{1}{2}\nabla\mathbf{F}^{\mathrm{true}}(:):(\boldsymbol{\xi}\otimes\boldsymbol{\xi})
+  +O(|\boldsymbol{\xi}|^{3})
+  \label{eq:fg-taylor}
+\end{equation}
+其中 $\nabla\mathbf{F}^{\mathrm{true}}$ 为三阶张量（应变梯度），$\nabla\mathbf{F}^{\mathrm{true}}(:):(\boldsymbol{\xi}\otimes\boldsymbol{\xi})$ 表示其第 2、3 指标与 $\boldsymbol{\xi}\otimes\boldsymbol{\xi}$ 的双点积，$O(|\boldsymbol{\xi}|^{3})$ 为三阶及以上的高阶项。将式\eqref{eq:fg-taylor}代入式\eqref{eq:nonlocal-deformation-gradient}：线性项给出 $\mathbf{F}^{\mathrm{true}}[\int_{H_{\mathbf{x}}}\omega\,\boldsymbol{\xi}\otimes\boldsymbol{\xi}\,dV_{\mathbf{x}'}]\mathbf{K}^{-1}=\mathbf{F}^{\mathrm{true}}$；二阶项含三阶矩 $\int_{H_{\mathbf{x}}}\omega\,\xi_{a}\xi_{b}\xi_{c}\,dV_{\mathbf{x}'}$，在权重 $\omega$ 只依赖 $|\boldsymbol{\xi}|$ 且近场域完整的球对称情形下为零（三阶矩是 $\boldsymbol{\xi}$ 的奇函数），故
+\begin{equation}
+  \mathbf{F}(\mathbf{x})=\mathbf{F}^{\mathrm{true}}(\mathbf{x})+O(\delta^{2})
+  \label{eq:fg-smoothing-error}
+\end{equation}
+即在光滑变形区域，非局部变形梯度与真实变形梯度一致到 $\delta^{2}$ 阶，三阶及以上项的残差构成 $O(\delta^{2})$ 量级的非局部误差 \cite{SillingLehoucq2010,QueirugaMoridis2017}。式\eqref{eq:fg-smoothing-error}表明 NOSB 的变形度量本身携带了非局部信息：变形梯度在空间上被光滑化，其波长小于 $\delta$ 的空间振荡（在近场域内梯度变化显著、Taylor 展开到二阶不足）被平均抹平。这一性质与键型理论中位移场的非局部平均相呼应，也是 NOSB 能够描述裂纹等不连续变形而不需要显式追踪裂纹面的原因之一——裂纹处位移不连续，式\eqref{eq:fg-taylor}的 Taylor 展开不再成立，式\eqref{eq:nonlocal-deformation-gradient}给出的恰是跨裂纹的加权平均而非局部导数。但相应地，对应材料对波长小于 $\delta$ 的变形模式的响应会被削弱，这正是零能模式失稳的根源之一，将在 \ref{sec:zero-energy}节详细分析 \cite{Silling2017}。
 
 \subsection{经典本构的嵌入形式}\label{sec:constitutive-embedding}
 
@@ -136,7 +203,23 @@ NOSB 理论的发展沿“理论奠基—首次实现—工程应用—稳定性
   \mathbf{E}=\frac{1}{2}\bigl(\mathbf{F}^{\mathrm{T}}\mathbf{F}-\mathbf{I}\bigr)
   \label{eq:stvenant-kirchhoff}
 \end{equation}
-其中 $\mathbf{E}$ 为 Green–Lagrange 应变张量，$\lambda$ 与 $\mu$ 为 Lame 常数 \cite{Silling2007,MadenciOterkus2014}。式\eqref{eq:stvenant-kirchhoff}中，第二 Piola–Kirchhoff 应力 $\mathbf{S}=\partial\Psi/\partial\mathbf{E}=\lambda(\operatorname{tr}\mathbf{E})\mathbf{I}+2\mu\mathbf{E}$，再由 $\mathbf{P}=\mathbf{F}\mathbf{S}$ 得第一 Piola–Kirchhoff 应力，代入式\eqref{eq:nosb-force-state}。需要指出的是，式\eqref{eq:stvenant-kirchhoff}这类以 $\mathbf{E}$ 为自变量的模型与以 $\mathbf{F}$ 为自变量的模型在数学上等价，区别仅在于是否显式引入应变张量 $\mathbf{E}$ 作为中间量 \cite{Silling2007}。
+其中 $\mathbf{E}$ 为 Green–Lagrange 应变张量，$\lambda$ 与 $\mu$ 为 Lame 常数 \cite{Silling2007,MadenciOterkus2014}。式\eqref{eq:stvenant-kirchhoff}对 $\mathbf{E}$ 求导即得第二 Piola–Kirchhoff 应力。求导用到两个标量函数对张量变量的链式法则——$\partial(\operatorname{tr}\mathbf{E})^{2}/\partial\mathbf{E}=2(\operatorname{tr}\mathbf{E})\mathbf{I}$ 与 $\partial\operatorname{tr}(\mathbf{E}^{2})/\partial\mathbf{E}=2\mathbf{E}$——故
+\begin{equation}
+  \mathbf{S}=\frac{\partial\Psi(\mathbf{E})}{\partial\mathbf{E}}
+  =\lambda\bigl(\operatorname{tr}\mathbf{E}\bigr)\mathbf{I}+2\mu\mathbf{E}
+  \label{eq:pk2-stv}
+\end{equation}
+第一 Piola–Kirchhoff 应力再由 $\mathbf{P}=\mathbf{F}\mathbf{S}$ 得到，这一关系可由链式法则导出：$\mathbf{P}=\partial\Psi/\partial\mathbf{F}=(\partial\Psi/\partial\mathbf{E}):(\partial\mathbf{E}/\partial\mathbf{F})=\mathbf{S}:(\partial\mathbf{E}/\partial\mathbf{F})$。由 $\mathbf{E}=\tfrac{1}{2}(\mathbf{F}^{\mathrm{T}}\mathbf{F}-\mathbf{I})$，$\mathbf{E}$ 对 $\mathbf{F}$ 的变分满足
+\begin{equation}
+  \delta\mathbf{E}=\frac{1}{2}\bigl(\delta\mathbf{F}^{\mathrm{T}}\mathbf{F}+\mathbf{F}^{\mathrm{T}}\delta\mathbf{F}\bigr)
+  \label{eq:gl-variation}
+\end{equation}
+将式\eqref{eq:gl-variation}代入并利用式\eqref{eq:pk2-stv}给出的 $\mathbf{S}$ 的对称性（$\mathbf{S}=\mathbf{S}^{\mathrm{T}}$），用分量验证：$P_{cd}=\tfrac{1}{2}S_{ab}(\delta_{ad}F_{cb}+F_{ca}\delta_{bd})=\tfrac{1}{2}(F_{cb}S_{bd}+F_{ca}S_{ad})=F_{cb}S_{bd}=(\mathbf{F}\mathbf{S})_{cd}$，即得
+\begin{equation}
+  \mathbf{P}=\mathbf{F}\mathbf{S}
+  \label{eq:pk1-from-pk2}
+\end{equation}
+将式\eqref{eq:pk1-from-pk2}代入式\eqref{eq:nosb-force-state}即得第一 Piola–Kirchhoff 应力形式的力态。需要指出的是，式\eqref{eq:stvenant-kirchhoff}这类以 $\mathbf{E}$ 为自变量的模型与以 $\mathbf{F}$ 为自变量的模型在数学上等价，区别仅在于是否显式引入应变张量 $\mathbf{E}$ 作为中间量 \cite{Silling2007}。
 
 \textbf{以 Cauchy 应力表述的本构。}工程中最常用的本构（如线弹性、$J_{2}$ 塑性、粘塑性等）通常以 Cauchy 应力 $\boldsymbol{\sigma}$ 为响应量。此时利用 Piola 变换式\eqref{eq:piola-cauchy}，把式\eqref{eq:nosb-force-state}改写为
 \begin{equation}
@@ -144,7 +227,14 @@ NOSB 理论的发展沿“理论奠基—首次实现—工程应用—稳定性
   =\omega(|\boldsymbol{\xi}|)\,J\boldsymbol{\sigma}\,\mathbf{F}^{-\mathrm{T}}\mathbf{K}^{-1}\boldsymbol{\xi}
   \label{eq:force-state-cauchy}
 \end{equation}
-即由 Cauchy 应力直接构造力态 \cite{Silling2007,SillingLehoucq2010}。式\eqref{eq:force-state-cauchy}的计算流程为：由式\eqref{eq:nonlocal-deformation-gradient}求 $\mathbf{F}$ → 由经典本构求 $\boldsymbol{\sigma}$（或 $\mathbf{P}$）→ 按式\eqref{eq:force-state-cauchy}构造力态 → 代入态型运动方程。值得注意的是，式\eqref{eq:force-state-cauchy}要求 $\mathbf{F}$ 可逆（出现 $\mathbf{F}^{-\mathrm{T}}$），这与式\eqref{eq:nonlocal-deformation-gradient}要求 $\mathbf{K}$ 可逆是相互独立的两个条件 \cite{Warren2009}。对小变形情形，$J\approx 1$、$\mathbf{F}^{-\mathrm{T}}\approx\mathbf{I}$，式\eqref{eq:force-state-cauchy}退化为
+即由 Cauchy 应力直接构造力态 \cite{Silling2007,SillingLehoucq2010}。式\eqref{eq:force-state-cauchy}的计算流程为：由式\eqref{eq:nonlocal-deformation-gradient}求 $\mathbf{F}$ → 由经典本构求 $\boldsymbol{\sigma}$（或 $\mathbf{P}$）→ 按式\eqref{eq:force-state-cauchy}构造力态 → 代入态型运动方程。值得注意的是，式\eqref{eq:force-state-cauchy}要求 $\mathbf{F}$ 可逆（出现 $\mathbf{F}^{-\mathrm{T}}$），这与式\eqref{eq:nonlocal-deformation-gradient}要求 $\mathbf{K}$ 可逆是相互独立的两个条件 \cite{Warren2009}。对小变形情形，位移梯度为小量（$\lVert\nabla\mathbf{u}\rVert\sim\varepsilon\ll 1$），$\mathbf{F}=\mathbf{I}+\nabla\mathbf{u}$。由行列式展开 $\det(\mathbf{I}+\nabla\mathbf{u})=1+\operatorname{tr}\nabla\mathbf{u}+O(\varepsilon^{2})$ 与 Neumann 级数 $(\mathbf{I}+\nabla\mathbf{u})^{-\mathrm{T}}=\mathbf{I}-(\nabla\mathbf{u})^{\mathrm{T}}+O(\varepsilon^{2})$，得
+\begin{equation}
+  J\boldsymbol{\sigma}\,\mathbf{F}^{-\mathrm{T}}
+  =\bigl(1+\operatorname{tr}\nabla\mathbf{u}\bigr)\boldsymbol{\sigma}\bigl(\mathbf{I}-(\nabla\mathbf{u})^{\mathrm{T}}\bigr)+O(\varepsilon^{2})
+  =\boldsymbol{\sigma}+O(\varepsilon)
+  \label{eq:small-strain-reduction}
+\end{equation}
+式\eqref{eq:small-strain-reduction}表明，在 $O(\varepsilon)$ 精度内 $J\boldsymbol{\sigma}\mathbf{F}^{-\mathrm{T}}\approx\boldsymbol{\sigma}$（被略去的 $O(\varepsilon)$ 项为 $-\boldsymbol{\sigma}(\nabla\mathbf{u})^{\mathrm{T}}+\boldsymbol{\sigma}\operatorname{tr}\nabla\mathbf{u}$，相对误差与 $\varepsilon$ 同量级），式\eqref{eq:force-state-cauchy}退化为
 \begin{equation}
   \underline{\mathbf{T}}\langle\boldsymbol{\xi}\rangle
   =\omega(|\boldsymbol{\xi}|)\,\boldsymbol{\sigma}\,\mathbf{K}^{-1}\boldsymbol{\xi}
@@ -157,13 +247,32 @@ NOSB 理论的发展沿“理论奠基—首次实现—工程应用—稳定性
   \mathbf{F}=\mathbf{R}\mathbf{U}
   \label{eq:polar-decomposition}
 \end{equation}
-其中 $\mathbf{R}$ 为正交旋转张量，$\mathbf{U}$ 为对称正定的右伸长张量 \cite{Warren2009,FlanaganTaylor1987}。利用 $\mathbf{R}$ 把变形率张量 $\mathbf{D}$ 与上一时刻的 Cauchy 应力旋转到未旋转（共转）构型
+其中 $\mathbf{R}$ 为正交旋转张量，$\mathbf{U}$ 为对称正定的右伸长张量 \cite{Warren2009,FlanaganTaylor1987}。率形式本构以变形率为输入，故先引入经典运动学量。定义速度梯度 $\mathbf{L}=\dot{\mathbf{F}}\mathbf{F}^{-1}$（$\dot{(\cdot)}$ 表示物质导数），其对称部分为变形率张量、反对称部分为自旋张量：
+\begin{equation}
+  \mathbf{L}=\dot{\mathbf{F}}\mathbf{F}^{-1},\qquad
+  \mathbf{D}=\frac{1}{2}\bigl(\mathbf{L}+\mathbf{L}^{\mathrm{T}}\bigr),\qquad
+  \mathbf{W}=\frac{1}{2}\bigl(\mathbf{L}-\mathbf{L}^{\mathrm{T}}\bigr)
+  \label{eq:rate-kinematics}
+\end{equation}
+$\mathbf{D}$ 是率形式本构的应变率输入，$\mathbf{W}$ 度量材料点的局部转动。利用极分解的 $\mathbf{R}$ 把式\eqref{eq:rate-kinematics}中的 $\mathbf{D}$ 与上一时刻的 Cauchy 应力旋转到未旋转（共转）构型
 \begin{equation}
   \tilde{\mathbf{D}}=\mathbf{R}^{\mathrm{T}}\mathbf{D}\mathbf{R},\qquad
   \tilde{\boldsymbol{\sigma}}=\mathbf{R}^{\mathrm{T}}\boldsymbol{\sigma}\mathbf{R}
   \label{eq:unrotated-frame}
 \end{equation}
-在未旋转构型中运行经典率形式本构 $\dot{\tilde{\boldsymbol{\sigma}}}=\mathbf{C}(\tilde{\boldsymbol{\sigma}},\ldots):\tilde{\mathbf{D}}$，再旋转回当前构型 $\boldsymbol{\sigma}=\mathbf{R}\tilde{\boldsymbol{\sigma}}\mathbf{R}^{\mathrm{T}}$，最后由式\eqref{eq:force-state-cauchy}构造力态 \cite{Warren2009}。这一“极分解—旋转—积分—旋转回”的流程与经典有限元中客观应力率的处理（如 Jaumann 率）一致，保证了塑性本构的客观性 \cite{FlanaganTaylor1987}。Warren 等 2009 年用该框架实现了各向同性弹塑性本构的 NOSB 模拟，验证了 NOSB 摆脱泊松比限制、处理有限转动与断裂的能力 \cite{Warren2009}。
+在未旋转构型中运行经典率形式本构 $\dot{\tilde{\boldsymbol{\sigma}}}=\mathbf{C}(\tilde{\boldsymbol{\sigma}},\ldots):\tilde{\mathbf{D}}$（$\mathbf{C}$ 为切线模量，对弹塑性切线可视为各向同性张量），再旋转回当前构型
+\begin{equation}
+  \boldsymbol{\sigma}=\mathbf{R}\tilde{\boldsymbol{\sigma}}\mathbf{R}^{\mathrm{T}}
+  \label{eq:rotate-back}
+\end{equation}
+最后由式\eqref{eq:force-state-cauchy}构造力态 \cite{Warren2009}。这一"极分解—旋转—积分—旋转回"的流程与经典有限元中客观应力率的处理（如 Jaumann 率）一致，保证了塑性本构的客观性 \cite{FlanaganTaylor1987}。为看清这一点，对式\eqref{eq:rotate-back}求物质导数。记 $\boldsymbol{\Omega}=\dot{\mathbf{R}}\mathbf{R}^{\mathrm{T}}$，由正交性 $\mathbf{R}\mathbf{R}^{\mathrm{T}}=\mathbf{I}$ 求导得 $\dot{\mathbf{R}}\mathbf{R}^{\mathrm{T}}+\mathbf{R}\dot{\mathbf{R}}^{\mathrm{T}}=\mathbf{0}$，故 $\boldsymbol{\Omega}$ 反对称；利用 $\dot{\mathbf{R}}=\boldsymbol{\Omega}\mathbf{R}$ 得
+\begin{equation}
+  \dot{\boldsymbol{\sigma}}
+  =\boldsymbol{\Omega}\boldsymbol{\sigma}+\mathbf{R}\dot{\tilde{\boldsymbol{\sigma}}}\mathbf{R}^{\mathrm{T}}-\boldsymbol{\sigma}\boldsymbol{\Omega}
+  =\boldsymbol{\Omega}\boldsymbol{\sigma}+\mathbf{C}:\mathbf{D}-\boldsymbol{\sigma}\boldsymbol{\Omega}
+  \label{eq:objective-rate}
+\end{equation}
+其中用到了 $\mathbf{R}\tilde{\mathbf{D}}\mathbf{R}^{\mathrm{T}}=\mathbf{D}$ 与各向同性切线模量的转动不变性 $\mathbf{R}(\mathbf{C}:\tilde{\mathbf{D}})\mathbf{R}^{\mathrm{T}}=\mathbf{C}:\mathbf{D}$。式\eqref{eq:objective-rate}正是共转（Green--Naghdi 型）客观率的应力演化形式：以极分解转动张量 $\boldsymbol{\Omega}=\dot{\mathbf{R}}\mathbf{R}^{\mathrm{T}}$ 取代 Jaumann 率中的自旋 $\mathbf{W}$（式\eqref{eq:rate-kinematics}）。因此，未旋转构型方法在连续极限下等价于 Green--Naghdi 客观率本构 $\dot{\boldsymbol{\sigma}}^{\nabla}=\mathbf{C}:\mathbf{D}$，而 Jaumann 率是取 $\boldsymbol{\Omega}=\mathbf{W}$ 的另一种选择 \cite{Warren2009,FlanaganTaylor1987}。Warren 等 2009 年用该框架实现了各向同性弹塑性本构的 NOSB 模拟，验证了 NOSB 摆脱泊松比限制、处理有限转动与断裂的能力 \cite{Warren2009}。
 
 \begin{remark}
   上述三类嵌入形式的适用场景不同。超弹性形式式\eqref{eq:piola-stress}理论上最简洁，但要求本构可写成 $\Psi(\mathbf{F})$ 的显式函数；Cauchy 应力形式式\eqref{eq:force-state-cauchy}—\eqref{eq:force-state-small}直接对接工程中常见的以 $\boldsymbol{\sigma}$ 为变量的本构，是应用最广的形式；率形式式\eqref{eq:polar-decomposition}—\eqref{eq:unrotated-frame}适用于塑性等路径相关材料，但引入了极分解与转动更新的额外计算量。三者在均匀变形下都精确恢复经典响应，差异主要体现在本构的表达方式与数值实现上 \cite{Silling2007,Warren2009,Breitenfeld2014}。值得强调的是，本构对应的灵活性是 NOSB 相对于 OSB 的核心优势：OSB 需要把每个本构重新表述为标量力态（见第 6 章），而 NOSB 可以直接调用经典本构，因此第 6 章建立的弹塑性、粘塑性模型（如 Foster 等的粘塑性模型 \cite{Foster2010}）以及第 13 章将讨论的热力耦合本构都可以不加改写地嵌入 NOSB。
@@ -173,28 +282,46 @@ NOSB 理论的发展沿“理论奠基—首次实现—工程应用—稳定性
 
 7.1 节与本节的对应模型式\eqref{eq:correspondence-energy}—\eqref{eq:nosb-force-state}在均匀变形下精确恢复经典响应，但在两个问题上存在缺陷：其一，非局部变形梯度式\eqref{eq:nonlocal-deformation-gradient}是加权平均，对近场域内某些变形模式（特别是波长小于 $\delta$ 的模式）不敏感，导致零能模式失稳；其二，式\eqref{eq:nonlocal-deformation-gradient}无法检测近场域内部的局部化变形（如键级的物质相互贯穿）。为克服这些缺陷，文献中发展了若干扩展与修正方案，本节择要介绍，其中零能模式的系统分析留待 \ref{sec:zero-energy}节。
 
-\textbf{键应变度量（bond-strain measures）。}Tupek 与 Radovitzky 2014 年指出，式\eqref{eq:nonlocal-deformation-gradient}的非局部变形梯度 $\mathbf{F}$ 只携带了近场域内键变形的“平均”信息，无法检测键级的局部化变形：某一键的变形后矢量可以趋近于零（键被压扁），而不影响 $\mathbf{F}$ 的值，即 $\det\mathbf{F}$ 仍大于零。这意味着对应材料无法阻止近场域内局部的物质相互贯穿。为此，他们提出基于键应变度量族的扩展对应模型 \cite{TupekRadovitzky2014}。定义键的伸长度量
+\textbf{键应变度量（bond-strain measures）。}Tupek 与 Radovitzky 2014 年指出，式\eqref{eq:nonlocal-deformation-gradient}的非局部变形梯度 $\mathbf{F}$ 只携带了近场域内键变形的"平均"信息，无法检测键级的局部化变形：某一键的变形后矢量可以趋近于零（键被压扁），而不影响 $\mathbf{F}$ 的值，即 $\det\mathbf{F}$ 仍大于零。这意味着对应材料无法阻止近场域内局部的物质相互贯穿。为此，他们提出基于键应变度量族的扩展对应模型 \cite{TupekRadovitzky2014}。定义键的应变度量
 \begin{equation}
   \varepsilon^{(m)}\langle\boldsymbol{\xi}\rangle
   =\frac{1}{2m}\Bigl[\bigl(c\langle\boldsymbol{\xi}\rangle\bigr)^{m}-1\Bigr],\qquad
   c\langle\boldsymbol{\xi}\rangle=\frac{\underline{\mathbf{Y}}\langle\boldsymbol{\xi}\rangle\cdot\underline{\mathbf{Y}}\langle\boldsymbol{\xi}\rangle}{\boldsymbol{\xi}\cdot\boldsymbol{\xi}}
   \label{eq:bond-strain-measure}
 \end{equation}
-其中 $c\langle\boldsymbol{\xi}\rangle$ 为键的 Cauchy–Green 型标量态，$m$ 为度量参数。式\eqref{eq:bond-strain-measure}是 Seth–Hill 应变族在键层面的推广：$m=2$ 对应 Green–Lagrange 型、$m=0$ 对应对数（Hencky）型应变 $c\to0$（键压扁）时，$m\le0$ 的度量趋向负无穷，从而在键层面逐键禁止物质贯穿 \cite{TupekRadovitzky2014}。相应的非局部应变张量定义为
+其中 $c\langle\boldsymbol{\xi}\rangle$ 为键的 Cauchy–Green 型标量态，$m$ 为度量参数。式\eqref{eq:bond-strain-measure}的构造可以直接从 Seth–Hill 应变族读出。经典 Seth–Hill 应变族以右 Cauchy–Green 张量 $\mathbf{F}^{\mathrm{T}}\mathbf{F}$ 为自变量，写为 $\tfrac{1}{2m}\bigl[(\mathbf{F}^{\mathrm{T}}\mathbf{F})^{m}-\mathbf{I}\bigr]$，其中 $m=1$ 给出 Green–Lagrange 应变、$m\to0$ 给出对数（Hencky）应变、$m=-1$ 给出 Almansi 应变。对单条键而言，右 Cauchy–Green 张量在键方向上的分量正是 $c\langle\boldsymbol{\xi}\rangle=|\underline{\mathbf{Y}}\langle\boldsymbol{\xi}\rangle|^{2}/|\boldsymbol{\xi}|^{2}$，把 $\tfrac{1}{2m}\bigl[(\mathbf{F}^{\mathrm{T}}\mathbf{F})^{m}-\mathbf{I}\bigr]$ 中的张量换成标量 $c$ 即得式\eqref{eq:bond-strain-measure}。因此本书中 $m=1$ 对应 Green–Lagrange 型、$m\to0$ 对应对数（Hencky）型、$m=-1$ 对应 Almansi 型。$m$ 的取值还控制键被压扁时的行为：当 $c\to0$（键压扁）时，$c^{m}$ 对 $m<0$ 发散，式\eqref{eq:bond-strain-measure}趋向负无穷；$m=0$ 时 $\tfrac{1}{2}\ln c\to-\infty$。故 $m\le0$ 的度量在键压扁时逐键发散到负无穷，从而在键层面禁止物质相互贯穿 \cite{TupekRadovitzky2014}。相应的非局部应变张量定义为
 \begin{equation}
   \bar{\mathbf{E}}^{(m)}
   =\int_{H_{\mathbf{x}}}\omega\,\varepsilon^{(m)}\langle\boldsymbol{\xi}\rangle\,\underline{\mathbf{H}}\langle\boldsymbol{\xi}\rangle\,dV_{\mathbf{x}'},\qquad
   \underline{\mathbf{H}}\langle\boldsymbol{\xi}\rangle=\frac{5}{2}\frac{\boldsymbol{\xi}\otimes\boldsymbol{\xi}}{\boldsymbol{\xi}\cdot\boldsymbol{\xi}}-\frac{1}{2}\mathbf{I}
   \label{eq:nonlocal-strain-tensor}
 \end{equation}
-其中 $\underline{\mathbf{H}}\langle\boldsymbol{\xi}\rangle$ 为投影态（投影算子），归一化条件 $\int_{H_{\mathbf{x}}}\omega\,dV=3$ 保证式\eqref{eq:nonlocal-strain-tensor}在均匀变形下退化为经典应变张量 \cite{TupekRadovitzky2014}。把式\eqref{eq:nonlocal-strain-tensor}代入经典本构 $\bar{\boldsymbol{\sigma}}^{(m)}=\partial\bar{\Psi}(\bar{\mathbf{E}}^{(m)})/\partial\bar{\mathbf{E}}^{(m)}$，得力态
+其中 $\underline{\mathbf{H}}\langle\boldsymbol{\xi}\rangle$ 为投影态（投影算子），其作用是把各键的标量应变 $\varepsilon^{(m)}$ 按键方向张量 $\boldsymbol{\xi}\otimes\boldsymbol{\xi}/|\boldsymbol{\xi}|^{2}$ 分配为二阶张量。$\underline{\mathbf{H}}$ 的系数由矩条件确定：在完整球对称近场域中，方向平均 $\int_{H_{\mathbf{x}}}\omega\,\tfrac{\boldsymbol{\xi}\otimes\boldsymbol{\xi}}{|\boldsymbol{\xi}|^{2}}\,dV_{\mathbf{x}'}=\tfrac{1}{3}\int_{H_{\mathbf{x}}}\omega\,dV_{\mathbf{x}'}\,\mathbf{I}$（三维中 $\int\hat{\boldsymbol{\xi}}\otimes\hat{\boldsymbol{\xi}}\,d\Omega=\tfrac{4\pi}{3}\mathbf{I}$），故
+\begin{equation}
+  \int_{H_{\mathbf{x}}}\omega\,\underline{\mathbf{H}}\langle\boldsymbol{\xi}\rangle\,dV_{\mathbf{x}'}
+  =\Bigl[\frac{5}{2}\cdot\frac{1}{3}-\frac{1}{2}\Bigr]\int_{H_{\mathbf{x}}}\omega\,dV_{\mathbf{x}'}\,\mathbf{I}
+  =\frac{1}{3}\int_{H_{\mathbf{x}}}\omega\,dV_{\mathbf{x}'}\,\mathbf{I}
+  \label{eq:projector-identity}
+\end{equation}
+归一化条件 $\int_{H_{\mathbf{x}}}\omega\,dV=3$ 使式\eqref{eq:projector-identity}给出 $\int_{H_{\mathbf{x}}}\omega\,\underline{\mathbf{H}}\,dV_{\mathbf{x}'}=\mathbf{I}$。这一恒等式保证式\eqref{eq:nonlocal-strain-tensor}在均匀变形下退化为经典应变张量：均匀变形下 $c\langle\boldsymbol{\xi}\rangle=\boldsymbol{\xi}\cdot(\mathbf{F}^{\mathrm{T}}\mathbf{F})\boldsymbol{\xi}/|\boldsymbol{\xi}|^{2}$，$m=1$ 时 $\varepsilon^{(1)}=\tfrac{1}{2}(c-1)=\tfrac{1}{2}\,\boldsymbol{\xi}\cdot(\mathbf{F}^{\mathrm{T}}\mathbf{F}-\mathbf{I})\boldsymbol{\xi}/|\boldsymbol{\xi}|^{2}$，代入式\eqref{eq:nonlocal-strain-tensor}并利用球对称四阶矩 $\int_{H_{\mathbf{x}}}\omega\,\tfrac{(\boldsymbol{\xi}\otimes\boldsymbol{\xi})(\boldsymbol{\xi}\otimes\boldsymbol{\xi})}{|\boldsymbol{\xi}|^{4}}\,dV_{\mathbf{x}'}=\tfrac{1}{15}\int_{H_{\mathbf{x}}}\omega\,dV_{\mathbf{x}'}\,(\mathbf{I}\otimes\mathbf{I}+\mathbf{I}\bar{\otimes}\mathbf{I}+\mathbf{I}\underline{\otimes}\mathbf{I})$ 与二阶矩，化简得
+\begin{equation}
+  \bar{\mathbf{E}}^{(1)}=\frac{1}{2}\bigl(\mathbf{F}^{\mathrm{T}}\mathbf{F}-\mathbf{I}\bigr)
+  \label{eq:strain-tensor-uniform}
+\end{equation}
+即式\eqref{eq:strain-tensor-uniform}给出经典 Green–Lagrange 应变张量（对照式\eqref{eq:stvenant-kirchhoff}中的 $\mathbf{E}$）\cite{TupekRadovitzky2014}。把式\eqref{eq:nonlocal-strain-tensor}代入经典本构 $\bar{\boldsymbol{\sigma}}^{(m)}=\partial\bar{\Psi}(\bar{\mathbf{E}}^{(m)})/\partial\bar{\mathbf{E}}^{(m)}$，得力态
 \begin{equation}
   \underline{\mathbf{T}}\langle\boldsymbol{\xi}\rangle
   =\bar{\boldsymbol{\sigma}}^{(m)}:\underline{\mathbf{H}}\langle\boldsymbol{\xi}\rangle\,\omega\,c\langle\boldsymbol{\xi}\rangle^{m-1}
   \frac{\underline{\mathbf{Y}}\langle\boldsymbol{\xi}\rangle}{|\boldsymbol{\xi}|^{2}}
   \label{eq:tupak-force-state}
 \end{equation}
-式\eqref{eq:tupak-force-state}中 $\bar{\boldsymbol{\sigma}}^{(m)}:\underline{\mathbf{H}}\langle\boldsymbol{\xi}\rangle$ 为二阶张量与态的点积 \cite{TupekRadovitzky2014}。值得注意的是，由于 $\bar{\mathbf{E}}^{(m)}$ 只依赖键长 $|\underline{\mathbf{Y}}\langle\boldsymbol{\xi}\rangle|$，式\eqref{eq:tupak-force-state}构造的力态平行于 $\underline{\mathbf{Y}}\langle\boldsymbol{\xi}\rangle$，属于普通态型（ordinary）表述——这是扩展对应与原始对应式\eqref{eq:nosb-force-state}（非常规）的本质区别。这一性质使得式\eqref{eq:tupak-force-state}自动满足角动量守恒，且避免了原始对应的零能模式问题 \cite{TupekRadovitzky2014}。
+式\eqref{eq:tupak-force-state}中 $\bar{\boldsymbol{\sigma}}^{(m)}:\underline{\mathbf{H}}\langle\boldsymbol{\xi}\rangle$ 为二阶张量与态的点积 \cite{TupekRadovitzky2014}。式\eqref{eq:tupak-force-state}可由对能量 $W=\bar{\Psi}(\bar{\mathbf{E}}^{(m)})$ 求关于 $\underline{\mathbf{Y}}$ 的 Fréchet 导数导出：由链式法则 $\delta W=\bar{\boldsymbol{\sigma}}^{(m)}:\delta\bar{\mathbf{E}}^{(m)}=\int_{H_{\mathbf{x}}}\omega\,\delta\varepsilon^{(m)}\langle\boldsymbol{\xi}\rangle\,\bar{\boldsymbol{\sigma}}^{(m)}:\underline{\mathbf{H}}\langle\boldsymbol{\xi}\rangle\,dV_{\mathbf{x}'}$。由式\eqref{eq:bond-strain-measure}，$\partial c/\partial\underline{\mathbf{Y}}=2\underline{\mathbf{Y}}/|\boldsymbol{\xi}|^{2}$ 与 $\partial\varepsilon^{(m)}/\partial c=\tfrac{1}{2}c^{m-1}$，故
+\begin{equation}
+  \frac{\partial\varepsilon^{(m)}\langle\boldsymbol{\xi}\rangle}{\partial\underline{\mathbf{Y}}\langle\boldsymbol{\xi}\rangle}
+  =c\langle\boldsymbol{\xi}\rangle^{m-1}\frac{\underline{\mathbf{Y}}\langle\boldsymbol{\xi}\rangle}{|\boldsymbol{\xi}|^{2}}
+  \label{eq:bond-strain-derivative}
+\end{equation}
+把式\eqref{eq:bond-strain-derivative}代入 $\delta W$，并与力态的变分定义式\eqref{eq:frechet-def}对比，即得力态式\eqref{eq:tupak-force-state} \cite{TupekRadovitzky2014}。值得注意的是，由于 $\bar{\mathbf{E}}^{(m)}$ 只依赖键长 $|\underline{\mathbf{Y}}\langle\boldsymbol{\xi}\rangle|$，式\eqref{eq:tupak-force-state}构造的力态平行于 $\underline{\mathbf{Y}}\langle\boldsymbol{\xi}\rangle$，属于普通态型（ordinary）表述——这是扩展对应与原始对应式\eqref{eq:nosb-force-state}（非常规）的本质区别。这一性质使得式\eqref{eq:tupak-force-state}自动满足角动量守恒，且避免了原始对应的零能模式问题 \cite{TupekRadovitzky2014}。
 
 \textbf{键关联变形梯度。}另一类修正思路是在更小的子近场域上构造变形梯度。Chen 2018 年提出键关联变形梯度（bond-associated deformation gradient）：对每条键 $\boldsymbol{\xi}$，在包含该键的子近场域 $H_{\mathbf{x}}^{\boldsymbol{\xi}}$ 上定义
 \begin{equation}
@@ -203,17 +330,17 @@ NOSB 理论的发展沿“理论奠基—首次实现—工程应用—稳定性
   \left[\int_{H_{\mathbf{x}}^{\boldsymbol{\xi}}}\omega\,\boldsymbol{\eta}\otimes\boldsymbol{\eta}\,dV_{\mathbf{x}'}\right]^{-1}
   \label{eq:bond-associated-f}
 \end{equation}
-其中 $H_{\mathbf{x}}^{\boldsymbol{\xi}}$ 是包含键 $\boldsymbol{\xi}$ 与 $\mathbf{x}$ 的球形子近场域，其半径小于 $\delta$。键关联变形梯度式\eqref{eq:bond-associated-f}把“变形态→力态”的映射变为单射，从根本上消除了零能模式 \cite{Chen2018}。类似地，Breitzman 与 Dayal 2018 年提出键级变形梯度（bond-level deformation gradients）与能量平均方法，在键层面构造变形梯度并对应变能密度作能量平均，在不引入罚参数的情况下同时消除线弹性失稳与物质贯穿 \cite{BreitzmanDayal2018}。
+其中 $H_{\mathbf{x}}^{\boldsymbol{\xi}}$ 是包含键 $\boldsymbol{\xi}$ 与 $\mathbf{x}$ 的球形子近场域，其半径小于 $\delta$。键关联变形梯度式\eqref{eq:bond-associated-f}把"变形态→力态"的映射变为单射，从根本上消除了零能模式 \cite{Chen2018}。类似地，Breitzman 与 Dayal 2018 年提出键级变形梯度（bond-level deformation gradients）与能量平均方法，在键层面构造变形梯度并对应变能密度作能量平均，在不引入罚参数的情况下同时消除线弹性失稳与物质贯穿 \cite{BreitzmanDayal2018}。
 
-\textbf{高阶近似与权重函数的作用。}零能模式的根源在于式\eqref{eq:nonlocal-deformation-gradient}对近场域内变形信息的“压缩”丢失了部分模式。Yaghoobi 与 Chorzepa 2017 年用高阶多项式近似构造变形梯度，保留更多变形模式的信息，从而抑制零能模式并改善大 horizon 情形的精度 \cite{YaghoobiChorzepa2017}。此外，权重函数 $\omega$ 的选择对式\eqref{eq:nonlocal-deformation-gradient}的性质有重要影响：Queiruga 与 Moridis 2017 年的数值实验表明，态型本构的收敛性质显著依赖 $\omega$ 的形式，其中三次型（cubic）权重整体最优，而常数型权重在大近场域时收敛性最差 \cite{QueirugaMoridis2017}；Seleson 与 Parks 2011 年则从影响函数（influence function）的角度分析了 $\omega$ 对波传播与断裂模拟的影响 \cite{SelesonParks2011}。权重函数的选择对零能模式的控制、表面效应的修正均有影响，将在 \ref{sec:zero-energy}节与第 10 章进一步讨论。
+\textbf{高阶近似与权重函数的作用。}零能模式的根源在于式\eqref{eq:nonlocal-deformation-gradient}对近场域内变形信息的"压缩"丢失了部分模式。Yaghoobi 与 Chorzepa 2017 年用高阶多项式近似构造变形梯度，保留更多变形模式的信息，从而抑制零能模式并改善大 horizon 情形的精度 \cite{YaghoobiChorzepa2017}。此外，权重函数 $\omega$ 的选择对式\eqref{eq:nonlocal-deformation-gradient}的性质有重要影响：Queiruga 与 Moridis 2017 年的数值实验表明，态型本构的收敛性质显著依赖 $\omega$ 的形式，其中三次型（cubic）权重整体最优，而常数型权重在大近场域时收敛性最差 \cite{QueirugaMoridis2017}；Seleson 与 Parks 2011 年则从影响函数（influence function）的角度分析了 $\omega$ 对波传播与断裂模拟的影响 \cite{SelesonParks2011}。权重函数的选择对零能模式的控制、表面效应的修正均有影响，将在 \ref{sec:zero-energy}节与第 10 章进一步讨论。
 
 \begin{remark}
-  上述扩展与修正方案可以归为两类：一类保留“变形梯度 + 经典本构”的对应结构，通过改进变形梯度的构造（键关联式\eqref{eq:bond-associated-f}、高阶近似、子近场域等）消除零能模式；另一类放弃变形梯度作为中间量，直接在键层面构造应变度量（键应变度量式\eqref{eq:bond-strain-measure}—\eqref{eq:tupak-force-state}），此时力态自动回到普通态型结构。两类方案各有取舍：前者保留了经典本构的直接可用性，但需要额外处理稳定性；后者本构表达受限于各向同性键度量，但稳定性与角动量守恒自动满足。此外，Silling 2017 年从势能稳定性的角度系统分析了对应模型的失稳机制，提出在应变能密度中附加稳定化项的方法，这是目前应用最广的零能模式控制策略，将在 \ref{sec:zero-energy}节详细介绍 \cite{Silling2017}。
+  上述扩展与修正方案可以归为两类：一类保留"变形梯度 + 经典本构"的对应结构，通过改进变形梯度的构造（键关联式\eqref{eq:bond-associated-f}、高阶近似、子近场域等）消除零能模式；另一类放弃变形梯度作为中间量，直接在键层面构造应变度量（键应变度量式\eqref{eq:bond-strain-measure}—\eqref{eq:tupak-force-state}），此时力态自动回到普通态型结构。两类方案各有取舍：前者保留了经典本构的直接可用性，但需要额外处理稳定性；后者本构表达受限于各向同性键度量，但稳定性与角动量守恒自动满足。此外，Silling 2017 年从势能稳定性的角度系统分析了对应模型的失稳机制，提出在应变能密度中附加稳定化项的方法，这是目前应用最广的零能模式控制策略，将在 \ref{sec:zero-energy}节详细介绍 \cite{Silling2017}。
 \end{remark}
 
 \section{线性问题的隐式求解}\label{sec:implicit-linear}
 
-第 5 章建立的显式时间积分在准静态问题中面临时间步受稳定条件限制的困难：显式格式的时间步须小于临界步长（与 $\delta$ 量级相关），而准静态加载的时间尺度远大于此，若直接采用显式积分，需要数百万步才能完成一次加载历程。为此，第 9 章将介绍两类准静态求解策略——自适应动力松弛法 \cite{KilicMadenci2010} 与隐式求解。本节介绍 NOSB 的隐式求解：利用本构对应机制把经典本构嵌入态型框架后，离散的 NOSB 方程可以组装成与有限元类似的代数方程组，从而直接求解位移场，避免了显式积分的时间步限制。本节内容按隐式求解的计算流程组织：首先给出 NOSB 的空间离散与准静态平衡方程（\ref{sec:implicit-discretize}节）；进而引入位移梯度与小应变张量的离散表示，建立“节点位移—应变—应力—力态”的线性链（\ref{sec:implicit-strain}节）；然后推导切线刚度矩阵的组装方法，并分析其与经典有限元刚度矩阵的结构差异（\ref{sec:implicit-stiffness}节）；最后讨论边界条件的处理与稀疏线性方程组的求解（\ref{sec:implicit-bc-solve}节）。本节聚焦于线性（小变形线弹性）情形的隐式格式，非线性情形的 Newton 型求解将在 \ref{sec:implicit-nonlinear}节讨论，零能模式对刚度矩阵的影响留待 \ref{sec:zero-energy}节分析。本节公式与 Breitenfeld 等的 NOSB 隐式实现一致 \cite{Breitenfeld2014,BreitenfeldThesis2014}。
+第 5 章建立的显式时间积分在准静态问题中面临时间步受稳定条件限制的困难：显式格式的时间步须小于临界步长（与 $\delta$ 量级相关），而准静态加载的时间尺度远大于此，若直接采用显式积分，需要数百万步才能完成一次加载历程。为此，第 9 章将介绍两类准静态求解策略——自适应动力松弛法 \cite{KilicMadenci2010} 与隐式求解。本节介绍 NOSB 的隐式求解：利用本构对应机制把经典本构嵌入态型框架后，离散的 NOSB 方程可以组装成与有限元类似的代数方程组，从而直接求解位移场，避免了显式积分的时间步限制。本节内容按隐式求解的计算流程组织：首先给出 NOSB 的空间离散与准静态平衡方程（\ref{sec:implicit-discretize}节）；进而引入位移梯度与小应变张量的离散表示，建立"节点位移—应变—应力—力态"的线性链（\ref{sec:implicit-strain}节）；然后推导切线刚度矩阵的组装方法，并分析其与经典有限元刚度矩阵的结构差异（\ref{sec:implicit-stiffness}节）；最后讨论边界条件的处理与稀疏线性方程组的求解（\ref{sec:implicit-bc-solve}节）。本节聚焦于线性（小变形线弹性）情形的隐式格式，非线性情形的 Newton 型求解将在 \ref{sec:implicit-nonlinear}节讨论，零能模式对刚度矩阵的影响留待 \ref{sec:zero-energy}节分析。本节公式与 Breitenfeld 等的 NOSB 隐式实现一致 \cite{Breitenfeld2014,BreitenfeldThesis2014}。
 
 \subsection{空间离散与准静态平衡方程}\label{sec:implicit-discretize}
 
@@ -229,29 +356,38 @@ NOSB 理论的发展沿“理论奠基—首次实现—工程应用—稳定性
 
 \subsection{位移梯度与小应变张量的离散}\label{sec:implicit-strain}
 
-为把式\eqref{eq:implicit-equilibrium}写成线性代数形式，先把位移梯度离散化。由式\eqref{eq:nonlocal-deformation-gradient}与 $\nabla\mathbf{u}=\mathbf{F}-\mathbf{I}$，节点 $\mathbf{x}_j$ 的离散位移梯度为
+为把式\eqref{eq:implicit-equilibrium}写成线性代数形式，先把位移梯度离散化。离散化从连续统定义式\eqref{eq:nonlocal-deformation-gradient}出发：把积分换为对近场域内邻居的黎曼和，并把变形后键矢量写为 $\underline{\mathbf{Y}}\langle\boldsymbol{\xi}\rangle=\boldsymbol{\xi}+\mathbf{u}_n-\mathbf{u}_j$（参考键矢量加相对位移），得
+\begin{equation}
+  \mathbf{F}(\mathbf{x}_j)
+  =\Bigl[\sum_{n=1}^{m}\omega(|\boldsymbol{\xi}|)\,
+  \bigl(\boldsymbol{\xi}+\mathbf{u}_n-\mathbf{u}_j\bigr)\otimes\boldsymbol{\xi}\,V_n\Bigr]\mathbf{K}(\mathbf{x}_j)^{-1}
+  =\mathbf{I}+\Bigl[\sum_{n=1}^{m}\omega(|\boldsymbol{\xi}|)\,
+  \bigl(\mathbf{u}_n-\mathbf{u}_j\bigr)\otimes\boldsymbol{\xi}\,V_n\Bigr]\mathbf{K}(\mathbf{x}_j)^{-1}
+  \label{eq:discrete-fgrad}
+\end{equation}
+式\eqref{eq:discrete-fgrad}的第二步用到 $\sum_{n}\omega\,\boldsymbol{\xi}\otimes\boldsymbol{\xi}\,V_n=\mathbf{K}(\mathbf{x}_j)$（式\eqref{eq:discrete-shape-tensor}），故 $\bigl[\sum_{n}\omega\,\boldsymbol{\xi}\otimes\boldsymbol{\xi}\,V_n\bigr]\mathbf{K}(\mathbf{x}_j)^{-1}=\mathbf{I}$。由 $\nabla\mathbf{u}=\mathbf{F}-\mathbf{I}$，节点 $\mathbf{x}_j$ 的离散位移梯度为
 \begin{equation}
   \nabla\mathbf{u}(\mathbf{x}_j)
   =\sum_{n=1}^{m}\omega(|\boldsymbol{\xi}|)\,
-  \bigl(\mathbf{u}_n-\mathbf{u}_j\bigr)\otimes\boldsymbol{\xi}\,V_n\cdot\mathbf{K}(\mathbf{x}_j)
+  \bigl(\mathbf{u}_n-\mathbf{u}_j\bigr)\otimes\boldsymbol{\xi}\,V_n\cdot\mathbf{K}(\mathbf{x}_j)^{-1}
   \label{eq:discrete-grad-u}
 \end{equation}
 其中 $\boldsymbol{\xi}=\mathbf{x}_n-\mathbf{x}_j$，$\mathbf{K}$ 为离散形状张量
 \begin{equation}
-  \mathbf{K}(\mathbf{x}_j)=\Bigl[\sum_{n=1}^{m}\omega(|\boldsymbol{\xi}|)\,
-  \boldsymbol{\xi}\otimes\boldsymbol{\xi}\,V_n\Bigr]^{-1}
+  \mathbf{K}(\mathbf{x}_j)=\sum_{n=1}^{m}\omega(|\boldsymbol{\xi}|)\,
+  \boldsymbol{\xi}\otimes\boldsymbol{\xi}\,V_n
   \label{eq:discrete-shape-tensor}
 \end{equation}
-对比连续统定义式\eqref{eq:shape-tensor}可见，式\eqref{eq:discrete-shape-tensor}只是把积分换为黎曼和 \cite{Breitenfeld2014}。注意本书与 Breitenfeld 原文献的记号约定：原文献把式\eqref{eq:discrete-shape-tensor}的逆矩阵直接记为 $\mathbf{K}$，而本书沿用第 7.1 节的定义，$\mathbf{K}$ 表示积分（求和）本身，逆矩阵 $\mathbf{K}^{-1}$ 显式写出 \cite{Breitenfeld2014,BreitenfeldThesis2014}。
+对比连续统定义式\eqref{eq:shape-tensor}可见，式\eqref{eq:discrete-shape-tensor}只是把积分换为黎曼和 \cite{Breitenfeld2014}。$\mathbf{K}(\mathbf{x}_j)$ 对称正定（$\boldsymbol{\xi}\otimes\boldsymbol{\xi}$ 对称半正定，近场域内键矢量张成三维空间），故其逆存在。注意本书与 Breitenfeld 原文献的记号约定：原文献把逆矩阵 $\mathbf{K}(\mathbf{x}_j)^{-1}$ 直接记为 $\mathbf{K}$，而本书沿用第 7.1 节的定义，$\mathbf{K}$ 表示积分（求和）本身，逆矩阵 $\mathbf{K}^{-1}$ 显式写出 \cite{Breitenfeld2014,BreitenfeldThesis2014}。
 
-小变形情形下，应变张量取位移梯度的对称部分 $\boldsymbol{\varepsilon}=\tfrac{1}{2}(\nabla\mathbf{u}+\nabla\mathbf{u}^{\mathrm{T}})$，代入式\eqref{eq:discrete-grad-u}得
+小变形情形下，应变张量取位移梯度的对称部分 $\boldsymbol{\varepsilon}=\tfrac{1}{2}(\nabla\mathbf{u}+\nabla\mathbf{u}^{\mathrm{T}})$。把式\eqref{eq:discrete-grad-u}代入，利用转置关系 $\bigl[(\mathbf{u}_n-\mathbf{u}_j)\otimes\boldsymbol{\xi}\bigr]^{\mathrm{T}}=\boldsymbol{\xi}\otimes(\mathbf{u}_n-\mathbf{u}_j)$ 以及形状张量式\eqref{eq:discrete-shape-tensor}的对称性（$\mathbf{K}^{\mathrm{T}}=\mathbf{K}$，从而 $(\mathbf{K}^{-1})^{\mathrm{T}}=\mathbf{K}^{-1}$，故 $\bigl[\mathbf{A}\,\mathbf{K}^{-1}\bigr]^{\mathrm{T}}=\mathbf{K}^{-1}\mathbf{A}^{\mathrm{T}}$），得
 \begin{equation}
   \boldsymbol{\varepsilon}(\mathbf{x}_j)=\frac{1}{2}\sum_{n=1}^{m}\omega(|\boldsymbol{\xi}|)\,
-  \Bigl[\bigl(\mathbf{u}_n-\mathbf{u}_j\bigr)\otimes\boldsymbol{\xi}
-  +\boldsymbol{\xi}\otimes\bigl(\mathbf{u}_n-\mathbf{u}_j\bigr)\Bigr]V_n\cdot\mathbf{K}(\mathbf{x}_j)
+  \Bigl[\bigl(\mathbf{u}_n-\mathbf{u}_j\bigr)\otimes\boldsymbol{\xi}\cdot\mathbf{K}(\mathbf{x}_j)^{-1}
+  +\mathbf{K}(\mathbf{x}_j)^{-1}\cdot\boldsymbol{\xi}\otimes\bigl(\mathbf{u}_n-\mathbf{u}_j\bigr)\Bigr]V_n
   \label{eq:discrete-strain}
 \end{equation}
-式\eqref{eq:discrete-strain}把节点 $\mathbf{x}_j$ 的应变表示为其近场域内全部邻居位移的线性组合 \cite{Breitenfeld2014,BreitenfeldThesis2014}。把节点 $\mathbf{x}_j$ 及其近场域内各邻居的位移按分量排成局部向量 $\mathbf{U}(\mathbf{x}_j)$，则式\eqref{eq:discrete-strain}可以写成矩阵形式
+式\eqref{eq:discrete-strain}把节点 $\mathbf{x}_j$ 的应变表示为其近场域内全部邻居位移的线性组合，且第二项恰为第一项的转置（利用了 $(\mathbf{K}^{-1})^{\mathrm{T}}=\mathbf{K}^{-1}$），故式\eqref{eq:discrete-strain}自动对称 \cite{Breitenfeld2014,BreitenfeldThesis2014}。把节点 $\mathbf{x}_j$ 及其近场域内各邻居的位移按分量排成局部向量 $\mathbf{U}(\mathbf{x}_j)$，则式\eqref{eq:discrete-strain}可以写成矩阵形式
 \begin{equation}
   \boldsymbol{\varepsilon}(\mathbf{x}_j)=\mathbf{N}(\mathbf{x}_j)\,\mathbf{U}(\mathbf{x}_j)
   \label{eq:strain-matrix-form}
@@ -268,7 +404,7 @@ NOSB 理论的发展沿“理论奠基—首次实现—工程应用—稳定性
   =\omega(|\boldsymbol{\xi}|)\,\mathbf{Q}(\mathbf{x}_j)\,\mathbf{D}\,\mathbf{N}(\mathbf{x}_j)\,\mathbf{U}(\mathbf{x}_j)
   \label{eq:force-state-matrix}
 \end{equation}
-其中 $\mathbf{Q}$ 是 $3\times 6$ 的矩阵，编码了 $\boldsymbol{\xi}\to\mathbf{K}^{-1}\boldsymbol{\xi}$ 这一与应变无关的几何映射 \cite{BreitenfeldThesis2014}。式\eqref{eq:strain-matrix-form}—\eqref{eq:force-state-matrix}建立了“节点位移 $\to$ 应变 $\to$ 应力 $\to$ 力态”的线性链，全部环节对 $\mathbf{U}$ 都是线性的，因此式\eqref{eq:implicit-equilibrium}最终给出一个线性代数方程组。这一“位移梯度—应变—应力”的构造与经典有限元的应变—位移矩阵 $[\mathbf{B}]$ 完全同构，差异仅在于：有限元的 $\mathbf{B}$ 由单元形函数导出的局部导数构成，而式\eqref{eq:strain-matrix-form}的 $\mathbf{N}$ 由近场域内键的加权和构成，携带非局部信息 \cite{Breitenfeld2014,Macek2007}。
+其中 $\mathbf{Q}$ 是 $3\times 6$ 的矩阵，编码了 $\boldsymbol{\xi}\to\mathbf{K}^{-1}\boldsymbol{\xi}$ 这一与应变无关的几何映射 \cite{BreitenfeldThesis2014}。式\eqref{eq:strain-matrix-form}—\eqref{eq:force-state-matrix}建立了"节点位移 $\to$ 应变 $\to$ 应力 $\to$ 力态"的线性链，全部环节对 $\mathbf{U}$ 都是线性的，因此式\eqref{eq:implicit-equilibrium}最终给出一个线性代数方程组。这一"位移梯度—应变—应力"的构造与经典有限元的应变—位移矩阵 $[\mathbf{B}]$ 完全同构，差异仅在于：有限元的 $\mathbf{B}$ 由单元形函数导出的局部导数构成，而式\eqref{eq:strain-matrix-form}的 $\mathbf{N}$ 由近场域内键的加权和构成，携带非局部信息 \cite{Breitenfeld2014,Macek2007}。
 
 \subsection{刚度矩阵的组装}\label{sec:implicit-stiffness}
 
@@ -279,7 +415,24 @@ NOSB 理论的发展沿“理论奠基—首次实现—工程应用—稳定性
 \end{equation}
 其中 $\mathbf{U}_{\mathrm{glob}}$ 为全体节点的位移向量，$\mathbf{F}_{\mathrm{ext}}$ 由体力 $\mathbf{b}$ 与边界条件构成，$\mathbf{K}_{\mathrm{glob}}$ 为整体刚度矩阵 \cite{Breitenfeld2014}。式\eqref{eq:global-system}在形式上与有限元静力方程完全一致。
 
-刚度矩阵的组装方式与键型近场动力学有本质区别。对键型理论，一条键 $\mathbf{x}_i$—$\mathbf{x}_j$ 的力只依赖两端点的位移，故其对刚度矩阵的贡献集中为 $4$ 个 $3\times 3$ 子块（$\mathbf{K}_{ii}$、$\mathbf{K}_{ij}$、$\mathbf{K}_{ji}$、$\mathbf{K}_{jj}$），与有限元中两节点杆单元完全类似 \cite{Macek2007}。而对 NOSB，由式\eqref{eq:force-state-matrix}可见，力态 $\underline{\mathbf{T}}[\mathbf{x}_j]\langle\boldsymbol{\xi}\rangle$ 通过 $\mathbf{N}(\mathbf{x}_j)$ 依赖整个近场域 $H_{\mathbf{x}_j}$ 内全部 $m$ 个邻居的位移（而非仅 $\mathbf{u}_j$ 与 $\mathbf{u}_n$），因此键 $\mathbf{x}_j$—$\mathbf{x}_n$ 对刚度矩阵的贡献是族级（family-level）的：它把节点 $\mathbf{x}_j$ 所在行与近场域 $H_{\mathbf{x}_j}$ 内所有节点的列相连，同时把节点 $\mathbf{x}_n$ 所在行与 $H_{\mathbf{x}_n}$ 内所有节点的列相连 \cite{Breitenfeld2014,BreitenfeldThesis2014}。相应地，NOSB 刚度矩阵的带宽约为单点近场域的两倍：原文献明确指出，由于变形梯度 $\mathbf{F}(\mathbf{x}_j)$ 对整个近场域的依赖，NOSB 实际具有相当于单点近场范围两倍的作用域，从而增大了刚度矩阵的带宽 \cite{Breitenfeld2014}。
+刚度矩阵的组装方式与键型近场动力学有本质区别。对键型理论，节点 $\mathbf{x}_i$ 的内力为近场域内各键力之和 $\mathbf{F}_{\mathrm{int},i}=\sum_{j\in H_{\mathbf{x}_i}}\mathbf{f}_{ij}\,V_j$，其中键力密度 $\mathbf{f}_{ij}=\mathbf{f}(\mathbf{u}_j-\mathbf{u}_i,\mathbf{x}_j-\mathbf{x}_i)$ 只依赖两端的相对位移。故键 $\mathbf{x}_i$—$\mathbf{x}_j$ 对刚度矩阵的贡献仅耦合两个节点的自由度，给出 $6\times 6$ 的局部刚度块
+\begin{equation}
+  \mathbf{K}^{\mathrm{bond}}=\begin{bmatrix}
+    \mathbf{k}_{ii} & \mathbf{k}_{ij}\\
+    \mathbf{k}_{ji} & \mathbf{k}_{jj}
+  \end{bmatrix},\qquad
+  \mathbf{k}_{ij}=\frac{\partial\mathbf{f}_{ij}}{\partial\mathbf{u}_{j}}\,V_{j},\quad
+  \mathbf{k}_{ii}=\frac{\partial\mathbf{f}_{ij}}{\partial\mathbf{u}_{i}}\,V_{j}
+  \label{eq:bond-stiffness-block}
+\end{equation}
+其中 $\mathbf{k}_{ii}$、$\mathbf{k}_{ij}$、$\mathbf{k}_{ji}$、$\mathbf{k}_{jj}$ 为 $3\times 3$ 子块。利用键力只依赖相对位移（$\partial\mathbf{f}_{ij}/\partial\mathbf{u}_{i}=-\partial\mathbf{f}_{ij}/\partial\mathbf{u}_{j}$）与反对称性 $\mathbf{f}_{ji}=-\mathbf{f}_{ij}$，在均匀网格 $V_i=V_j$ 下可得 $\mathbf{k}_{ii}=\mathbf{k}_{jj}=-\mathbf{k}_{ij}=-\mathbf{k}_{ji}$，即式\eqref{eq:bond-stiffness-block}与有限元两节点杆单元的刚度矩阵同构，装配时只需把 4 个 $3\times 3$ 子块散布到整体矩阵的行列 $\{i,j\}$ \cite{Macek2007}。而对 NOSB，由式\eqref{eq:force-state-matrix}可见，力态 $\underline{\mathbf{T}}[\mathbf{x}_j]\langle\boldsymbol{\xi}\rangle$ 通过 $\mathbf{N}(\mathbf{x}_j)$ 依赖整个近场域 $H_{\mathbf{x}_j}$ 内全部 $m$ 个邻居的位移（而非仅 $\mathbf{u}_j$ 与 $\mathbf{u}_n$）。把式\eqref{eq:force-state-matrix}代入式\eqref{eq:implicit-equilibrium}并对 $\mathbf{u}_k$ 求导，得到整体刚度矩阵的 $3\times 3$ 分块
+\begin{equation}
+  \mathbf{K}_{\mathrm{glob}}^{jk}
+  =\Bigl[\sum_{n\in H_{j}}\omega_{jn}V_n\,\mathbf{Q}(\boldsymbol{\xi}_{jn})\Bigr]\mathbf{D}\,\mathbf{N}^{(k)}(\mathbf{x}_j)
+  -\sum_{\substack{n\in H_{j}\\ k\in\{n\}\cup H_{n}}}\omega_{nj}V_n\,\mathbf{Q}(\boldsymbol{\xi}_{nj})\mathbf{D}\,\mathbf{N}^{(k)}(\mathbf{x}_n)
+  \label{eq:family-stiffness-block}
+\end{equation}
+其中 $\mathbf{N}^{(k)}(\mathbf{x}_j)$ 为应变—位移矩阵 $\mathbf{N}(\mathbf{x}_j)$ 中与全局节点 $k$ 对应的 $6\times 3$ 子块（当 $k=j$ 或 $k\in H_j$ 时非零），$\mathbf{Q}(\boldsymbol{\xi}_{jn})$ 为式\eqref{eq:force-state-matrix}中编码 $\boldsymbol{\xi}\to\mathbf{K}(\mathbf{x}_j)^{-1}\boldsymbol{\xi}$ 的 $3\times 6$ 几何矩阵在键 $\boldsymbol{\xi}_{jn}$ 上的取值，$\omega_{jn}=\omega(|\boldsymbol{\xi}_{jn}|)$。式\eqref{eq:family-stiffness-block}的第一项来自节点 $\mathbf{x}_j$ 自身的力态，把行 $j$ 与近场域 $H_{\mathbf{x}_j}$ 内所有节点的列相连；第二项来自每个邻居 $\mathbf{x}_n$ 的力态，把行 $j$ 还与 $H_{\mathbf{x}_n}$ 内所有节点的列相连。因此键 $\mathbf{x}_j$—$\mathbf{x}_n$ 对刚度矩阵的贡献是族级（family-level）的：它把节点 $\mathbf{x}_j$ 所在行与 $H_{\mathbf{x}_j}\cup H_{\mathbf{x}_n}$ 内所有节点的列相连，同时把节点 $\mathbf{x}_n$ 所在行与 $H_{\mathbf{x}_n}\cup H_{\mathbf{x}_j}$ 内所有节点的列相连 \cite{Breitenfeld2014,BreitenfeldThesis2014}。相应地，NOSB 刚度矩阵的带宽约为单点近场域的两倍：原文献明确指出，由于变形梯度 $\mathbf{F}(\mathbf{x}_j)$ 对整个近场域的依赖，NOSB 实际具有相当于单点近场范围两倍的作用域，从而增大了刚度矩阵的带宽 \cite{Breitenfeld2014}。
 
 \begin{remark}
   把 NOSB 刚度矩阵的族级装配与经典有限元对照有助于理解其结构。有限元中，刚度矩阵的行列连通性由网格拓扑决定：只有共享单元的节点对才产生非零块；而 NOSB 中，连通性由近场域决定：每个节点与近场域内所有节点相连，且键的贡献还跨近场域传递。因此 NOSB 刚度矩阵的非零元分布比有限元稠密得多，带宽约为 $\delta$ 的数值倍数（离散比 $m=\delta/\Delta x$ 越大越稠密）。在均匀网格且权重函数径向对称的简单情形下，整体刚度矩阵仍保持对称正定，可用共轭梯度等对称求解器高效求解 \cite{Breitenfeld2014,BreitenfeldThesis2014}。对线弹性小变形问题，式\eqref{eq:global-system}的系数矩阵是常矩阵，只需组装一次即可直接求解。
@@ -287,31 +440,77 @@ NOSB 理论的发展沿“理论奠基—首次实现—工程应用—稳定性
 
 \subsection{边界条件与稀疏求解}\label{sec:implicit-bc-solve}
 
-隐式求解的边界条件处理与显式积分有相同之处，但施加方式更接近有限元。位移边界条件通常施加在物体边界外扩展的一层体积上：对边界附近的节点，在边界外增设虚拟节点（或扩展体积）并指定其位移，从而在式\eqref{eq:global-system}中直接消去相应自由度 \cite{Breitenfeld2014,BreitenfeldThesis2014}。面力边界条件则以体力密度的形式施加于边界体积内的节点上，等效于把分布面力转化为节点力向量 $\mathbf{F}_{\mathrm{ext}}$ 的相应分量 \cite{Breitenfeld2014}。这一处理与第 10 章将系统讨论的近场动力学边界条件方法一致。
+隐式求解的边界条件处理与显式积分有相同之处，但施加方式更接近有限元。位移边界条件通常施加在物体边界外扩展的一层体积上：对边界附近的节点，在边界外增设虚拟节点（或扩展体积）并指定其位移。设有 $c$ 个约束自由度被指定位移，把式\eqref{eq:global-system}中的位移向量按未知自由度与约束自由度重排为 $\mathbf{U}_{\mathrm{glob}}=[\mathbf{U}_{u};\,\mathbf{U}_{c}]$，其中 $\mathbf{U}_{c}$ 为虚拟节点上已知的指定位移，则式\eqref{eq:global-system}相应分块为
+\begin{equation}
+  \begin{bmatrix}
+    \mathbf{K}_{uu} & \mathbf{K}_{uc}\\
+    \mathbf{K}_{cu} & \mathbf{K}_{cc}
+  \end{bmatrix}
+  \begin{bmatrix}
+    \mathbf{U}_{u}\\
+    \mathbf{U}_{c}
+  \end{bmatrix}
+  =\begin{bmatrix}
+    \mathbf{F}_{u}\\
+    \mathbf{F}_{c}
+  \end{bmatrix}
+  \label{eq:bc-partition}
+\end{equation}
+其中 $\mathbf{F}_{c}$ 为约束自由度上的约束反力。由式\eqref{eq:bc-partition}的第一行，未知自由度满足
+\begin{equation}
+  \mathbf{K}_{uu}\,\mathbf{U}_{u}=\mathbf{F}_{u}-\mathbf{K}_{uc}\,\mathbf{U}_{c}
+  \label{eq:bc-eliminated}
+\end{equation}
+式\eqref{eq:bc-eliminated}把指定位移 $\mathbf{U}_{c}$ 作为已知载荷移项到右端，只需求解 $3q-3c$ 维的缩减方程组——这就是"消去自由度"的含义，与有限元中施加指定位移后的缩减方程（划行划列法）完全一致 \cite{Breitenfeld2014,BreitenfeldThesis2014}。面力边界条件则以体力密度的形式施加于边界体积内的节点上：设边界面上节点 $i$ 分担的面积元为 $A_i$，作用其上的面力为 $\mathbf{t}$，则节点 $i$ 上的等效体力密度为 $\mathbf{b}_i=\mathbf{t}A_i/V_i$（$V_i$ 为节点参考体积），等价于在式\eqref{eq:global-system}右端施加节点力
+\begin{equation}
+  \mathbf{F}_{\mathrm{ext},i}=\mathbf{b}_i\,V_i=\mathbf{t}\,A_i
+  \label{eq:bc-traction-force}
+\end{equation}
+式\eqref{eq:bc-traction-force}把分布面力按节点分担面积离散为节点力向量 $\mathbf{F}_{\mathrm{ext}}$ 的相应分量 \cite{Breitenfeld2014}。这一处理与第 10 章将系统讨论的近场动力学边界条件方法一致。
 
-断裂问题中，键的断裂通过把对应键的影响函数置零 $\omega=0$ 实现。与显式方法不同，隐式求解在键断裂后需要重新组装受影响部分的刚度矩阵，再继续求解；由于只有与断裂键相关的近场域发生变化，重新组装通常限于局部 \cite{Breitenfeld2014}。此外，断裂导致近场域不再完整，形状张量式\eqref{eq:discrete-shape-tensor}的可逆性可能受到影响，这是隐式格式处理裂纹问题时需要特别关注的问题 \cite{Breitenfeld2014,BreitenfeldThesis2014}。
+断裂问题中，键的断裂通过把对应键的影响函数置零 $\omega=0$ 实现。与显式方法不同，隐式求解在键断裂后需要重新组装受影响部分的刚度矩阵，再继续求解。结合式\eqref{eq:family-stiffness-block}可以精确刻画这一局部范围：若键 $\boldsymbol{\xi}_{jn}$ 断裂（$\omega_{jn}=\omega_{nj}=0$），则该键对刚度矩阵的族级贡献消失，同时节点 $j$、$n$ 的形状张量式\eqref{eq:discrete-shape-tensor}因失去该键而改变，其逆矩阵经式\eqref{eq:family-stiffness-block}中的 $\mathbf{Q}(\boldsymbol{\xi}_{jn})$ 影响两节点各自近场域内的全部键。因此重新组装只需更新行 $j$、$n$ 与列 $\{j\}\cup H_{j}\cup\{n\}\cup H_{n}$ 交叉处的族级块，其余部分保持不变 \cite{Breitenfeld2014}。此外，断裂导致近场域不再完整，形状张量式\eqref{eq:discrete-shape-tensor}的可逆性可能受到影响，这是隐式格式处理裂纹问题时需要特别关注的问题 \cite{Breitenfeld2014,BreitenfeldThesis2014}。
 
-式\eqref{eq:global-system}的求解可以采用经典稀疏线性代数方法。由于整体刚度矩阵对称正定且高度稀疏，Breitenfeld 等采用带 Jacobi 预条件的共轭梯度法（CG）求解，并利用矩阵对称性只存储上三角部分以节省内存 \cite{Breitenfeld2014}。数值实验表明，对一万阶量级的系统，CG 迭代比直接法（LU 分解）快一个数量级以上 \cite{Breitenfeld2014,BreitenfeldThesis2014}。值得指出的是，把 NOSB 刚度矩阵视为有限元刚度矩阵后，可以自然地调用成熟的有限元求解框架：Macek 与 Silling 2007 年曾把键型近场动力学解释为杆单元并在商业有限元软件中实现 \cite{Macek2007}，这一思路对 NOSB 同样适用，是第 12 章讨论的近场动力学—有限元耦合的基础之一。
+式\eqref{eq:global-system}的求解可以采用经典稀疏线性代数方法。由于整体刚度矩阵对称正定且高度稀疏，Breitenfeld 等采用带 Jacobi 预条件的共轭梯度法（CG）求解：取预条件矩阵为整体刚度矩阵的对角部分
+\begin{equation}
+  \mathbf{M}=\operatorname{diag}(\mathbf{K}_{\mathrm{glob}})
+  \label{eq:jacobi-precond}
+\end{equation}
+以式\eqref{eq:jacobi-precond}的 $\mathbf{M}$ 构造对称预条件系统 $\mathbf{M}^{-1/2}\mathbf{K}_{\mathrm{glob}}\mathbf{M}^{-1/2}(\mathbf{M}^{1/2}\mathbf{U}_{\mathrm{glob}})=\mathbf{M}^{-1/2}\mathbf{F}_{\mathrm{ext}}$，其系数矩阵保持对称正定，且条件数较式\eqref{eq:global-system}显著改善（对角占优程度越强改善越明显），CG 迭代步数随之减少 \cite{Breitenfeld2014}。同时利用矩阵对称性只存储上三角部分以节省内存 \cite{Breitenfeld2014}。数值实验表明，对一万阶量级的系统，CG 迭代比直接法（LU 分解）快一个数量级以上 \cite{Breitenfeld2014,BreitenfeldThesis2014}。值得指出的是，把 NOSB 刚度矩阵视为有限元刚度矩阵后，可以自然地调用成熟的有限元求解框架：Macek 与 Silling 2007 年曾把键型近场动力学解释为杆单元并在商业有限元软件中实现 \cite{Macek2007}，这一思路对 NOSB 同样适用，是第 12 章讨论的近场动力学—有限元耦合的基础之一。
 
 \section{非线性问题的隐式求解}\label{sec:implicit-nonlinear}
 
-第 7.3 节讨论的线性隐式求解以“小变形 + 线弹性本构”为前提：此时式\eqref{eq:global-system}的系数矩阵是常矩阵，只需组装一次即可直接求解。然而 NOSB 的典型应用场景——塑性、粘弹性、超弹性等非线性本构，以及有限变形——都使离散平衡方程组成为关于节点位移的非线性代数方程组。这时不能直接求解式\eqref{eq:global-system}，而须采用 Newton 型迭代方法：在每一步迭代中线性化当前的平衡方程，求解线性化系统获得位移增量，并反复迭代直至残差满足收敛判据。本节按非线性隐式求解的计算流程组织：首先给出非线性平衡方程的残差形式与 Newton 迭代格式（\ref{sec:nl-residual}节），进而推导 NOSB 切线刚度矩阵的表达式，并分析其与经典非线性有限元的材料/几何刚度分解的联系（\ref{sec:nl-tangent}节），然后介绍载荷增量步与收敛判据的典型实现（\ref{sec:nl-stepping}节），最后讨论断裂问题给 Newton 迭代带来的特殊困难及对策（\ref{sec:nl-fracture}节）。非线性隐式求解的一般框架与经典非线性有限元一致 \cite{BelytschkoLiuMoran2000}，但其 NOSB 实现细节——特别是切线刚度矩阵的族级结构与断裂处理——已在近场动力学文献中得到了专门研究 \cite{Hashim2020,Littlewood2015,Ni2019}。零能模式对切线刚度的影响及其稳定化处理留待 \ref{sec:zero-energy}节讨论。
+第 7.3 节讨论的线性隐式求解以"小变形 + 线弹性本构"为前提：此时式\eqref{eq:global-system}的系数矩阵是常矩阵，只需组装一次即可直接求解。然而 NOSB 的典型应用场景——塑性、粘弹性、超弹性等非线性本构，以及有限变形——都使离散平衡方程组成为关于节点位移的非线性代数方程组。这时不能直接求解式\eqref{eq:global-system}，而须采用 Newton 型迭代方法：在每一步迭代中线性化当前的平衡方程，求解线性化系统获得位移增量，并反复迭代直至残差满足收敛判据。本节按非线性隐式求解的计算流程组织：首先给出非线性平衡方程的残差形式与 Newton 迭代格式（\ref{sec:nl-residual}节），进而推导 NOSB 切线刚度矩阵的表达式，并分析其与经典非线性有限元的材料/几何刚度分解的联系（\ref{sec:nl-tangent}节），然后介绍载荷增量步与收敛判据的典型实现（\ref{sec:nl-stepping}节），最后讨论断裂问题给 Newton 迭代带来的特殊困难及对策（\ref{sec:nl-fracture}节）。非线性隐式求解的一般框架与经典非线性有限元一致 \cite{BelytschkoLiuMoran2000}，但其 NOSB 实现细节——特别是切线刚度矩阵的族级结构与断裂处理——已在近场动力学文献中得到了专门研究 \cite{Hashim2020,Littlewood2015,Ni2019}。零能模式对切线刚度的影响及其稳定化处理留待 \ref{sec:zero-energy}节讨论。
 
 \subsection{非线性平衡方程与残差}\label{sec:nl-residual}
 
-把第 7.3.1 节的离散平衡方程式\eqref{eq:implicit-equilibrium}整理成统一形式：定义节点内力向量 $\mathbf{F}_{\mathrm{int}}(\mathbf{U})$，其第 $j$ 个分量为式\eqref{eq:implicit-equilibrium}左端的键力合（不含体力），则非线性平衡方程可写成
+把第 7.3.1 节的离散平衡方程式\eqref{eq:implicit-equilibrium}整理成统一形式。定义节点内力向量 $\mathbf{F}_{\mathrm{int}}(\mathbf{U})$，其第 $j$ 个分量为节点 $\mathbf{x}_j$ 的键力合（即式\eqref{eq:implicit-equilibrium}左端方括号内的求和，不含体力）
+\begin{equation}
+  \mathbf{F}_{\mathrm{int},j}=\sum_{n=1}^{m}\Bigl[
+    \underline{\mathbf{T}}[\mathbf{x}_j]\langle\mathbf{x}_n-\mathbf{x}_j\rangle
+    -\underline{\mathbf{T}}[\mathbf{x}_n]\langle\mathbf{x}_j-\mathbf{x}_n\rangle
+  \Bigr]V_n
+  \label{eq:internal-force-vector}
+\end{equation}
+式\eqref{eq:internal-force-vector}定义的 $\mathbf{F}_{\mathrm{int},j}$ 使式\eqref{eq:implicit-equilibrium}等价于 $\mathbf{F}_{\mathrm{int},j}=\mathbf{F}_{\mathrm{ext},j}$，其中 $\mathbf{F}_{\mathrm{ext},j}$ 为节点 $\mathbf{x}_j$ 上的体力/等效节点力。把全部 $q$ 个节点的平衡条件汇总，得到非线性平衡方程
 \begin{equation}
   \mathbf{R}(\mathbf{U})=\mathbf{F}_{\mathrm{ext}}-\mathbf{F}_{\mathrm{int}}(\mathbf{U})=\mathbf{0},
   \label{eq:nl-residual}
 \end{equation}
 其中 $\mathbf{U}$ 为全体节点的位移向量，$\mathbf{F}_{\mathrm{ext}}$ 为体力与面力等效节点力向量，$\mathbf{R}$ 称为残差向量（residual vector）或不平衡力向量（out-of-balance force vector）\cite{Littlewood2015,Hashim2020}。当本构或几何非线性时，$\mathbf{F}_{\mathrm{int}}$ 是 $\mathbf{U}$ 的非线性函数，式\eqref{eq:nl-residual}是 $3q$ 维非线性代数方程组。
 
-求解式\eqref{eq:nl-residual}的标准方法是 Newton--Raphson 迭代。设 $\mathbf{U}^{l}$ 为第 $l$ 次迭代的位移近似值，将 $\mathbf{R}$ 在 $\mathbf{U}^{l}$ 处作一阶 Taylor 展开并令其为零，得线性化方程组
+求解式\eqref{eq:nl-residual}的标准方法是 Newton--Raphson 迭代。设 $\mathbf{U}^{l}$ 为第 $l$ 次迭代的位移近似值，$\Delta\mathbf{U}^{l+1}=\mathbf{U}^{l+1}-\mathbf{U}^{l}$ 为位移增量。把 $\mathbf{R}$ 在 $\mathbf{U}^{l}$ 处作一阶 Taylor 展开并令其为零：
+\begin{equation}
+  \mathbf{R}\bigl(\mathbf{U}^{l}+\Delta\mathbf{U}^{l+1}\bigr)
+  \approx\mathbf{R}(\mathbf{U}^{l})
+  +\frac{\partial\mathbf{R}}{\partial\mathbf{U}}\Big|_{\mathbf{U}^{l}}\Delta\mathbf{U}^{l+1}
+  =\mathbf{0}
+  \label{eq:nr-taylor}
+\end{equation}
+其中忽略了二阶及以上高阶项。由式\eqref{eq:nl-residual}，$\partial\mathbf{R}/\partial\mathbf{U}=-\partial\mathbf{F}_{\mathrm{int}}/\partial\mathbf{U}$（外载荷 $\mathbf{F}_{\mathrm{ext}}$ 不随位移变化，故 $\partial\mathbf{F}_{\mathrm{ext}}/\partial\mathbf{U}=\mathbf{0}$）。引入切线刚度矩阵 $\mathbf{K}_{\mathrm{t}}=\partial\mathbf{F}_{\mathrm{int}}/\partial\mathbf{U}$（tangent stiffness matrix），式\eqref{eq:nr-taylor}化为线性化方程组
 \begin{equation}
   \mathbf{K}_{\mathrm{t}}(\mathbf{U}^{l})\,\Delta\mathbf{U}^{l+1}=\mathbf{R}(\mathbf{U}^{l}),
   \label{eq:nr-iteration}
-\end{equation}
-其中 $\mathbf{K}_{\mathrm{t}}=\partial\mathbf{F}_{\mathrm{int}}/\partial\mathbf{U}$ 为切线刚度矩阵（tangent stiffness matrix），$\Delta\mathbf{U}^{l+1}=\mathbf{U}^{l+1}-\mathbf{U}^{l}$ 为位移增量。迭代自初始猜测 $\mathbf{U}^{0}$ 出发，反复求解式\eqref{eq:nr-iteration}并更新 $\mathbf{U}^{l+1}=\mathbf{U}^{l}+\Delta\mathbf{U}^{l+1}$，直到残差范数满足收敛判据（见 \ref{sec:nl-stepping}节）。当载荷足够小、材料响应足够光滑时，Newton 迭代以二阶收敛速度逼近精确解；式\eqref{eq:nr-iteration}与第 7.3 节线性情形式\eqref{eq:global-system}的唯一区别在于系数矩阵不再是常数，而须在每个迭代步依据当前构型重新组装 \cite{Hashim2020}。
+\end{equation}迭代自初始猜测 $\mathbf{U}^{0}$ 出发，反复求解式\eqref{eq:nr-iteration}并更新 $\mathbf{U}^{l+1}=\mathbf{U}^{l}+\Delta\mathbf{U}^{l+1}$，直到残差范数满足收敛判据（见 \ref{sec:nl-stepping}节）。当载荷足够小、材料响应足够光滑时，Newton 迭代以二阶收敛速度逼近精确解——设 $\mathbf{U}^{\ast}$ 为精确解，误差按 $\lVert\mathbf{U}^{l+1}-\mathbf{U}^{\ast}\rVert\le C\lVert\mathbf{U}^{l}-\mathbf{U}^{\ast}\rVert^{2}$（$C$ 为常数）衰减，故每次迭代使有效数字约翻倍；式\eqref{eq:nr-iteration}与第 7.3 节线性情形式\eqref{eq:global-system}的唯一区别在于系数矩阵不再是常数，而须在每个迭代步依据当前构型重新组装 \cite{Hashim2020}。
 
 \subsection{切线刚度矩阵}\label{sec:nl-tangent}
 
@@ -322,37 +521,60 @@ NOSB 理论的发展沿“理论奠基—首次实现—工程应用—稳定性
   K_{\mathrm{t}}^{ij}=\frac{\partial F_{\mathrm{int},i}}{\partial u_{j}}.
   \label{eq:tangent-stiffness}
 \end{equation}
-对 NOSB，把力态式\eqref{eq:nosb-force-state}代入式\eqref{eq:implicit-equilibrium}并对 $\mathbf{u}_{k}$ 求导（注意形状张量 $\mathbf{K}$ 只依赖参考构型的键矢量，故 $\partial\mathbf{K}/\partial\mathbf{u}=\mathbf{0}$），得到切线刚度矩阵的族级分块表达式 \cite{Hashim2020}：
+对 NOSB，切线刚度矩阵的族级分块可由链式法则直接导出。把力态式\eqref{eq:nosb-force-state}代入式\eqref{eq:internal-force-vector}，内力向量第 $j$ 个分量写为
 \begin{equation}
+  \mathbf{F}_{\mathrm{int},j}=\sum_{n\in H_{j}}\Bigl[
+    \omega_{jn}\,\mathbf{P}(\mathbf{x}_j)\,\mathbf{K}(\mathbf{x}_j)^{-1}\boldsymbol{\xi}_{jn}
+    -\omega_{nj}\,\mathbf{P}(\mathbf{x}_n)\,\mathbf{K}(\mathbf{x}_n)^{-1}\boldsymbol{\xi}_{nj}
+  \Bigr]V_{n}
+  \label{eq:internal-force-nosb}
+\end{equation}
+其中 $\mathbf{P}(\mathbf{x}_j)$ 为节点 $\mathbf{x}_j$ 处的第一 Piola--Kirchhoff 应力，经本构关系依赖该节点的非局部变形梯度 $\mathbf{F}(\mathbf{x}_j)$，而 $\mathbf{F}(\mathbf{x}_j)$ 又依赖近场域内各节点的位移。对式\eqref{eq:internal-force-nosb}关于 $\mathbf{u}_{k}$ 求导：形状张量式\eqref{eq:discrete-shape-tensor}只依赖参考构型的键矢量、与位移无关，故 $\partial\mathbf{K}/\partial\mathbf{u}=\mathbf{0}$（$\mathbf{K}^{-1}$ 亦然）；应力对位移的导数按链式法则经变形梯度传递：
+\begin{equation}
+  \frac{\partial\mathbf{P}(\mathbf{x}_j)}{\partial\mathbf{u}_{k}}
+  =\frac{\partial\mathbf{P}(\mathbf{x}_j)}{\partial\mathbf{F}(\mathbf{x}_j)}
+  :\frac{\partial\mathbf{F}(\mathbf{x}_j)}{\partial\mathbf{u}_{k}}
+  \label{eq:chain-p}
+\end{equation}
+其中 $\partial\mathbf{P}/\partial\mathbf{F}$ 为四阶张量（材料切线），与二阶张量 $\partial\mathbf{F}/\partial\mathbf{u}_{k}$ 作双点积。把式\eqref{eq:chain-p}代入式\eqref{eq:internal-force-nosb}的导数，得到切线刚度矩阵的族级分块表达式 \cite{Hashim2020}：
+\begin{equation}
+\begin{split}
   \mathbf{K}_{\mathrm{t}}^{jk}
-  =\frac{\partial\mathbf{F}_{\mathrm{int},j}}{\partial\mathbf{u}_{k}}
+  &=\frac{\partial\mathbf{F}_{\mathrm{int},j}}{\partial\mathbf{u}_{k}}
   =\sum_{n\in H_{j}}\Bigl[
     \omega_{jn}\Bigl(\frac{\partial\mathbf{P}(\mathbf{x}_{j})}{\partial\mathbf{F}(\mathbf{x}_{j})}
-      :\frac{\partial\mathbf{F}(\mathbf{x}_{j})}{\partial\mathbf{u}_{k}}\Bigr)\mathbf{K}(\mathbf{x}_{j})\boldsymbol{\xi}_{jn}
-    -\omega_{nj}\Bigl(\frac{\partial\mathbf{P}(\mathbf{x}_{n})}{\partial\mathbf{F}(\mathbf{x}_{n})}
-      :\frac{\partial\mathbf{F}(\mathbf{x}_{n})}{\partial\mathbf{u}_{k}}\Bigr)\mathbf{K}(\mathbf{x}_{n})\boldsymbol{\xi}_{nj}
+      :\frac{\partial\mathbf{F}(\mathbf{x}_{j})}{\partial\mathbf{u}_{k}}\Bigr)\mathbf{K}(\mathbf{x}_{j})^{-1}\boldsymbol{\xi}_{jn}\\
+  &\quad-\omega_{nj}\Bigl(\frac{\partial\mathbf{P}(\mathbf{x}_{n})}{\partial\mathbf{F}(\mathbf{x}_{n})}
+      :\frac{\partial\mathbf{F}(\mathbf{x}_{n})}{\partial\mathbf{u}_{k}}\Bigr)\mathbf{K}(\mathbf{x}_{n})^{-1}\boldsymbol{\xi}_{nj}
   \Bigr]V_{n},
+\end{split}
   \label{eq:tangent-nosb}
 \end{equation}
-其中 $\boldsymbol{\xi}_{jn}=\mathbf{x}_{n}-\mathbf{x}_{j}$，$\boldsymbol{\xi}_{nj}=-\boldsymbol{\xi}_{jn}$，符号“$:$”表示四阶张量与二阶张量的双点积。式\eqref{eq:tangent-nosb}的结构与 7.3.3 节线性情形的族级装配完全一致：节点 $j$ 的行与近场域 $H_{j}$ 内全部节点及其近场域相连，带宽约为单点近场域的两倍 \cite{Hashim2020,Breitenfeld2014}。运动学部分 $\partial\mathbf{F}/\partial\mathbf{u}_{k}$ 由离散变形梯度式\eqref{eq:discrete-grad-u}对位移求导得到，即式\eqref{eq:kinematic-tangent} \cite{Hashim2020}：
+其中 $\boldsymbol{\xi}_{jn}=\mathbf{x}_{n}-\mathbf{x}_{j}$，$\boldsymbol{\xi}_{nj}=-\boldsymbol{\xi}_{jn}$，符号"$:$"表示四阶张量与二阶张量的双点积。式\eqref{eq:tangent-nosb}的结构与 7.3.3 节线性情形的族级装配完全一致：节点 $j$ 的行与近场域 $H_{j}$ 内全部节点及其近场域相连，带宽约为单点近场域的两倍 \cite{Hashim2020,Breitenfeld2014}。运动学部分 $\partial\mathbf{F}/\partial\mathbf{u}_{k}$ 由离散变形梯度式\eqref{eq:discrete-grad-u}对位移求导得到（注意式\eqref{eq:discrete-shape-tensor}的形状张量及其逆只依赖参考构型的键矢量，与位移无关），即式\eqref{eq:kinematic-tangent} \cite{Hashim2020}：
 \begin{equation}
   \frac{\partial\mathbf{F}(\mathbf{x}_{j})}{\partial\mathbf{u}_{k}}
   =\Bigl[\sum_{n\in H_{j}}\omega(|\boldsymbol{\xi}|)\,
-    \frac{\partial(\mathbf{u}_{n}-\mathbf{u}_{j})}{\partial\mathbf{u}_{k}}\otimes\boldsymbol{\xi}\,V_{n}\Bigr]\mathbf{K}(\mathbf{x}_{j}),
+    \frac{\partial(\mathbf{u}_{n}-\mathbf{u}_{j})}{\partial\mathbf{u}_{k}}\otimes\boldsymbol{\xi}\,V_{n}\Bigr]\mathbf{K}(\mathbf{x}_{j})^{-1},
   \qquad
   \frac{\partial(\mathbf{u}_{n}-\mathbf{u}_{j})}{\partial\mathbf{u}_{k}}=\mathbf{I}\,(\delta_{nk}-\delta_{jk}).
   \label{eq:kinematic-tangent}
 \end{equation}
 
 \begin{remark}
-  材料部分 $\partial\mathbf{P}/\partial\mathbf{F}$ 与经典非线性有限元的材料刚度、几何刚度分解存在精确对应。对有限变形情形，第一类 Piola--Kirchhoff 应力 $\mathbf{P}=J\boldsymbol{\sigma}\mathbf{F}^{-\mathrm{T}}=\boldsymbol{\tau}\mathbf{F}^{-\mathrm{T}}$（$\boldsymbol{\tau}$ 为 Kirchhoff 应力），其对本构自变量 $\mathbf{F}$ 的导数可分解为两项 \cite{Hashim2020}：
+  材料部分 $\partial\mathbf{P}/\partial\mathbf{F}$ 与经典非线性有限元的材料刚度、几何刚度分解存在精确对应。对有限变形情形，第一类 Piola--Kirchhoff 应力 $\mathbf{P}=J\boldsymbol{\sigma}\mathbf{F}^{-\mathrm{T}}=\boldsymbol{\tau}\mathbf{F}^{-\mathrm{T}}$（$\boldsymbol{\tau}$ 为 Kirchhoff 应力），其对本构自变量 $\mathbf{F}$ 的导数由乘积法则（$\boldsymbol{\tau}$ 与 $\mathbf{F}^{-\mathrm{T}}$ 均依赖 $\mathbf{F}$）分解为两项 \cite{Hashim2020}：
   \begin{equation}
     \mathbf{A}=\frac{\partial\mathbf{P}}{\partial\mathbf{F}}
     =\underbrace{\frac{\partial\boldsymbol{\tau}}{\partial\mathbf{F}}\,\mathbf{F}^{-\mathrm{T}}}_{\text{材料部分}}
      +\underbrace{\boldsymbol{\tau}\,\frac{\partial\mathbf{F}^{-\mathrm{T}}}{\partial\mathbf{F}}}_{\text{初始应力（几何）部分}},
     \label{eq:material-tangent}
   \end{equation}
-  其中第一项由应力--应变切线模量（对超弹性本构即 $\mathbf{M}=\mathbf{Q}\mathbf{D}_{e}\mathbf{N}$）经 Piola 变换得到，第二项反映初始应力在变形中引起的“几何”效应。需要指出的是，近场动力学文献中通常不采用经典有限元的 $\mathbf{K}_{\mathrm{t}}=\mathbf{K}_{\mathrm{M}}+\mathbf{K}_{\mathrm{G}}$ 分块记号：式\eqref{eq:tangent-nosb}已把 $\mathbf{K}_{\mathrm{t}}$ 写成“材料切线 $\mathbf{A}$”与“运动学因子 $\partial\mathbf{F}/\partial\mathbf{u}$”的复合，而式\eqref{eq:material-tangent}把 $\mathbf{A}$ 进一步拆为材料部分与初始应力部分 \cite{Hashim2020}。小变形线性情形下，$\mathbf{A}$ 退化为常数弹性矩阵，$\partial\mathbf{F}/\partial\mathbf{u}$ 为常矩阵，式\eqref{eq:tangent-nosb}即回归 7.3.3 节的 $\mathbf{K}_{\mathrm{glob}}$，这正是第 7.3 节与本节的自然衔接点。
+  其中第二项含逆张量的导数，由 $\mathbf{F}\mathbf{F}^{-1}=\mathbf{I}$ 对 $F_{kl}$ 求导（$\partial(\mathbf{F}\mathbf{F}^{-1})/\partial F_{kl}=\mathbf{0}$）得
+  \begin{equation}
+    \frac{\partial(\mathbf{F}^{-1})_{ij}}{\partial F_{kl}}
+    =-(\mathbf{F}^{-1})_{ik}(\mathbf{F}^{-1})_{lj},
+    \label{eq:inv-derivative}
+  \end{equation}
+  式\eqref{eq:inv-derivative}（经典结果，可经数值验证）结合 $\mathbf{F}^{-\mathrm{T}}=(\mathbf{F}^{-1})^{\mathrm{T}}$ 给出初始应力部分：它正比于当前应力 $\boldsymbol{\tau}$ 本身，反映初始应力在后续变形中引起的"几何"刚度效应。其中第一项由应力--应变切线模量（对超弹性本构即 $\mathbf{M}=\mathbf{Q}\mathbf{D}_{e}\mathbf{N}$）经 Piola 变换得到。需要指出的是，近场动力学文献中通常不采用经典有限元的 $\mathbf{K}_{\mathrm{t}}=\mathbf{K}_{\mathrm{M}}+\mathbf{K}_{\mathrm{G}}$ 分块记号：式\eqref{eq:tangent-nosb}已把 $\mathbf{K}_{\mathrm{t}}$ 写成"材料切线 $\mathbf{A}$"与"运动学因子 $\partial\mathbf{F}/\partial\mathbf{u}$"的复合，而式\eqref{eq:material-tangent}把 $\mathbf{A}$ 进一步拆为材料部分与初始应力部分 \cite{Hashim2020}。小变形线性情形下，$\mathbf{A}$ 退化为常数弹性矩阵，$\partial\mathbf{F}/\partial\mathbf{u}$ 为常矩阵，式\eqref{eq:tangent-nosb}即回归 7.3.3 节的 $\mathbf{K}_{\mathrm{glob}}$，这正是第 7.3 节与本节的自然衔接点。
 \end{remark}
 
 切线刚度矩阵的计算途径有三类 \cite{Littlewood2015}。其一是解析计算：直接对式\eqref{eq:tangent-nosb}逐项求导，精度最高，但需对每种本构推导材料切线 $\mathbf{A}$，实现复杂（Hashim 等对稳定化 NOSB 给出了完整的解析 Jacobian \cite{Hashim2020}）。其二是有限差分近似：对内力向量做中心差分，即式\eqref{eq:tangent-fd}：
@@ -360,11 +582,16 @@ NOSB 理论的发展沿“理论奠基—首次实现—工程应用—稳定性
   K_{\mathrm{t}}^{ij}\approx\frac{F_{\mathrm{int},i}(\mathbf{U}+\varepsilon\mathbf{e}_{j})-F_{\mathrm{int},i}(\mathbf{U}-\varepsilon\mathbf{e}_{j})}{2\varepsilon},
   \label{eq:tangent-fd}
 \end{equation}
-其中 $\mathbf{e}_{j}$ 为第 $j$ 个自由度的单位向量，$\varepsilon$ 为扰动步长（Peridigm 默认取 $\varepsilon=10^{-6}\times$ 节点尺度）。有限差分法实现简单、与具体本构无关，但每列刚度需两次内力计算，计算成本高，且 $\varepsilon$ 选取不当会引入数值误差或病态。其三是自动微分：利用模板元编程库（如 Sacado）在组装内力时同时计算导数，兼具解析法的精度与有限差分的通用性，Peridigm 中已有实现 \cite{Littlewood2015}。
+其中 $\mathbf{e}_{j}$ 为第 $j$ 个自由度的单位向量，$\varepsilon$ 为扰动步长。有限差分法实现简单、与具体本构无关，但每列刚度需两次内力计算，计算成本高，且 $\varepsilon$ 的选取需在两类误差之间权衡：中心差分式\eqref{eq:tangent-fd}的截断误差为 $O(\varepsilon^{2})$，而有限精度浮点运算引入的舍入误差为 $O(\epsilon_{\mathrm{mach}}/\varepsilon)$（$\epsilon_{\mathrm{mach}}$ 为机器精度，约 $10^{-16}$），二者之和在 $\varepsilon\sim\epsilon_{\mathrm{mach}}^{1/3}\sim10^{-5}$ 附近取极小——Peridigm 默认取 $\varepsilon=10^{-6}\times$ 节点尺度正是基于这一平衡；$\varepsilon$ 过小则舍入误差主导（数值病态），过大则截断误差主导，均使切线刚度失真。其三是自动微分：利用模板元编程库（如 Sacado）在组装内力时同时计算导数，兼具解析法的精度与有限差分的通用性，Peridigm 中已有实现 \cite{Littlewood2015}。
 
 \subsection{载荷增量步与收敛判据}\label{sec:nl-stepping}
 
-Newton 迭代的收敛域有限：当载荷步过大、初始猜测远离真解时，迭代可能发散。因此非线性隐式求解普遍采用载荷增量步（load stepping）策略，把载荷历程划分为若干增量步，在每步内用 Newton 迭代求解，并把上一步的收敛解作为下一步的初始猜测。典型流程如下 \cite{Littlewood2015}：
+Newton 迭代的收敛域有限：当载荷步过大、初始猜测远离真解时，迭代可能发散。因此非线性隐式求解普遍采用载荷增量步（load stepping）策略：引入载荷参数 $\lambda\in[0,1]$，把外载荷参数化为 $\mathbf{F}_{\mathrm{ext}}(\lambda)=\lambda\bar{\mathbf{F}}_{\mathrm{ext}}$（$\bar{\mathbf{F}}_{\mathrm{ext}}$ 为最终外载荷；位移边界情形则以指定位移为参数），把载荷历程划分为 $N$ 个增量步 $0=\lambda_{0}<\lambda_{1}<\cdots<\lambda_{N}=1$。第 $n$ 步求解载荷参数为 $\lambda_{n}$ 的非线性平衡方程
+\begin{equation}
+  \mathbf{R}(\mathbf{U},\lambda_{n})=\lambda_{n}\bar{\mathbf{F}}_{\mathrm{ext}}-\mathbf{F}_{\mathrm{int}}(\mathbf{U})=\mathbf{0}
+  \label{eq:load-stepping-equation}
+\end{equation}
+并把上一步的收敛解 $\mathbf{U}^{n}$ 作为本步 Newton 迭代的初始猜测。典型流程如下 \cite{Littlewood2015}：
 \begin{enumerate}
   \item 初始化：设载荷步计数 $n=0$，位移 $\mathbf{U}=\mathbf{0}$，初始化材料状态变量；
   \item 进入下一步：$n\leftarrow n+1$，按增量方案更新边界条件（位移边界更新指定位移值，力边界更新指定外力）；
@@ -379,13 +606,51 @@ Newton 迭代的收敛域有限：当载荷步过大、初始猜测远离真解�
   \frac{\lVert\mathbf{R}(\mathbf{U}^{l})\rVert_{2}}{\lVert\mathbf{F}_{\mathrm{ext}}\rVert_{2}}\le\varepsilon_{\mathrm{tol}},
   \label{eq:convergence-residual}
 \end{equation}
-其中 $\varepsilon_{\mathrm{tol}}$ 为容差。Littlewood 采用等价的相对判据：$\lVert\mathbf{R}^{l}\rVert\le\varepsilon\,\lVert\mathbf{R}^{0}\rVert$，即以载荷步初始残差为基准 \cite{Littlewood2015}；Hashim 等在有限变形算例中取 $\varepsilon_{\mathrm{tol}}=10^{-10}$ \cite{Hashim2020}。需要说明的是，以位移增量范数 $\lVert\Delta\mathbf{U}^{l+1}\rVert/\lVert\mathbf{U}^{l+1}\rVert\le\varepsilon$ 作为收敛判据是经典非线性有限元的常见做法 \cite{BelytschkoLiuMoran2000}，近场动力学文献中较少采用，故本书以残差判据式\eqref{eq:convergence-residual}为主。
+其中 $\varepsilon_{\mathrm{tol}}$ 为容差。残差判据取相对形式，是因为残差具有力的量纲、其绝对量级随问题规模与载荷水平变化，只有以外力范数为基准归一化后才能统一设定容差。Littlewood 采用与式\eqref{eq:convergence-residual}类似但基准不同的相对判据：$\lVert\mathbf{R}^{l}\rVert\le\varepsilon\,\lVert\mathbf{R}^{0}\rVert$，即以载荷步初始残差 $\mathbf{R}^{0}$（对应上一增量步的收敛解、式\eqref{eq:load-stepping-equation}在 $\lambda_{n}$ 下的初始不平衡力）为基准，衡量本步内残差的相对下降 \cite{Littlewood2015}；二者的区别仅在于归一化基准（$\lVert\mathbf{F}_{\mathrm{ext}}\rVert$ 与 $\lVert\mathbf{R}^{0}\rVert$）：式\eqref{eq:convergence-residual}以外载荷为参照，载荷已知时直观，但在载荷趋近零（如卸载阶段）时分母趋于零而失效；Littlewood 判据以本步初始不平衡力为参照，只要本步载荷有增量基准即非零，对卸载、接近零载荷的情形更稳健。Hashim 等在有限变形算例中取 $\varepsilon_{\mathrm{tol}}=10^{-10}$ \cite{Hashim2020}。需要说明的是，以位移增量范数 $\lVert\Delta\mathbf{U}^{l+1}\rVert/\lVert\mathbf{U}^{l+1}\rVert\le\varepsilon$ 作为收敛判据是经典非线性有限元的常见做法 \cite{BelytschkoLiuMoran2000}，近场动力学文献中较少采用，故本书以残差判据式\eqref{eq:convergence-residual}为主。
 
 \subsection{断裂问题的非线性求解}\label{sec:nl-fracture}
 
-隐式求解断裂问题面临一个根本困难：键的断裂使本构关系产生不连续。在键型或态型损伤模型中，键的失效通常表现为达到临界伸长率后作用力突然消失（第 11 章将详细讨论），这种不连续使式\eqref{eq:nl-residual}的残差函数不可微，标准 Newton--Raphson 迭代无法直接使用——Hashim 等明确指出“本构关系的不连续阻止了 Newton--Raphson 类型算法的标准实现” \cite{Hashim2020}。针对这一困难，文献中发展了三类对策 \cite{Hashim2020,Ni2019}。
+隐式求解断裂问题面临一个根本困难：键的断裂使本构关系产生不连续。在键型或态型损伤模型中，键的失效通常表现为达到临界伸长率后作用力突然消失（第 11 章将详细讨论），这种不连续使式\eqref{eq:nl-residual}的残差函数不可微，标准 Newton--Raphson 迭代无法直接使用——Hashim 等明确指出"本构关系的不连续阻止了 Newton--Raphson 类型算法的标准实现" \cite{Hashim2020}。针对这一困难，文献中发展了三类对策 \cite{Hashim2020,Ni2019}。
 
-其一是平滑软化法：把硬性的“断键”替换为光滑的渐近软化函数，使残差保持连续可微。Hashim 等采用双曲正切形式的键退化函数 $T_{s}=\tfrac{1}{2}(1-\tanh n)$，其中 $n$ 由当前伸长率与临界伸长率构造，并把 $\partial T_{s}/\partial\mathbf{u}_{k}$ 计入切线刚度矩阵，从而在保留断裂描述的同时维持 Newton 迭代的收敛性 \cite{Hashim2020}。其二是限制断键速率法：Ni 等在每个载荷步内限制允许断裂的键数，并控制迭代过程的破坏增量，避免大量键同时断裂导致的残差突变 \cite{Ni2019}。其三是割线刚度法：用不依赖当前切线状态的割线刚度矩阵替代切线刚度，允许在较大的载荷步下稳定求解，Li 等把这一方法用于稳定化 NOSB 模型 \cite{Li2019}。
+其一是平滑软化法：把硬性的"断键"替换为光滑的渐近软化函数，使残差保持连续可微。Hashim 等采用双曲正切形式的键退化函数 \cite{Hashim2020}：
+\begin{equation}
+  T_{s}(s)=
+  \begin{cases}
+    1, & s<s_{\min},\\
+    \dfrac{1}{2}\Bigl[1-\tanh\Bigl(\beta\,\dfrac{s_{\min}+s_{\mathrm{cr}}-2s}{s_{\min}-s_{\mathrm{cr}}}\Bigr)\Bigr], & s_{\min}\le s<s_{\mathrm{cr}},\\
+    0, & s\ge s_{\mathrm{cr}},
+  \end{cases}
+  \label{eq:smooth-softening}
+\end{equation}
+其中 $s$ 为键伸长率（式\eqref{eq:bond-stretch}），$s_{\mathrm{cr}}$ 为临界伸长率，$s_{\min}\in(0,s_{\mathrm{cr}})$ 为损伤起始伸长率，$\beta>0$ 为控制退化速率的陡度参数（Hashim 等取 $\beta=3$）\cite{Hashim2020}。式\eqref{eq:smooth-softening}在 $s<s_{\min}$ 时键保持完好（$T_s=1$）、$s\ge s_{\mathrm{cr}}$ 时完全失效（$T_s=0$，等价于断键），中间区间以双曲正切平滑过渡，故残差及其一阶导数处处连续。损伤通过退化因子乘在无损力态上实现：$\underline{\mathbf{T}}\leftarrow T_{s}\,\underline{\mathbf{T}}^{0}$（$\underline{\mathbf{T}}^{0}$ 为无损力态，式\eqref{eq:nosb-force-state}）。相应地，切线刚度须计入退化因子的贡献，其推导分三步、每步对应一个概念。
+
+\textbf{第一步：乘积法则。}$T_{s}$ 是标量（每条键一个介于 $0$ 与 $1$ 之间的值），$\underline{\mathbf{T}}^{0}$ 是该键的无损力态（向量），乘积 $T_{s}\,\underline{\mathbf{T}}^{0}$ 就是把该键的力按退化程度缩放。对某节点位移 $\mathbf{u}_{k}$ 求导时，因子 $T_{s}$ 与 $\underline{\mathbf{T}}^{0}$ 都依赖位移，由乘积法则
+\begin{equation}
+  \frac{\partial(T_{s}\,\underline{\mathbf{T}}^{0})}{\partial\mathbf{u}_{k}}
+  =T_{s}\,\frac{\partial\underline{\mathbf{T}}^{0}}{\partial\mathbf{u}_{k}}
+  +\underline{\mathbf{T}}^{0}\otimes\frac{\partial T_{s}}{\partial\mathbf{u}_{k}}
+  \label{eq:softening-tangent}
+\end{equation}
+式\eqref{eq:softening-tangent}的第一项 $T_{s}\,\partial\underline{\mathbf{T}}^{0}/\partial\mathbf{u}_{k}$ 是无损切线刚度（式\eqref{eq:tangent-nosb}）乘以退化因子——损伤只是把弹性刚度整体缩小，不改变其结构；第二项 $\underline{\mathbf{T}}^{0}\otimes(\partial T_{s}/\partial\mathbf{u}_{k})$ 是退化因子自身随位移变化引起的附加刚度——键正处于软化阶段时，刚度在"被缩小"之外还叠加一项与当前力态成比例的贡献（符号 $\otimes$ 为张量积，把力态向量 $\underline{\mathbf{T}}^{0}$ 与梯度向量 $\partial T_{s}/\partial\mathbf{u}_{k}$ 组合成二阶张量）。
+
+\textbf{第二步：链式法则。}退化因子 $T_{s}$ 并不直接依赖位移，而是通过键伸长率 $s$ 间接依赖——$T_{s}=T_{s}(s)$（式\eqref{eq:smooth-softening}的自变量是 $s$），而 $s$ 由键的相对位移 $\boldsymbol{\eta}=\mathbf{u}_n-\mathbf{u}_j$ 决定（式\eqref{eq:bond-stretch}）。故
+\begin{equation}
+  \frac{\partial T_{s}}{\partial\mathbf{u}_{k}}
+  =\frac{\mathrm{d}T_{s}}{\mathrm{d}s}\,\frac{\partial s}{\partial\mathbf{u}_{k}},
+  \qquad
+  \frac{\partial s}{\partial\mathbf{u}_{n}}=\frac{\underline{\mathbf{M}}\langle\boldsymbol{\xi}\rangle}{|\boldsymbol{\xi}|},\qquad
+  \frac{\partial s}{\partial\mathbf{u}_{j}}=-\frac{\underline{\mathbf{M}}\langle\boldsymbol{\xi}\rangle}{|\boldsymbol{\xi}|}
+  \label{eq:softening-chain}
+\end{equation}
+其中 $\underline{\mathbf{M}}\langle\boldsymbol{\xi}\rangle=(\boldsymbol{\xi}+\boldsymbol{\eta})/|\boldsymbol{\xi}+\boldsymbol{\eta}|$ 为变形后键方向的单位态（与第 6 章记号一致），分母中的 $|\boldsymbol{\xi}|$ 来自式\eqref{eq:bond-stretch}的定义。式\eqref{eq:softening-chain}表明 $\partial s/\partial\mathbf{u}_{k}$ 仅在 $k=j$ 或 $k=n$ 时非零——键伸长率只依赖其两端点的位移，这正对应式\eqref{eq:tangent-nosb}族级结构中"键的贡献局限在两端节点附近"。
+
+\textbf{第三步：$T_{s}$ 的显式导数。}对式\eqref{eq:smooth-softening}的中间分支求导，利用 $\tanh$ 的导数 $\mathrm{d}\tanh x/\mathrm{d}x=\operatorname{sech}^{2}x$，得
+\begin{equation}
+  \frac{\mathrm{d}T_{s}}{\mathrm{d}s}
+  =\frac{\beta\,\operatorname{sech}^{2}\bigl(\beta\,\frac{s_{\min}+s_{\mathrm{cr}}-2s}{s_{\min}-s_{\mathrm{cr}}}\bigr)}{s_{\min}-s_{\mathrm{cr}}}
+  \label{eq:softening-ds}
+\end{equation}
+由于 $s_{\min}-s_{\mathrm{cr}}<0$，式\eqref{eq:softening-ds}为负：伸长率越大、退化因子下降越快；$s<s_{\min}$ 或 $s\ge s_{\mathrm{cr}}$ 时 $T_{s}$ 为常数（$1$ 或 $0$），导数为零。Hashim 等的解析 Jacobian 正是按"乘积法则—链式法则—显式导数"这三步构造，从而在保留断裂描述的同时维持 Newton 迭代的收敛性 \cite{Hashim2020}。其二是限制断键速率法：Ni 等在每个载荷步内限制允许断裂的键数，并控制迭代过程的破坏增量，避免大量键同时断裂导致的残差突变 \cite{Ni2019}。其三是割线刚度法：用不依赖当前切线状态的割线刚度矩阵替代切线刚度，允许在较大的载荷步下稳定求解，Li 等把这一方法用于稳定化 NOSB 模型 \cite{Li2019}。
 
 \begin{remark}
   键断裂的施加时机对收敛性同样重要。Hashim 等的实现中，键的断裂判定在当前载荷步收敛之后、施加下一载荷步之前进行：若某键的伸长率超过临界值，则把该键的影响函数置零（$\omega\leftarrow(1-d)\omega$，$d$ 为损伤变量），并在下一载荷步的切线刚度重组装中自然体现。由于完全 Newton 法每步都重新组装 $\mathbf{K}_{\mathrm{t}}$，断键的影响自动进入后续迭代，无需像线性情形势\eqref{eq:global-system}那样显式处理局部重组装 \cite{Hashim2020,Ni2019}。此外，断键导致节点近场域不完整，形状张量式\eqref{eq:discrete-shape-tensor}的可逆性可能恶化，从而影响切线刚度式\eqref{eq:tangent-nosb}的可靠性；配合零能模式稳定化处理（\ref{sec:zero-energy}节）可缓解这一影响 \cite{Hashim2020}。
@@ -404,19 +669,33 @@ Newton 迭代的收敛域有限：当载荷步过大、初始猜测远离真解�
     \underline{\mathbf{Y}}\langle\boldsymbol{\xi}\rangle\otimes\boldsymbol{\xi}\,dV_{\mathbf{x}'}\right]\mathbf{K}^{-1}
   \label{eq:zero-energy-fgrad}
 \end{equation}
-变形梯度算子把一族键的变形信息"压缩"为单个二阶张量。这一压缩必然丢失信息：存在非零的键变形构型，其加权平均为零。Breitenfeld 等给出了最简单的例子 \cite{Breitenfeld2014}：考虑球对称权重函数 $\omega\langle\boldsymbol{\xi}\rangle=\omega(|\boldsymbol{\xi}|)$ 与远离边界的内部点 $\mathbf{x}$，固定其他所有点不动、仅将点 $\mathbf{x}$ 移动 $\delta\mathbf{u}$。此时点 $\mathbf{x}$ 的每根键 $\boldsymbol{\xi}$ 的变形后矢量都改变同一个增量 $-\delta\mathbf{u}$。在式\eqref{eq:zero-energy-fgrad}的被积函数中，键对 $(\boldsymbol{\xi},-\boldsymbol{\xi})$ 的贡献
+变形梯度算子把一族键的变形信息"压缩"为单个二阶张量。这一压缩必然丢失信息：存在非零的键变形构型，其加权平均为零。Breitenfeld 等给出了最简单的例子 \cite{Breitenfeld2014}：考虑球对称权重函数 $\omega\langle\boldsymbol{\xi}\rangle=\omega(|\boldsymbol{\xi}|)$ 与远离边界的内部点 $\mathbf{x}$，固定其他所有点不动、仅将点 $\mathbf{x}$ 移动 $\delta\mathbf{u}$。此时点 $\mathbf{x}$ 处每根键 $\boldsymbol{\xi}$ 的变形后矢量都改变同一个增量 $\delta\underline{\mathbf{Y}}\langle\boldsymbol{\xi}\rangle=-\delta\mathbf{u}$（因 $\underline{\mathbf{Y}}\langle\boldsymbol{\xi}\rangle=\mathbf{y}'-\mathbf{y}$，只有 $\mathbf{y}$ 变化）。把这一增量代入式\eqref{eq:zero-energy-fgrad}，变形梯度增量为
 \begin{equation}
-  \omega\,\delta\mathbf{u}\otimes\boldsymbol{\xi}+\omega\,\delta\mathbf{u}\otimes(-\boldsymbol{\xi})=\mathbf{0}
+  \delta\mathbf{F}(\mathbf{x})
+  =\Bigl[\int_{H_{\mathbf{x}}}\omega(|\boldsymbol{\xi}|)\,
+  \bigl(-\delta\mathbf{u}\bigr)\otimes\boldsymbol{\xi}\,dV_{\mathbf{x}'}\Bigr]\mathbf{K}^{-1}
+  =-\delta\mathbf{u}\otimes\Bigl[\int_{H_{\mathbf{x}}}\omega(|\boldsymbol{\xi}|)\,\boldsymbol{\xi}\,dV_{\mathbf{x}'}\Bigr]\mathbf{K}^{-1}
+  \label{eq:zero-energy-df}
+\end{equation}
+球对称近场域中矢量积分 $\int_{H_{\mathbf{x}}}\omega(|\boldsymbol{\xi}|)\,\boldsymbol{\xi}\,dV_{\mathbf{x}'}=\mathbf{0}$：权重是偶函数、键矢量按 $\boldsymbol{\xi}\to-\boldsymbol{\xi}$ 成对出现，键对 $(\boldsymbol{\xi},-\boldsymbol{\xi})$ 的被积贡献
+\begin{equation}
+  \omega\,\bigl(-\delta\mathbf{u}\bigr)\otimes\boldsymbol{\xi}
+  +\omega\,\bigl(-\delta\mathbf{u}\bigr)\otimes(-\boldsymbol{\xi})=\mathbf{0}
   \label{eq:zero-energy-pair-cancel}
 \end{equation}
-成对抵消，故 $\delta\mathbf{F}=\mathbf{0}$，进而 $\delta\mathbf{P}=\mathbf{0}$，力态不变。然而这些键的实际伸长/缩短均非零——该位移模式对力态完全"不可见"，因而称为零能模式 \cite{Breitenfeld2014}。
+恰好相互抵消（这里用到了 $\delta\underline{\mathbf{Y}}\langle\boldsymbol{\xi}\rangle=\delta\underline{\mathbf{Y}}\langle-\boldsymbol{\xi}\rangle=-\delta\mathbf{u}$ 与 $\omega(|\boldsymbol{\xi}|)=\omega(|-\boldsymbol{\xi}|)$）。于是由式\eqref{eq:zero-energy-df}得 $\delta\mathbf{F}=\mathbf{0}$，进而 $\delta\mathbf{P}=\mathbf{0}$（经本构关系）、力态不变。然而这些键的实际伸长/缩短均非零——该位移模式对力态完全"不可见"，因而称为零能模式 \cite{Breitenfeld2014}。
 
 \ref{sec:correspondence}节的分析表明，力态式\eqref{eq:nosb-force-state}完全由应力张量 $\mathbf{P}$ 决定，而 $\mathbf{P}$ 又只依赖变形梯度 $\mathbf{F}$。因此，凡满足 $\delta\mathbf{F}=\mathbf{0}$ 的变形增量都不产生力响应。在规则网格上，这类模式表现为交替的正负位移（棋盘或锯齿模式）：一维情形取 $u_j=(-1)^j a$，对节点 $x_j$ 而言，对称邻居对 $x_j\pm k\Delta x$（$k$ 为奇数）的相对位移 $u_{j\pm k}-u_j$ 相等，其贡献在式\eqref{eq:zero-energy-fgrad}中相互抵消，故 $\delta\mathbf{F}=0$；三维情形即两个子晶格整体反向位移的模式。Silling 2017 年从势能稳定性角度给出了这一现象的严格刻画 \cite{Silling2017}。考虑弹性体总势能
 \begin{equation}
   \Pi(\mathbf{y})=\int_{\mathcal{B}}\Bigl(W(\underline{\mathbf{Y}}[\mathbf{x}])-\mathbf{b}\cdot\mathbf{y}\Bigr)\,dV_{\mathbf{x}}
   \label{eq:zero-energy-potential}
 \end{equation}
-平衡解的稳定性要求 $\Pi$ 取局部极小，即对一切非零容许变形态增量 $\delta\underline{\mathbf{Y}}$，二阶变分为正：
+对式\eqref{eq:zero-energy-potential}取变分：一阶变分为 $\delta\Pi=\int_{\mathcal{B}}\bigl(\underline{\mathbf{T}}\cdot\delta\underline{\mathbf{Y}}-\mathbf{b}\cdot\delta\mathbf{y}\bigr)\,dV_{\mathbf{x}}$（力态是应变能密度的 Fréchet 导数，式\eqref{eq:frechet-def}）；对 $\underline{\mathbf{T}}\cdot\delta\underline{\mathbf{Y}}$ 再变分即得二阶变分
+\begin{equation}
+  \delta^{2}\Pi=\int_{\mathcal{B}}\delta\underline{\mathbf{T}}\cdot\delta\underline{\mathbf{Y}}\,dV_{\mathbf{x}},
+  \label{eq:second-variation}
+\end{equation}
+其中 $\delta\underline{\mathbf{T}}$ 为力态对变形态的线性化增量（Fréchet 导数 $\nabla_{\underline{\mathbf{Y}}}\underline{\mathbf{T}}[\delta\underline{\mathbf{Y}}]$），态点积定义为 $\delta\underline{\mathbf{T}}\cdot\delta\underline{\mathbf{Y}}=\int_{H_{\mathbf{x}}}\delta\underline{\mathbf{T}}\langle\boldsymbol{\xi}\rangle\cdot\delta\underline{\mathbf{Y}}\langle\boldsymbol{\xi}\rangle\,dV_{\mathbf{x}'}$。平衡解稳定要求式\eqref{eq:second-variation}对一切非零 $\delta\underline{\mathbf{Y}}$ 为正。由于被积函数对每个材料点独立，Silling 采用逐点（局部）形式：要求每个材料点的力态增量与变形态增量的态点积为正，即
 \begin{equation}
   \delta^{2}\Pi>0
   \quad\Longleftrightarrow\quad
@@ -424,13 +703,22 @@ Newton 迭代的收敛域有限：当载荷步过大、初始猜测远离真解�
   \qquad\forall\;\delta\underline{\mathbf{Y}}\neq\mathbf{0}
   \label{eq:zero-energy-stability-condition}
 \end{equation}
-其中 $\delta\underline{\mathbf{T}}$ 为力态对变形态的线性化增量，$\cdot$ 为态点积。Silling 证明，一切对应材料都违反这一条件：存在满足
+（逐点正定蕴含整体二阶变分为正，是稳定性的充分条件）。Silling 证明，一切对应材料都违反这一条件：存在满足
 \begin{equation}
   \omega(-\boldsymbol{\xi})\,\delta\underline{\mathbf{Y}}\langle-\boldsymbol{\xi}\rangle
   =\omega(\boldsymbol{\xi})\,\delta\underline{\mathbf{Y}}\langle\boldsymbol{\xi}\rangle
   \label{eq:zero-energy-nullspace}
 \end{equation}
- 的非零变形态增量，其变形梯度增量为零（$\delta\mathbf{F}=\mathbf{0}$），从而 $\delta\underline{\mathbf{T}}\cdot\delta\underline{\mathbf{Y}}=0$，稳定化条件失效 \cite{Silling2017}。式\eqref{eq:zero-energy-nullspace}正是式\eqref{eq:zero-energy-pair-cancel}所述键对反转对称的严格表述：满足该条件的模式构成变形梯度算子的非平凡零空间。值得强调的是，零能模式是材料层面的性质而非离散伪影：对应材料本身就不稳定，粒子离散只是继承了这一失稳。此外，Tupek 与 Radovitzky 指出，零能模式的根源在于本构对应机制本身——把一族键的变形压缩为一个平均量必然丢失键级信息 \cite{TupekRadovitzky2014}。
+的非零变形态增量。为看清式\eqref{eq:zero-energy-nullspace}的后果，代入变形梯度增量并考察键对 $(\boldsymbol{\xi},-\boldsymbol{\xi})$ 的贡献：权重为偶函数时式\eqref{eq:zero-energy-nullspace}给出反转对称变形增量 $\delta\underline{\mathbf{Y}}\langle-\boldsymbol{\xi}\rangle=\delta\underline{\mathbf{Y}}\langle\boldsymbol{\xi}\rangle$，于是
+\begin{equation}
+  \omega(\boldsymbol{\xi})\,\delta\underline{\mathbf{Y}}\langle\boldsymbol{\xi}\rangle\otimes\boldsymbol{\xi}
+  +\omega(-\boldsymbol{\xi})\,\delta\underline{\mathbf{Y}}\langle-\boldsymbol{\xi}\rangle\otimes(-\boldsymbol{\xi})
+  =\omega\,\delta\underline{\mathbf{Y}}\langle\boldsymbol{\xi}\rangle\otimes\boldsymbol{\xi}
+  -\omega\,\delta\underline{\mathbf{Y}}\langle\boldsymbol{\xi}\rangle\otimes\boldsymbol{\xi}
+  =\mathbf{0}
+  \label{eq:nullspace-cancel}
+\end{equation}
+式\eqref{eq:nullspace-cancel}表明键对贡献再次抵消，变形梯度增量为零（$\delta\mathbf{F}=\mathbf{0}$），从而 $\delta\mathbf{P}=\mathbf{0}$、$\delta\underline{\mathbf{T}}=\mathbf{0}$，$\delta\underline{\mathbf{T}}\cdot\delta\underline{\mathbf{Y}}=0$，稳定化条件式\eqref{eq:zero-energy-stability-condition}失效 \cite{Silling2017}。式\eqref{eq:zero-energy-nullspace}正是式\eqref{eq:zero-energy-pair-cancel}所述键对反转对称的严格表述：满足该条件的模式构成变形梯度算子的非平凡零空间。值得强调的是，零能模式是材料层面的性质而非离散伪影：对应材料本身就不稳定，粒子离散只是继承了这一失稳。此外，Tupek 与 Radovitzky 指出，零能模式的根源在于本构对应机制本身——把一族键的变形压缩为一个平均量必然丢失键级信息 \cite{TupekRadovitzky2014}。
 
 \subsection{零能模式的数值表现与检测}\label{sec:zero-energy-detect}
 
@@ -442,14 +730,23 @@ Newton 迭代的收敛域有限：当载荷步过大、初始猜测远离真解�
   =\underline{\mathbf{Y}}\langle\boldsymbol{\xi}\rangle-\mathbf{F}\boldsymbol{\xi}
   \label{eq:nonuniform-part}
 \end{equation}
-即键的实际变形与变形梯度所预示的均匀变形之差。$\underline{\mathbf{z}}$ 恰在变形为均匀时为零，故其加权范数直接度量零能模式的"活跃度"：零能模式增长，则稳定化能量随之增长，可作为计算中的实时监测量 \cite{Silling2017}。其二是能谱分析：Chowdhury 等对正弦位移场定义能量型度量
+即键的实际变形与变形梯度所预示的均匀变形之差。$\underline{\mathbf{z}}$ 恰在变形为均匀时为零，故其加权范数直接度量零能模式的"活跃度"。$\underline{\mathbf{z}}$ 有两个重要性质。其一，它与变形梯度正交：把式\eqref{eq:nonuniform-part}代入权重积并用式\eqref{eq:nonlocal-deformation-gradient}，
+\begin{equation}
+  \int_{H_{\mathbf{x}}}\omega\,\underline{\mathbf{z}}\langle\boldsymbol{\xi}\rangle\otimes\boldsymbol{\xi}\,dV_{\mathbf{x}'}
+  =\int_{H_{\mathbf{x}}}\omega\,\underline{\mathbf{Y}}\langle\boldsymbol{\xi}\rangle\otimes\boldsymbol{\xi}\,dV_{\mathbf{x}'}
+  -\mathbf{F}\int_{H_{\mathbf{x}}}\omega\,\boldsymbol{\xi}\otimes\boldsymbol{\xi}\,dV_{\mathbf{x}'}
+  =\mathbf{F}\mathbf{K}-\mathbf{F}\mathbf{K}
+  =\mathbf{0}
+  \label{eq:z-orthogonality}
+\end{equation}
+式\eqref{eq:z-orthogonality}表明 $\underline{\mathbf{z}}$ 是变形梯度加权最小二乘拟合（见 7.1 节 remark）的残差，不包含任何能被 $\mathbf{F}$ 捕捉的均匀变形信息。其二，它恰好捕捉零能模式：对满足式\eqref{eq:zero-energy-nullspace}的反转对称变形增量，$\delta\mathbf{F}=\mathbf{0}$ 而 $\delta\underline{\mathbf{z}}=\delta\underline{\mathbf{Y}}\neq\mathbf{0}$——零能模式的全部变形信息都落在 $\underline{\mathbf{z}}$ 中，而不进入 $\mathbf{F}$。因此 $\underline{\mathbf{z}}$ 的加权范数 $\int\omega\,\underline{\mathbf{z}}\cdot\underline{\mathbf{z}}\,dV_{\mathbf{x}'}$ 是零能模式"活跃度"的直接度量：零能模式增长，则稳定化能量随之增长，可作为计算中的实时监测量 \cite{Silling2017}。其二是能谱分析：Chowdhury 等对正弦位移场定义能量型度量
 \begin{equation}
   e(k)=\sum_{i}\sum_{j}
   \underline{\mathbf{T}}[\mathbf{x}_i]\langle\mathbf{x}_j-\mathbf{x}_i\rangle\cdot
   \bigl(\mathbf{u}(\mathbf{x}_j)-\mathbf{u}(\mathbf{x}_i)\bigr)\,\Delta V_i
   \label{eq:zero-energy-spectrum}
 \end{equation}
-其中 $k$ 为波数。数值实验表明，常规对应模型的 $e(k)$ 在高波数（短波长）趋于零，定量证明了高频模式不携带能量；而修正后的子近场域模型对所有波数都给出有限能量 \cite{Chowdhury2019}。其三是直接观察：交替 $\pm$ 位移、速度振荡或应力振荡的锯齿形态，以及其随 $\delta$ 增大而加剧的趋势，都是零能模式的直观信号 \cite{Breitenfeld2014}。
+其中 $k$ 为波数，$\mathbf{u}(\mathbf{x})=\mathbf{a}\sin(\mathbf{k}\cdot\mathbf{x})$ 为波矢 $\mathbf{k}$、振幅 $\mathbf{a}$ 的正弦位移场，$e(k)$ 度量该波数模式携带能量的能力。式\eqref{eq:zero-energy-spectrum}的每一对被积项是键力密度 $\underline{\mathbf{T}}[\mathbf{x}_i]\langle\mathbf{x}_j-\mathbf{x}_i\rangle$ 与键相对位移 $\mathbf{u}(\mathbf{x}_j)-\mathbf{u}(\mathbf{x}_i)$ 的点积，物理上即该键"内力$\times$变形"的功密度；对所有键求和后，$e(k)$ 反映波数为 $k$ 的变形模式在键力上做功的总量。零能模式在能谱上的特征由此可直接读出：对最高波数 $k=\pi/\Delta x$（波长 $2\Delta x$ 的棋盘模式），由 7.5.1 节的分析，其变形梯度增量为零、力态不变（$\delta\underline{\mathbf{T}}=\mathbf{0}$），且键对 $(\boldsymbol{\xi},-\boldsymbol{\xi})$ 的贡献因 $\underline{\mathbf{T}}\langle-\boldsymbol{\xi}\rangle=-\underline{\mathbf{T}}\langle\boldsymbol{\xi}\rangle$（力态式\eqref{eq:nosb-force-state}中 $\boldsymbol{\xi}\to-\boldsymbol{\xi}$ 反号）与反转对称位移 $u_{i+}=u_{i-}$ 而相互抵消，故 $e(\pi/\Delta x)=0$——高频模式不携带能量。数值实验表明，常规对应模型的 $e(k)$ 随波数增大趋于零，定量印证了这一结论；而修正后的子近场域模型对所有波数都给出有限能量 \cite{Chowdhury2019}。其三是直接观察：交替 $\pm$ 位移、速度振荡或应力振荡的锯齿形态，以及其随 $\delta$ 增大而加剧的趋势，都是零能模式的直观信号 \cite{Breitenfeld2014}。
 
 \begin{remark}
   零能模式与表面效应（surface effect）是 NOSB 的两类不同数值困难，须加以区分。表面效应源于边界附近近场域不完整导致形状张量式\eqref{eq:discrete-shape-tensor}的计算偏差，表现为边界区域刚度的错误估计，属于边界误差（第 10 章讨论）；零能模式则源于变形梯度算子的非平凡零空间，表现为全域的振荡失稳，属于本构层次的不稳定 \cite{Silling2017,LeBobaru2018}。二者都需要修正，但机理与手段不同。
@@ -457,29 +754,41 @@ Newton 迭代的收敛域有限：当载荷步过大、初始猜测远离真解�
 
 \subsection{零能模式的控制策略总览}\label{sec:zero-energy-control}
 
-自 Breitenfeld 等 2014 年首次系统研究零能模式以来 \cite{Breitenfeld2014}，文献中发展出了五类控制策略。其一是修正力态或附加罚刚度：直接在力态上附加与键变形相关的修正项，或对"变形梯度预示的均匀变形与实际键变形之差"施加惩罚，使零能模式携带能量。Breitenfeld 等比较了多种控制方法，最终采用对近场域内位移取平均的修正方案 \cite{Breitenfeld2014}；Littlewood 及 Wu 与 Ren 也提出了类似的罚刚度修正 \cite{Littlewood2015,WuRen2015}。其二是势能型稳定化：Silling 2017 年提出在应变能密度中附加稳定化项（见下式），这是目前应用最广、理论基础最完备的方法 \cite{Silling2017}。其三是高阶近似：用高阶多项式构造变形梯度，把被一阶（仿射）拟合抹平的短波变形信息重新纳入，从而收缩变形梯度算子的零空间 \cite{YaghoobiChorzepa2017}。其四是键关联与键级构造：为每条键在子近场域上单独构造变形梯度（\ref{sec:zero-energy}节引言已提及的键关联方法 \cite{Chen2018}），或在键级上构造变形梯度并对能量取平均 \cite{BreitzmanDayal2018}，使变形态到力态的映射成为单射，从源头消除零能模式。其五是权重函数选择：Queiruga 与 Moridis 的数值研究表明，权重函数的形式显著影响对应模型的收敛与稳定性质，三次型（cubic）权重整体最优 \cite{QueirugaMoridis2017}。
+自 Breitenfeld 等 2014 年首次系统研究零能模式以来 \cite{Breitenfeld2014}，文献中发展出了五类控制策略。其一是修正力态或附加罚刚度：直接在力态上附加与键变形相关的修正项，使零能模式携带能量。这一思路可用 7.5.2 节定义的非均匀部分 $\underline{\mathbf{z}}$（式\eqref{eq:nonuniform-part}）统一表述：由于零能模式的变形信息全部落在 $\underline{\mathbf{z}}$ 中（7.5.2 节），在力态上附加与 $\underline{\mathbf{z}}$ 成比例的修正项
+\begin{equation}
+  \underline{\mathbf{T}}\leftarrow\underline{\mathbf{T}}+\gamma\,\omega\,\underline{\mathbf{z}}
+  \label{eq:penalty-force}
+\end{equation}
+（$\gamma>0$ 为罚参数，$\underline{\mathbf{z}}$ 每条键一个向量），即可使零能模式获得正的能量。式\eqref{eq:penalty-force}的修正项有两个关键性质。其一，由式\eqref{eq:z-orthogonality}，$\underline{\mathbf{z}}$ 与变形梯度正交，均匀变形下 $\underline{\mathbf{z}}=\mathbf{0}$，故修正项不改变对应材料恢复经典响应的能力。其二，对零能模式（$\delta\mathbf{F}=\mathbf{0}$、$\delta\underline{\mathbf{z}}=\delta\underline{\mathbf{Y}}\neq\mathbf{0}$），修正项对稳定性条件式\eqref{eq:zero-energy-stability-condition}的贡献为 $\gamma\int_{H_{\mathbf{x}}}\omega\,\delta\underline{\mathbf{z}}\cdot\delta\underline{\mathbf{Y}}\,dV_{\mathbf{x}'}=\gamma\int_{H_{\mathbf{x}}}\omega\,|\delta\underline{\mathbf{Y}}|^{2}\,dV_{\mathbf{x}'}>0$，恰好补上对应材料缺失的正定性。Breitenfeld 等比较了多种此类修正，最终采用对近场域内位移取平均的修正方案 \cite{Breitenfeld2014}；Littlewood 在 Peridigm 中实现了力态附加与键变形偏离程度成正比项的罚刚度修正 \cite{Littlewood2015}，Wu 与 Ren 则通过对变形梯度计算采用正则化的位移场达到同一效果 \cite{WuRen2015}。势能型稳定化（下述其二）正是式\eqref{eq:penalty-force}的势能版本：对 $\underline{\mathbf{z}}$ 的二次型 $\tfrac{1}{2}\int_{H_{\mathbf{x}}}\beta\,\underline{\mathbf{z}}\cdot\underline{\mathbf{z}}\,dV_{\mathbf{x}'}$ 求 Fréchet 导数即得式\eqref{eq:penalty-force}形式的修正力态（$\gamma$ 对应 $\beta$），故二者本质相同，详见 \ref{sec:stabilization}节。其二是势能型稳定化：Silling 2017 年提出在应变能密度中附加稳定化项（见下式），这是目前应用最广、理论基础最完备的方法 \cite{Silling2017}。其三是高阶近似：用高阶多项式构造变形梯度，把被一阶（仿射）拟合抹平的短波变形信息重新纳入，从而收缩变形梯度算子的零空间 \cite{YaghoobiChorzepa2017}。其四是键关联与键级构造：为每条键在子近场域上单独构造变形梯度（\ref{sec:zero-energy}节引言已提及的键关联方法 \cite{Chen2018}），或在键级上构造变形梯度并对能量取平均 \cite{BreitzmanDayal2018}，使变形态到力态的映射成为单射，从源头消除零能模式。其五是权重函数选择：Queiruga 与 Moridis 的数值研究表明，权重函数的形式显著影响对应模型的收敛与稳定性质，三次型（cubic）权重整体最优 \cite{QueirugaMoridis2017}。
 
 上述策略中，势能型稳定化（Silling 2017）与键关联/键级构造（Chen 2018；Breitzman–Dayal 2018）是当前两种主流路线，其具体实现、参数选取与适用范围将在 \ref{sec:stabilization}节详细展开。
 
 \section{稳定化策略}\label{sec:stabilization}
 
-\ref{sec:zero-energy}节概述了控制零能模式的五类策略，本节介绍其中三类代表性方法的详细实现：应力点法、罚函数法与键关联方法。应力点法通过在近场域内增设积分点避免共位求导；罚函数法在应变能密度或力态上附加惩罚项，使零能模式携带能量；键关联方法为每条键在子近场域上单独构造变形度量，从源头消除零能模式。三类方法分别代表了"改变求积位置""附加能量惩罚"与"重构变形度量"三种思路，本节依次介绍其原理、公式与适用性。
+\ref{sec:zero-energy}节概述了控制零能模式的五类策略，本节介绍其中三类代表性方法的详细实现：应力点法（\ref{sec:stress-point}节）、罚函数法（\ref{sec:penalty-methods}节）与键关联方法（\ref{sec:bond-associated}节）。应力点法通过在近场域内增设积分点避免共位求导；罚函数法在应变能密度或力态上附加惩罚项，使零能模式携带能量；键关联方法为每条键在子近场域上单独构造变形度量，从源头消除零能模式。三类方法分别代表了"改变求积位置""附加能量惩罚"与"重构变形度量"三种思路，本节依次介绍其原理、公式与适用性。
 
 \subsection{应力点法}\label{sec:stress-point}
 
 应力点（stress point）法源于光滑粒子流体动力学（SPH）中抑制拉伸失稳与零能模式的经典技术。在 SPH 中，若场量导数在粒子处共位（collocated）计算，则某些高频变形模式在离散求和意义下相互抵消、不产生响应，即零能模式。Dyka 与 Ingel 首次提出在粒子之间增设应力点、在应力点处计算场量导数的方法 \cite{DykaIngel1995}，Randles 与 Libersky 将其系统化 \cite{RandlesLibersky1996}，Vignjevic 等进一步分析了该方法对零能模式的抑制机理 \cite{Vignjevic2000}。
 
-Luo 与 Sundararaghavan 将这一思想移植到 NOSB 对应模型 \cite{LuoSundararaghavan2018}。其核心思想是：在每个材料点的近场域内布置若干应力点 $\mathbf{x}_s$，在应力点处计算场量的空间导数（变形梯度、应力），再据以装配键力。由于导数计算不再与物质点共位，零能模式所需的"积分平均抵消"被打破，交替位移模式被阻尼。在 NOSB 框架中，应力点处的变形梯度仍用与非局部变形梯度式\eqref{eq:nonlocal-deformation-gradient}相同的积分公式计算，只是积分中心从材料点 $\mathbf{x}$ 移到应力点 $\mathbf{x}_s$，即式\eqref{eq:stress-point-fgrad}：
+Luo 与 Sundararaghavan 将这一思想移植到 NOSB 对应模型 \cite{LuoSundararaghavan2018}。其核心思想是：在每个材料点的近场域内布置若干应力点 $\mathbf{x}_s$，在应力点处计算场量的空间导数（变形梯度、应力），再据以装配键力。在 NOSB 框架中，应力点处的变形梯度仍用与非局部变形梯度式\eqref{eq:nonlocal-deformation-gradient}相同的积分公式计算，只是积分以应力点为中心：键矢量取 $\boldsymbol{\xi}_s=\mathbf{x}'-\mathbf{x}_s$（从应力点指向近场域内各材料点）、积分域取以 $\mathbf{x}_s$ 为中心、半径 $\delta$ 的球域 $H_{\mathbf{x}_s}$，即
 \begin{equation}
   \mathbf{F}(\mathbf{x}_s)
-  =\left[\int_{H_{\mathbf{x}}}\omega(|\boldsymbol{\xi}|)\,
-    \underline{\mathbf{Y}}\langle\boldsymbol{\xi}\rangle\otimes\boldsymbol{\xi}\,dV_{\mathbf{x}'}\right]\mathbf{K}(\mathbf{x}_s)^{-1},
+  =\left[\int_{H_{\mathbf{x}_s}}\omega(|\boldsymbol{\xi}_s|)\,
+    \underline{\mathbf{Y}}\langle\boldsymbol{\xi}_s\rangle\otimes\boldsymbol{\xi}_s\,dV_{\mathbf{x}'}\right]\mathbf{K}(\mathbf{x}_s)^{-1},
   \qquad
-  \mathbf{K}(\mathbf{x}_s)=\int_{H_{\mathbf{x}}}\omega(|\boldsymbol{\xi}|)\,
-    \boldsymbol{\xi}\otimes\boldsymbol{\xi}\,dV_{\mathbf{x}'}
+  \mathbf{K}(\mathbf{x}_s)=\int_{H_{\mathbf{x}_s}}\omega(|\boldsymbol{\xi}_s|)\,
+    \boldsymbol{\xi}_s\otimes\boldsymbol{\xi}_s\,dV_{\mathbf{x}'}
   \label{eq:stress-point-fgrad}
 \end{equation}
-其中 $H_{\mathbf{x}}$ 仍为以材料点 $\mathbf{x}$ 为中心、$\delta$ 为半径的近场域，应力点 $\mathbf{x}_s$ 位于该近场域内部。求得应力点处的应力张量后，材料点间的键力由应力场插值回物质点得到。Luo 与 Sundararaghavan 在一维、二维与三维算例中验证，该方法能完全阻尼零能模式，且不引入任何附加参数 \cite{LuoSundararaghavan2018}。
+其中应力点 $\mathbf{x}_s$ 位于材料点 $\mathbf{x}$ 的近场域内部（如布置在键中点或按 Voronoi 偏移），$\underline{\mathbf{Y}}\langle\boldsymbol{\xi}_s\rangle$ 为连接 $\mathbf{x}_s$ 与 $\mathbf{x}'$ 的键的变形后矢量。式\eqref{eq:stress-point-fgrad}与式\eqref{eq:nonlocal-deformation-gradient}的差别仅在于求积中心的错位，而这正是抑制零能模式的关键：7.5.1 节的"键对 $\pm\boldsymbol{\xi}$ 成对抵消"依赖求积点落在棋盘模式的反演中心（即材料点网格节点）上；应力点与材料点错位后，交替位移模式在应力点处不再具有关于键对的反转对称性，积分不再成对抵消——一维棋盘模式的应变在材料点处为零、在错位的应力点处却非零，故零能模式被阻尼（这一机理可数值验证，见下文）。求得应力点处的应力张量 $\boldsymbol{\sigma}(\mathbf{x}_s)$ 后，材料点 $\mathbf{x}$ 处的应力由近场域内各应力点的应力按加权平均插值得到
+\begin{equation}
+  \boldsymbol{\sigma}(\mathbf{x})
+  =\frac{\sum_{s}w(\mathbf{x}-\mathbf{x}_s)\,\boldsymbol{\sigma}(\mathbf{x}_s)}
+  {\sum_{s}w(\mathbf{x}-\mathbf{x}_s)}
+  \label{eq:stress-interpolation}
+\end{equation}
+其中 $w(\mathbf{x}-\mathbf{x}_s)$ 为插值权重（如 $\lvert\mathbf{x}-\mathbf{x}_s\rvert^{-1}$ 或核函数），式\eqref{eq:stress-interpolation}为 Shepard 型归一化加权平均，对均匀应力场精确还原。把式\eqref{eq:stress-interpolation}得到的 $\boldsymbol{\sigma}(\mathbf{x})$ 代入式\eqref{eq:force-state-cauchy}或式\eqref{eq:force-state-small}构造材料点间的键力。Luo 与 Sundararaghavan 在一维、二维与三维算例中验证，该方法能完全阻尼零能模式，且不引入任何附加参数 \cite{LuoSundararaghavan2018}。
 
 \begin{remark}
   应力点法不修改本构关系，也不改变变形梯度算子的零空间结构，而是通过改变导数的求积位置使零能模式在离散意义下携带能量。这一"改求积"思路与罚函数法的"加惩罚"思路、键关联方法的"换度量"思路在机理上根本不同。其主要代价是应力点的布置与应力场插值增加了实现复杂度，且应力点位置的选择（如在键中点、按 Voronoi 偏移等）对精度有一定影响 \cite{LuoSundararaghavan2018}。
@@ -503,21 +812,40 @@ Luo 与 Sundararaghavan 将这一思想移植到 NOSB 对应模型 \cite{LuoSund
   \underline{\mathbf{z}}\langle\boldsymbol{\xi}\rangle\cdot\underline{\mathbf{z}}\langle\boldsymbol{\xi}\rangle\;dV_{\mathbf{x}'}
   \label{eq:stabilization-energy}
 \end{equation}
-其中 $W^{c}$ 为对应材料原有的应变能密度，$W^{s}$ 为稳定化项，$\beta$ 为正定的标量态（每条键一个正的权重），它惩罚变形态对均匀变形的偏离 \cite{Silling2017}。由此导出的力态为
+其中 $W^{c}$ 为对应材料原有的应变能密度，$W^{s}$ 为稳定化项，$\beta$ 为正定的标量态（每条键一个正的权重），它惩罚变形态对均匀变形的偏离 \cite{Silling2017}。式\eqref{eq:stabilization-energy}对 $\underline{\mathbf{Y}}$ 求 Fréchet 导数即得稳定化力态。由 $\delta\underline{\mathbf{z}}=\delta\underline{\mathbf{Y}}-\delta\mathbf{F}\boldsymbol{\xi}$，能量变分为
+\begin{equation}
+  \delta W^{s}
+  =\int_{H_{\mathbf{x}}}\beta\,\underline{\mathbf{z}}\cdot\delta\underline{\mathbf{Y}}\,dV_{\mathbf{x}'}
+  -\delta\mathbf{F}:\Bigl[\int_{H_{\mathbf{x}}}\beta\,\underline{\mathbf{z}}\otimes\boldsymbol{\xi}\,dV_{\mathbf{x}'}\Bigr]
+  \label{eq:stabilization-variation}
+\end{equation}
+把式\eqref{eq:stabilization-variation}与力态的变分定义式\eqref{eq:frechet-def}对比，稳定化力态含两项
+\begin{equation}
+  \underline{\mathbf{T}}^{s}\langle\boldsymbol{\xi}\rangle
+  =\beta(|\boldsymbol{\xi}|)\,\underline{\mathbf{z}}\langle\boldsymbol{\xi}\rangle
+  -\omega(|\boldsymbol{\xi}|)\Bigl[\int_{H_{\mathbf{x}}}\beta\,\underline{\mathbf{z}}\otimes\boldsymbol{\xi}\,dV_{\mathbf{x}'}\Bigr]\mathbf{K}^{-1}\boldsymbol{\xi}
+  \label{eq:stabilization-force-full}
+\end{equation}
+其中第二项来自 $\underline{\mathbf{z}}$ 经变形梯度对 $\underline{\mathbf{Y}}$ 的间接依赖（$\delta\mathbf{F}$ 由式\eqref{eq:zero-energy-df}给出）。若取 $\beta=\gamma\omega$（$\gamma$ 为正常数），式\eqref{eq:stabilization-force-full}的第二项因 $\underline{\mathbf{z}}$ 的正交性式\eqref{eq:z-orthogonality}（$\int\omega\,\underline{\mathbf{z}}\otimes\boldsymbol{\xi}\,dV=\mathbf{0}$）而消失，得
 \begin{equation}
   \underline{\mathbf{T}}\langle\boldsymbol{\xi}\rangle
   =\omega(|\boldsymbol{\xi}|)\Bigl(\mathbf{P}\,\mathbf{K}^{-1}\boldsymbol{\xi}
   +\gamma\,\underline{\mathbf{z}}\langle\boldsymbol{\xi}\rangle\Bigr)
   \label{eq:stabilization-force}
 \end{equation}
-其中取 $\beta=\gamma\omega$（$\gamma$ 为正常数）即得式\eqref{eq:stabilization-force}的简洁形式。Silling 证明，稳定化项有两个关键性质：其一，它对应力张量没有贡献（偏应力 $\boldsymbol{\nu}^{s}=\mathbf{0}$），即不改变材料点的平均应力响应；其二，修正后的力态满足稳定性条件式\eqref{eq:zero-energy-stability-condition}，对一切非零变形态增量都有 $\delta\underline{\mathbf{T}}\cdot\delta\underline{\mathbf{Y}}>0$ \cite{Silling2017}。
+式\eqref{eq:stabilization-force}即对应力态与稳定化力态 $\gamma\omega\underline{\mathbf{z}}$ 之和。Silling 证明，稳定化项有两个关键性质。其一，它不改变部分应力：部分应力定义为 $\boldsymbol{\nu}=\int_{H_{\mathbf{x}}}\underline{\mathbf{T}}\langle\boldsymbol{\xi}\rangle\otimes\boldsymbol{\xi}\,dV_{\mathbf{x}'}$（用参考键矢量，见 \cite{SillingLehoucq2010}）。把式\eqref{eq:stabilization-force-full}代入，第一项与第二项对 $\boldsymbol{\nu}^{s}$ 的贡献分别为 $\int\beta\,\underline{\mathbf{z}}\otimes\boldsymbol{\xi}\,dV_{\mathbf{x}'}$ 与 $-\bigl[\int\beta\,\underline{\mathbf{z}}\otimes\boldsymbol{\xi}\,dV_{\mathbf{x}'}\bigr]\mathbf{K}^{-1}\mathbf{K}$，二者恰好相消（$\mathbf{K}^{-1}\mathbf{K}=\mathbf{I}$），故 $\boldsymbol{\nu}^{s}=\mathbf{0}$（对任意 $\beta$ 成立，不限于 $\beta=\gamma\omega$）——即不改变材料点的平均应力响应。其二，修正后的力态满足稳定性条件式\eqref{eq:zero-energy-stability-condition}，对一切非零变形态增量都有 $\delta\underline{\mathbf{T}}\cdot\delta\underline{\mathbf{Y}}>0$ \cite{Silling2017}。
 
-稳定化强度由 $\gamma$ 控制。Silling 建议按稳定化能量占材料应变能的比例来标定：设均匀膨胀（线性应变 $\varepsilon$）中稳定化项能量占材料能量（体积模量 $\kappa$）的比例为 $\alpha$，则在三维、$\omega$ 仅依赖 $|\boldsymbol{\xi}|$ 的假设下得到式\eqref{eq:stabilization-gamma}：
+稳定化强度由 $\gamma$ 控制。Silling 按稳定化项能量占材料应变能的比例来标定 $\gamma$ \cite{Silling2017}：考虑各向同性膨胀（线应变 $\varepsilon$、体积模量 $\kappa$，材料膨胀应变能密度 $\kappa(3\varepsilon)^{2}$），把稳定化项类比键型材料、其能量按 $\lvert\underline{\mathbf{z}}\rvert\sim\varepsilon\lvert\boldsymbol{\xi}\rvert$ 估计为
+\begin{equation}
+  W^{s}\approx\gamma\pi\varepsilon^{2}\int_{0}^{\delta}\omega(r)\,r^{4}\,dr
+  \label{eq:stabilization-energy-estimate}
+\end{equation}
+（三维球对称近场域中，球壳体积微元 $4\pi r^{2}\,dr$ 与 $\lvert\boldsymbol{\xi}\rvert^{2}$ 合并积分给出 $\pi$ 因子）。令式\eqref{eq:stabilization-energy-estimate}占材料膨胀能的 $\alpha$ 倍：$W^{s}=\alpha\kappa(3\varepsilon)^{2}=9\alpha\kappa\varepsilon^{2}$，解出
 \begin{equation}
   \gamma=\frac{9\kappa\alpha}{\pi\displaystyle\int_{0}^{\delta}\omega(r)\,r^{4}\,dr}
   \label{eq:stabilization-gamma}
 \end{equation}
-论文算例取 $\alpha=1$，即稳定化项与材料的膨胀应变能同量级；$\alpha$ 越小修正越弱 \cite{Silling2017}。
+论文算例取 $\alpha=1$，即式\eqref{eq:stabilization-gamma}给出的稳定化项与材料的膨胀应变能同量级；$\alpha$ 越小修正越弱 \cite{Silling2017}。
 
 \begin{remark}
   罚函数类方法还包括若干变体。Wu 与 Ren 通过在变形梯度计算中采用正则化的位移场抑制零能模式，属于"位移场正则化 + 稳定化力态"路线 \cite{WuRen2015}；Littlewood 在 Peridigm 中实现了在力态上附加与键变形偏离程度成正比的修正项 \cite{Littlewood2015}；Li 等 2018 年提出基于弹性张量与形状张量的稳定化项，并在 2019 年将其纳入隐式求解框架，在切线刚度中计入稳定化项对位移的导数 \cite{Li2018,Li2019}。Hashim 等对稳定化 NOSB 的隐式实现也采用了罚函数类稳定化，其解析 Jacobian 已在前文\ref{sec:nl-tangent}节讨论 \cite{Hashim2020}。罚函数法的主要优点是与本构解耦、实现简单；缺点是 $\gamma$（或 $\alpha$）需标定，取值过大虽抑制零能模式却会引入多余的"键级刚度"、使结果偏离经典响应，取值过小则修正不足。
@@ -527,7 +855,7 @@ Luo 与 Sundararaghavan 将这一思想移植到 NOSB 对应模型 \cite{LuoSund
 
 键关联（bond-associated）方法的思路与前两类根本不同：不修改求积位置、不附加惩罚项，而是为每条键在子近场域上单独构造变形度量，使变形态到力态的映射成为单射，从而从源头消除零能模式。
 
-Chen 2018 年提出的键关联变形梯度是这一思路的直接实现 \cite{Chen2018}。零能模式的根源在于常规非局部变形梯度把一族键的变形压缩为单个张量，映射非单射。Chen 的修正是为每条键 $\boldsymbol{\xi}$ 在包含该键的子近场域 $H_{\mathbf{x}}^{\boldsymbol{\xi}}$（键关联族）上单独构造变形梯度，即式\eqref{eq:bond-associated-fgrad}：
+Chen 2018 年提出的键关联变形梯度是这一思路的直接实现 \cite{Chen2018}。零能模式的根源在于常规非局部变形梯度把一族键的变形压缩为单个张量，映射非单射。Chen 的修正是为每条键 $\boldsymbol{\xi}$ 在其关联族 $H_{\mathbf{x}}^{\boldsymbol{\xi}}$（键两端 horizon 的交集，近似为包含键 $\boldsymbol{\xi}$ 与材料点 $\mathbf{x}$ 的球形子近场域）上单独构造变形梯度，即式\eqref{eq:bond-associated-fgrad}：
 \begin{equation}
   \tilde{\mathbf{F}}\langle\boldsymbol{\xi}\rangle
   =\left[\int_{H_{\mathbf{x}}^{\boldsymbol{\xi}}}\omega\,
@@ -536,28 +864,44 @@ Chen 2018 年提出的键关联变形梯度是这一思路的直接实现 \cite{
     \boldsymbol{\eta}\otimes\boldsymbol{\eta}\,dV_{\mathbf{x}'}\right]^{-1}
   \label{eq:bond-associated-fgrad}
 \end{equation}
-其中 $H_{\mathbf{x}}^{\boldsymbol{\xi}}$ 是同时包含键 $\boldsymbol{\xi}$ 与材料点 $\mathbf{x}$ 的球形子近场域，其半径（键关联 horizon）通常与 $\delta$ 同量级。键关联变形梯度能更真实地表征每条键的变形，使变形态到力态的映射成为单射，从源头消除零能模式，且不引入任何需要调参的罚参数 \cite{Chen2018}。参数研究表明，键关联 horizon 的最优值不小于材料点的 horizon $\delta$ 且小于 $2\delta$；在此区间内应力与应变的振荡（尤其在边界与应力集中处）明显小于罚函数类方法 \cite{Chen2018}。
+其中 $\boldsymbol{\eta}$ 为键关联族内的键矢量。式\eqref{eq:bond-associated-fgrad}与常规变形梯度式\eqref{eq:nonlocal-deformation-gradient}的唯一区别是积分域：对均匀变形 $\underline{\mathbf{Y}}\langle\boldsymbol{\eta}\rangle=\mathbf{F}_{0}\boldsymbol{\eta}$，代入式\eqref{eq:bond-associated-fgrad}仍精确给出 $\tilde{\mathbf{F}}\langle\boldsymbol{\xi}\rangle=\mathbf{F}_{0}$，故键关联方法不破坏均匀变形下的经典响应。其消除零能模式的机理在于键关联族的非对称性：常规变形梯度在以材料点 $\mathbf{x}$ 为中心的对称近场域上，7.5.1 节的反转对称（棋盘）模式关于键对 $\pm\boldsymbol{\eta}$ 成对抵消；而键关联族偏向键 $\boldsymbol{\xi}$ 一侧（同时含两端 $\mathbf{x}$ 与 $\mathbf{x}'$ 的信息），棋盘模式在其中不再具有反转对称性、不再抵消（一维棋盘模式的应变在对称域内为零、在键关联族内却非零，可数值验证），故 $\delta\tilde{\mathbf{F}}\neq\mathbf{0}$，力态对该模式有响应。相应的键关联力态按对应机制由键关联变形梯度直接构造
+\begin{equation}
+  \underline{\mathbf{T}}\langle\boldsymbol{\xi}\rangle
+  =\omega(|\boldsymbol{\xi}|)\,\tilde{\mathbf{P}}\langle\boldsymbol{\xi}\rangle
+  \tilde{\mathbf{K}}\langle\boldsymbol{\xi}\rangle^{-1}\boldsymbol{\xi},
+  \qquad
+  \tilde{\mathbf{P}}\langle\boldsymbol{\xi}\rangle=\hat{\mathbf{P}}\bigl(\tilde{\mathbf{F}}\langle\boldsymbol{\xi}\rangle\bigr)
+  \label{eq:bond-associated-force}
+\end{equation}
+其中 $\tilde{\mathbf{K}}\langle\boldsymbol{\xi}\rangle$ 为式\eqref{eq:bond-associated-fgrad}中第二个积分（键关联形状张量），$\tilde{\mathbf{P}}$ 为经典本构在键关联变形梯度上的取值——每条键有自己的应力，不再共享材料点的单个 $\mathbf{P}$。式\eqref{eq:bond-associated-force}使变形态到力态的映射成为单射，从源头消除零能模式，且不引入任何需要调参的罚参数 \cite{Chen2018}。参数研究表明，键关联 horizon 的最优值不小于材料点的 horizon $\delta$ 且小于 $2\delta$；在此区间内应力与应变的振荡（尤其在边界与应力集中处）明显小于罚函数类方法 \cite{Chen2018}。
 
-Breitzman 与 Dayal 2018 年提出的键级变形梯度与能量平均方法代表了另一类键关联构造 \cite{BreitzmanDayal2018}。其思想是：对每条键定义键级变形梯度 $\mathbf{F}^{\mathrm{bond}}(\mathbf{x},\check{\mathbf{x}})$，同时包含该键邻域的平均变形与键伸长相对平均变形的偏离，然后把经典局部应变能作用在键级梯度上、对能量取平均，即式\eqref{eq:bond-level-energy-average}：
+Breitzman 与 Dayal 2018 年提出的键级变形梯度与能量平均方法代表了另一类键关联构造 \cite{BreitzmanDayal2018}。其思想是：对每条键定义键级变形梯度 $\mathbf{F}^{\mathrm{bond}}(\mathbf{x},\check{\mathbf{x}})$，同时包含该键邻域的平均变形与键伸长率相对平均变形的偏离，然后把经典局部应变能作用在键级梯度上、对能量取平均，即式\eqref{eq:bond-level-energy-average}：
 \begin{equation}
   W^{\mathrm{ave}}(\mathbf{x})
   =\frac{1}{2}\int_{\check{\mathbf{x}}\in\Omega}\alpha(\check{\mathbf{x}}-\mathbf{x})\;
   \widetilde{W}_{\mathrm{loc}}\bigl(\mathbf{F}^{\mathrm{bond}}(\mathbf{x},\check{\mathbf{x}})\bigr)\;dV_{\check{\mathbf{x}}}
   \label{eq:bond-level-energy-average}
 \end{equation}
-其中 $\alpha$ 为影响函数，因子 $1/2$ 表示键能由两端点平分。对比常规对应模型"先对变形梯度取平均、再作用能量"的顺序，Breitzman–Dayal 方法"先逐键作用能量、再取平均"，从而对偏离平均的局部变形天然施加能量代价 \cite{BreitzmanDayal2018}。该方法的键级变形梯度显式地包含键的伸长偏离项，均匀变形时该项为零，精确回到经典响应。与罚函数法不同，键级方法不引入任何额外参数，且当发生物质相互贯穿时 $\det\mathbf{F}^{\mathrm{bond}}=0$、经典局部应变能奇异，从而自然禁止贯穿 \cite{BreitzmanDayal2018}。
+键级变形梯度定义为平均变形梯度与键伸长率偏离的合成 \cite{BreitzmanDayal2018}。记键 $\check{\mathbf{x}}-\mathbf{x}$ 方向的单位矢量为 $\hat{\mathbf{e}}=(\check{\mathbf{x}}-\mathbf{x})/|\check{\mathbf{x}}-\mathbf{x}|$，则
+\begin{equation}
+  \mathbf{F}^{\mathrm{bond}}(\mathbf{x},\check{\mathbf{x}})
+  =\mathbf{F}^{\mathrm{ave}}(\mathbf{x})\bigl(\mathbf{I}-\hat{\mathbf{e}}\otimes\hat{\mathbf{e}}\bigr)
+  +\frac{\check{\mathbf{y}}-\mathbf{y}}{|\check{\mathbf{x}}-\mathbf{x}|}\otimes\hat{\mathbf{e}}
+  \label{eq:bond-level-fgrad}
+\end{equation}
+其中 $\mathbf{F}^{\mathrm{ave}}$ 为平均变形梯度（对应式\eqref{eq:nonlocal-deformation-gradient}），$\check{\mathbf{y}}-\mathbf{y}$ 为键的实际变形后矢量。式\eqref{eq:bond-level-fgrad}的第一项保留平均变形在垂直于键方向的分量，第二项用键的实际伸长率 $(\check{\mathbf{y}}-\mathbf{y})/|\check{\mathbf{x}}-\mathbf{x}|$ 替换平均变形在键方向的预测，故 $\mathbf{F}^{\mathrm{bond}}(\mathbf{x},\check{\mathbf{x}})\cdot(\check{\mathbf{x}}-\mathbf{x})=\check{\mathbf{y}}-\mathbf{y}$（键的实际变形被精确再现）。对比常规对应模型"先对变形梯度取平均、再作用能量"的顺序，Breitzman–Dayal 方法"先逐键作用能量、再取平均"（式\eqref{eq:bond-level-energy-average}），从而对偏离平均的局部变形天然施加能量代价 \cite{BreitzmanDayal2018}。式\eqref{eq:bond-level-fgrad}显式地包含键的伸长率偏离项，均匀变形时该项为零（$\check{\mathbf{y}}-\mathbf{y}=\mathbf{F}^{\mathrm{ave}}(\check{\mathbf{x}}-\mathbf{x})$，第二项退化为 $\mathbf{F}^{\mathrm{ave}}\hat{\mathbf{e}}\otimes\hat{\mathbf{e}}$，式\eqref{eq:bond-level-fgrad}精确回到 $\mathbf{F}^{\mathrm{ave}}=\mathbf{F}_{0}$），精确恢复经典响应。与罚函数法不同，键级方法不引入任何额外参数，且当发生物质相互贯穿时 $\check{\mathbf{y}}-\mathbf{y}=\mathbf{0}$，式\eqref{eq:bond-level-fgrad}退化为秩亏损张量（$\det\mathbf{F}^{\mathrm{bond}}=0$）、经典局部应变能奇异，从而自然禁止贯穿 \cite{BreitzmanDayal2018}。
 
 \begin{remark}
   键关联方法在机理上优于罚函数法：它不改变材料的应力响应（不引入多余刚度），无需标定参数，且同时解决线弹性失稳与物质贯穿问题。其代价是每个材料点的变形梯度计算量随近场域内键数线性增长（每条键一个子近场域积分）。近年来，Behzadinasab 与 Foster 提出的半拉格朗日对应框架把键关联构造推广到有限变形与显式动力学情形，成为该方向的现代发展 \cite{BehzadinasabFoster2020}。键关联方法对刚度矩阵结构的影响及其在隐式求解中的应用，可与 \ref{sec:implicit-stiffness}节、\ref{sec:nl-tangent}节的族级装配框架结合讨论。
 \end{remark}
 
-\section{高阶非常规态型模型}
+\section{高阶非常规态型模型}\label{sec:higher-order}
 
 \ref{sec:nosb-framework}节至\ref{sec:stabilization}节建立的 NOSB 框架以"一阶非局部变形梯度 + 经典本构"为核心：变形态通过非局部最小二乘拟合压缩为单个变形梯度 $\mathbf{F}$，经典本构作用其上。这一框架的成功源于其与经典连续介质力学的最小分歧，但也隐含两方面的局限：其一，变形梯度的"压缩"丢失键级信息，需要\ref{sec:zero-energy}节、\ref{sec:stabilization}节的稳定化处理；其二，本构能力受限于一阶梯度——经典本构中需要高阶变形信息（应变梯度、高阶矩）的材料行为难以直接嵌入。本节介绍超越标准对应框架的高阶非常规态型模型：沿"高阶变形梯度"方向扩展的对应模型（7.7.1 节）、从相互作用几何出发引入多邻域运动学的连续介质运动学启发近场动力学（7.7.2 节）、把对应搬到当前构型的半拉格朗日框架（7.7.3 节），以及用再生核方法与机器学习增强本构的现代发展（7.7.4 节），最后给出各模型关系的总览（7.7.5 节）。这些模型代表了 NOSB 从"标准对应"向"高阶、多构型、数据驱动"演进的三条主线。
 
 \subsection{高阶变形梯度对应模型}\label{sec:higher-order-correspondence}
 
-标准对应模型的一阶变形梯度 $\mathbf{F}$ 是位移场在近场域内的线性最小二乘拟合。当变形梯度在空间上变化时（如弯曲、应变局部化），一阶拟合不足以刻画位移场的弯曲信息，这部分信息同样落入零空间。Yaghoobi 与 Chorzepa 最早指出，用高阶多项式构造变形梯度可以恢复被一阶拟合抹平的短波信息、收缩零空间 \cite{YaghoobiChorzepa2017}（\ref{sec:zero-energy-control}节已述）。Chen 与 Chan 将这一思想系统化，建立了高阶对应模型的一般框架 \cite{ChenChan2020}：把位移场在近场域内作 Taylor 展开并保留到 $N$ 阶，通过加权最小二乘同时求出一阶与高阶变形梯度，即式\eqref{eq:higher-order-taylor}：
+标准对应模型的一阶变形梯度 $\mathbf{F}$ 是位移场在近场域内的线性最小二乘拟合。当变形梯度在空间上变化时（如弯曲、应变局部化），一阶拟合不足以刻画位移场的弯曲信息，这部分信息同样落入零空间。Yaghoobi 与 Chorzepa 最早指出，用高阶多项式构造变形梯度可以恢复被一阶拟合抹平的短波信息、收缩零空间 \cite{YaghoobiChorzepa2017}（\ref{sec:zero-energy-control}节已述）。Chen 与 Chan 将这一思想系统化，建立了高阶对应模型的一般框架 \cite{ChenChan2020}：把位移场在近场域内作 Taylor 展开并保留到 $N$ 阶，
 \begin{equation}
   \mathbf{u}(\mathbf{x}')-\mathbf{u}(\mathbf{x})
   \approx\mathbf{F}\,\boldsymbol{\xi}
@@ -565,7 +909,16 @@ Breitzman 与 Dayal 2018 年提出的键级变形梯度与能量平均方法代�
   +\cdots+\frac{1}{N!}\,\mathbf{F}^{(N-1)}:(\boldsymbol{\xi}\otimes\cdots\otimes\boldsymbol{\xi})
   \label{eq:higher-order-taylor}
 \end{equation}
-其中 $\mathbf{F}^{(1)}=\nabla\mathbf{F}$ 为二阶变形梯度（三阶张量，应变梯度），更高阶项以此类推。应变能密度取为高阶变形梯度的函数，力态由 Fréchet 导数导出。这一框架的意义在于，它把经典应变梯度理论（如 Mindlin 型）嵌入近场动力学：$\mathbf{F}^{(1)}$ 恰好对应应变梯度类本构的独立自变量，从而可以描述尺度效应、弯曲主导的变形与材料内部长度尺度 \cite{ChenChan2020}。Gu 等对高阶对应模型作了系统分析，指出数值振荡的两类根源——变形态到力态映射的非单射性与点关联变形梯度对任意变形违反运动学约束——并在此基础上建立了键关联高阶稳定化模型，把高阶变形梯度与 \ref{sec:bond-associated}节的键关联构造结合，在抑制振荡的同时保持高阶精度 \cite{GuZhangMadenciXia2019,GuMadenciZhang2018}。
+其中 $\mathbf{F}^{(1)}=\nabla\mathbf{F}=\nabla\nabla\mathbf{u}$ 为二阶变形梯度（三阶张量，即应变梯度，分量 $F^{(1)}_{abc}=\partial^{2}u_{a}/\partial x_{b}\partial x_{c}$），更高阶项以此类推，$\boldsymbol{\xi}=\mathbf{x}'-\mathbf{x}$。式\eqref{eq:higher-order-taylor}中的各阶梯度由加权最小二乘同时确定：构造拟合误差泛函
+\begin{equation}
+  \mathcal{J}=\int_{H_{\mathbf{x}}}\omega(|\boldsymbol{\xi}|)\,
+  \Bigl\lvert\mathbf{u}(\mathbf{x}')-\mathbf{u}(\mathbf{x})
+  -\mathbf{F}\,\boldsymbol{\xi}
+  -\tfrac{1}{2}\mathbf{F}^{(1)}:(\boldsymbol{\xi}\otimes\boldsymbol{\xi})
+  -\cdots-\tfrac{1}{N!}\mathbf{F}^{(N-1)}:(\boldsymbol{\xi}\otimes\cdots\otimes\boldsymbol{\xi})\Bigr\rvert^{2}\,dV_{\mathbf{x}'}
+  \label{eq:higher-order-leastsq}
+\end{equation}
+对式\eqref{eq:higher-order-leastsq}关于各级梯度分量求极值（$\partial\mathcal{J}/\partial F_{ab}=\mathbf{0}$、$\partial\mathcal{J}/\partial F^{(1)}_{abc}=\mathbf{0}$ 等），得到一组线性法方程，从中解出全部 $N$ 阶梯度。当 $N=1$ 时式\eqref{eq:higher-order-leastsq}退化为标准对应模型的加权最小二乘拟合（7.1 节 remark），其法方程即给出式\eqref{eq:nonlocal-deformation-gradient}；$N\ge2$ 时高阶梯度 $\mathbf{F}^{(1)}$、$\mathbf{F}^{(2)}$ 等把一阶拟合无法捕捉的弯曲与局部化信息纳入状态变量（例如对二次位移场，$N=2$ 的拟合精确给出应变梯度 $\mathbf{F}^{(1)}=\nabla\nabla\mathbf{u}$，而 $N=1$ 的拟合只在拟合点给出零斜率、弯曲信息全部丢失——可数值验证）。应变能密度取为高阶变形梯度的函数 $\Psi(\mathbf{F},\mathbf{F}^{(1)},\ldots)$，力态由 Fréchet 导数导出。这一框架的意义在于，它把经典应变梯度理论（如 Mindlin 型）嵌入近场动力学：$\mathbf{F}^{(1)}$ 恰好对应应变梯度类本构的独立自变量，从而可以描述尺度效应、弯曲主导的变形与材料内部长度尺度 \cite{ChenChan2020}。Gu 等对高阶对应模型作了系统分析，指出数值振荡的两类根源——变形态到力态映射的非单射性与点关联变形梯度对任意变形违反运动学约束——并在此基础上建立了键关联高阶稳定化模型，把高阶变形梯度与 \ref{sec:bond-associated}节的键关联构造结合，在抑制振荡的同时保持高阶精度 \cite{GuZhangMadenciXia2019,GuMadenciZhang2018}。
 
 \begin{remark}
   高阶变形梯度对应模型从"变形态的 Taylor 系数"角度扩展了本构自变量：标准模型的态只保留一阶系数 $\mathbf{F}$，高阶模型显式纳入 $\mathbf{F}^{(1)}$、$\mathbf{F}^{(2)}$ 等。这相当于在算子层面实现了"高阶态"——把变形场的局部 Taylor 展开系数作为新的状态变量。需要指出的是，Silling 态理论框架内并不存在把高阶矩直接编码进态对象的成熟文献；高阶对应模型与第 15 章将介绍的任意阶非局部微分算子（PDDO）是两条可实证的实现路线 \cite{ChenChan2020,Madenci2016}。
@@ -597,7 +950,7 @@ Breitzman 与 Dayal 2018 年提出的键级变形梯度与能量平均方法代�
 \end{equation}
 即键矢量、面矢量（余因子/Nanson 公式）与体积（行列式）分别被一阶、二阶与三阶运动学量承载 \cite{Javili2019}。
 
-本构以这三类度量为自变量。材料框架不变性要求势能函数只依赖度量的大小，故取 $\psi_1=\psi_1(l)$、$\psi_2=\psi_2(a)$、$\psi_3=\psi_3(v)$（$l=|\boldsymbol{\xi}|$、$a=|\mathbf{a}|$、$v$ 分别为键长、三角形面积与四面体体积），此时角动量守恒先验满足。点应变能密度为三部分之和，即式\eqref{eq:ckp-energy}：
+本构以这三类度量为自变量。材料框架不变性要求势能函数只依赖度量的大小，故取 $\psi_1=\psi_1(l)$、$\psi_2=\psi_2(a)$、$\psi_3=\psi_3(v)$，其中 $l=|\boldsymbol{\xi}^{ai}|$、$a=|\mathbf{a}^{aij}|$、$v=v^{aijk}$ 分别为变形构型中键长、叉积面积度量与体积度量，此时角动量守恒先验满足。点应变能密度为三部分之和（$H_{0}$ 为材料点 $\mathbf{x}$ 在参考构型中的近场域），即式\eqref{eq:ckp-energy}：
 \begin{equation}
   \Psi(\mathbf{x})=\Psi_1+\Psi_2+\Psi_3
   =\int_{H_0}\psi_1\,dV^{i}
@@ -605,7 +958,7 @@ Breitzman 与 Dayal 2018 年提出的键级变形梯度与能量平均方法代�
   +\int_{H_0}\!\int_{H_0}\!\int_{H_0}\psi_3\,dV^{k}dV^{j}dV^{i}
   \label{eq:ckp-energy}
 \end{equation}
-一个常用的调和势族以三种"伸长"度量 $S_1=l/L-1$、$S_2=a/A-1$、$S_3=v/V-1$ 为自变量，即式\eqref{eq:ckp-harmonic}：
+一个常用的调和势族以三种"伸长率"度量 $S_1=l/L-1$、$S_2=a/A-1$、$S_3=v/V-1$ 为自变量，其中 $L=|\boldsymbol{\Xi}^{ai}|$、$A=|\mathbf{A}^{aij}|$、$V=V^{aijk}$ 为参考构型中对应的键长、叉积面积度量与体积度量（式\eqref{eq:ckp-reference}），即式\eqref{eq:ckp-harmonic}：
 \begin{equation}
   \psi_1=\tfrac{1}{2}C_1L\Bigl(\tfrac{l}{L}-1\Bigr)^{2},\qquad
   \psi_2=\tfrac{1}{2}C_2A\Bigl(\tfrac{a}{A}-1\Bigr)^{2},\qquad
@@ -620,7 +973,7 @@ Breitzman 与 Dayal 2018 年提出的键级变形梯度与能量平均方法代�
   \bigl[\boldsymbol{\xi}^{aj}\times\boldsymbol{\xi}^{ak}\bigr]\,dV^{k}dV^{j}
   \label{eq:ckp-force}
 \end{equation}
-运动方程与态型运动方程式\eqref{eq:state-motion}同构，只是被积函数换为三部分力密度之和 \cite{Javili2019}。
+其中 $\mathbf{T}_1^{ai}$ 为一邻域（键）上的力密度，直接由 $\psi_1$ 对键矢量求导；$\mathbf{T}_2^{ai}$ 中，$\psi_2$ 对面积度量 $\mathbf{a}^{aij}$ 求导给出面法向贡献，再与边 $\boldsymbol{\xi}^{aj}$ 叉积得到键 $ai$ 上的力；$\mathbf{T}_3^{ai}$ 中的因子 $3$ 来自体积度量对三条键的对称依赖：由 $v^{aijk}=\det[\boldsymbol{\xi}^{ai}\,\boldsymbol{\xi}^{aj}\,\boldsymbol{\xi}^{ak}]$，$\partial v^{aijk}/\partial\boldsymbol{\xi}^{ai}=\boldsymbol{\xi}^{aj}\times\boldsymbol{\xi}^{ak}$，而键 $ai$ 在三重积分 $\iiint\psi_3\,dV^{k}dV^{j}dV^{i}$ 中会作为 $\boldsymbol{\xi}^{ai}$、$\boldsymbol{\xi}^{aj}$、$\boldsymbol{\xi}^{ak}$ 出现在三个置换位置，三处贡献（含符号相消）合并后给出因子 $3$（可数值验证）。运动方程与态型运动方程式\eqref{eq:state-motion}同构，只是被积函数换为三部分力密度之和 \cite{Javili2019}。
 
 \begin{remark}
   CKP 与标准对应框架是两条平行的推广路线。对应框架把一族键的变形压缩为单个 $\mathbf{F}$（一阶运动学），CKP 则把线、面、体三个层次的几何信息全部保留为本构自变量，因此天然没有键型理论的泊松比限制，也不存在对应框架的零能模式——每个几何度量都携带能量。CKP 是"高阶几何信息"的最原则性体现，其代价是本构表达需要三/四重积分，计算量与实现复杂度显著高于标准 NOSB \cite{Javili2019}。
@@ -637,13 +990,41 @@ Breitzman 与 Dayal 2018 年提出的键级变形梯度与能量平均方法代�
   \boldsymbol{\xi}\otimes\boldsymbol{\xi}\,dV_{\mathbf{x}'}
   \label{eq:sl-velocity-gradient}
 \end{equation}
-其中 $\boldsymbol{\xi}=\mathbf{x}'-\mathbf{x}$ 为当前构型中的相对位置，$\tilde{\mathbf{v}}=\mathbf{v}'-\mathbf{v}$ 为相对速度，$\mathbf{K}$ 为当前构型中的形状张量 \cite{BehzadinasabFoster2020}。内状态变量（塑性应变、损伤等）仍存储在拉格朗日物质点上，从而保留历史相关性——这是"半拉格朗日"得名的由来，也是它与纯欧拉框架的本质区别。半拉格朗日框架可处理拉格朗日映射严重扭曲的极端变形，且无表面效应；配以\ref{sec:bond-associated}节的键关联构造可消除材料失稳 \cite{BehzadinasabFoster2020}。
+其中 $\omega\langle\boldsymbol{\xi}\rangle$ 为当前构型中的影响函数（依赖当前键长 $|\boldsymbol{\xi}|$、随变形更新），$\boldsymbol{\xi}=\mathbf{x}'-\mathbf{x}$ 为当前构型中的相对位置，$\tilde{\mathbf{v}}=\mathbf{v}'-\mathbf{v}$ 为相对速度，$\mathbf{K}$ 为当前构型中的形状张量 \cite{BehzadinasabFoster2020}。式\eqref{eq:sl-velocity-gradient}与参考构型中的式\eqref{eq:nonlocal-deformation-gradient}形式相同，只是把变形后键矢量 $\underline{\mathbf{Y}}\langle\boldsymbol{\xi}\rangle$ 换成相对速度 $\tilde{\mathbf{v}}$、键矢量与积分域取当前构型；对当前构型中的均匀速度场 $\mathbf{v}(\mathbf{x})=\mathbf{L}_{0}\mathbf{x}$（$\tilde{\mathbf{v}}=\mathbf{L}_{0}\boldsymbol{\xi}$），式\eqref{eq:sl-velocity-gradient}精确给出 $\mathbf{L}=\mathbf{L}_{0}$（对照式\eqref{eq:fg-uniform}，可数值验证）。按式\eqref{eq:rate-kinematics}把速度梯度分解为变形率与自旋
+\begin{equation}
+  \mathbf{D}=\frac{1}{2}\bigl(\mathbf{L}+\mathbf{L}^{\mathrm{T}}\bigr),\qquad
+  \mathbf{W}=\frac{1}{2}\bigl(\mathbf{L}-\mathbf{L}^{\mathrm{T}}\bigr)
+  \label{eq:sl-rate-decomposition}
+\end{equation}
+速率型本构（如 Jaumann 率次弹性关系 $\dot{\boldsymbol{\sigma}}^{\nabla}=\mathbf{C}:\mathbf{D}$，客观率的一般形式见 7.2.2 节）以式\eqref{eq:sl-rate-decomposition}中的 $\mathbf{D}$ 为输入求出 Cauchy 应力率，沿时间积分更新应力 $\boldsymbol{\sigma}$，再按当前构型构造键力
+\begin{equation}
+  \underline{\mathbf{T}}\langle\boldsymbol{\xi}\rangle
+  =\omega\langle\boldsymbol{\xi}\rangle\,\boldsymbol{\sigma}\,\mathbf{K}(\mathbf{x},t)^{-1}\boldsymbol{\xi}
+  \label{eq:sl-force-state}
+\end{equation}
+即半拉格朗日框架的完整流程：$\tilde{\mathbf{v}}\to\mathbf{L}\to\mathbf{D}\to\dot{\boldsymbol{\sigma}}\to\boldsymbol{\sigma}\to\underline{\mathbf{T}}$（式\eqref{eq:sl-velocity-gradient}—\eqref{eq:sl-force-state}）。内状态变量（塑性应变、损伤等）仍存储在拉格朗日物质点上，从而保留历史相关性——这是"半拉格朗日"得名的由来，也是它与纯欧拉框架的本质区别。半拉格朗日框架可处理拉格朗日映射严重扭曲的极端变形，且无表面效应；配以\ref{sec:bond-associated}节的键关联构造可消除材料失稳 \cite{BehzadinasabFoster2020}。
 
 \subsection{统一框架与数据驱动增强}\label{sec:data-driven}
 
-高阶对应模型、CKP 与半拉格朗日框架分别从"梯度阶数""相互作用几何"与"构型选择"三个维度扩展 NOSB。把它们统一起来的是再生核粒子法（reproducing kernel particle method，RKPM）的视角。Bessa 等证明，对应形式的态型近场动力学与 RKPM 是统一的：近场动力学的非局部变形梯度等价于一种二阶精度的隐式梯度再生核近似 \cite{Bessa2014}。这一统一性带来两个与高阶直接相关的推论：其一，引入再生核的高阶基（二次、三次再生条件）即可得到任意阶精度的非局部变形梯度，为\ref{sec:higher-order-correspondence}节的高阶模型提供了通用构造手段；其二，近场动力学与 SPH、CSPH、RKPM 等无网格方法可以写成统一的积分算子形式，近场动力学是这一家族中以"积分形式运动方程"为特征的一员 \cite{Bessa2014}。
+高阶对应模型、CKP 与半拉格朗日框架分别从"梯度阶数""相互作用几何"与"构型选择"三个维度扩展 NOSB。把它们统一起来的是再生核粒子法（reproducing kernel particle method，RKPM）的视角。RKPM 的位移近似为再生核卷积
+\begin{equation}
+  \mathbf{u}^{h}(\mathbf{x})=\int_{\Omega}\Psi(\mathbf{x};\mathbf{x}'-\mathbf{x})\,\mathbf{u}(\mathbf{x}')\,dV_{\mathbf{x}'}
+  \label{eq:rk-approximation}
+\end{equation}
+其中 $\Psi$ 为再生核（由基向量 $\mathbf{H}(\mathbf{x}'-\mathbf{x})$ 与权函数构造），式\eqref{eq:rk-approximation}的系数由再生条件确定
+\begin{equation}
+  \int_{\Omega}\Psi(\mathbf{x};\mathbf{x}'-\mathbf{x})\,\mathbf{H}(\mathbf{x}'-\mathbf{x})\,dV_{\mathbf{x}'}
+  =\mathbf{H}(\mathbf{0})
+  \label{eq:rk-reproducing-condition}
+\end{equation}
+式\eqref{eq:rk-reproducing-condition}保证基 $\mathbf{H}$ 中的多项式被精确再现：含常数与线性项的基 $\mathbf{H}=[1,\boldsymbol{\xi}^{\mathrm{T}}]^{\mathrm{T}}$ 使近似对线性场精确，其梯度算子对光滑场具有二阶精度。Bessa 等证明，对应形式的态型近场动力学与 RKPM 是统一的：按式\eqref{eq:rk-reproducing-condition}构造的一阶隐式梯度算子的积分结构正是非局部变形梯度式\eqref{eq:nonlocal-deformation-gradient}，即近场动力学的非局部变形梯度等价于二阶精度的隐式梯度再生核近似（该二阶精度与 7.2.1 节式\eqref{eq:fg-smoothing-error}的 $O(\delta^{2})$ 一致，一阶再生核梯度算子与对应梯度相同，见 \cite{Bessa2014}）。这一统一性带来两个与高阶直接相关的推论：其一，引入再生核的高阶基（二次、三次再生条件）即可得到任意阶精度的非局部变形梯度，为\ref{sec:higher-order-correspondence}节的高阶模型提供了通用构造手段；其二，近场动力学与 SPH、CSPH、RKPM 等无网格方法可以写成统一的积分算子形式，近场动力学是这一家族中以"积分形式运动方程"为特征的一员 \cite{Bessa2014}。
 
-在数据驱动方向，Xu 等 2021 年用带物理约束的神经网络直接学习近场动力学材料模型（力态），以材料框架不变性、守恒律与热力学一致性约束网络训练，把经典本构或实验/分子模拟数据直接嵌入近场动力学框架 \cite{Xu2021}。这与 Bessa 的统一框架分别从"近似精度"与"本构表达"两个方向扩展 NOSB 的能力边界。
+在数据驱动方向，Xu 等 2021 年用带物理约束的神经网络直接学习近场动力学材料模型（力态）\cite{Xu2021}：把力态表示为神经网络的输出
+\begin{equation}
+  \underline{\mathbf{T}}\langle\boldsymbol{\xi}\rangle=\mathcal{N}_{\boldsymbol{\theta}}\bigl(\underline{\mathbf{Y}}\langle\boldsymbol{\xi}\rangle,\boldsymbol{\xi}\bigr)
+  \label{eq:nn-force-state}
+\end{equation}
+其中 $\mathcal{N}_{\boldsymbol{\theta}}$ 为参数为 $\boldsymbol{\theta}$ 的神经网络，输入为键的变形信息（该键的变形态取值 $\underline{\mathbf{Y}}\langle\boldsymbol{\xi}\rangle$ 与参考键矢量 $\boldsymbol{\xi}$），输出为该键的力态（式\eqref{eq:nn-force-state}为示意性表述，具体网络结构见原文 \cite{Xu2021}）。网络训练以材料框架不变性、守恒律与热力学一致性为物理约束，从而把经典本构或实验/分子模拟数据直接嵌入近场动力学框架。这与 Bessa 的统一框架分别从"近似精度"与"本构表达"两个方向扩展 NOSB 的能力边界。
 
 \begin{remark}
   需要区分"高阶模型"与"高阶离散化"。变 horizon 的双水平近场动力学（dual-horizon peridynamics）在变近场域条件下通过对偶相互作用恢复线动量守恒，属于离散化/多尺度技术而非高阶模型 \cite{Ren2017dualhorizon}，其详述见第 9 章（离散化）与第 12 章（多尺度耦合）。键关联 NOSB 已被证明适用于变 horizon 情形，是"高阶模型 + 变 horizon"组合的可行途径 \cite{GuZhangMadenciXia2019}。
@@ -657,16 +1038,18 @@ Breitzman 与 Dayal 2018 年提出的键级变形梯度与能量平均方法代�
   \centering
   \caption{高阶非常规态型模型的分类与定位}
   \label{tab:higher-order-models}
-  \begin{tabular}{@{}llll@{}}
+  \begin{tabular}{@{}>{\raggedright\arraybackslash}p{2.4cm}>{\raggedright\arraybackslash}p{2.0cm}>{\raggedright\arraybackslash}p{2.0cm}>{\raggedright\arraybackslash}p{3.4cm}>{\raggedright\arraybackslash}p{2.6cm}@{}}
     \toprule
-    模型 & 扩展维度 & 关键运动学量 & 代表文献 \\
+    模型 & 扩展维度 & 关键运动学量 & 零能模式处理 & 代表文献 \\
     \midrule
-    标准对应 NOSB & 基准 & $\mathbf{F}$ & \cite{Silling2007} \\
-    高阶变形梯度对应 & 梯度阶数 & $\mathbf{F},\mathbf{F}^{(1)},\ldots$ & \cite{ChenChan2020,GuZhangMadenciXia2019} \\
-    CKP & 相互作用几何 & $\boldsymbol{\xi},\mathbf{a},v$ & \cite{Javili2019} \\
-    半拉格朗日对应 & 构型选择 & $\mathbf{L}$（当前构型） & \cite{BehzadinasabFoster2020} \\
-    统一框架 & 构造工具 & RK 梯度算子 & \cite{Bessa2014} \\
-    数据驱动本构 & 本构表达 & 力态（神经网络） & \cite{Xu2021} \\
+    标准对应 NOSB & 基准 & $\mathbf{F}$ & 存在零能模式失稳（7.5 节） & \cite{Silling2007} \\
+    高阶变形梯度对应 & 梯度阶数 & $\mathbf{F},\mathbf{F}^{(1)},\ldots$ & 高阶基收缩零空间 & \cite{ChenChan2020,GuZhangMadenciXia2019} \\
+    CKP & 相互作用几何 & $\boldsymbol{\xi},\mathbf{a},v$ & 各度量均携带能量，无零能模式 & \cite{Javili2019} \\
+    半拉格朗日对应 & 构型选择 & $\mathbf{L}$（当前构型） & 配以键关联构造消除失稳 & \cite{BehzadinasabFoster2020} \\
+    统一框架 & 构造工具 & RK 梯度算子 & 为高阶构造提供通用手段 & \cite{Bessa2014} \\
+    数据驱动本构 & 本构表达 & 力态（神经网络） & 物理约束训练保证稳定性 & \cite{Xu2021} \\
     \bottomrule
   \end{tabular}
 \end{table}
+
+本章建立了非常规态型近场动力学的完整框架：7.1 节的本构对应机制使经典本构不经改写即可嵌入，7.2 节详述了超弹性、Cauchy 应力与率形式三类嵌入形式，7.3、7.4 节建立了与有限元同构的线性与非线性隐式求解框架；7.5、7.6 节分析了零能模式失稳的机理并给出罚函数、应力点、键关联三类稳定化策略，7.7 节展示了高阶变形梯度、多邻域运动学与当前构型对应三条演进主线及数据驱动发展方向。这些内容构成了 NOSB 从"标准对应"走向更高阶、更通用、更数据驱动的完整图景，其中零能模式的控制与高阶扩展始终是贯穿本章的两条线索：前者决定 NOSB 数值实现的可靠性，后者拓展其本构能力的边界。第 8 章将在此基础上进入本构模型专题，深入讨论弹塑性、粘弹性、损伤等各类经典本构在近场动力学中的嵌入形式与数值实现。
