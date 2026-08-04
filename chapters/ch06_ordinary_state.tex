@@ -466,9 +466,9 @@ OSB-PDLT 的标量力态由膨胀项与伸长项两部分组成，其键型区�
   \frac{\partial f}{\partial\boldsymbol{\sigma}}:\mathbf{C}:\frac{\partial f}{\partial\boldsymbol{\sigma}}+H}
   \label{eq:classical-plastic-multiplier}
 \end{equation}
-对 von Mises 屈服函数（式\eqref{eq:von-mises}）与各向同性线性硬化（式\eqref{eq:isotropic-hardening}），$\partial f/\partial\boldsymbol{\sigma}=\tfrac{3}{2}\mathbf{s}/\sigma_{\mathrm{eq}}$，且对偏张量有 $\tfrac{3}{2}\mathbf{s}/\sigma_{\mathrm{eq}}:\mathbf{C}:\tfrac{3}{2}\mathbf{s}/\sigma_{\mathrm{eq}}=3\mu$（$\mu$ 为剪切模量），故式\eqref{eq:classical-plastic-multiplier}简化为
+对 von Mises 屈服函数（式\eqref{eq:von-mises}）与各向同性线性硬化（式\eqref{eq:isotropic-hardening}），$\partial f/\partial\boldsymbol{\sigma}=\tfrac{3}{2}\mathbf{s}/\sigma_{\mathrm{eq}}=\mathbf{n}$。由于 $\mathbf{n}$ 为偏张量（$\mathbf{n}:\mathbf{I}=0$），弹性张量 $\mathbf{C}=2\mu\mathbf{I}_{4}+\lambda\mathbf{1}\otimes\mathbf{1}$ 作用于其上时迹项消失，故有 $\mathbf{n}:\mathbf{C}:\dot{\boldsymbol{\varepsilon}}=2\mu\,\mathbf{n}:\dot{\boldsymbol{\varepsilon}}$ 与 $\mathbf{n}:\mathbf{C}:\mathbf{n}=3\mu$（$\mu$ 为剪切模量），式\eqref{eq:classical-plastic-multiplier}简化为
 \begin{equation}
-  \dot{\lambda}=\frac{3\mu\,\mathbf{n}:\dot{\boldsymbol{\varepsilon}}}{3\mu+H},\qquad
+  \dot{\lambda}=\frac{2\mu\,\mathbf{n}:\dot{\boldsymbol{\varepsilon}}}{3\mu+H},\qquad
   \mathbf{n}=\frac{3\mathbf{s}}{2\sigma_{\mathrm{eq}}}
   \label{eq:j2-plastic-multiplier}
 \end{equation}
@@ -552,13 +552,14 @@ OSB-PDLT 的标量力态由膨胀项与伸长项两部分组成，其键型区�
 
 断裂参数标定的核心思想是能量等效：设想裂纹面张开单位面积，裂纹面附近原本连接两侧材料的所有键被拉断，这些键储存的总弹性能应等于材料的断裂能（能量释放率）$G_{0}$。键型理论中，键的临界伸长率（critical stretch）$s_{0}$ 由此确定。对原型微弹性脆性（PMB）材料，键力为 $f=cs$（$c$ 为微模量，$s$ 为伸长率），单根键的成对势为 $w=\tfrac{1}{2}cs^{2}|\boldsymbol{\xi}|$（见第 4 章）。当键伸长达到临界值 $s_{0}$ 时键断裂，释放的能量为 $w(s_{0})=\tfrac{1}{2}cs_{0}^{2}|\boldsymbol{\xi}|$。把所有穿过单位裂纹面的键的断裂能求和并令其等于 $G_{0}$，即可解出 $s_{0}$ \cite{SillingAskari2005}。
 
-以三维情形为例，考虑裂纹面上方高 $z$ 处（$0\le z\le\delta$）的一根键，其长度 $|\boldsymbol{\xi}|=r$ 须满足 $r>z$（否则键不跨越裂纹面），键方向与裂纹面法向的夹角由 $\cos^{-1}(z/r)$ 界定。单位裂纹面积对应的键体积元为 $r^{2}\sin\varphi\,d\varphi\,dr$（球坐标），对全部跨越裂纹面的键求和并对裂纹面法向距离 $z$ 积分，得式\eqref{eq:G0-3d-integral}：
+以三维情形为例，考虑裂纹面上方高 $z$ 处（$0\le z\le\delta$）的一根键，其长度 $|\boldsymbol{\xi}|=r$ 须满足 $r>z$（否则键不跨越裂纹面）。设键方向与裂纹面法向的夹角为 $\varphi$，跨越裂纹面的条件为 $r\cos\varphi\ge z$，即 $\varphi\le\cos^{-1}(z/r)$；绕裂纹面法向的方位角记为 $\psi\in[0,2\pi)$。球坐标下键体积元为 $r^{2}\sin\varphi\,d\psi\,d\varphi\,dr$。将键的参考端点统一取在裂纹面上方，对全部跨越裂纹面的键求和并对裂纹面法向距离 $z$ 积分——此时每个跨越裂纹面的键恰好被计数一次，无须再乘因子 $2$——得式\eqref{eq:G0-3d-integral}：
 \begin{equation}
-  G_{0}=2\int_{0}^{\delta}\int_{z}^{\delta}\int_{0}^{\cos^{-1}(z/r)}
-  \frac{1}{2}cs_{0}^{2}r\cdot r^{2}\sin\varphi\,d\varphi\,dr\,dz
+  G_{0}=\int_{0}^{\delta}\int_{z}^{\delta}\int_{0}^{\cos^{-1}(z/r)}
+  \int_{0}^{2\pi}
+  \frac{1}{2}cs_{0}^{2}r\cdot r^{2}\sin\varphi\,d\psi\,d\varphi\,dr\,dz
   \label{eq:G0-3d-integral}
 \end{equation}
-其中因子 $2$ 源于裂纹面上、下两侧的键各计一次。完成积分，将三维微模量 $c=18k/(\pi\delta^{4})$（$k$ 为体积模量，见第 4 章）代入，得
+完成积分（方位角积分给出因子 $2\pi$）得 $G_{0}=\pi c s_{0}^{2}\delta^{5}/10$，即 $s_{0}=\sqrt{10G_{0}/(\pi c\delta^{5})}$，将三维微模量 $c=18k/(\pi\delta^{4})$（$k$ 为体积模量，见第 4 章）代入，得
 \begin{equation}
   s_{0}=\sqrt{\frac{5G_{0}}{9k\delta}}
   \label{eq:critical-stretch-3d}
@@ -566,7 +567,7 @@ OSB-PDLT 的标量力态由膨胀项与伸长项两部分组成，其键型区�
 式\eqref{eq:critical-stretch-3d}即键型理论三维情形的临界伸长率，其中 $k$ 为体积模量，$\delta$ 为近场范围 \cite{SillingAskari2005,MadenciOterkus2014}。
 
 \begin{remark}
-  式\eqref{eq:critical-stretch-3d}中分母含体积模量 $k$。由于键型理论三维情形固定 $\nu=1/4$，此时 $E=9k/2$，故式\eqref{eq:critical-stretch-3d}亦可写为 $s_{0}=\sqrt{5G_{0}/(6E\delta)}$。部分文献将分母误写为 $9E\delta$，应予避免；以 $k$ 表达的形式为原始文献所用，最为稳妥 \cite{SillingAskari2005,OterkusOterkus2026}。
+  式\eqref{eq:critical-stretch-3d}中分母含体积模量 $k$。由于键型理论三维情形固定 $\nu=1/4$，此时 $E=3k(1-2\nu)=3k/2$（即 $k=2E/3$），故 $9k\delta=6E\delta$，式\eqref{eq:critical-stretch-3d}亦可写为 $s_{0}=\sqrt{5G_{0}/(6E\delta)}$。部分文献将分母误写为 $9E\delta$，应予避免；以 $k$ 表达的形式为原始文献所用，最为稳妥 \cite{SillingAskari2005,OterkusOterkus2026}。
 \end{remark}
 
 二维情形的标定与三维类似，区别在于键体积元与微模量的表达式不同。二维平面应力情形（板厚 $h$），微模量 $c=9E/(\pi h\delta^{3})$，对单位裂纹长度的键求和得
