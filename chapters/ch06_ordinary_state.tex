@@ -184,17 +184,24 @@
 
 \subsection{弹性态与本构概念}\label{sec:elastic-states}
 
-态型框架下的本构理论以弹性态（elastic state）为起点。若存在一个以变形态为自变量的可微标量函数 $W(\underline{\mathbf{Y}})$，称为应变能密度函数，使得力态等于 $W$ 对 $\underline{\mathbf{Y}}$ 的 Fréchet 导数，即对任意变形态增量 $\Delta\underline{\mathbf{Y}}$ 有
+态型框架下的本构理论以弹性态（elastic state）为起点。与经典理论中应变能密度是变形梯度的标量函数不同，态型理论中的应变能密度 $W(\underline{\mathbf{Y}})$ 是定义在变形态空间上的标量泛函——其自变量是整个近场域内的变形构型，而非某一点的局部量。因此，"$W$ 对 $\underline{\mathbf{Y}}$ 求导"须在泛函意义上理解：考虑变形态的任意增量 $\Delta\underline{\mathbf{Y}}$（它本身也是一个态，代表变形构型的微小扰动），能量增量能否分解为对 $\Delta\underline{\mathbf{Y}}$ 线性依赖的主部与高阶余项之和，正是弹性材料与一般材料的判别准则。形式地，若存在态 $\underline{\mathbf{T}}$ 使得对任意变形态增量 $\Delta\underline{\mathbf{Y}}$ 有
 \begin{equation}
   W(\underline{\mathbf{Y}}+\Delta\underline{\mathbf{Y}})=W(\underline{\mathbf{Y}})+\underline{\mathbf{T}}\cdot\Delta\underline{\mathbf{Y}}+o\bigl(\|\Delta\underline{\mathbf{Y}}\|\bigr)
   \label{eq:elastic-material}
 \end{equation}
-则称该材料为弹性材料。式中 $\underline{\mathbf{T}}\cdot\Delta\underline{\mathbf{Y}}$ 为态点积（见式\eqref{eq:state-dot-product}），$\|\cdot\|$ 为由点积诱导的范数。由式\eqref{eq:elastic-material}，力态可以形式地写为式\eqref{eq:force-frechet}：
+则称该材料为弹性材料，$\underline{\mathbf{T}}$ 即应变能密度对变形态的 Fréchet 导数 \cite{Silling2007}。式中三项各有明确含义：$W(\underline{\mathbf{Y}})$ 为基准构型的应变能密度；$\underline{\mathbf{T}}\cdot\Delta\underline{\mathbf{Y}}$ 是能量增量中对 $\Delta\underline{\mathbf{Y}}$ 线性依赖的部分，称为线性主部；$o(\|\Delta\underline{\mathbf{Y}}\|)$ 表示当 $\|\Delta\underline{\mathbf{Y}}\|\to 0$ 时比 $\|\Delta\underline{\mathbf{Y}}\|$ 更快趋于零的高阶小量，它保证线性主部在扰动足够小时占据主导地位。态点积（式\eqref{eq:state-dot-product}）赋予态空间内积结构，使任何关于 $\Delta\underline{\mathbf{Y}}$ 的连续线性泛函都能唯一地表示为某一态与 $\Delta\underline{\mathbf{Y}}$ 的点积（Riesz 表示定理），故式\eqref{eq:elastic-material}中的线性主部天然具有 $\underline{\mathbf{T}}\cdot\Delta\underline{\mathbf{Y}}$ 的形式，$\|\cdot\|$ 为由点积诱导的范数。把点积按定义式\eqref{eq:state-dot-product}显式写出，得式\eqref{eq:linear-main-part}：
+\begin{equation}
+  \underline{\mathbf{T}}\cdot\Delta\underline{\mathbf{Y}}=
+  \int_{H_{\mathbf{x}}}\underline{\mathbf{T}}[\mathbf{x},t]\langle\boldsymbol{\xi}\rangle\cdot
+  \Delta\underline{\mathbf{Y}}\langle\boldsymbol{\xi}\rangle\,dV_{\mathbf{x}'}
+  \label{eq:linear-main-part}
+\end{equation}
+可见 $\underline{\mathbf{T}}\langle\boldsymbol{\xi}\rangle$ 的物理意义：它是应变能密度对第 $\boldsymbol{\xi}$ 根键的变形增量的敏感度，即能量泛函在键 $\boldsymbol{\xi}$ 处的变分导数；对近场域内每一根键取这样的敏感度并汇集为态，就得到材料点 $\mathbf{x}$ 处的力态。这正是本构关系的功能所在：把描述变形构型的变形态映射为描述受力的力态。由式\eqref{eq:elastic-material}，力态可以形式地写为式\eqref{eq:force-frechet}：
 \begin{equation}
   \underline{\mathbf{T}}=\nabla_{\underline{\mathbf{Y}}}W
   \label{eq:force-frechet}
 \end{equation}
-即力态是应变能密度对变形态的 Fréchet 导数 \cite{Silling2007}。这个定义与经典超弹性理论中应力 $\boldsymbol{\sigma}=\partial W/\partial\mathbf{F}$ 的关系完全类似，区别仅在于自变量：经典理论的自变量是变形梯度 $\mathbf{F}$，描述无穷小邻域内的线性化变形；态型理论的自变量是变形态 $\underline{\mathbf{Y}}$，描述整个近场域内的变形构型。
+式\eqref{eq:force-frechet}与经典超弹性理论中应力 $\boldsymbol{\sigma}=\partial W/\partial\mathbf{F}$ 的关系完全类似，区别仅在于求导的意义：经典理论中 $\mathbf{F}$ 是变形梯度，$W$ 是普通标量函数，$\partial W/\partial\mathbf{F}$ 是微积分意义上的张量求导，应力度量能量密度对一点的局部变形（无穷小邻域内的线性化变形）的敏感性；态型理论中 $\underline{\mathbf{Y}}$ 是变形态，$W$ 是态空间上的泛函，$\nabla_{\underline{\mathbf{Y}}}W$ 是泛函意义上的 Fréchet 导数，力态度量能量密度对整个近场域变形构型的敏感性。正是自变量从"一点"到"一族键"的转变，使态型本构在构造上天然携带非局部信息：$\underline{\mathbf{T}}\langle\boldsymbol{\xi}\rangle$ 虽对应单根键 $\boldsymbol{\xi}$，其取值却由近场域内全部键的变形共同决定。
 
 若材料的本构响应只依赖当前的变形态 $\underline{\mathbf{Y}}[\mathbf{x},t]$（以及 $\mathbf{x}$、$t$ 的显式依赖），不依赖变形历史与更高阶信息，则称为简单材料（simple material）\cite{Silling2007}。\ref{sec:osb-elastic}节建立的线性弹性本构即属此类；\ref{sec:osb-plastic}节讨论的弹塑性材料将通过内变量的引入把历史依赖纳入本构，可以看作简单材料框架的推广。对于弹性材料，线动量守恒自动满足；角动量守恒则对 $W$ 施加限制，其充分条件为 $W$ 具有旋转不变性（客观性）。这些守恒律条件及其对态型本构的约束将在第 2 章系统讨论 \cite{Silling2007,SillingLehoucq2010}。
 
@@ -213,7 +220,7 @@
   \underline{e}\langle\boldsymbol{\xi}\rangle\approx\frac{\boldsymbol{\xi}\cdot\boldsymbol{\varepsilon}\cdot\boldsymbol{\xi}}{|\boldsymbol{\xi}|}
   \label{eq:extension-small-strain}
 \end{equation}
-其中 $\boldsymbol{\varepsilon}$ 为小应变张量；又因权重函数仅依赖 $|\boldsymbol{\xi}|$，积分张量 $\int_{H_{\mathbf{x}}}\omega\,\boldsymbol{\xi}\otimes\boldsymbol{\xi}\,dV_{\mathbf{x}'}$ 是各向同性的，取迹并与式\eqref{eq:weighted-volume}比较可知其等于 $(m/3)\mathbf{I}$，于是得到式\eqref{eq:dilatation-small-strain}：
+其中 $\boldsymbol{\varepsilon}$ 为小应变张量；又因权重函数仅依赖 $|\boldsymbol{\xi}|$，积分张量 $\int_{H_{\mathbf{x}}}\omega\,\boldsymbol{\xi}\otimes\boldsymbol{\xi}\,dV_{\mathbf{x}'}$ 是各向同性的二阶张量，故必具 $c\mathbf{I}$ 的形式；其迹 $\int\omega|\boldsymbol{\xi}|^{2}\,dV$ 恰为加权体积 $m$（式\eqref{eq:weighted-volume}），而 $\mathrm{tr}(c\mathbf{I})=3c$，得 $c=m/3$，即 $\int_{H_{\mathbf{x}}}\omega\,\boldsymbol{\xi}\otimes\boldsymbol{\xi}\,dV_{\mathbf{x}'}=(m/3)\mathbf{I}$，于是得到式\eqref{eq:dilatation-small-strain}：
 \begin{equation}
   \theta=\frac{3}{m}\int_{H_{\mathbf{x}}}\omega\,\boldsymbol{\xi}\cdot\boldsymbol{\varepsilon}\cdot\boldsymbol{\xi}\,dV_{\mathbf{x}'}
   =\frac{3}{m}\cdot\frac{m}{3}\,\mathrm{tr}\,\boldsymbol{\varepsilon}
@@ -222,7 +229,7 @@
 \end{equation}
 即均匀小变形下膨胀恰等于经典体积应变。可见膨胀把近场域内键的伸长信息压缩为一个标量，表征材料点的体积变形状态。式\eqref{eq:dilatation}中的系数 $3/m$ 对应三维情形，二维情形的系数为 $2/m$，将在\ref{sec:osb-elastic}节给出 \cite{MadenciOterkus2014}。
 
-膨胀概念的引入使 OSB 本构可以沿“体积—偏斜”两条通道分别标定：标量力态 $\underline{t}$ 中的膨胀项由体积模量与剪切模量的组合 $3k-5\mu$ 标定，伸长态项由剪切模量 $\mu$ 标定（其中 $k$ 为体积模量，$\mu$ 为剪切模量）\cite{Silling2007}，从而实现了\ref{sec:state-limits}节指出的体积变形与剪切变形的独立响应。这一本构的具体形式将在\ref{sec:osb-elastic}节给出，其线性化分析可参见 \cite{Silling2010,SillingLehoucq2010}；关于态型理论更为系统的综述性论述见文献 \cite{Bobaru2016}。
+膨胀概念的引入使 OSB 本构可以沿“体积—偏斜”两条通道分别标定：在本章采用的偏伸长态表述中（见式\eqref{eq:osb-3d}），膨胀项由体积模量 $k$ 标定（系数 $3k/m$），偏项由剪切模量 $\mu$ 标定（系数 $15\mu/m$），二者互不约束（$k$ 为体积模量，$\mu$ 为剪切模量）；若改用总伸长态表述，膨胀项系数则写为 $(3k-5\mu)/m$，与偏伸长态表述等价 \cite{Silling2007}。正是这种双通道独立标定，实现了\ref{sec:state-limits}节指出的体积变形与剪切变形的独立响应。这一本构的具体形式将在\ref{sec:osb-elastic}节给出，其线性化分析可参见 \cite{Silling2010,SillingLehoucq2010}；关于态型理论更为系统的综述性论述见文献 \cite{Bobaru2016}。
 
 本节建立了态型理论的基本概念与数学框架：态的定义与运算提供了描述非局部变形与受力的语言，态型运动方程式\eqref{eq:state-motion}取代键型方程成为核心方程，OSB 与 NOSB 的分类界定了本构模型的构造范围，弹性态、简单材料与膨胀则奠定了本构理论的基础。\ref{sec:osb-elastic}节将在此基础上建立线性各向同性 OSB 弹性本构并推广到复合材料层合板，\ref{sec:osb-plastic}节讨论弹塑性模型，\ref{sec:strength-params}节讨论材料强度参数的确定。
 
@@ -240,7 +247,7 @@
   \underline{e}^{\mathrm{d}}\langle\boldsymbol{\xi}\rangle=\underline{e}\langle\boldsymbol{\xi}\rangle-\frac{1}{3}\theta\,|\boldsymbol{\xi}|
   \label{eq:deviatoric-extension}
 \end{equation}
-其中系数 $1/3$ 来自三维情形膨胀定义中式\eqref{eq:dilatation}的归一化（二维情形系数为 $1/2$，见下文）。各向同性部分描述纯体积变形，偏部分描述体积不变的形状变形；二者在态点积意义下正交，即 $\underline{e}^{\mathrm{i}}\cdot\underline{e}^{\mathrm{d}}=0$，这保证了应变能密度中体积项与偏项不耦合 \cite{Silling2007}。
+其中系数 $1/3$ 来自三维情形膨胀定义中式\eqref{eq:dilatation}的归一化（二维情形系数为 $1/2$，见下文）。各向同性部分描述纯体积变形，偏部分描述体积不变的形状变形；二者在应变能所需的加权内积意义下正交，$\int_{H_{\mathbf{x}}}\omega\,\underline{e}^{\mathrm{i}}\underline{e}^{\mathrm{d}}\,dV=0$（由式\eqref{eq:dilatation}与式\eqref{eq:weighted-volume}，$\int_{H}\omega|\boldsymbol{\xi}|\underline{e}\,dV=m\theta/3$、$\int_{H}\omega|\boldsymbol{\xi}|^{2}\,dV=m$，代入 $\int_{H}\omega(\theta|\boldsymbol{\xi}|/3)(\underline{e}-\theta|\boldsymbol{\xi}|/3)\,dV$ 即得 $m\theta^{2}/9-m\theta^{2}/9=0$），这保证了应变能密度中体积项与偏项不耦合 \cite{Silling2007}。
 
 三维线性各向同性 OSB 材料的应变能密度函数取体积项与偏项之和
 \begin{equation}
@@ -254,7 +261,40 @@
   \underline{t}\langle\boldsymbol{\xi}\rangle=\frac{3k\theta}{m}\,\omega(|\boldsymbol{\xi}|)\,|\boldsymbol{\xi}|+\alpha\,\omega(|\boldsymbol{\xi}|)\,\underline{e}^{\mathrm{d}}\langle\boldsymbol{\xi}\rangle
   \label{eq:osb-t-general}
 \end{equation}
-常数 $\alpha$ 由能量等效确定：令 PD 应变能密度与经典线弹性应变能密度在均匀变形下相等。对均匀纯剪切变形，$\theta=0$，$\underline{e}^{\mathrm{d}}\neq\mathbf{0}$，比较式\eqref{eq:osb-strain-energy}与经典剪切应变能密度 $\mu\gamma^{2}$（$\gamma$ 为工程剪应变）可得 $\alpha=15\mu/m$，其中 $\mu$ 为剪切模量 \cite{Silling2007}。代入式\eqref{eq:osb-t-general}，得到三维线性各向同性 OSB 材料的标量力态
+常数 $\alpha$ 由能量等效确定：令态型应变能密度与经典线弹性应变能密度在均匀变形下相等。先给出经典侧的结果。经典弹性理论中，应变能密度是应力与应变的双点积之半，$W_{\mathrm{cl}}=\tfrac{1}{2}\boldsymbol{\sigma}:\boldsymbol{\varepsilon}$。对均匀纯剪切变形，设工程剪应变为 $\gamma$（张量剪切应变为 $\varepsilon_{12}=\gamma/2$），胡克定律给出剪应力 $\tau=\sigma_{12}=2\mu\varepsilon_{12}=\mu\gamma$（$\mu$ 为剪切模量），代入双点积表达式得式\eqref{eq:shear-energy}：
+\begin{equation}
+  W_{\mathrm{cl}}=\frac{1}{2}\boldsymbol{\sigma}:\boldsymbol{\varepsilon}
+  =\frac{1}{2}\bigl(2\,\sigma_{12}\varepsilon_{12}\bigr)
+  =\sigma_{12}\varepsilon_{12}
+  =\frac{1}{2}\mu\gamma^{2}
+  \label{eq:shear-energy}
+\end{equation}
+其中 $\boldsymbol{\sigma}:\boldsymbol{\varepsilon}=2\,\sigma_{12}\varepsilon_{12}$ 的因子 $2$ 来自两个对称剪切分量（$\sigma_{12}\varepsilon_{12}$ 与 $\sigma_{21}\varepsilon_{21}$）各自贡献一次，纯剪切时其余分量均为零；因子 $\tfrac{1}{2}$ 与 $2$ 相消，得 $W_{\mathrm{cl}}=\sigma_{12}\varepsilon_{12}=\tfrac{1}{2}\mu\gamma^{2}$。可见经典纯剪切应变能密度为 $\tfrac{1}{2}\mu\gamma^{2}$。又因纯剪切时 $\mathrm{tr}\,\boldsymbol{\varepsilon}=0$、偏应变 $\boldsymbol{\varepsilon}^{\mathrm{d}}=\boldsymbol{\varepsilon}$，且 $\boldsymbol{\varepsilon}^{\mathrm{d}}:\boldsymbol{\varepsilon}^{\mathrm{d}}=\gamma^{2}/2$，故亦可写为 $W_{\mathrm{cl}}=\mu\boldsymbol{\varepsilon}^{\mathrm{d}}:\boldsymbol{\varepsilon}^{\mathrm{d}}$，与式\eqref{eq:osb-strain-energy}偏项 $\mu\boldsymbol{\varepsilon}^{\mathrm{d}}:\boldsymbol{\varepsilon}^{\mathrm{d}}$ 的对应关系一致。
+
+态型一侧，均匀纯剪切变形满足 $\theta=\mathrm{tr}\,\boldsymbol{\varepsilon}=0$（式\eqref{eq:dilatation-small-strain}），故式\eqref{eq:osb-strain-energy}中体积项消失，应变能密度只剩偏项，$W_{\mathrm{PD}}=(\alpha/2)\,\omega\underline{e}^{\mathrm{d}}\cdot\underline{e}^{\mathrm{d}}$。伸长态由式\eqref{eq:extension-small-strain}给出 $\underline{e}\langle\boldsymbol{\xi}\rangle=\boldsymbol{\xi}\cdot\boldsymbol{\varepsilon}\cdot\boldsymbol{\xi}/|\boldsymbol{\xi}|$；设键矢量在材料主方向上的分量为 $(\xi_{1},\xi_{2},\xi_{3})$，对纯剪切有 $\boldsymbol{\xi}\cdot\boldsymbol{\varepsilon}\cdot\boldsymbol{\xi}=\gamma\xi_{1}\xi_{2}$，故 $\underline{e}\langle\boldsymbol{\xi}\rangle=\gamma\xi_{1}\xi_{2}/|\boldsymbol{\xi}|$；又因 $\theta=0$，偏伸长态与伸长态相等，$\underline{e}^{\mathrm{d}}=\underline{e}$。于是由态点积定义式\eqref{eq:state-dot-product}，$W_{\mathrm{PD}}$ 的偏项展开为式\eqref{eq:pd-shear-energy}：
+\begin{equation}
+  W_{\mathrm{PD}}=\frac{\alpha}{2}\int_{H_{\mathbf{x}}}\omega\,\bigl(\underline{e}^{\mathrm{d}}\langle\boldsymbol{\xi}\rangle\bigr)^{2}\,dV
+  =\frac{\alpha\gamma^{2}}{2}\int_{H_{\mathbf{x}}}\omega\,\frac{\xi_{1}^{2}\xi_{2}^{2}}{|\boldsymbol{\xi}|^{2}}\,dV
+  \label{eq:pd-shear-energy}
+\end{equation}
+式\eqref{eq:pd-shear-energy}中的积分可由近场域的球对称性直接求值。取球坐标 $\xi_{1}=r\sin\vartheta\cos\psi$、$\xi_{2}=r\sin\vartheta\sin\psi$、$|\boldsymbol{\xi}|=r$、$dV=r^{2}\sin\vartheta\,d\vartheta\,d\psi\,dr$（$\vartheta$ 为极角、$\psi$ 为方位角），并利用标准积分 $\int_{0}^{\pi}\sin^{5}\vartheta\,d\vartheta=16/15$ 与 $\int_{0}^{2\pi}\cos^{2}\psi\sin^{2}\psi\,d\psi=\pi/4$，得式\eqref{eq:xi-integral}：
+\begin{equation}
+  \begin{aligned}
+    \int_{H_{\mathbf{x}}}\omega\,\frac{\xi_{1}^{2}\xi_{2}^{2}}{|\boldsymbol{\xi}|^{2}}\,dV
+    &=\Bigl(\int_{0}^{\pi}\sin^{5}\vartheta\,d\vartheta\Bigr)
+    \Bigl(\int_{0}^{2\pi}\cos^{2}\psi\sin^{2}\psi\,d\psi\Bigr)
+    \int_{0}^{\delta}\omega(r)\,r^{4}\,dr\\
+    &=\frac{4\pi}{15}\int_{0}^{\delta}\omega(r)\,r^{4}\,dr
+    =\frac{m}{15}
+  \end{aligned}
+  \label{eq:xi-integral}
+\end{equation}
+式中最后一个等号用到加权体积定义式\eqref{eq:weighted-volume}：$m=\int_{H_{\mathbf{x}}}\omega\,\boldsymbol{\xi}\cdot\boldsymbol{\xi}\,dV=4\pi\int_{0}^{\delta}\omega(r)r^{4}\,dr$。将式\eqref{eq:xi-integral}代入式\eqref{eq:pd-shear-energy}得 $W_{\mathrm{PD}}=\alpha m\gamma^{2}/30$；令其与经典值式\eqref{eq:shear-energy}相等，$W_{\mathrm{PD}}=W_{\mathrm{cl}}$，即 $\alpha m\gamma^{2}/30=\tfrac{1}{2}\mu\gamma^{2}$，解得待定系数式\eqref{eq:alpha-calibrated}：
+\begin{equation}
+  \alpha=\frac{15\mu}{m}
+  \label{eq:alpha-calibrated}
+\end{equation}
+将式\eqref{eq:alpha-calibrated}代入式\eqref{eq:osb-t-general}，得到三维线性各向同性 OSB 材料的标量力态
 \begin{equation}
   \underline{t}\langle\boldsymbol{\xi}\rangle=\frac{3k\theta}{m}\,\omega(|\boldsymbol{\xi}|)\,|\boldsymbol{\xi}|+\frac{15\mu}{m}\,\omega(|\boldsymbol{\xi}|)\,\underline{e}^{\mathrm{d}}\langle\boldsymbol{\xi}\rangle
   \label{eq:osb-3d}
@@ -265,7 +305,7 @@
   式\eqref{eq:osb-3d}中权重函数 $\omega(|\boldsymbol{\xi}|)$ 同时出现在膨胀定义式\eqref{eq:dilatation}与本构式\eqref{eq:osb-3d}中，其作用是对近场域内不同距离的键赋予不同权重。常用的选择是常数 $\omega=1$ 或线性衰减 $\omega=1-|\boldsymbol{\xi}|/\delta$。在均匀变形下，标量力态对应力的贡献与权重函数的具体形式无关（权重函数在分子分母中相消），因而本构参数 $k$、$\mu$ 的标定不依赖 $\omega$ 的选取；但权重函数影响表面效应的大小与数值离散的精度，其影响将在第 9、10 章讨论 \cite{Silling2007,LeBobaru2018Obj}。
 \end{remark}
 
-二维情形（板厚 $h$）的推导与三维完全类似，仅需将膨胀定义式\eqref{eq:dilatation}中的系数 $3/m$ 改为 $2/m$，并将式\eqref{eq:osb-3d}中的本构参数相应替换。Le 与 Bobaru 给出的二维线性各向同性 OSB 本构为 \cite{LeBobaru2018Obj}
+二维情形（板厚 $h$）的推导与三维完全类似，仅需将膨胀定义式\eqref{eq:dilatation}中的系数 $3/m$ 改为 $2/m$，并将式\eqref{eq:osb-3d}中的本构参数相应替换。二维的待定系数同样由纯剪切能量等效确定：纯剪切下 $\underline{e}^{\mathrm{d}}=\underline{e}=\gamma\xi_{1}\xi_{2}/|\boldsymbol{\xi}|$，二维积分恒等式 $\int_{H}\omega\,\xi_{1}^{2}\xi_{2}^{2}/|\boldsymbol{\xi}|^{2}\,dV=m/8$（二维加权体积 $m=\pi h\delta^{4}/2$，$\omega=1$）给出 $W_{\mathrm{PD}}=\alpha\gamma^{2}m/16$，与经典剪切能 $W_{\mathrm{cl}}=\tfrac{1}{2}\mu\gamma^{2}$ 相等解得 $\alpha=8\mu/m$，即式\eqref{eq:osb-2d-ps}—\eqref{eq:osb-2d-pe}伸长项的共同系数。Le 与 Bobaru 给出的二维线性各向同性 OSB 本构为 \cite{LeBobaru2018Obj}
 \begin{equation}
   \underline{t}\langle\boldsymbol{\xi}\rangle=
   \frac{2(2k-8\mu/3)\,\theta}{m}\,\omega(|\boldsymbol{\xi}|)\,|\boldsymbol{\xi}|+
@@ -314,7 +354,7 @@ OSB-PDLT 的标量力态由膨胀项与伸长项两部分组成，其键型区�
 \end{equation}
 其中 $a$、$d$、$b_{F}$、$b_{T}$、$b_{FT}$ 为材料本构参数，$\delta$ 为近场范围。式\eqref{eq:osb-pdlt-force}中第一项为膨胀项，其系数 $2\delta a d\Lambda/|\boldsymbol{\xi}|$ 与式\eqref{eq:osb-3d}的 $3k\omega|\boldsymbol{\xi}|/m$ 相对应，$\Lambda$ 的引入使膨胀项的贡献方向相关；第二项为伸长项，三个参数 $b_{F}$、$b_{T}$、$b_{FT}$ 分别标定纤维键、矩阵键与任意键的轴向刚度。
 
-本构参数由单层板工程常数确定。记平面应力状态下的缩减刚度（reduced stiffness）为式\eqref{eq:reduced-stiffness}：
+本构参数由单层板工程常数确定，其桥梁是经典层板理论中的缩减刚度（reduced stiffness）矩阵 $[Q]$。三维情形下，正交各向异性材料的柔度关系 $\boldsymbol{\varepsilon}=\mathbf{S}\boldsymbol{\sigma}$ 的面内分量为 $S_{11}=1/E_{11}$、$S_{22}=1/E_{22}$、$S_{12}=-\nu_{21}/E_{22}=-\nu_{12}/E_{11}$（后一等式由柔度矩阵对称性 $E_{11}\nu_{21}=E_{22}\nu_{12}$ 保证）与 $S_{66}=1/G_{12}$。层板分析取平面应力状态，即面外应力 $\sigma_{33}=\sigma_{13}=\sigma_{23}=0$，此时面内应力与应变通过缩减刚度矩阵联系：$\sigma_{11}=Q_{11}\varepsilon_{11}+Q_{12}\varepsilon_{22}$、$\sigma_{22}=Q_{12}\varepsilon_{11}+Q_{22}\varepsilon_{22}$、$\tau_{12}=Q_{66}\gamma_{12}$。将柔度关系 $\varepsilon_{11}=\sigma_{11}/E_{11}-\nu_{21}\sigma_{22}/E_{22}$、$\varepsilon_{22}=-\nu_{12}\sigma_{11}/E_{11}+\sigma_{22}/E_{22}$ 视为关于 $(\sigma_{11},\sigma_{22})$ 的线性方程组并求逆，其系数行列式为 $(1-\nu_{12}\nu_{21})/(E_{11}E_{22})$，即得平面应力状态下的缩减刚度式\eqref{eq:reduced-stiffness}：
 \begin{equation}
   Q_{11}=\frac{E_{11}}{1-\nu_{12}\nu_{21}},\qquad
   Q_{22}=\frac{E_{22}}{1-\nu_{12}\nu_{21}},\qquad
@@ -322,7 +362,7 @@ OSB-PDLT 的标量力态由膨胀项与伸长项两部分组成，其键型区�
   Q_{66}=G_{12}
   \label{eq:reduced-stiffness}
 \end{equation}
-其中 $E_{11}$、$E_{22}$ 为纤维方向与横向弹性模量，$G_{12}$ 为面内剪切模量，$\nu_{12}$、$\nu_{21}$ 为主次泊松比（满足 $E_{11}\nu_{21}=E_{22}\nu_{12}$）。Madenci 与 Oterkus 通过能量等效给出 \cite{MadenciOterkus2014}
+其中 $E_{11}$、$E_{22}$ 为纤维方向与横向弹性模量，$G_{12}$ 为面内剪切模量，$\nu_{12}$、$\nu_{21}$ 为主次泊松比（满足 $E_{11}\nu_{21}=E_{22}\nu_{12}$）。剩余的本构参数 $a$、$d$、$b_{F}$、$b_{T}$、$b_{FT}$ 由能量等效确定：令 PD 应变能密度与经典层板理论应变能密度在均匀变形下相等。经典侧（平面应力）的应变能密度为 $W_{\mathrm{cl}}=\tfrac{1}{2}\boldsymbol{\sigma}:\boldsymbol{\varepsilon}=\tfrac{1}{2}\bigl(Q_{11}\varepsilon_{11}^{2}+2Q_{12}\varepsilon_{11}\varepsilon_{22}+Q_{22}\varepsilon_{22}^{2}+Q_{66}\gamma_{12}^{2}\bigr)$。Madenci 与 Oterkus 的标定策略是选取典型均匀变形状态，使各参数被逐一隔离确定 \cite{MadenciOterkus2014}：纯剪切 $\gamma_{12}$ 状态下，纤维键与矩阵键沿材料主轴方向、其伸长率恒为零，仅任意方向的键产生伸长，故由纯剪切能量相等单独确定 $b_{FT}$；沿纤维方向（1 方向）与横向（2 方向）的均匀拉伸分别主导 $b_{F}$ 与 $b_{T}$；双轴均匀变形（纯体积变形）则确定膨胀项系数 $a$ 与 $d$。由此得到式\eqref{eq:osb-pdlt-params1}—\eqref{eq:osb-pdlt-params2}：
 \begin{equation}
   a=\frac{1}{2}\bigl(Q_{12}-Q_{66}\bigr),\qquad
   d=\frac{2}{\pi h\delta^{3}}
@@ -336,7 +376,7 @@ OSB-PDLT 的标量力态由膨胀项与伸长项两部分组成，其键型区�
   b_{FT}=\frac{6Q_{66}}{\pi h\delta^{4}}
   \label{eq:osb-pdlt-params2}
 \end{equation}
-其中 $h$ 为板厚，式\eqref{eq:osb-pdlt-params2}中求和遍历近场域内全部纤维键（$b_{F}$）或全部矩阵键（$b_{T}$），$V_{j}$ 为键端点 $j$ 的体积。注意到 $b_{F}$、$b_{T}$ 的分母含求和项，这使式\eqref{eq:osb-pdlt-force}在均匀变形下能够精确复现经典层板理论的正交各向异性本构关系 \cite{MadenciOterkus2014}。
+其中 $h$ 为板厚。式\eqref{eq:osb-pdlt-params2}中 $b_{F}$、$b_{T}$ 的分母含求和项，其来源是离散性：纤维键与矩阵键在离散模型中沿材料主轴方向精确对齐、数量有限，故能量等效中对这两类键的积分退化为对键的求和 $\sum_{j}|\boldsymbol{\xi}_{j}|V_{j}$（$j$ 遍历近场域内全部纤维键或全部矩阵键，$V_{j}$ 为键端点 $j$ 的体积）；而 $b_{FT}$ 对应连续分布的任意方向键，其积分给出闭式结果 $6Q_{66}/(\pi h\delta^{4})$。正是 $b_{F}$、$b_{T}$ 分母的求和项，使式\eqref{eq:osb-pdlt-force}在均匀变形下能够精确复现经典层板理论的正交各向异性本构关系 \cite{MadenciOterkus2014}。参数 $d=2/(\pi h\delta^{3})$ 为纯几何归一化：在均匀面内应变 $(\varepsilon_{11},\varepsilon_{22})$ 下，式\eqref{eq:osb-pdlt-dilatation}给出 $\theta=\tfrac{2}{3}(\varepsilon_{11}+\varepsilon_{22})$，即膨胀与面内体积应变成正比，比例系数由能量等效确定；而 $a=\tfrac{1}{2}(Q_{12}-Q_{66})$ 携带面内横向拉伸—压缩耦合刚度 $Q_{12}$ 与剪切刚度 $Q_{66}$ 之差，控制膨胀项对力态的贡献（其正负特征见下文 remark）。
 
 \begin{remark}
   式\eqref{eq:osb-pdlt-params1}中参数 $a$ 的正负取决于 $Q_{12}$ 与 $Q_{66}$ 的相对大小。对碳纤维增强复合材料，通常 $Q_{12}>Q_{66}$，$a>0$；而对某些 $G_{12}$ 较大的材料，$a$ 可能为负，此时膨胀项对力态的贡献反向。这是各向异性 OSB 本构与各向同性情形的显著差异之一，不影响本构的稳定性 \cite{MadenciOterkus2014}。
@@ -376,25 +416,59 @@ OSB-PDLT 的标量力态由膨胀项与伸长项两部分组成，其键型区�
   \dot{\boldsymbol{\varepsilon}}^{\mathrm{p}}=\dot{\lambda}\,\frac{\partial f}{\partial\boldsymbol{\sigma}}
   \label{eq:flow-rule}
 \end{equation}
-其中 $\dot{\lambda}\ge 0$ 为塑性乘子（plastic multiplier）。对式\eqref{eq:von-mises}的 von Mises 屈服函数，由式\eqref{eq:equivalent-stress}求导得 $\partial f/\partial\boldsymbol{\sigma}=\tfrac{3}{2}\mathbf{s}/\sigma_{\mathrm{eq}}$，代入式\eqref{eq:flow-rule}得到式\eqref{eq:prandtl-reuss}：
+式\eqref{eq:flow-rule}取屈服函数梯度（屈服面外法向）的形式并非武断的假设，而是 Drucker 稳定性公设（Drucker's stability postulate）的必然推论。该公设要求：对稳定材料，从屈服面内任意应力状态 $\boldsymbol{\sigma}^{*}$ 出发、加载至屈服面上应力 $\boldsymbol{\sigma}$ 再返回原状态的闭合循环中，外力做功非负；其塑性部分给出 $(\boldsymbol{\sigma}-\boldsymbol{\sigma}^{*}):\dot{\boldsymbol{\varepsilon}}^{\mathrm{p}}\ge 0$ 对一切满足 $f(\boldsymbol{\sigma}^{*})\le 0$ 的许用应力成立。上式等价于最大塑性耗散原理（principle of maximum plastic dissipation）：在所有满足屈服条件的应力状态中，实际应力使塑性功率 $\boldsymbol{\sigma}:\dot{\boldsymbol{\varepsilon}}^{\mathrm{p}}$ 达到最大。
+
+把这一约束优化问题用拉格朗日乘子法求解，构造拉格朗日函数 $\mathcal{L}=\boldsymbol{\sigma}:\dot{\boldsymbol{\varepsilon}}^{\mathrm{p}}-\dot{\lambda}\,f(\boldsymbol{\sigma})$（$\dot{\lambda}\ge 0$ 为拉格朗日乘子），驻点条件 $\partial\mathcal{L}/\partial\boldsymbol{\sigma}=\dot{\boldsymbol{\varepsilon}}^{\mathrm{p}}-\dot{\lambda}\,\partial f/\partial\boldsymbol{\sigma}=\mathbf{0}$ 恰给出式\eqref{eq:flow-rule}，即塑性应变率沿屈服面外法向；互补松弛条件 $\dot{\lambda}\,f=0$ 保证塑性加载时应力点停留在屈服面上（该条件将在\ref{sec:plastic-consistency}节以 Kuhn–Tucker 形式系统给出）。又因 Drucker 公设蕴含屈服面外凸，该驻点即全局最大值。可见，关联流动法则中的塑性乘子 $\dot{\lambda}$ 正是约束优化中的拉格朗日乘子，度量屈服面约束的松紧程度；其合理性前提是材料稳定（屈服面外凸），对岩土等压强敏感材料该前提不再成立，从而引出下文的非关联流动法则。
+
+对式\eqref{eq:von-mises}的 von Mises 屈服函数，由式\eqref{eq:equivalent-stress}求导得 $\partial f/\partial\boldsymbol{\sigma}=\tfrac{3}{2}\mathbf{s}/\sigma_{\mathrm{eq}}$，代入式\eqref{eq:flow-rule}得到式\eqref{eq:prandtl-reuss}：
 \begin{equation}
   \dot{\boldsymbol{\varepsilon}}^{\mathrm{p}}=\dot{\lambda}\,\frac{3\mathbf{s}}{2\sigma_{\mathrm{eq}}}
   \label{eq:prandtl-reuss}
 \end{equation}
-即 Prandtl–Reuss 流动法则。可以验证，在此约定下塑性乘子恰等于等效塑性应变率
+即 Prandtl–Reuss 流动法则。图\ref{fig:yield-surface-flow}以 $\sigma_{1}$–$\sigma_{2}$ 应力平面上的 von Mises 屈服椭圆示意了关联流动法则的几何意义：屈服面 $f=0$（图中蓝色椭圆）将应力空间划分为弹性区 $f<0$ 与塑性区 $f>0$；塑性加载时应力点停留在屈服面上，塑性应变率 $\dot{\boldsymbol{\varepsilon}}^{\mathrm{p}}=\dot{\lambda}\,\partial f/\partial\boldsymbol{\sigma}$ 沿屈服面外法向（图中红色箭头）。对 von Mises 屈服函数，外法向即偏应力方向 $\mathbf{n}=\tfrac{3\mathbf{s}}{2\sigma_{\mathrm{eq}}}$，与应力矢量 $\boldsymbol{\sigma}$（图中黑色箭头）一般不平行；图中单轴拉伸应力点处，法向同时具有轴向伸长与横向收缩分量，正体现塑性体积不可压的特征。
+\begin{figure}[htbp]
+  \centering
+  \begin{tikzpicture}[scale=1.25]
+    % 应力坐标轴（物理量 + 单位）
+    \draw[-Stealth] (-2.1,0) -- (2.5,0) node[right] {$\sigma_{1}$（MPa）};
+    \draw[-Stealth] (0,-1.7) -- (0,1.9) node[above] {$\sigma_{2}$（MPa）};
+    % von Mises 屈服面：σ₁²−σ₁σ₂+σ₂²=σY²（取 σY 为单位），主轴旋转 45° 的椭圆
+    \fill[blue!10, rotate around={45:(0,0)}] (0,0) ellipse (1.414 and 0.816);
+    \draw[blue, thick, rotate around={45:(0,0)}] (0,0) ellipse (1.414 and 0.816);
+    \node[blue] at (1.85,1.15) {$f=\sigma_{\mathrm{eq}}-\sigma_{Y}=0$};
+    % 弹性区标注
+    \node at (-0.5,0.55) {$f<0$（弹性）};
+    % 应力点：单轴拉伸 σ₁=σY、σ₂=0
+    \filldraw (1.0,0) circle (2pt);
+    \draw[-Stealth, thick] (0,0) -- (1.0,0) node[above] {$\boldsymbol{\sigma}$};
+    % 屈服面外法向（梯度 (2σ₁−σ₂, 2σ₂−σ₁)，在 (1,0) 处为 (2,−1) 方向）
+    \draw[-Stealth, red, very thick] (1.0,0) -- (1.58,-0.29);
+    \node[red] at (1.62,-0.5) {$\dot{\boldsymbol{\varepsilon}}^{\mathrm{p}}$};
+  \end{tikzpicture}
+  \caption{关联流动法则的几何意义，塑性应变率沿屈服面外法向}
+  \label{fig:yield-surface-flow}
+\end{figure}
+可以验证，在此约定下塑性乘子恰等于等效塑性应变率
 \begin{equation}
   \dot{\lambda}=\dot{\bar{\varepsilon}}^{\mathrm{p}}=\sqrt{\tfrac{2}{3}\,\dot{\boldsymbol{\varepsilon}}^{\mathrm{p}}:\dot{\boldsymbol{\varepsilon}}^{\mathrm{p}}}
   \label{eq:plastic-multiplier-identity}
 \end{equation}
-式\eqref{eq:plastic-multiplier-identity}这一恒等式在从经典理论过渡到态型表述时至关重要：它将抽象的塑性乘子与可直接度量的塑性应变率联系起来 \cite{SimoHughes1998}。
+式\eqref{eq:plastic-multiplier-identity}的验证只需一步代数运算：记 $\mathbf{n}=\tfrac{3\mathbf{s}}{2\sigma_{\mathrm{eq}}}$，由式\eqref{eq:equivalent-stress}（$\sigma_{\mathrm{eq}}^{2}=\tfrac{3}{2}\mathbf{s}:\mathbf{s}$）得 $\mathbf{n}:\mathbf{n}=\tfrac{9}{4}\mathbf{s}:\mathbf{s}/\sigma_{\mathrm{eq}}^{2}=\tfrac{3}{2}$，代入式\eqref{eq:prandtl-reuss}有 $\dot{\bar{\varepsilon}}^{\mathrm{p}}=\sqrt{\tfrac{2}{3}\dot{\boldsymbol{\varepsilon}}^{\mathrm{p}}:\dot{\boldsymbol{\varepsilon}}^{\mathrm{p}}}=\dot{\lambda}\sqrt{\tfrac{2}{3}\mathbf{n}:\mathbf{n}}=\dot{\lambda}$，此即式\eqref{eq:plastic-multiplier-identity}。这一恒等式在从经典理论过渡到态型表述时至关重要：它将抽象的塑性乘子与可直接度量的等效塑性应变率联系起来 \cite{SimoHughes1998}。
 
-硬化（hardening）描述屈服应力随塑性变形的演化。各向同性硬化（isotropic hardening）假设屈服面等大膨胀，屈服应力是等效塑性应变 $\bar{\varepsilon}^{\mathrm{p}}$ 的单调增函数
+上述关联流动法则以屈服函数为塑性势，其合理性基于 Drucker 稳定性公设（最大塑性耗散原理），适用于金属等无摩擦材料。岩土材料与混凝土则是典型的压强敏感（pressure-sensitive）材料，其屈服依赖于平均应力，且塑性流动伴随的剪胀（dilatancy）远小于关联流动法则的预测。为此，经典塑性理论引入塑性势（plastic potential）$g(\boldsymbol{\sigma})$，令塑性应变率沿塑性势的法向而非屈服面的法向，
+\begin{equation}
+  \dot{\boldsymbol{\varepsilon}}^{\mathrm{p}}=\dot{\lambda}\,\frac{\partial g}{\partial\boldsymbol{\sigma}},\qquad g\neq f
+  \label{eq:nonassociated-flow}
+\end{equation}
+式\eqref{eq:nonassociated-flow}即非关联流动法则（non-associated flow rule）\cite{VermeerDeBorst1984}。对岩土与混凝土最常用的 Mohr–Coulomb 与 Drucker–Prager 屈服准则，屈服面由内摩擦角与黏聚力控制，塑性势则由剪胀角 $\psi$ 构造：关联流动时剪胀角等于内摩擦角，非关联流动时剪胀角较小（无剪胀材料取 $\psi=0$）。以 Drucker–Prager 准则为例，$f=\alpha_{\varphi}I_{1}+\sqrt{J_{2}}-k_{\varphi}$（$I_{1}=\mathrm{tr}\,\boldsymbol{\sigma}$ 为应力第一不变量，$\alpha_{\varphi}$、$k_{\varphi}$ 为与内摩擦角、黏聚力相关的材料参数 \cite{DruckerPrager1952}），关联流动的塑性体积应变率与摩擦相称、剪胀偏大；非关联流动改取塑性势 $g=\alpha_{\psi}I_{1}+\sqrt{J_{2}}$（$\alpha_{\psi}$ 由剪胀角确定），从而独立控制塑性体积变形。非关联流动法则对数值实现有重要影响：塑性切线刚度矩阵不再对称，隐式求解的代数代价上升，且对摩擦型材料可能诱发应变局部化与非唯一性，数值处理需谨慎。态型框架下的推广与经典理论完全平行：以塑性势对偏力态的 Fréchet 导数 $\nabla g$ 取代屈服函数导数即可，塑性偏伸长态演化率写为 $\dot{\underline{e}}^{\mathrm{dp}}=\dot{\lambda}\,\nabla g$；本章后续以关联流动法则（von Mises）为主线展开，非关联推广的经典背景见 \cite{VermeerDeBorst1984,SimoHughes1998}。
+
+流动法则确定了塑性应变率的方向，但屈服应力自身如何随塑性变形演化尚未交代。真实材料在塑性流动过程中，屈服应力随累积塑性变形而变化——升高时称硬化（hardening），降低时称软化（softening）；理想塑性（perfect plasticity）假定屈服应力恒定，是 $H=0$ 的特例。描述这一演化需要一个度量累积塑性变形量的标量，式\eqref{eq:plastic-multiplier-identity}已给出其自然选择：等效塑性应变 $\bar{\varepsilon}^{\mathrm{p}}$，其演化率恰为塑性乘子，$\dot{\bar{\varepsilon}}^{\mathrm{p}}=\dot{\lambda}$，故 $\bar{\varepsilon}^{\mathrm{p}}$ 累积了全部塑性变形历史。据此，各向同性硬化（isotropic hardening）假设屈服面在应力空间中等大膨胀，屈服应力是 $\bar{\varepsilon}^{\mathrm{p}}$ 的单调增函数，其一般形式与线性硬化特例为式\eqref{eq:isotropic-hardening}：
 \begin{equation}
   \sigma_{Y}=\sigma_{Y}\bigl(\bar{\varepsilon}^{\mathrm{p}}\bigr),\qquad
   \sigma_{Y}=\sigma_{Y0}+H\bar{\varepsilon}^{\mathrm{p}}
   \label{eq:isotropic-hardening}
 \end{equation}
-其中 $\sigma_{Y0}$ 为初始屈服应力，$H$ 为各向同性硬化模量（线性硬化情形）。各向同性硬化描述屈服面对称膨胀，无法反映反向加载时屈服应力降低的 Bauschinger 效应；描述该效应需引入随动硬化（kinematic hardening），使屈服面整体平移，其屈服函数中的等效应力改用 $\boldsymbol{\sigma}-\boldsymbol{\alpha}$（$\boldsymbol{\alpha}$ 为背应力）计算 \cite{Hill1950,SimoHughes1998}。本节以各向同性硬化为主，随动硬化的一般框架见 \cite{Pirzadeh2024}。
+其中 $\sigma_{Y0}$ 为初始屈服应力，$H$ 为各向同性硬化模量（线性硬化情形）。线性硬化情形的增量形式为 $\dot{\sigma}_{Y}=H\dot{\bar{\varepsilon}}^{\mathrm{p}}=H\dot{\lambda}$，这正是\ref{sec:plastic-consistency}节推导塑性乘子时由 $\partial f/\partial\bar{\varepsilon}^{\mathrm{p}}=-\mathrm{d}\sigma_{Y}/\mathrm{d}\bar{\varepsilon}^{\mathrm{p}}=-H$ 所依据的硬化演化关系。各向同性硬化描述屈服面对称膨胀，无法反映反向加载时屈服应力降低的 Bauschinger 效应；描述该效应需引入随动硬化（kinematic hardening），使屈服面整体平移，其屈服函数中的等效应力改用 $\boldsymbol{\sigma}-\boldsymbol{\alpha}$（$\boldsymbol{\alpha}$ 为背应力）计算 \cite{Hill1950,SimoHughes1998}。本节以各向同性硬化为主，随动硬化的一般框架见 \cite{Pirzadeh2024}。
 
 将上述经典框架推广到态型理论，关键是回答两个问题：什么是态型理论中的“应力”？什么是“塑性应变”？\ref{sec:osb-elastic}节表明，OSB 材料中与应力张量地位相当的是标量力态 $\underline{t}$，与偏应变地位相当的是偏伸长态 $\underline{e}^{\mathrm{d}}$。因此，态型塑性理论把塑性变形引入偏伸长态，将其分解为弹性与塑性两部分
 \begin{equation}
@@ -416,12 +490,12 @@ OSB-PDLT 的标量力态由膨胀项与伸长项两部分组成，其键型区�
   f\bigl(\underline{t}^{\mathrm{d}}\bigr)=\tfrac{1}{2}\bigl\|\underline{t}^{\mathrm{d}}\bigr\|^{2}-\psi_{0}\le 0
   \label{eq:yield-mitchell}
 \end{equation}
-其中 $\psi_{0}$ 为屈服常数。由能量等效（令态型偏应变能与经典偏应变能在纯剪切屈服时相等）可得
+其中 $\psi_{0}$ 为屈服常数，由能量等效标定：令态型偏应变能在纯剪切屈服时与经典偏应变能相等。纯剪切状态（工程剪应变 $\gamma$）下 $\theta=0$，由式\eqref{eq:extension-small-strain}伸长态为 $\underline{e}\langle\boldsymbol{\xi}\rangle=\gamma\xi_{1}\xi_{2}/|\boldsymbol{\xi}|$，且偏伸长态 $\underline{e}^{\mathrm{d}}=\underline{e}$；弹性阶段（$\underline{e}^{\mathrm{dp}}=0$）由式\eqref{eq:osb-3d-elastoplastic}得偏力态 $\underline{t}^{\mathrm{d}}=(15\mu/m)\,\omega\,\underline{e}$。据此，$\|\underline{t}^{\mathrm{d}}\|^{2}=(15\mu/m)^{2}\gamma^{2}\int_{H_{\mathbf{x}}}\omega^{2}\xi_{1}^{2}\xi_{2}^{2}/|\boldsymbol{\xi}|^{2}\,dV$；取 $\omega=1$，并利用式\eqref{eq:xi-integral}的积分恒等式 $\int_{H}\omega\,\xi_{1}^{2}\xi_{2}^{2}/|\boldsymbol{\xi}|^{2}\,dV=m/15$ 与三维加权体积 $m=\int_{H}\omega|\boldsymbol{\xi}|^{2}\,dV=4\pi\delta^{5}/5$（式\eqref{eq:weighted-volume}），得 $\|\underline{t}^{\mathrm{d}}\|^{2}=15\mu^{2}\gamma^{2}/m$。屈服条件 $\tfrac{1}{2}\|\underline{t}^{\mathrm{d}}\|^{2}=\psi_{0}$ 在纯剪切屈服（$\gamma=\gamma_{Y}$）时给出 $\psi_{0}=15\mu^{2}\gamma_{Y}^{2}/(2m)$；由 von Mises 准则，剪切屈服应力与单轴屈服应力满足 $\tau_{Y}=\mu\gamma_{Y}=\sigma_{Y}/\sqrt{3}$，代入消去 $\mu\gamma_{Y}$ 即得式\eqref{eq:psi0-3d}：
 \begin{equation}
   \psi_{0}=\frac{25\,\sigma_{Y}^{2}}{8\pi\delta^{5}}
   \label{eq:psi0-3d}
 \end{equation}
-式中 $\sigma_{Y}$ 为单轴屈服应力（三维情形）\cite{Mitchell2011}。式\eqref{eq:yield-mitchell}中 $\tfrac{1}{2}\|\underline{t}^{\mathrm{d}}\|^{2}$ 正是\ref{sec:osb-elastic}节偏应变能密度的力态表述，故屈服条件 $\tfrac{1}{2}\|\underline{t}^{\mathrm{d}}\|^{2}=\psi_{0}$ 的物理意义是：当偏应变能密度达到临界值 $\psi_{0}$ 时材料屈服。二维情形因面外偏应力分量的贡献，屈服函数需附加修正项 \cite{Mousavi2021}
+式中 $\sigma_{Y}$ 为单轴屈服应力（三维情形）\cite{Mitchell2011}。由上面的推导可见，$\tfrac{1}{2}\|\underline{t}^{\mathrm{d}}\|^{2}$ 与偏应变能密度成正比（$\omega=1$ 时比例系数为 $15\mu/m$），故屈服条件 $\tfrac{1}{2}\|\underline{t}^{\mathrm{d}}\|^{2}=\psi_{0}$ 的物理意义是：当偏应变能密度达到与 $\psi_{0}$ 对应的临界值时材料屈服，$\psi_{0}$ 即三维情形的临界偏应变能度量。二维情形下，面外偏应力分量对 $J_{2}$ 有贡献，而二维键只感知面内变形，故屈服函数需附加修正项 \cite{Mousavi2021}
 \begin{equation}
   f\bigl(\underline{t}^{\mathrm{d}}\bigr)=
   \tfrac{1}{2}\bigl\|\underline{t}^{\mathrm{d}}\bigr\|^{2}+
@@ -433,7 +507,7 @@ OSB-PDLT 的标量力态由膨胀项与伸长项两部分组成，其键型区�
   \psi_{0}=\frac{8\sigma_{Y}^{2}}{3\pi h\delta^{4}}
   \label{eq:psi0-2d}
 \end{equation}
-式\eqref{eq:yield-mousavi}中第二项 $\bigl(\underline{t}^{\mathrm{d}}\cdot\underline{\mathbf{X}}\bigr)^{2}$ 反映了二维问题中面外应力分量对 $J_{2}$ 的贡献，该项使得屈服函数在二维情形下严格等价于经典 von Mises 准则 \cite{Mousavi2021}。
+二维情形的屈服常数由同样的纯剪切能量等效标定。二维纯剪切下 $\underline{e}^{\mathrm{d}}=\underline{e}=\gamma\xi_{1}\xi_{2}/|\boldsymbol{\xi}|$，由二维弹性本构式\eqref{eq:osb-2d-ps}得偏力态 $\underline{t}^{\mathrm{d}}=(8\mu/m)\,\omega\underline{e}$；取 $\omega=1$，二维积分 $\int_{H}\omega\,\xi_{1}^{2}\xi_{2}^{2}/|\boldsymbol{\xi}|^{2}\,dV=m/8$（二维加权体积 $m=\int_{H}\omega|\boldsymbol{\xi}|^{2}\,dV=\pi h\delta^{4}/2$，$h$ 为板厚），得 $\|\underline{t}^{\mathrm{d}}\|^{2}=8\mu^{2}\gamma^{2}/m$。屈服条件在纯剪切屈服时给出 $\psi_{0}=4\mu^{2}\gamma_{Y}^{2}/m=4\sigma_{Y}^{2}/(3m)=8\sigma_{Y}^{2}/(3\pi h\delta^{4})$，此即式\eqref{eq:psi0-2d}。式\eqref{eq:yield-mousavi}中的修正项 $\bigl(\underline{t}^{\mathrm{d}}\cdot\underline{\mathbf{X}}\bigr)^{2}$ 补偿面外偏应力对 $J_{2}$ 的贡献：平面应力下面外偏应力 $s_{33}=-(\sigma_{11}+\sigma_{22})/3\neq 0$，而面内键模型只感知面内偏变形，若仅用 $\tfrac{1}{2}\|\underline{t}^{\mathrm{d}}\|^{2}=\psi_{0}$，则在单轴拉伸屈服（$\sigma_{11}=\sigma_{Y}$）时 $f=-\tfrac{2}{3}\sigma_{Y}^{2}/(\pi h\delta^{4})<0$，模型不会在预期应力处屈服；修正项恰好补足这一差额，使二维屈服函数与经典平面应力 von Mises 准则一致 \cite{Mousavi2021}。
 
 \begin{remark}
   式\eqref{eq:yield-mitchell}与式\eqref{eq:yield-mousavi}给出的屈服函数均以偏力态 $\underline{t}^{\mathrm{d}}$ 为自变量，形式上与经典屈服函数 $f(\boldsymbol{\sigma})$ 以应力张量为自变量平行。这一选择是自然的：\ref{sec:osb-elastic}节表明力态是态型理论中的“应力”，而偏力态则对应经典理论中的偏应力。屈服函数对 $\underline{t}^{\mathrm{d}}$ 的依赖性意味着屈服判据考察的是材料点近场域内全部键的偏力状态，体现了塑性屈服的非局部特性 \cite{Mitchell2011,Mousavi2021}。
@@ -466,15 +540,15 @@ OSB-PDLT 的标量力态由膨胀项与伸长项两部分组成，其键型区�
   \frac{\partial f}{\partial\boldsymbol{\sigma}}:\mathbf{C}:\frac{\partial f}{\partial\boldsymbol{\sigma}}+H}
   \label{eq:classical-plastic-multiplier}
 \end{equation}
-对 von Mises 屈服函数（式\eqref{eq:von-mises}）与各向同性线性硬化（式\eqref{eq:isotropic-hardening}），$\partial f/\partial\boldsymbol{\sigma}=\tfrac{3}{2}\mathbf{s}/\sigma_{\mathrm{eq}}$，且对偏张量有 $\tfrac{3}{2}\mathbf{s}/\sigma_{\mathrm{eq}}:\mathbf{C}:\tfrac{3}{2}\mathbf{s}/\sigma_{\mathrm{eq}}=3\mu$（$\mu$ 为剪切模量），故式\eqref{eq:classical-plastic-multiplier}简化为
+对 von Mises 屈服函数（式\eqref{eq:von-mises}）与各向同性线性硬化（式\eqref{eq:isotropic-hardening}），$\partial f/\partial\boldsymbol{\sigma}=\tfrac{3}{2}\mathbf{s}/\sigma_{\mathrm{eq}}=\mathbf{n}$。由于 $\mathbf{n}$ 为偏张量（$\mathbf{n}:\mathbf{I}=0$），弹性张量 $\mathbf{C}=2\mu\mathbf{I}_{4}+\lambda\mathbf{1}\otimes\mathbf{1}$ 作用于其上时迹项消失，故有 $\mathbf{n}:\mathbf{C}:\dot{\boldsymbol{\varepsilon}}=2\mu\,\mathbf{n}:\dot{\boldsymbol{\varepsilon}}$ 与 $\mathbf{n}:\mathbf{C}:\mathbf{n}=3\mu$（$\mu$ 为剪切模量），式\eqref{eq:classical-plastic-multiplier}简化为
 \begin{equation}
-  \dot{\lambda}=\frac{3\mu\,\mathbf{n}:\dot{\boldsymbol{\varepsilon}}}{3\mu+H},\qquad
+  \dot{\lambda}=\frac{2\mu\,\mathbf{n}:\dot{\boldsymbol{\varepsilon}}}{3\mu+H},\qquad
   \mathbf{n}=\frac{3\mathbf{s}}{2\sigma_{\mathrm{eq}}}
   \label{eq:j2-plastic-multiplier}
 \end{equation}
 其中 $\mathbf{n}$ 为偏应力方向的单位张量（满足 $\mathbf{n}:\mathbf{n}=3/2$）\cite{SimoHughes1998}。
 
-态型理论的塑性乘子由同样的逻辑导出，区别仅在于把应力张量换成力态、应变张量换成伸长态。将屈服函数 $f(\underline{t}^{\mathrm{d}})$ 对时间求导并令其为零，利用式\eqref{eq:pd-flow-rule}与式\eqref{eq:osb-3d-elastoplastic}的速率形式，三维情形得到
+态型理论的塑性乘子由同样的逻辑导出，区别仅在于把应力张量换成力态、应变张量换成伸长态。塑性加载时一致性条件要求屈服函数不随时间变化，$\dot{f}=0$。由式\eqref{eq:osb-3d-elastoplastic}取速率形式，且屈服函数只依赖偏力态（体积部分对 $\dot{f}$ 无贡献），故偏力态的演化率为 $\dot{\underline{t}}^{\mathrm{d}}=\tfrac{15\mu}{m}\,\omega\bigl(\dot{\underline{e}}^{\mathrm{d}}-\dot{\underline{e}}^{\mathrm{dp}}\bigr)$；将流动法则式\eqref{eq:pd-flow-rule}（$\dot{\underline{e}}^{\mathrm{dp}}=\dot{\lambda}\nabla^{\mathrm{d}}f$）代入 $\dot{f}=\nabla^{\mathrm{d}}f\cdot\dot{\underline{t}}^{\mathrm{d}}=0$，得 $\nabla^{\mathrm{d}}f\cdot\tfrac{15\mu}{m}\,\omega\bigl(\dot{\underline{e}}^{\mathrm{d}}-\dot{\lambda}\nabla^{\mathrm{d}}f\bigr)=0$。系数 $(15\mu/m)\omega$ 由参考构型量组成（$m=\int\omega|\boldsymbol{\xi}|^{2}dV$ 与 $\omega$ 均不随变形改变），在率形式中为常数，等式两边相消，解得三维情形的塑性乘子
 \begin{equation}
   \dot{\lambda}=\frac{\nabla^{\mathrm{d}}f\cdot\dot{\underline{e}}^{\mathrm{d}}}
   {\nabla^{\mathrm{d}}f\cdot\nabla^{\mathrm{d}}f}
@@ -509,7 +583,7 @@ OSB-PDLT 的标量力态由膨胀项与伸长项两部分组成，其键型区�
 \end{equation}
 若 $f(\underline{t}^{\mathrm{d}}_{\mathrm{trial}})>0$，则进入塑性校正。
 
-\textbf{第三步（塑性校正）}。由后向 Euler 离散的一致性条件 $f(\underline{t}^{\mathrm{d}}_{n+1})=0$ 求解塑性乘子增量 $\Delta\lambda$。对三维屈服函数式\eqref{eq:yield-mitchell}，因 $\nabla^{\mathrm{d}}f=\underline{t}^{\mathrm{d}}$，校正方向沿试探偏力态径向，塑性乘子有闭式解式\eqref{eq:plastic-multiplier-increment}：
+\textbf{第三步（塑性校正）}。由后向 Euler 离散的一致性条件 $f(\underline{t}^{\mathrm{d}}_{n+1})=0$ 求解塑性乘子增量 $\Delta\lambda$。先建立试探态与校正态的关系。校正后的塑性偏伸长态由后向 Euler 格式的流动法则式\eqref{eq:pd-flow-rule}给出，$\underline{e}^{\mathrm{dp}}_{n+1}=\underline{e}^{\mathrm{dp}}_{n}+\Delta\lambda\,\nabla^{\mathrm{d}}f\bigl(\underline{t}^{\mathrm{d}}_{n+1}\bigr)$；对式\eqref{eq:yield-mitchell}有 $\nabla^{\mathrm{d}}f=\underline{t}^{\mathrm{d}}$，代入弹性关系式\eqref{eq:osb-3d-elastoplastic}的偏部分（$\underline{t}^{\mathrm{d}}=\alpha\omega(\underline{e}^{\mathrm{d}}-\underline{e}^{\mathrm{dp}})$，$\alpha=15\mu/m$），得 $\underline{t}^{\mathrm{d}}_{n+1}=\underline{t}^{\mathrm{d}}_{\mathrm{trial}}-\alpha\omega\Delta\lambda\,\underline{t}^{\mathrm{d}}_{n+1}$，即 $\underline{t}^{\mathrm{d}}_{n+1}=\underline{t}^{\mathrm{d}}_{\mathrm{trial}}/(1+\alpha\omega\Delta\lambda)$——校正方向与试探偏力态共线，这正是"径向回映"名称的由来。一致性条件 $\tfrac{1}{2}\|\underline{t}^{\mathrm{d}}_{n+1}\|^{2}=\psi_{0}$ 给出 $\|\underline{t}^{\mathrm{d}}_{n+1}\|=\sqrt{2\psi_{0}}$，故校正后的偏力态把试探态按比例缩放回屈服面，即式\eqref{eq:radial-return}。取常数权重 $\omega=1$ 时，$\|\underline{t}^{\mathrm{d}}_{n+1}\|=\|\underline{t}^{\mathrm{d}}_{\mathrm{trial}}\|/(1+\alpha\Delta\lambda)$，代入一致性条件解得塑性乘子增量式\eqref{eq:plastic-multiplier-increment}：
 \begin{equation}
   \Delta\lambda=\frac{1}{\alpha}\left(\frac{\bigl\|\underline{t}^{\mathrm{d}}_{\mathrm{trial}}\bigr\|}{\sqrt{2\psi_{0}}}-1\right),\qquad
   \alpha=\frac{15\mu}{m}
@@ -526,7 +600,7 @@ OSB-PDLT 的标量力态由膨胀项与伸长项两部分组成，其键型区�
   \underline{e}^{\mathrm{dp}}_{n+1}=\underline{e}^{\mathrm{dp}}_{n}+\Delta\lambda\,\underline{t}^{\mathrm{d}}_{n+1}
   \label{eq:plastic-state-update}
 \end{equation}
-式\eqref{eq:radial-return}中 $\underline{t}^{\mathrm{d}}_{n+1}$ 与 $\underline{t}^{\mathrm{d}}_{\mathrm{trial}}$ 方向相同（径向），故式\eqref{eq:plastic-state-update}正对应经典径向回映中 $\Delta\boldsymbol{\varepsilon}^{\mathrm{p}}=\Delta\lambda\,\mathbf{n}$ 的更新 \cite{Mitchell2011}。二维情形因式\eqref{eq:yield-mousavi}的修正项，校正方向不再严格沿径向，$\Delta\lambda$ 由单个非线性标量方程用 Newton–Raphson 迭代求解，详见 Mousavi 等 \cite{Mousavi2021}。
+式\eqref{eq:plastic-state-update}是后向 Euler 流动法则的直接结果：由 $\underline{e}^{\mathrm{dp}}_{n+1}-\underline{e}^{\mathrm{dp}}_{n}=\Delta\lambda\,\nabla^{\mathrm{d}}f=\Delta\lambda\,\underline{t}^{\mathrm{d}}_{n+1}$（后一等号用了式\eqref{eq:yield-mitchell}的 $\nabla^{\mathrm{d}}f=\underline{t}^{\mathrm{d}}$）；又因式\eqref{eq:radial-return}中 $\underline{t}^{\mathrm{d}}_{n+1}$ 与 $\underline{t}^{\mathrm{d}}_{\mathrm{trial}}$ 方向相同（径向），它正对应经典径向回映中 $\Delta\boldsymbol{\varepsilon}^{\mathrm{p}}=\Delta\lambda\,\mathbf{n}$ 的更新 \cite{Mitchell2011}。二维情形因式\eqref{eq:yield-mousavi}的修正项，$\nabla^{\mathrm{d}}f$ 不再等于 $\underline{t}^{\mathrm{d}}$，校正方向不再严格沿径向，$\Delta\lambda$ 由单个非线性标量方程用 Newton–Raphson 迭代求解，详见 Mousavi 等 \cite{Mousavi2021}。
 
 各向同性硬化的处理只需将屈服常数 $\psi_{0}$ 替换为随等效塑性变形演化的当前值。由式\eqref{eq:psi0-3d}与式\eqref{eq:isotropic-hardening}，三维情形
 \begin{equation}
@@ -552,13 +626,14 @@ OSB-PDLT 的标量力态由膨胀项与伸长项两部分组成，其键型区�
 
 断裂参数标定的核心思想是能量等效：设想裂纹面张开单位面积，裂纹面附近原本连接两侧材料的所有键被拉断，这些键储存的总弹性能应等于材料的断裂能（能量释放率）$G_{0}$。键型理论中，键的临界伸长率（critical stretch）$s_{0}$ 由此确定。对原型微弹性脆性（PMB）材料，键力为 $f=cs$（$c$ 为微模量，$s$ 为伸长率），单根键的成对势为 $w=\tfrac{1}{2}cs^{2}|\boldsymbol{\xi}|$（见第 4 章）。当键伸长达到临界值 $s_{0}$ 时键断裂，释放的能量为 $w(s_{0})=\tfrac{1}{2}cs_{0}^{2}|\boldsymbol{\xi}|$。把所有穿过单位裂纹面的键的断裂能求和并令其等于 $G_{0}$，即可解出 $s_{0}$ \cite{SillingAskari2005}。
 
-以三维情形为例，考虑裂纹面上方高 $z$ 处（$0\le z\le\delta$）的一根键，其长度 $|\boldsymbol{\xi}|=r$ 须满足 $r>z$（否则键不跨越裂纹面），键方向与裂纹面法向的夹角由 $\cos^{-1}(z/r)$ 界定。单位裂纹面积对应的键体积元为 $r^{2}\sin\varphi\,d\varphi\,dr$（球坐标），对全部跨越裂纹面的键求和并对裂纹面法向距离 $z$ 积分，得式\eqref{eq:G0-3d-integral}：
+以三维情形为例，考虑裂纹面上方高 $z$ 处（$0\le z\le\delta$）的一根键，其长度 $|\boldsymbol{\xi}|=r$ 须满足 $r>z$（否则键不跨越裂纹面）。设键方向与裂纹面法向的夹角为 $\varphi$，跨越裂纹面的条件为 $r\cos\varphi\ge z$，即 $\varphi\le\cos^{-1}(z/r)$；绕裂纹面法向的方位角记为 $\psi\in[0,2\pi)$。球坐标下键体积元为 $r^{2}\sin\varphi\,d\psi\,d\varphi\,dr$。将键的参考端点统一取在裂纹面上方，对全部跨越裂纹面的键求和并对裂纹面法向距离 $z$ 积分——此时每个跨越裂纹面的键恰好被计数一次，无须再乘因子 $2$——得式\eqref{eq:G0-3d-integral}：
 \begin{equation}
-  G_{0}=2\int_{0}^{\delta}\int_{z}^{\delta}\int_{0}^{\cos^{-1}(z/r)}
-  \frac{1}{2}cs_{0}^{2}r\cdot r^{2}\sin\varphi\,d\varphi\,dr\,dz
+  G_{0}=\int_{0}^{\delta}\int_{z}^{\delta}\int_{0}^{\cos^{-1}(z/r)}
+  \int_{0}^{2\pi}
+  \frac{1}{2}cs_{0}^{2}r\cdot r^{2}\sin\varphi\,d\psi\,d\varphi\,dr\,dz
   \label{eq:G0-3d-integral}
 \end{equation}
-其中因子 $2$ 源于裂纹面上、下两侧的键各计一次。完成积分，将三维微模量 $c=18k/(\pi\delta^{4})$（$k$ 为体积模量，见第 4 章）代入，得
+完成积分（方位角积分给出因子 $2\pi$）得 $G_{0}=\pi c s_{0}^{2}\delta^{5}/10$，即 $s_{0}=\sqrt{10G_{0}/(\pi c\delta^{5})}$，将三维微模量 $c=18k/(\pi\delta^{4})$（$k$ 为体积模量，见第 4 章）代入，得
 \begin{equation}
   s_{0}=\sqrt{\frac{5G_{0}}{9k\delta}}
   \label{eq:critical-stretch-3d}
@@ -566,16 +641,16 @@ OSB-PDLT 的标量力态由膨胀项与伸长项两部分组成，其键型区�
 式\eqref{eq:critical-stretch-3d}即键型理论三维情形的临界伸长率，其中 $k$ 为体积模量，$\delta$ 为近场范围 \cite{SillingAskari2005,MadenciOterkus2014}。
 
 \begin{remark}
-  式\eqref{eq:critical-stretch-3d}中分母含体积模量 $k$。由于键型理论三维情形固定 $\nu=1/4$，此时 $E=9k/2$，故式\eqref{eq:critical-stretch-3d}亦可写为 $s_{0}=\sqrt{5G_{0}/(6E\delta)}$。部分文献将分母误写为 $9E\delta$，应予避免；以 $k$ 表达的形式为原始文献所用，最为稳妥 \cite{SillingAskari2005,OterkusOterkus2026}。
+  式\eqref{eq:critical-stretch-3d}中分母含体积模量 $k$。由于键型理论三维情形固定 $\nu=1/4$，此时 $E=3k(1-2\nu)=3k/2$（即 $k=2E/3$），故 $9k\delta=6E\delta$，式\eqref{eq:critical-stretch-3d}亦可写为 $s_{0}=\sqrt{5G_{0}/(6E\delta)}$。部分文献将分母误写为 $9E\delta$，应予避免；以 $k$ 表达的形式为原始文献所用，最为稳妥 \cite{SillingAskari2005,OterkusOterkus2026}。
 \end{remark}
 
-二维情形的标定与三维类似，区别在于键体积元与微模量的表达式不同。二维平面应力情形（板厚 $h$），微模量 $c=9E/(\pi h\delta^{3})$，对单位裂纹长度的键求和得
+二维情形的标定与三维完全类似，区别在于裂纹由面退化为直线、考虑单位裂纹长度，键体积元相应降维。设键的参考端点位于裂纹线上方高 $z$ 处（$0\le z\le\delta$），键长 $r$、与裂纹线法向的夹角 $\varphi$，跨越条件仍为 $r\cos\varphi\ge z$，即 $\varphi\le\cos^{-1}(z/r)$；二维键体积元为 $r\,d\varphi\,dr$，且跨越键可在法向两侧偏斜（$\varphi$ 取正负对称区间），故对全部跨越键求和并对 $z$ 积分得 $G_{0}=h\int_{0}^{\delta}\int_{z}^{\delta}\int_{-\cos^{-1}(z/r)}^{\cos^{-1}(z/r)}\tfrac{1}{2}cs_{0}^{2}r\cdot r\,d\varphi\,dr\,dz$（$h$ 为板厚，对称区间给出因子 $2$）。利用换元 $z=r\cos u$ 与 $\int_{0}^{\pi/2}u\sin u\,du=1$ 得 $G_{0}=hc\delta^{4}s_{0}^{2}/4$，即 $s_{0}=\sqrt{4G_{0}/(hc\delta^{4})}$。二维平面应力情形（板厚 $h$），微模量 $c=9E/(\pi h\delta^{3})$，代入 $s_{0}=\sqrt{4G_{0}/(hc\delta^{4})}$ 即得
 \begin{equation}
   s_{0}=\sqrt{\frac{4\pi G_{0}}{9E\delta}}
   \qquad(\text{平面应力})
   \label{eq:critical-stretch-2d-ps}
 \end{equation}
-二维平面应变情形，微模量 $c=48E/(5\pi h\delta^{3})$（等价地 $24\mu/(\pi h\delta^{3})$，因 $\nu=1/4$ 时 $\mu=2E/5$），标定结果为
+二维平面应变情形，微模量 $c=48E/(5\pi h\delta^{3})$（等价地 $24\mu/(\pi h\delta^{3})$，因 $\nu=1/4$ 时 $\mu=2E/5$），代入 $s_{0}=\sqrt{4G_{0}/(hc\delta^{4})}$ 得 $s_{0}=\sqrt{\pi G_{0}/(6\mu\delta)}$，标定结果为
 \begin{equation}
   s_{0}=\sqrt{\frac{5\pi G_{0}}{12E\delta}}=\sqrt{\frac{\pi G_{0}}{6\mu\delta}}
   \qquad(\text{平面应变})
@@ -622,12 +697,12 @@ OSB 模型的断裂参数标定比键型理论复杂，因为 OSB 材料的本�
 \end{equation}
 其中 $\kappa$ 为体积模量，$\mu$ 为剪切模量，$G_{c}$ 为断裂能 \cite{Karpenko2020}。与键型理论式\eqref{eq:critical-stretch-2d-ps}不同，式\eqref{eq:osb-critical-stretch}的分母同时含 $\kappa$ 与 $\mu$，反映了 OSB 模型体积—偏斜双通道本构对断裂能量的分配。当材料满足键型理论的限制（$\nu=1/3$ 平面应力）时，式\eqref{eq:osb-critical-stretch}退化为接近键型公式，但两者不完全相等——这是 OSB 本构与键型本构在断裂层面差异的体现 \cite{Karpenko2020}。
 
-OSB 模型的另一种断裂准则是基于键的能量密度。Foster 等提出的能量型失效准则认为，键在单位体积内储存的能量密度超过临界值 $w_{c}$ 时断裂 \cite{Foster2011}。对三维情形，由断裂能等效得
+OSB 模型的另一种断裂准则是基于键的能量密度。Foster 等提出的能量型失效准则认为，键在单位体积内储存的能量密度超过临界值 $w_{c}$ 时断裂 \cite{Foster2011}。$w_{c}$ 由断裂能等效标定：裂纹面张开时，每个跨越裂纹面的键释放其临界能量密度 $w_{c}$。对三维情形，用与式\eqref{eq:G0-3d-integral}完全相同的跨越几何积分，$G_{0}=\int_{0}^{\delta}\int_{z}^{\delta}\int_{0}^{\cos^{-1}(z/r)}\int_{0}^{2\pi}w_{c}\,r^{2}\sin\varphi\,d\psi\,d\varphi\,dr\,dz=w_{c}\cdot 2\pi\cdot\delta^{4}/8=\pi w_{c}\delta^{4}/4$，解得式\eqref{eq:foster-3d}：
 \begin{equation}
   w_{c}=\frac{4G_{0}}{\pi\delta^{4}}
   \label{eq:foster-3d}
 \end{equation}
-二维情形（板厚 $h$）
+二维情形（板厚 $h$）的跨越积分相应降维，$G_{0}=h\int_{0}^{\delta}\int_{z}^{\delta}\int_{-\cos^{-1}(z/r)}^{\cos^{-1}(z/r)}w_{c}\,r\,d\varphi\,dr\,dz=2hw_{c}\delta^{3}/3$（利用了 $\int_{0}^{\delta}\int_{z}^{\delta}r\cos^{-1}(z/r)\,dr\,dz=\delta^{3}/3$），解得式\eqref{eq:foster-2d}：
 \begin{equation}
   w_{c}=\frac{3G_{0}}{2h\delta^{3}}
   \label{eq:foster-2d}
