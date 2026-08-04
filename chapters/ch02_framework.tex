@@ -13,7 +13,7 @@
 
 近场动力学仍然是一种连续介质理论，它把物体所占的区域 $\mathcal{B}$ 视为物质点的连续集合。每个物质点 $\mathbf{x}$ 携带质量密度 $\rho(\mathbf{x})$，代表参考构型中占据无穷小体积 $dV_{\mathbf{x}}$ 的微元。与经典连续介质力学一样，物质点本身只是一个数学抽象，其尺寸趋于零，而密度、位移等场量在 $\mathcal{B}$ 上逐点有定义。
 
-近场动力学与经典连续介质力学的本质区别不在于物质点本身，而在于物质点之间的相互作用方式。在经典理论中，材料点只与其无穷小邻域内的物质相互作用，其力学状态完全由该点处的变形梯度决定；而在近场动力学中，物质点与有限距离内的其他物质点相互作用，作用范围由近场范围 $\delta$ 刻画。图\ref{fig:material-point-comparison}对这两种相互作用方式作了直观对比。需要强调的是，近场动力学的物质点不是原子，它不携带原子间势，也不依赖分子动力学（molecular dynamics，简称 MD）中的势能面，这一点与第 1 章 1.4 节对近场动力学与 MD 的对照一致 \cite{Silling2000}。物质点只是连续介质的一个微元，其本构关系基于变形而非势能，因此可以描述具有复杂本构行为的工程材料。
+近场动力学与经典连续介质力学的本质区别不在于物质点本身，而在于物质点之间的相互作用方式。在经典理论中，材料点只与其无穷小邻域内的物质相互作用，其力学状态完全由该点处的变形梯度决定；而在近场动力学中，物质点与有限距离内的其他物质点相互作用，作用范围由近场范围 $\delta$ 刻画。图\ref{fig:material-point-comparison}对这两种相互作用方式作了直观对比：左图为经典局部模型，物质点的力学状态由该点处的应力张量 $\boldsymbol{\sigma}$ 与变形梯度 $\nabla\mathbf{u}$ 完全决定，相互作用限于无穷小邻域；右图为近场动力学非局部模型，物质点通过键与近场域 $H_{\mathbf{x}}$（半径 $\delta$）内的远处物质点直接相互作用。需要强调的是，近场动力学的物质点不是原子，它不携带原子间势，也不依赖分子动力学（molecular dynamics，简称 MD）中的势能面，这一点与第 1 章 1.4 节对近场动力学与 MD 的对照一致 \cite{Silling2000}。物质点只是连续介质的一个微元，其本构关系基于变形而非势能，因此可以描述具有复杂本构行为的工程材料。
 
 \begin{figure}[htbp]
   \centering
@@ -21,7 +21,7 @@
     % 左 panel：经典局部模型——相互作用限于无穷小邻域，状态由场量决定
     \begin{scope}
       \draw[dashed, thick] (0,0) circle (0.7);
-      \node[above] at (0,0.95) {无穷小邻域};
+      \node[above] at (0,0.8) {无穷小邻域};
       \filldraw (0,0) circle (2.5pt) node[below left] {$\mathbf{x}$};
       \filldraw (0.52,0.3) circle (1.8pt);
       \draw[gray, thin] (0,0) -- (0.52,0.3);
@@ -32,8 +32,8 @@
       \filldraw[gray] (-1.3,0.95) circle (1.8pt);
       \filldraw[gray] (1.25,-0.9) circle (1.8pt);
       \filldraw[gray] (-1.4,-0.75) circle (1.8pt);
-      \node[blue, right] at (1.0,0.0) {$\boldsymbol{\sigma}$、$\nabla\mathbf{u}$};
-      \node at (0,-2.4) {（a）经典局部模型};
+      \node[blue, above right] at (0.1,0.28) {$\boldsymbol{\sigma},\nabla\mathbf{u}$};
+      \node at (0,-2.7) {（a）经典局部模型};
     \end{scope}
     % 右 panel：近场动力学非局部模型——通过键与 $\delta$ 内远处物质点直接作用
     \begin{scope}[xshift=6cm]
@@ -41,22 +41,21 @@
       \node[above] at (0,2.25) {$H_{\mathbf{x}}$};
       \filldraw (0,0) circle (2.5pt) node[below left] {$\mathbf{x}$};
       \filldraw (1.7,0.9) circle (2pt) node[above right] {$\mathbf{x}'$};
-      \draw[thick, {Stealth}-{Stealth}] (0,0) -- (1.7,0.9);
-      \node[blue, above] at (0.85,0.45) {$\mathbf{f}$};
+      \draw[thick] (0,0) -- (1.7,0.9);
+      \draw[->, blue, thick] (0.47,0.31) -- (1.17,0.69) node[midway, above] {$\mathbf{f}$};
       \filldraw (-1.3,1.4) circle (2pt);
-      \draw[thick] (0,0) -- (-1.3,1.4);
+      \draw[->, gray, dashed] (0,0) -- (-1.3,1.4) node[midway, above, sloped] {$\boldsymbol{\xi}$};
       \filldraw (0.9,-1.7) circle (2pt);
       \draw[thick] (0,0) -- (0.9,-1.7);
       \filldraw (-1.7,-1.0) circle (2pt);
       \draw[thick] (0,0) -- (-1.7,-1.0);
-      \node[below] at (-0.85,-0.5) {$\boldsymbol{\xi}$};
-      \node[above right] at (1.35,1.35) {$\delta$};
+      \draw[dash dot, gray, thin] (0,0) -- (2.0,0) node[midway, below] {$\delta$};
       % 近场域外灰色点：无直接相互作用
       \filldraw[gray] (2.95,1.15) circle (1.8pt);
-      \node at (1.0,-2.7) {（b）近场动力学非局部模型};
+      \node at (0,-2.7) {（b）近场动力学非局部模型};
     \end{scope}
   \end{tikzpicture}
-  \caption{经典局部连续介质力学与近场动力学在物质点相互作用方式上的对比，左图为经典局部模型，其力学状态由该点处的应力张量 $\boldsymbol{\sigma}$ 与变形梯度 $\nabla\mathbf{u}$ 完全决定，右图为近场动力学非局部模型，物质点通过键与近场域 $H_{\mathbf{x}}$（半径 $\delta$）内的远处物质点直接相互作用}
+  \caption{经典局部模型与近场动力学非局部模型的物质点相互作用方式对比}
   \label{fig:material-point-comparison}
 \end{figure}
 
@@ -66,16 +65,15 @@
 \[
   \boldsymbol{\xi}=\mathbf{x}'-\mathbf{x}
 \]
-变形后，物质点 $\mathbf{x}$ 的位置为 $\mathbf{y}(\mathbf{x},t)=\mathbf{x}+\mathbf{u}(\mathbf{x},t)$，其中 $\mathbf{u}(\mathbf{x},t)$ 为位移场。两物质点之间的相对位移矢量记为
+如图\ref{fig:bond-geometry}(a)所示，参考构型中两物质点的相对位置由 $\boldsymbol{\xi}$ 确定，其模 $|\boldsymbol{\xi}|$ 即为键的参考长度。变形后，物质点 $\mathbf{x}$ 的位移记为 $\mathbf{u}(\mathbf{x},t)$，其中 $\mathbf{u}(\mathbf{x},t)$ 为位移场。两物质点之间的相对位移矢量记为
 \[
   \boldsymbol{\eta}=\mathbf{u}(\mathbf{x}',t)-\mathbf{u}(\mathbf{x},t)
 \]
-于是键的当前长度为 $|\boldsymbol{\xi}+\boldsymbol{\eta}|$，参考长度为 $|\boldsymbol{\xi}|$。键的伸长率（bond stretch）定义为
+如图\ref{fig:bond-geometry}(b)所示，变形后两点分别运动到 $\mathbf{y}=\mathbf{x}+\mathbf{u}(\mathbf{x},t)$ 与 $\mathbf{y}'=\mathbf{x}'+\mathbf{u}(\mathbf{x}',t)$，相对位移矢量 $\boldsymbol{\eta}$ 使键矢量变为 $\boldsymbol{\xi}+\boldsymbol{\eta}$；图中以灰色虚线标出变形前的参考位置，以便与变形后的实际位置形成直观对比，蓝色箭头则示意了相对位移 $\boldsymbol{\eta}$ 的方向与大小。于是键的当前长度为 $|\boldsymbol{\xi}+\boldsymbol{\eta}|$，参考长度为 $|\boldsymbol{\xi}|$。键的伸长率（bond stretch）定义为
 \begin{equation}
   s = \frac{|\boldsymbol{\xi} + \boldsymbol{\eta}| - |\boldsymbol{\xi}|}{|\boldsymbol{\xi}|}
   \label{eq:bond-stretch}
 \end{equation}
-其推导已在第 1 章 1.4 节给出，此处不再重复。键的几何关系如图\ref{fig:bond-geometry}所示：参考构型中两物质点的相对位置由 $\boldsymbol{\xi}$ 确定，变形后的当前构型中该量变为 $\boldsymbol{\xi}+\boldsymbol{\eta}$。键的伸长率 $s$ 由式\eqref{eq:bond-stretch}定义，其三种典型状态如图\ref{fig:bond-stretch-states}所示。
 
 \begin{figure}[htbp]
   \centering
@@ -104,6 +102,8 @@
   \caption{键的几何关系：(a) 参考构型；(b) 变形构型}
   \label{fig:bond-geometry}
 \end{figure}
+
+其推导已在第 1 章 1.4 节给出，此处不再重复。键的伸长率 $s$ 由式\eqref{eq:bond-stretch}定义，其三种典型状态——拉伸、参考长度与压缩——如图\ref{fig:bond-stretch-states}所示。当 $s>0$ 时键被拉长，变形后长度大于参考长度；$s=0$ 时键保持参考长度不变，两点间距离与变形前完全一致；$s<0$ 时键被压缩，变形后长度小于参考长度。这三种状态分别对应 $|\boldsymbol{\xi}+\boldsymbol{\eta}|>|\boldsymbol{\xi}|$、$|\boldsymbol{\xi}+\boldsymbol{\eta}|=|\boldsymbol{\xi}|$ 与 $|\boldsymbol{\xi}+\boldsymbol{\eta}|<|\boldsymbol{\xi}|$ 三种几何关系，为后续建立本构模型与损伤准则提供了直观的几何图像。
 
 \begin{figure}[htbp]
   \centering
@@ -389,7 +389,7 @@
   w(-\boldsymbol{\eta},-\boldsymbol{\xi})=w(\boldsymbol{\eta},\boldsymbol{\xi})
   \label{eq:potential-symmetry}
 \end{equation}
-即 $w$ 仅依赖旋转不变量（如 $|\boldsymbol{\xi}|$、$|\boldsymbol{\xi}+\boldsymbol{\eta}|$、$\boldsymbol{\xi}\cdot\boldsymbol{\eta}$ 等）且在键的两端对称。式\eqref{eq:potential-symmetry}的第二式保证 $w$ 在交换 $\mathbf{x}$ 与 $\mathbf{x}'$ 时不变，从而由式\eqref{eq:pairwise-force-potential}导出的 $\mathbf{f}$ 沿变形后键方向（图\ref{fig:pairwise-potential}，蓝色箭头所示）并满足反作用条件 \eqref{eq:reaction}。
+即 $w$ 仅依赖旋转不变量（如 $|\boldsymbol{\xi}|$、$|\boldsymbol{\xi}+\boldsymbol{\eta}|$、$\boldsymbol{\xi}\cdot\boldsymbol{\eta}$ 等）且在键的两端对称。式\eqref{eq:potential-symmetry}的第二式保证 $w$ 在交换 $\mathbf{x}$ 与 $\mathbf{x}'$ 时不变，从而由式\eqref{eq:pairwise-force-potential}导出的 $\mathbf{f}$ 沿变形后键方向并满足反作用条件 \eqref{eq:reaction}（图\ref{fig:pairwise-potential}）。该图示意成对势 $w$ 在键两端对称，导出的对力 $\mathbf{f}$ 沿变形后键方向作用（蓝色箭头所示）。
 
 \begin{figure}[htbp]
   \centering
@@ -752,7 +752,7 @@ $\mu$ 不可逆：键一旦断裂便永久失去承载能力，这与脆性材�
     \draw[->, dashed, thick, gray!60!black] (4.0,3.11) -- (0.2,0.16);
     \node[below, gray!60!black] at (2.0,1.4) {卸载（$\mu$ 已置零）};
   \end{tikzpicture}
-  \caption{对力函数 $|\mathbf{f}|$ 与伸长率 $s$ 的关系示意：加载阶段键伸长，$|\mathbf{f}|$ 按本构关系增长；当 $s$ 首次达到 $s_c$ 时键断裂，$|\mathbf{f}|$ 骤降为零；此后该键永久失效，卸载路径沿原本构曲线返回原点但历史变量 $\mu$ 已置零}
+  \caption{键的力-伸长率关系示意}
   \label{fig:force-stretch}
 \end{figure}
 
@@ -851,7 +851,7 @@ $\mu$ 不可逆：键一旦断裂便永久失去承载能力，这与脆性材�
     \node[below] at (3.5,-0.2) {\small $\partial\mathcal{B}$};
     \draw[<->, dashed, gray] (2.5,-0.05) -- (3.5,-0.05) node[midway, below, gray] {\small 厚度 $\delta$};
   \end{tikzpicture}
-  \caption{经典面力 $\mathbf{t}$（左）到 PD 等效体力层 $\mathbf{b}_{\text{eff}}$（右）的转换示意：面力作用在物体表面 $\partial\mathcal{B}$，PD 中转换为分布在厚度 $\delta$ 的边界薄层内的体力，二者通过式\eqref{eq:force-conversion} 的面积分-体积分等效关系联系}
+  \caption{经典面力 $\mathbf{t}$ 到 PD 等效体力层 $\mathbf{b}_{\text{eff}}$ 的转换示意}
   \label{fig:boundary-force-conversion}
 \end{figure}
 

@@ -1,4 +1,4 @@
-\begin{thebibliography}{10}
+\begin{thebibliography}{100}
 
 \bibitem{Agwai2011}
 A.~Agwai, I.~Guven, and E.~Madenci.
@@ -16,6 +16,18 @@ E.~C. Aifantis.
 Z.~P. Ba\v{z}ant and T.~B. Belytschko.
 \newblock Wave propagation in a strain-softening bar: Exact solution.
 \newblock {\em Journal of Engineering Mechanics}, 111(3):381--389, 1985.
+
+\bibitem{BehzadinasabFoster2020}
+M.~Behzadinasab and J.~T. Foster.
+\newblock A semi-lagrangian constitutive correspondence framework for
+  peridynamics.
+\newblock {\em Journal of the Mechanics and Physics of Solids}, 137:103862,
+  2020.
+
+\bibitem{BelytschkoLiuMoran2000}
+T.~Belytschko, W.~K. Liu, and B.~Moran.
+\newblock {\em Nonlinear Finite Elements for Continua and Structures}.
+\newblock John Wiley \& Sons, Chichester, 2000.
 
 \bibitem{Bessa2014}
 M.~A. Bessa, J.~T. Foster, T.~Belytschko, and W.~K. Liu.
@@ -45,11 +57,57 @@ F.~Bobaru, M.~Yang, L.~F. Alves, S.~A. Silling, E.~Askari, and J.~Xu.
 \newblock {\em International Journal for Numerical Methods in Engineering},
   77(6):852--877, 2009.
 
+\bibitem{BreitenfeldThesis2014}
+M.~S. Breitenfeld.
+\newblock {\em Quasi-static non-ordinary state-based peridynamics for the
+  modeling of 3D fracture}.
+\newblock PhD thesis, University of Illinois at Urbana-Champaign, 2014.
+\newblock hdl.handle.net/2142/49545, Open Access via IDEALS.
+
+\bibitem{Breitenfeld2014}
+M.~S. Breitenfeld, P.~H. Geubelle, O.~Weckner, and S.~A. Silling.
+\newblock Non-ordinary state-based peridynamic analysis of stationary crack
+  problems.
+\newblock {\em Computer Methods in Applied Mechanics and Engineering},
+  272:233--250, 2014.
+
+\bibitem{BreitzmanDayal2018}
+B.~J. Breitzman and K.~Dayal.
+\newblock Bond-level deformation gradients and energy averaging in
+  peridynamics.
+\newblock {\em Journal of the Mechanics and Physics of Solids}, 110:192--204,
+  2018.
+
+\bibitem{ButtMeschke2021}
+S.~N. Butt and G.~Meschke.
+\newblock A peridynamic framework for fracture analysis of functionally graded
+  materials.
+\newblock {\em Computational Mechanics}, 68(3):509--529, 2021.
+
+\bibitem{Chen2018}
+H.~Chen.
+\newblock Bond-associated deformation gradients for peridynamic correspondence
+  model.
+\newblock {\em Mechanics Research Communications}, 90:34--41, 2018.
+
+\bibitem{ChenChan2020}
+H.~Chen and S.~Y. Chan.
+\newblock Higher-order peridynamic material correspondence models for
+  elasticity.
+\newblock {\em Journal of Elasticity}, 142(1):135--161, 2020.
+
 \bibitem{ChenBobaru2015}
 Z.~Chen and F.~Bobaru.
 \newblock Peridynamic modeling of pitting corrosion damage.
 \newblock {\em Journal of the Mechanics and Physics of Solids}, 78:352--381,
   2015.
+
+\bibitem{Chowdhury2019}
+S.~R. Chowdhury, P.~Roy, D.~Roy, and J.~N. Reddy.
+\newblock Peridynamic theory of solid mechanics: A comparison of the nonlocal
+  model and its local limit.
+\newblock {\em arXiv preprint}, 2019.
+\newblock arXiv:1712.09339.
 
 \bibitem{Cosserat1909}
 E.~Cosserat and F.~Cosserat.
@@ -75,10 +133,22 @@ N.~Dimola, A.~Coclite, G.~Fanizza, and T.~Politi.
   fluid-dynamics.
 \newblock {\em Advances in Continuous and Discrete Models}, 2022(1), 2022.
 
+\bibitem{Dipasquale2017}
+D.~Dipasquale, G.~Sarego, M.~Zaccariotto, and U.~Galvanetto.
+\newblock A discussion on failure criteria for ordinary state-based
+  peridynamics.
+\newblock {\em Engineering Fracture Mechanics}, 186:378--398, 2017.
+
 \bibitem{Dipasquale2014}
 D.~Dipasquale, M.~Zaccariotto, and U.~Galvanetto.
 \newblock Crack propagation with adaptive grid refinement in 2d peridynamics.
 \newblock {\em International Journal of Fracture}, 190(1):1--22, 2014.
+
+\bibitem{DykaIngel1995}
+C.~T. Dyka and R.~P. Ingel.
+\newblock An approach for tension instability in smoothed particle
+  hydrodynamics ({SPH}).
+\newblock {\em Computers \& Structures}, 57(4):573--580, 1995.
 
 \bibitem{Eringen1972}
 A.~C. Eringen.
@@ -104,11 +174,24 @@ A.~C. Eringen, C.~G. Speziale, and B.~S. Kim.
 \newblock {\em Journal of the Mechanics and Physics of Solids}, 25(5):339--355,
   1977.
 
+\bibitem{FlanaganTaylor1987}
+D.~P. Flanagan and L.~M. Taylor.
+\newblock An accurate numerical algorithm for stress integration with finite
+  rotations.
+\newblock {\em Computer Methods in Applied Mechanics and Engineering},
+  62(3):305--320, 1987.
+
 \bibitem{Foster2010}
 J.~T. Foster, S.~A. Silling, and W.~W. Chen.
 \newblock Viscoplasticity using peridynamics.
 \newblock {\em International Journal for Numerical Methods in Engineering},
   81(10):1242--1258, 2010.
+
+\bibitem{Foster2011}
+J.~T. Foster, S.~A. Silling, and W.~W. Chen.
+\newblock An energy based failure criterion for use with peridynamic states.
+\newblock {\em International Journal for Multiscale Computational Engineering},
+  9(6):675--688, 2011.
 
 \bibitem{Ganzenmuller2015}
 G.~C. Ganzenm\"uller, S.~Hiermaier, and M.~May.
@@ -134,6 +217,18 @@ A.~A. Griffith.
 \newblock {\em Philosophical Transactions of the Royal Society of London,
   Series A}, 221:163--198, 1921.
 
+\bibitem{GuMadenciZhang2018}
+X.~Gu, E.~Madenci, and Q.~Zhang.
+\newblock Revisit of non-ordinary state-based peridynamics.
+\newblock {\em Engineering Fracture Mechanics}, 190:31--52, 2018.
+
+\bibitem{GuZhangMadenciXia2019}
+X.~Gu, Q.~Zhang, E.~Madenci, and X.~Xia.
+\newblock Possible causes of numerical oscillations in non-ordinary state-based
+  peridynamics and a bond-associated higher-order stabilized model.
+\newblock {\em Computer Methods in Applied Mechanics and Engineering},
+  357:112592, 2019.
+
 \bibitem{HaBobaru2010}
 Y.~D. Ha and F.~Bobaru.
 \newblock Studies of dynamic crack propagation and crack branching with
@@ -146,6 +241,18 @@ F.~Han, G.~Lubineau, Y.~Azdoud, and A.~Askari.
   continuum mechanics.
 \newblock {\em Computer Methods in Applied Mechanics and Engineering},
   301:1--10, 2016.
+
+\bibitem{Hashim2020}
+N.~A. Hashim, W.~M. Coombs, C.~E. Augarde, and G.~Hattori.
+\newblock An implicit non-ordinary state-based peridynamics with stabilised
+  correspondence material model for finite deformation analysis.
+\newblock {\em Computer Methods in Applied Mechanics and Engineering},
+  371:113304, 2020.
+
+\bibitem{Hill1950}
+R.~Hill.
+\newblock {\em The Mathematical Theory of Plasticity}.
+\newblock Clarendon Press, Oxford, 1950.
 
 \bibitem{HuHaBobaru2012}
 W.~Hu, Y.~D. Ha, and F.~Bobaru.
@@ -179,6 +286,19 @@ L.~M. Kachanov.
 \newblock {\em Izvestiya Akademii Nauk SSSR, Otdelenie Tekhnicheskikh Nauk},
   8:26--31, 1958.
 
+\bibitem{Karpenko2020}
+O.~Karpenko, S.~Oterkus, and E.~Oterkus.
+\newblock An in-depth investigation of critical stretch based failure criterion
+  in ordinary state based peridynamics.
+\newblock {\em International Journal of Fracture}, 223(1--2):1--23, 2020.
+
+\bibitem{KilicMadenci2010}
+B.~Kilic and E.~Madenci.
+\newblock An adaptive dynamic relaxation method for quasi-static simulations
+  using the peridynamic theory.
+\newblock {\em Theoretical and Applied Fracture Mechanics}, 53(3):194--204,
+  2010.
+
 \bibitem{Kroner1967}
 E.~Kr\"{o}ner.
 \newblock Elasticity theory of materials with long range cohesive forces.
@@ -196,6 +316,19 @@ Q.~V. Le and F.~Bobaru.
   fracture.
 \newblock {\em Computational Mechanics}, 61(4):499--518, 2018.
 
+\bibitem{Li2019}
+P.~Li, Z.~Hao, S.~Yu, and W.~Zhen.
+\newblock Implicit implementation of the stabilized non-ordinary state-based
+  peridynamic model.
+\newblock {\em International Journal for Numerical Methods in Engineering},
+  121(4):571--587, 2019.
+
+\bibitem{Li2018}
+P.~Li, Z.~M. Hao, and W.~Q. Zhen.
+\newblock A stabilized non-ordinary state-based peridynamic model.
+\newblock {\em Computer Methods in Applied Mechanics and Engineering},
+  339:262--280, 2018.
+
 \bibitem{Littlewood2010}
 D.~J. Littlewood.
 \newblock Simulation of dynamic fracture using peridynamics, finite element
@@ -204,11 +337,24 @@ D.~J. Littlewood.
   Engineering Congress and Exposition}, Vancouver, Canada, 2010.
 \newblock IMECE2010-40621.
 
+\bibitem{Littlewood2015}
+D.~J. Littlewood.
+\newblock Roadmap for peridynamic software implementation.
+\newblock Technical Report SAND2015-9013, Sandia National Laboratories,
+  Albuquerque, NM, 2015.
+
 \bibitem{Lubineau2012}
 G.~Lubineau, Y.~Azdoud, F.~Han, C.~Rey, and A.~Askari.
 \newblock A morphing strategy to couple non-local to local continuum mechanics.
 \newblock {\em Journal of the Mechanics and Physics of Solids},
   60(6):1088--1102, 2012.
+
+\bibitem{LuoSundararaghavan2018}
+J.~Luo and V.~Sundararaghavan.
+\newblock Stress-point method for stabilizing zero-energy modes in non-ordinary
+  state-based peridynamics.
+\newblock {\em International Journal of Solids and Structures}, 150:197--207,
+  2018.
 
 \bibitem{Macek2007}
 R.~W. Macek and S.~A. Silling.
@@ -234,17 +380,43 @@ E.~Madenci and E.~Oterkus.
 \newblock {\em Peridynamic Theory and Its Applications}.
 \newblock Springer, New York, 2014.
 
+\bibitem{MadenciOterkus2016}
+E.~Madenci and S.~Oterkus.
+\newblock Ordinary state-based peridynamics for plastic deformation according
+  to von {Mises} yield criteria with isotropic hardening.
+\newblock {\em Journal of the Mechanics and Physics of Solids}, 86:192--219,
+  2016.
+
 \bibitem{Mindlin1964}
 R.~D. Mindlin.
 \newblock Micro-structure in linear elasticity.
 \newblock {\em Archive for Rational Mechanics and Analysis}, 16(1):51--78,
   1964.
 
+\bibitem{Mitchell2011}
+J.~A. Mitchell.
+\newblock A nonlocal, ordinary, state-based plasticity model for peridynamics.
+\newblock Technical Report SAND2011-3166, Sandia National Laboratories,
+  Albuquerque, NM, 2011.
+
 \bibitem{Mitchell2015}
 J.~A. Mitchell, S.~A. Silling, and D.~J. Littlewood.
 \newblock A position-aware linear solid constitutive model for peridynamics.
 \newblock {\em Journal of Mechanics of Materials and Structures},
   10(5):539--557, 2015.
+
+\bibitem{Mousavi2021}
+F.~Mousavi, S.~Jafarzadeh, and F.~Bobaru.
+\newblock An ordinary state-based peridynamic elastoplastic 2d model consistent
+  with {J2} plasticity.
+\newblock {\em International Journal of Solids and Structures}, 229:111146,
+  2021.
+
+\bibitem{Ni2019}
+T.~Ni, M.~Zaccariotto, Q.-Z. Zhu, and U.~Galvanetto.
+\newblock Static solution of crack propagation problems in peridynamics.
+\newblock {\em Computer Methods in Applied Mechanics and Engineering},
+  346:126--151, 2019.
 
 \bibitem{OterkusMadenci2012}
 E.~Oterkus and E.~Madenci.
@@ -257,6 +429,11 @@ E.~Oterkus, E.~Madenci, O.~Weckner, S.~Silling, P.~Bogert, and A.~Tessler.
 \newblock Combined finite element and peridynamic analyses for predicting
   failure in a stiffened composite curved panel with a central slot.
 \newblock {\em Composite Structures}, 94(3):839--850, 2012.
+
+\bibitem{OterkusOterkus2026}
+E.~Oterkus and S.~Oterkus.
+\newblock Peridynamic modelling of fracture: a comprehensive review.
+\newblock {\em Journal of Peridynamics and Nonlocal Modeling}, 2026.
 
 \bibitem{Oterkus2014}
 S.~Oterkus, E.~Madenci, and A.~Agwai.
@@ -291,6 +468,27 @@ G.~Pijaudier-Cabot and Z.~P. Ba\v{z}ant.
 \newblock Nonlocal damage theory.
 \newblock {\em Journal of Engineering Mechanics}, 113(10):1512--1533, 1987.
 
+\bibitem{Pirzadeh2024}
+A.~Pirzadeh, F.~Dalla~Barba, F.~Bobaru, L.~Sanavia, M.~Zaccariotto, and
+  U.~Galvanetto.
+\newblock Elastoplastic peridynamic formulation for materials with isotropic
+  and kinematic hardening.
+\newblock {\em Engineering with Computers}, 40(4):2063--2082, 2024.
+
+\bibitem{QueirugaMoridis2017}
+A.~F. Queiruga and G.~J. Moridis.
+\newblock Numerical experiments on the convergence properties of state-based
+  peridynamic laws and influence functions in two-dimensional problems.
+\newblock {\em Computer Methods in Applied Mechanics and Engineering},
+  322:97--122, 2017.
+
+\bibitem{RandlesLibersky1996}
+P.~W. Randles and L.~D. Libersky.
+\newblock Smoothed particle hydrodynamics: Some recent improvements and
+  applications.
+\newblock {\em Computer Methods in Applied Mechanics and Engineering},
+  139(1--4):375--408, 1996.
+
 \bibitem{Ren2017dualhorizon}
 H.~Ren, X.~Zhuang, and T.~Rabczuk.
 \newblock Dual-horizon peridynamics: A stable solution to varying horizons.
@@ -309,6 +507,12 @@ P.~Seleson and D.~J. Littlewood.
 \newblock Convergence studies in meshfree peridynamic simulations.
 \newblock {\em Computers \& Mathematics with Applications}, 71(11):2432--2448,
   2016.
+
+\bibitem{SelesonParks2011}
+P.~Seleson and M.~L. Parks.
+\newblock On the role of the influence function in the peridynamic theory.
+\newblock {\em International Journal for Multiscale Computational Engineering},
+  9(6):689--706, 2011.
 
 \bibitem{Seleson2009}
 P.~Seleson, M.~L. Parks, M.~Gunzburger, and R.~B. Lehoucq.
@@ -372,6 +576,11 @@ S.~A. Silling, O.~Weckner, E.~Askari, and F.~Bobaru.
 \newblock Crack nucleation in a peridynamic solid.
 \newblock {\em International Journal of Fracture}, 162(1--2):219--227, 2010.
 
+\bibitem{SimoHughes1998}
+J.~C. Simo and T.~J.~R. Hughes.
+\newblock {\em Computational Inelasticity}.
+\newblock Springer, New York, 1998.
+
 \bibitem{SunFish2019}
 W.~Sun and J.~Fish.
 \newblock Superposition-based coupling of peridynamics and finite element
@@ -397,6 +606,13 @@ F.~S. Vieira and A.~L. Ara\'ujo.
 \newblock An improved peridynamics density-based topology optimization
   framework for compliance minimization.
 \newblock {\em Structural and Multidisciplinary Optimization}, 67(8):150, 2024.
+
+\bibitem{Vignjevic2000}
+R.~Vignjevic, J.~Campbell, and L.~Libersky.
+\newblock A treatment of zero-energy modes in the smoothed particle
+  hydrodynamics method.
+\newblock {\em Computer Methods in Applied Mechanics and Engineering},
+  184(1):67--85, 2000.
 
 \bibitem{Voigt1887}
 W.~Voigt.
@@ -426,12 +642,18 @@ T.~L. Warren, S.~A. Silling, A.~Askari, O.~Weckner, M.~A. Epton, and J.~Xu.
 \newblock {\em International Journal of Solids and Structures},
   46(5):1186--1195, 2009.
 
+\bibitem{EWF2023}
+Y.~Wen, B.~Chen, T.~Li, Q.~Zhang, and Y.~Wang.
+\newblock The influence of the peridynamic horizon and the critical stretch on
+  the prediction of fracture.
+\newblock {\em International Journal of Fracture}, 241(1):1--22, 2023.
+
 \bibitem{WuRen2015}
 C.~T. Wu and B.~Ren.
 \newblock A stabilized non-ordinary state-based peridynamics for the nonlocal
   ductile material failure analysis in metal machining process.
 \newblock {\em Computer Methods in Applied Mechanics and Engineering},
-  291:262--281, 2015.
+  291:197--215, 2015.
 
 \bibitem{Xu2021}
 X.~Xu, M.~D'Elia, and J.~T. Foster.
@@ -439,6 +661,12 @@ X.~Xu, M.~D'Elia, and J.~T. Foster.
   physical constraints.
 \newblock {\em Computer Methods in Applied Mechanics and Engineering},
   386:114062, 2021.
+
+\bibitem{YaghoobiChorzepa2017}
+A.~Yaghoobi and M.~G. Chorzepa.
+\newblock Higher-order approximation to suppress the zero-energy mode in
+  non-ordinary state-based peridynamics.
+\newblock {\em Computers \& Structures}, 188:63--79, 2017.
 
 \bibitem{Zaccariotto2018}
 M.~Zaccariotto, T.~Mudric, D.~Tomasi, A.~Shojaei, and U.~Galvanetto.
