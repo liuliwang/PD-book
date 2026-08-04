@@ -152,7 +152,35 @@
   H_{\mathbf{x}}=\{\mathbf{x}'\in\mathcal{B}:|\mathbf{x}'-\mathbf{x}|\le\delta\}
   \label{eq:horizon}
 \end{equation}
-如式\eqref{eq:horizon}所定义，近场域 $H_{\mathbf{x}}$ 内的物质点与 $\mathbf{x}$ 通过键直接相互作用，近场域之外的物质点则与 $\mathbf{x}$ 无直接作用。
+如式\eqref{eq:horizon}所定义，近场域 $H_{\mathbf{x}}$ 内的物质点与 $\mathbf{x}$ 通过键直接相互作用，近场域之外的物质点则与 $\mathbf{x}$ 无直接作用。图\ref{fig:horizon-definition}以二维情形示意了这一几何图像：以 $\mathbf{x}$ 为中心、$\delta$ 为半径的灰色虚线圆即近场域 $H_{\mathbf{x}}$，圆内物质点经键与 $\mathbf{x}$ 相连，圆外灰色物质点则不与 $\mathbf{x}$ 相连。
+
+\begin{figure}[htbp]
+  \centering
+  \begin{tikzpicture}[scale=1.1]
+    % 近场域：以 x 为中心、delta 为半径的虚线圆
+    \draw[dashed, thick] (0,0) circle (2.2);
+    \node[above] at (0,2.4) {$H_{\mathbf{x}}$};
+    % 半径标注
+    \draw[dash dot, gray, thin] (0,0) -- (2.2,0) node[midway, below] {$\delta$};
+    % 中心物质点
+    \filldraw (0,0) circle (2.5pt) node[below left] {$\mathbf{x}$};
+    % 近场域内物质点与键
+    \filldraw (1.7,0.7) circle (2pt);
+    \draw[thick] (0,0) -- (1.7,0.7);
+    \filldraw (-1.2,1.4) circle (2pt);
+    \draw[thick] (0,0) -- (-1.2,1.4);
+    \filldraw (0.5,-1.8) circle (2pt);
+    \draw[thick] (0,0) -- (0.5,-1.8);
+    \filldraw (-1.8,-0.4) circle (2pt);
+    \draw[thick] (0,0) -- (-1.8,-0.4);
+    % 近场域外灰色物质点：无直接相互作用
+    \filldraw[gray] (2.9,1.2) circle (2pt);
+    \filldraw[gray] (-2.6,0.8) circle (2pt);
+    \filldraw[gray] (-0.3,-2.9) circle (2pt);
+  \end{tikzpicture}
+  \caption{近场域 $H_{\mathbf{x}}$ 的定义示意}
+  \label{fig:horizon-definition}
+\end{figure}
 
 近场范围 $\delta$ 具有三个层面的含义。其一，它是非局部作用的长度尺度，刻画了相互作用在空间上的延伸范围。其二，$\delta$ 常与材料的微结构尺度相联系：对于多晶金属可取为晶粒尺寸的量级，对于混凝土可取为骨料尺寸的量级。其三，从数值实现的角度，近场域内须包含足够多的物质点以保证收敛性，通常要求 $m=\delta/\Delta x\ge 3$，其中 $\Delta x$ 为离散网格尺寸 \cite{Bobaru2009}。当 $\delta\to 0$ 时，近场域退化为无穷小邻域，近场动力学方程在形式上退化为经典局部理论 \cite{SillingLehoucq2008}，这一极限关系将在第 3 章详细分析。
 
@@ -163,7 +191,7 @@
   \mathcal{F}_{\mathbf{x}}=\left\{\mathbf{x}'\in H_{\mathbf{x}}:\mathbf{x}'\neq\mathbf{x}\right\}
   \label{eq:family}
 \end{equation}
-由式\eqref{eq:family}定义的族与近场域是两个既有联系又有区别的概念：近场域 $H_{\mathbf{x}}$ 是几何区域，刻画了相互作用的范围；族 $\mathcal{F}_{\mathbf{x}}$ 是点集，刻画了参与相互作用的物质点及其相互作用关系。在态基理论（第 6 章）中，族的概念被推广为状态（state）作用的定义域。需要指出的是，位于物体边界附近的物质点，其近场域被物体边界截断，族不完整，导致其有效刚度与内部物质点存在差异，这一现象称为表面效应（surface effect），其处理详见第 10 章 \cite{LeBobaru2018,Mitchell2015}。图\ref{fig:boundary-truncation}对比了内部物质点与边界附近物质点在近场域与族上的差异：边界附近的物质点其近场域被物体边界截断，族不完整，导致有效刚度与内部物质点存在差异。
+由式\eqref{eq:family}定义的族与近场域是两个既有联系又有区别的概念：近场域 $H_{\mathbf{x}}$ 是几何区域，刻画了相互作用的范围；族 $\mathcal{F}_{\mathbf{x}}$ 是点集，刻画了参与相互作用的物质点及其相互作用关系。在态基理论（第 6 章）中，族的概念被推广为状态（state）作用的定义域。需要指出的是，位于物体边界附近的物质点，其近场域被物体边界截断，族不完整，导致其有效刚度与内部物质点存在差异，这一现象称为表面效应（surface effect），其处理详见第 10 章 \cite{LeBobaru2018,Mitchell2015}。图\ref{fig:boundary-truncation}对比了内部物质点与边界附近物质点在近场域与族上的差异：图中物体边界以外的空心圆表示因近场域被截断而无法与 $\mathbf{x}$ 相互作用的潜在物质点。
 
 \begin{figure}[htbp]
   \centering
@@ -174,7 +202,7 @@
       \node[above right] at (4,3.2) {$\mathcal{B}$};
       \draw[dashed, thick] (2,1.6) circle (1.3);
       \filldraw (2,1.6) circle (2.5pt) node[below] {$\mathbf{x}$};
-      \node[above] at (2,2.95) {$H_{\mathbf{x}}$（完整）};
+      \node[above] at (2,3.1) {$H_{\mathbf{x}}$（完整）};
       \node[below] at (2,-0.25) {$\mathcal{F}_{\mathbf{x}}$（完整）};
       \filldraw (2.9,1.9) circle (2pt);
       \filldraw (2.5,2.5) circle (2pt);
@@ -184,7 +212,7 @@
       \filldraw (1.7,0.7) circle (2pt);
       \filldraw (3.0,1.5) circle (2pt);
       \filldraw (2.0,2.7) circle (2pt);
-      \node[above] at (2,3.6) {（a）内部物质点};
+      \node[below] at (2,-0.7) {（a）内部物质点};
     \end{scope}
     % 右 panel：边界物质点
     \begin{scope}[xshift=5.5cm]
@@ -192,54 +220,26 @@
       \node[above right] at (4,3.2) {$\mathcal{B}$};
       \draw[dashed, thick] (0.7,1.6) ++(-57.4:1.3) arc[start angle=-57.4, end angle=57.4, radius=1.3];
       \draw[red, dashed, thick] (0,0) -- (0,3.2);
+      % 边界外空心圆：因近场域被截断而无法与 x 相互作用的潜在物质点
+      \draw (-0.3,1.6) circle (2pt);
+      \draw (-0.5,1.2) circle (2pt);
+      \draw (-0.4,2.2) circle (2pt);
       \filldraw (0.7,1.6) circle (2.5pt) node[below] {$\mathbf{x}$};
-      \node[above] at (0.7,2.95) {$H_{\mathbf{x}}$（截断）};
+      \node[above] at (0.7,3.1) {$H_{\mathbf{x}}$（截断）};
       \node[below] at (0.7,-0.25) {$\mathcal{F}_{\mathbf{x}}$（不完整）};
       \filldraw (1.2,1.3) circle (2pt);
       \filldraw (1.5,1.9) circle (2pt);
       \filldraw (1.0,2.2) circle (2pt);
       \filldraw (0.9,0.7) circle (2pt);
       \filldraw (1.4,1.0) circle (2pt);
-      \node[above] at (2,3.6) {（b）边界物质点};
+      \node[below] at (2,-0.7) {（b）边界物质点};
     \end{scope}
   \end{tikzpicture}
-  \caption{内部物质点与边界物质点的近场域和族对比：边界附近的物质点其近场域被物体边界截断，族不完整，导致表面效应（surface effect，详见第 10 章）\cite{LeBobaru2018,Mitchell2015}}
+  \caption{内部物质点与边界物质点的近场域和族对比}
   \label{fig:boundary-truncation}
 \end{figure}
 
-图\ref{fig:family-horizon}综合展示了物质点、键、近场域与族四个基本概念：中心物质点 $\mathbf{x}$ 的近场域 $H_{\mathbf{x}}$ 以 $\delta$ 为半径，族 $\mathcal{F}_{\mathbf{x}}$ 内的若干物质点通过键与 $\mathbf{x}$ 相连，其中 $\boldsymbol{\xi}$ 为参考相对位置矢量，$\boldsymbol{\eta}$ 为相对位移矢量。
-
-\begin{figure}[htbp]
-  \centering
-  \begin{tikzpicture}[scale=1.1]
-    % 近场域
-    \draw[dashed, thick] (0,0) circle (2.2);
-    \node[above] at (0,2.4) {$H_{\mathbf{x}}$};
-    \node[above right] at (1.5,1.5) {$\delta$};
-    % 中心物质点
-    \filldraw (0,0) circle (2.5pt) node[below left] {$\mathbf{x}$};
-    % 族内物质点与键
-    \filldraw (1.6,0.9) circle (2pt) node[above right] {$\mathbf{x}'$};
-    \draw[thick] (0,0) -- (1.6,0.9);
-    \filldraw (-1.3,1.1) circle (2pt);
-    \draw[thick] (0,0) -- (-1.3,1.1);
-    \filldraw (0.6,-1.6) circle (2pt);
-    \draw[thick] (0,0) -- (0.6,-1.6);
-    \filldraw (-1.7,-0.6) circle (2pt);
-    \draw[thick] (0,0) -- (-1.7,-0.6);
-    % 键矢量标注
-    \node[above] at (0.8,0.45) {$\boldsymbol{\xi}$};
-    % 变形后位置
-    \draw[dashed, thick, red] (0,0) -- (2.1,1.3);
-    \filldraw[red] (2.1,1.3) circle (2pt);
-    \node[red, above right] at (2.1,1.3) {$\mathbf{x}'+\boldsymbol{\eta}$};
-    \node[red, above] at (1.05,0.65) {$\boldsymbol{\xi}+\boldsymbol{\eta}$};
-    % 族标签
-    \node[below] at (0,-2.6) {$\mathcal{F}_{\mathbf{x}}$};
-  \end{tikzpicture}
-  \caption{物质点、键、近场域与族的整合示意，族 $\mathcal{F}_{\mathbf{x}}$ 为近场域 $H_{\mathbf{x}}$ 内与 $\mathbf{x}$ 通过键相连的物质点集合}
-  \label{fig:family-horizon}
-\end{figure}
+物质点、键与近场域的几何关系已在第 1 章 图\ref{fig:horizon-bond}中给出：中心物质点 $\mathbf{x}$ 的近场域 $H_{\mathbf{x}}$ 以 $\delta$ 为半径，域内物质点通过键与 $\mathbf{x}$ 相连，其中 $\boldsymbol{\xi}$ 为参考相对位置矢量，$\boldsymbol{\eta}$ 为相对位移矢量。在此基础上，族 $\mathcal{F}_{\mathbf{x}}$ 即为近场域 $H_{\mathbf{x}}$ 内与 $\mathbf{x}$ 通过键相连的物质点集合（不含 $\mathbf{x}$ 自身）。
 
 \subsection{运动方程总览}
 

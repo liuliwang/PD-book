@@ -1,0 +1,25 @@
+Task 1 Verification — adjust fig 2.4 (a) H_x label position
+===========================================================
+
+1. File modification
+   File: chapters/ch02_framework.tex (line 205)
+   Original:      \node[above] at (2,2.95) {$H_{\mathbf{x}}$（完整）};
+   Modified:      \node[above] at (2,3.1) {$H_{\mathbf{x}}$（完整）};
+   Only line 205 changed; (b) panel label, subfigure captions, circle,
+   dashed arc, caption, and label untouched.
+
+2. Compilation (xelatex -interaction=nonstopmode -halt-on-error main.tex)
+   Pass 1: ExitCode=0
+   Pass 2: ExitCode=0
+   Output written on main.pdf (139 pages).
+
+3. Log filter (main.log, pattern '^!|undefined|Warning: Reference|Warning: Citation')
+   Matches=0
+   (Known benign: Underfull \vbox and infwarerr package self-description
+   lines do not match these patterns.)
+
+4. Aux label check (main.aux)
+   \newlabel{fig:boundary-truncation}{{2.5}{19}{内部物质点与边界物质点近场域比较}{figure.caption.18}{}}
+   -> fig:boundary-truncation label still present.
+
+RESULT: PASS

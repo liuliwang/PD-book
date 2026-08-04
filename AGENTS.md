@@ -2,7 +2,7 @@
 
 ## 项目性质
 
-专著《近场动力学理论与数值方法》的 LaTeX 书籍项目。当前完成状态：**第1章绪论**（386 行，10 幅插图）；**第2章"近场动力学基本理论框架"2.1–2.8 节**（888 行，10 幅 TikZ 图，含 3 个守恒律严格证明；已按第 1 章格式优化：章级导言路线图、节级导言段、remark 精简为 4 条、章末收尾段）；**第6章常规态型 6.1–6.4 节**（654 行，2 幅图；6.1 态型理论基础、6.2 弹性本构、6.3 弹塑性本构、6.4 断裂参数标定）；**第7章非常规态型已成章**（672 行，7 节：NOSB 框架、非局部变形梯度与本构对应、隐式线性/非线性求解、零能模式、稳定化、高阶模型分类）。其余章节（第3-5、8-19章）仍为骨架文件（12-19 行，仅含 \input 占位或空 \chapter）；全部附录（appA–appE）1-2 行。
+专著《近场动力学理论与数值方法》的 LaTeX 书籍项目。当前完成状态：**第1章绪论**（386 行，10 幅插图）；**第2章"近场动力学基本理论框架"2.1–2.8 节**（884 行，10 幅 TikZ 图，含 3 个守恒律严格证明；2026-08 新增 2.1.3 节近场域定义图 fig:horizon-definition（图2.4）、删除与第 1 章图重复的综合概念图 fig:family-horizon（原图2.6），现图序 2.1–2.10 连续；已按第 1 章格式优化：章级导言路线图、节级导言段、remark 精简为 4 条、章末收尾段）；**第6章常规态型 6.1–6.4 节**（654 行，2 幅图；6.1 态型理论基础、6.2 弹性本构、6.3 弹塑性本构、6.4 断裂参数标定）；**第7章非常规态型已成章**（672 行，7 节：NOSB 框架、非局部变形梯度与本构对应、隐式线性/非线性求解、零能模式、稳定化、高阶模型分类）。其余章节（第3-5、8-19章）仍为骨架文件（11-18 行，仅含 \input 占位或空 \chapter）；全部附录（appA–appE）1-2 行。
 
 ## 编译
 
@@ -22,9 +22,9 @@ xelatex main.tex
 
 产物 `main.pdf`（当前约 139 页，随内容增长）。编译临时文件（.aux/.log/.toc 等）勿提交。
 
-**编译门禁验证**：`xelatex -interaction=nonstopmode -halt-on-error main.tex` 跑两遍后，过滤 `Error|undefined|Warning: Reference` 应零命中；`main.aux` 中 `\newlabel{fig:xxx}{{2.1}{16}...}` 可核对图号与交叉引用页。
+**编译门禁验证**：`xelatex -interaction=nonstopmode -halt-on-error main.tex` 跑两遍后，过滤 `Error|undefined|Warning: Reference` 应零命中；`main.aux` 中 `\newlabel{fig:xxx}{{2.1}{16}...}` 可核对图号与交叉引用页。注意：大小写不敏感过滤 `Error` 会命中 1 处良性行——`main.log` 中 `Package: infwarerr ... Providing info/warning/error messages`（宏包自述文本，非错误），核对时排除该行。
 
-**已知良性警告**（勿误判为错误）：仅个别 `Underfull \vbox`（LaTeX 排版固有，不影响内容）；曾有的 `caption Warning`（Unused \captionsetup[table]）与 notation.tex `Overfull \hbox` 已随列宽修正消失（2026-08 复核 log 零命中）。
+**已知良性警告**（勿误判为错误）：仅个别 `Underfull \vbox`（LaTeX 排版固有，不影响内容）；曾有的 `caption Warning`（Unused \captionsetup[table]）与 notation.tex `Overfull \hbox` 已随列宽修正消失（2026-08 复核 log 零命中）；`infwarerr` 宏包加载描述行（"Providing info/warning/error messages"）非警告，会被 `Error` 过滤器误匹配（详见编译门禁验证）。
 
 ## 文件组织
 
@@ -89,7 +89,7 @@ xelatex main.tex
 
 - **标点符号**：符合 GB/T 15834《标点符号用法》
 - **数字用法**：符合 GB/T 15835《出版物上数字用法》
-- **科技术语**：符合 CY/T 119《学术出版规范 科学技术名词》；全书术语统一，英文缩写首次出现须给全称（如"近场动力学（peridynamics，PD）"）。stretch 统一译「伸长率」而非「伸长」（s 为无量纲量，不是绝对伸长）；键伸长率 s 的定义式位于 2.1.2 节（式 2.1，`\label{eq:bond-stretch}`），正文与图注须用 `\eqref{eq:bond-stretch}` 引用，勿再内联重复完整公式；第 1 章 1.4 节「键的伸长（stretch）定义为」仍为旧表述残留（现位于第 150 行），第 2 章第 275 行「键的伸长 $s=(|\boldsymbol{\xi}+\boldsymbol{\eta}|-|\boldsymbol{\xi}|)/|\boldsymbol{\xi}|$」亦为旧表述——改稿时统一为「伸长率」
+- **科技术语**：符合 CY/T 119《学术出版规范 科学技术名词》；全书术语统一，英文缩写首次出现须给全称（如"近场动力学（peridynamics，PD）"）。stretch 统一译「伸长率」而非「伸长」（s 为无量纲量，不是绝对伸长）；键伸长率 s 的定义式位于 2.1.2 节（式 2.1，`\label{eq:bond-stretch}`），正文与图注须用 `\eqref{eq:bond-stretch}` 引用，勿再内联重复完整公式；第 1 章 1.4 节「键的伸长（stretch）定义为」仍为旧表述残留（现位于第 150 行），第 2 章第 271 行「键的伸长 $s=(|\boldsymbol{\xi}+\boldsymbol{\eta}|-|\boldsymbol{\xi}|)/|\boldsymbol{\xi}|$」亦为旧表述——改稿时统一为「伸长率」
 - **量与单位**：符合 GB 3100—1993《国际单位制及其应用》、GB/T 3101—1993《有关量、单位和符号的一般原则》；量符号斜体，单位符号正体，矢量用粗体或箭头标注
 - **符号表维护**：新符号须在 `frontmatter/notation.tex` 登记，并在正文中首次出现时定义。按章新增 `\section*{第 X 章 ...}` 小节，短表用 `p{0.22\textwidth}p{0.65\textwidth}`、长表（第 6、7 章先例）用 `p{4.8cm}>{\raggedright\arraybackslash}p{10.2cm}` 的 longtable 列宽防溢出（曾用 `ll` 致 Overfull，已全部修正，勿再用 `ll`）
 
@@ -107,7 +107,7 @@ xelatex main.tex
 
 ## Git
 
-- 当前分支 `add-近场动力学基本理论框架`（非 `main`），已有提交（第1、2、6、7章相关，最近提交"第2章：修改图2.1名称和引用" 34aad70）
-- 工作区常有未提交改动（各章节骨架文件、AGENTS.md 等），提交前先 `git status`/`git diff` 确认范围
+- 当前分支 `add-近场动力学基本理论框架`（非 `main`），已有提交（第1、2、6、7章相关，最近提交"第2章：修改图2.2和图2.3" 96b04e7）
+- `.gitignore` 实际仅 1 行，LaTeX 编译产物 `main.pdf`/`main.aux`/`main.log`/`main.out`/`main.toc` 均已被 git 跟踪——每次编译后 `git status` 显示这些文件 modified 属正常，勿误报；提交时只 stage 源文件（`.tex`/`.bib` 等）
+- 工作区常有多个独立计划的未提交改动，`git diff`（对比 HEAD）显示累积状态，排查改动归属时须区分各计划
 - 不要自动commit和push等操作，人工会进行commit和push等工作。
-- `.gitignore` 已忽略 LaTeX 编译产物（`*.aux`/`*.log`/`*.pdf` 等）与 `/.omo`、`.opencode/`、`opencode.json`、`docs/`；`main.pdf` 因 `!main.pdf` 例外被 git 跟踪——每次编译后 `git status` 显示其 modified 属正常，勿误报异常
