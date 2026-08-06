@@ -424,7 +424,7 @@
 
 反作用条件 \eqref{eq:reaction} 要求 $\mathbf{f}(-\boldsymbol{\eta},-\boldsymbol{\xi})=-\mathbf{f}(\boldsymbol{\eta},\boldsymbol{\xi})$，这是牛顿第三定律在近场动力学中的体现。其物理意义可这样理解：当交换 $\mathbf{x}$ 与 $\mathbf{x}'$ 的角色时，参考键变为 $-\boldsymbol{\xi}$，相对位移变为 $-\boldsymbol{\eta}$，$\mathbf{x}$ 对 $\mathbf{x}'$ 的力密度为 $\mathbf{f}(-\boldsymbol{\eta},-\boldsymbol{\xi})$；根据牛顿第三定律，它应等于 $\mathbf{x}'$ 对 $\mathbf{x}$ 的力密度的反号，即 $-\mathbf{f}(\boldsymbol{\eta},\boldsymbol{\xi})$。这一条件是近场动力学运动方程满足线动量守恒的必要前提，2.6 节将给出严格证明。
 
-中心力条件 \eqref{eq:central-force} 要求 $(\boldsymbol{\xi}+\boldsymbol{\eta})\times\mathbf{f}(\boldsymbol{\eta},\boldsymbol{\xi})=\mathbf{0}$，即对力方向与变形后键方向 $\boldsymbol{\xi}+\boldsymbol{\eta}$ 共线。这一条件比反作用条件更强：反作用只要求成对力等大反向，而中心力进一步要求力沿键方向。反作用条件保证线动量守恒但不足以保证角动量守恒，中心力条件才是角动量守恒的必要条件。2.6 节将证明：在反作用条件下，运动方程的角动量变化率中，成对项的"等大反向"部分相消，但残留一个力矩项；只有中心力条件才能使该力矩项也为零，从而得到角动量守恒。
+中心力条件 \eqref{eq:central-force} 要求 $(\boldsymbol{\xi}+\boldsymbol{\eta})\times\mathbf{f}(\boldsymbol{\eta},\boldsymbol{\xi})=\mathbf{0}$，即对力方向与变形后键方向 $\boldsymbol{\xi}+\boldsymbol{\eta}$ 共线。这一条件比反作用条件更强：反作用只要求成对力等大反向，而中心力进一步要求力沿键方向。直观地说，反作用条件只约束成对力等大反向，并不禁止对力含有垂直于键方向的分量；这样的横向分量虽彼此平衡，但其作用线不共线，会形成一个力偶矩，使键两端物质点对产生相对转动的趋势（图\ref{fig:bond-geometry}）。中心力条件把对力限制在变形后键方向 $\boldsymbol{\xi}+\boldsymbol{\eta}$ 上，横向分量消失，力矩项亦随之消除。反作用条件保证线动量守恒但不足以保证角动量守恒，中心力条件才是角动量守恒的必要条件。2.6 节将证明：在反作用条件下，运动方程的角动量变化率中，成对项的"等大反向"部分相消，但残留一个力矩项；只有中心力条件才能使该力矩项也为零，从而得到角动量守恒。
 
 从几何角度看，中心力条件意味着对力可以写为
 \begin{equation}
@@ -435,9 +435,9 @@
 
 \subsection{微弹性材料与成对势}
 
-近场动力学中的微弹性材料（microelastic material）是指其本构关系可由一个标量势函数导出的材料 \cite{Silling2000}。对每个键 $(\mathbf{x},\mathbf{x}')$，定义成对势 $w(\boldsymbol{\eta},\boldsymbol{\xi})$（单位参考体积平方下的势能），使得对力函数为其对相对位移的偏导
+近场动力学中的微弹性材料（microelastic material）是指其本构关系可由一个标量势函数导出的材料 \cite{Silling2000}。对每个键 $(\mathbf{x},\mathbf{x}')$，定义成对势 $w(\boldsymbol{\eta},\boldsymbol{\xi})$（单位参考体积平方下的势能），使得对力函数为其关于相对位移 $\boldsymbol{\eta}$ 的梯度 $\nabla_{\boldsymbol{\eta}} w$，其中 $\nabla_{\boldsymbol{\eta}}$ 表示关于 $\boldsymbol{\eta}$ 的梯度算子（$w$ 为标量，其梯度为向量，与对力 $\mathbf{f}$ 的向量性一致）
 \begin{equation}
-  \mathbf{f}(\boldsymbol{\eta},\boldsymbol{\xi})=\frac{\partial w}{\partial\boldsymbol{\eta}}(\boldsymbol{\eta},\boldsymbol{\xi})
+  \mathbf{f}(\boldsymbol{\eta},\boldsymbol{\xi})=\nabla_{\boldsymbol{\eta}} w(\boldsymbol{\eta},\boldsymbol{\xi})
   \label{eq:pairwise-force-potential}
 \end{equation}
 成对势的客观性与反作用条件分别要求
@@ -474,7 +474,7 @@
 
 应变能密度定义为物质点 $\mathbf{x}$ 与其族内所有邻居的成对势之和
 \begin{equation}
-  W(\mathbf{x},t)=\frac{1}{2}\int_{\mathcal{H}_{\mathbf{x}}} w\bigl(\boldsymbol{\eta}(\mathbf{x}',\mathbf{x},t),\boldsymbol{\xi}\bigr)\,\mathrm{d}V'
+  W(\mathbf{x},t)=\frac{1}{2}\int_{\mathcal{F}_{\mathbf{x}}} w\bigl(\boldsymbol{\eta}(\mathbf{x}',\mathbf{x},t),\boldsymbol{\xi}\bigr)\,\mathrm{d}V'
   \label{eq:strain-energy}
 \end{equation}
 式\eqref{eq:strain-energy}中系数 $1/2$ 的来源是：每条键 $(\mathbf{x},\mathbf{x}')$ 被 $\mathbf{x}$ 与 $\mathbf{x}'$ 两点共享，在计算两点的应变能密度时各计一半，避免重复。$W$ 的深入讨论（包括能量平衡、正定性、与第 6 章态型应变能密度的衔接）见 2.5 节。
@@ -483,9 +483,9 @@
 
 运动方程 \eqref{eq:motion} 重写如下以便讨论
 \[
-  \rho(\mathbf{x})\,\ddot{\mathbf{u}}(\mathbf{x},t)=\int_{\mathcal{H}_{\mathbf{x}}}\mathbf{f}\bigl(\boldsymbol{\eta}(\mathbf{x}',\mathbf{x},t),\boldsymbol{\xi}\bigr)\,\mathrm{d}V'+\mathbf{b}(\mathbf{x},t)
+  \rho(\mathbf{x})\,\ddot{\mathbf{u}}(\mathbf{x},t)=\int_{\mathcal{F}_{\mathbf{x}}}\mathbf{f}\bigl(\boldsymbol{\eta}(\mathbf{x}',\mathbf{x},t),\boldsymbol{\xi}\bigr)\,\mathrm{d}V'+\mathbf{b}(\mathbf{x},t)
 \]
-其中左端 $\rho\ddot{\mathbf{u}}$ 为惯性力密度，量纲 $\mathrm{kg}/\mathrm{m}^{3}\times\mathrm{m}/\mathrm{s}^{2}=\mathrm{N}/\mathrm{m}^{4}$；右端积分项为对力的体积积分，$\mathbf{f}$ 的量纲须使 $\mathbf{f}\,\mathrm{d}V'$ 为力，故 $\mathrm{dim}\,\mathbf{f}=\mathrm{N}/\mathrm{m}^{6}$，即"力每体积平方"。这与经典连续介质力学中应力（$\mathrm{N}/\mathrm{m}^{2}$）量纲不同，是近场动力学非局部描述的固有特征。体力密度 $\mathbf{b}$ 的量纲为 $\mathrm{N}/\mathrm{m}^{4}$，与惯性项一致。
+其中左端 $\rho\ddot{\mathbf{u}}$ 为惯性力密度，量纲 $\mathrm{kg}/\mathrm{m}^{3}\times\mathrm{m}/\mathrm{s}^{2}=\mathrm{N}/\mathrm{m}^{3}$；右端积分项为对力的体积积分，$\mathbf{f}$ 的量纲须使 $\mathbf{f}\,\mathrm{d}V'$ 为力密度，故 $\mathrm{dim}\,\mathbf{f}=\mathrm{N}/\mathrm{m}^{6}$，即"力每体积平方"。这与经典连续介质力学中应力（$\mathrm{N}/\mathrm{m}^{2}$）量纲不同，是近场动力学非局部描述的固有特征。体力密度 $\mathbf{b}$ 的量纲为 $\mathrm{N}/\mathrm{m}^{3}$，与惯性项一致。
 
 在小变形近似下，对力可关于 $\boldsymbol{\eta}=\mathbf{0}$ 线性化
 \begin{equation}
