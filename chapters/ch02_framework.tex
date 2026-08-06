@@ -263,9 +263,9 @@
   \mathbf{y}(\mathbf{x},t)=\mathbf{x}+\mathbf{u}(\mathbf{x},t)
   \label{eq:motion-config}
 \end{equation}
-式\eqref{eq:motion-config}定义的映射 $\mathbf{y}:\mathcal{B}\times\mathbb{R}^{+}\to\mathbb{R}^{3}$ 把参考构型中的每个物质点映为其当前构型中的位置。与经典理论不同，近场动力学不要求 $\mathbf{y}$ 在裂纹面或不连续面上可微，因为运动方程不含空间导数；唯一需要的是 $\mathbf{y}$ 本身有定义，使键的两端位置可被确定。
+式\eqref{eq:motion-config}定义的映射 $\mathbf{y}:\mathcal{B}\times\mathbb{R}^{+}\to\mathbb{R}^{3}$ 中，符号 $\times$ 表示笛卡尔积，$\mathcal{B}\times\mathbb{R}^{+}$ 为所有位置-时间对 $(\mathbf{x},t)$ 的集合；该映射把参考构型中的每个物质点映为其当前构型中的位置。与经典理论不同，近场动力学不要求 $\mathbf{y}$ 在裂纹面或不连续面上可微，因为运动方程不含空间导数；唯一需要的是 $\mathbf{y}$ 本身有定义，使键的两端位置可被确定。
 
-连接物质点 $\mathbf{x}$ 与 $\mathbf{x}'$ 的键在参考构型中的方向矢量为 $\boldsymbol{\xi}=\mathbf{x}'-\mathbf{x}$，变形后两端点的相对位置变为
+图\ref{fig:reference-deformation} 示意了从参考构型到变形构型的映射关系，其中位移场 $\mathbf{u}$ 将每个物质点从参考位置映到当前位置，参考键 $\boldsymbol{\xi}$ 相应变为变形后的 $\boldsymbol{\xi}+\boldsymbol{\eta}$。连接物质点 $\mathbf{x}$ 与 $\mathbf{x}'$ 的键在参考构型中的方向矢量为 $\boldsymbol{\xi}=\mathbf{x}'-\mathbf{x}$，变形后两端点的相对位置变为
 \begin{equation}
   \boldsymbol{\xi}+\boldsymbol{\eta}=\mathbf{y}(\mathbf{x}',t)-\mathbf{y}(\mathbf{x},t)
   \label{eq:deformed-bond}
@@ -302,7 +302,7 @@
   \label{fig:reference-deformation}
 \end{figure}
 
-图\ref{fig:reference-deformation} 示意了从参考构型到变形构型的映射关系，其中位移场 $\mathbf{u}$ 将每个物质点从参考位置映到当前位置，参考键 $\boldsymbol{\xi}$ 相应变为变形后的 $\boldsymbol{\xi}+\boldsymbol{\eta}$。
+
 
 \subsection{相对位移的轴向—偏斜分解}
 
@@ -313,7 +313,7 @@
   \boldsymbol{\eta}_{\perp}=\boldsymbol{\eta}-\boldsymbol{\eta}_{\parallel}
   \label{eq:eta-decomp}
 \end{equation}
-式中分母 $|\boldsymbol{\xi}|^{2}$ 与外乘的 $\boldsymbol{\xi}$ 共同完成投影：点积 $\boldsymbol{\eta}\cdot\boldsymbol{\xi}$ 计算投影大小，除以 $|\boldsymbol{\xi}|^{2}$ 得到标量投影系数，再乘以方向矢量 $\boldsymbol{\xi}$ 得到沿参考键方向的矢量分量。其中 $\boldsymbol{\eta}_{\parallel}$ 描述两物质点沿键方向的相对分离或靠近，$\boldsymbol{\eta}_{\perp}$ 描述两物质点垂直于键方向的相对错动。这一分解的几何意义如图\ref{fig:bond-decomp}所示：轴向分量使键伸长或缩短而不改变方向，偏斜分量使键偏转而在小变形下对键长的改变为高阶小量。
+式中点积 $\boldsymbol{\eta}\cdot\boldsymbol{\xi}$ 是一个标量，它表示 $\boldsymbol{\eta}$ 在参考键方向上的投影大小；分母 $|\boldsymbol{\xi}|^{2}$ 与外乘的 $\boldsymbol{\xi}$ 共同完成矢量投影：除以 $|\boldsymbol{\xi}|^{2}$ 得到标量投影系数，再乘以方向矢量 $\boldsymbol{\xi}$ 得到沿参考键方向的矢量分量。其中 $\boldsymbol{\eta}_{\parallel}$ 描述两物质点沿键方向的相对分离或靠近，$\boldsymbol{\eta}_{\perp}$ 描述两物质点垂直于键方向的相对错动。这一分解的几何意义如图\ref{fig:bond-decomp}所示：轴向分量使键伸长或缩短而不改变方向，偏斜分量使键偏转而在小变形下对键长的改变为高阶小量。
 
 \begin{figure}[htbp]
   \centering
@@ -347,20 +347,43 @@
 
 利用式\eqref{eq:eta-decomp}，变形后键长的平方可以展开为
 \begin{equation}
+  |\boldsymbol{\xi}+\boldsymbol{\eta}|^{2}=|\boldsymbol{\xi}|^{2}+2\,\boldsymbol{\xi}\cdot\boldsymbol{\eta}+|\boldsymbol{\eta}|^{2}
+  \label{eq:bond-length-expand}
+\end{equation}
+再将 $\boldsymbol{\eta}=\boldsymbol{\eta}_{\parallel}+\boldsymbol{\eta}_{\perp}$ 代入，并利用 $\boldsymbol{\xi}\cdot\boldsymbol{\eta}_{\perp}=0$（由 $\boldsymbol{\eta}_{\perp}$ 的定义），得
+\begin{equation}
   |\boldsymbol{\xi}+\boldsymbol{\eta}|^{2}=|\boldsymbol{\xi}|^{2}+2\,\boldsymbol{\xi}\cdot\boldsymbol{\eta}_{\parallel}+|\boldsymbol{\eta}_{\parallel}|^{2}+|\boldsymbol{\eta}_{\perp}|^{2}
   \label{eq:bond-length-sq}
 \end{equation}
-式\eqref{eq:bond-length-sq}中已利用 $\boldsymbol{\xi}\cdot\boldsymbol{\eta}_{\perp}=0$（由 $\boldsymbol{\eta}_{\perp}$ 的定义）。由此可看出轴向分量与偏斜分量对键长改变的贡献具有不同量级：$\boldsymbol{\eta}_{\parallel}$ 直接进入键长的线性项 $2\boldsymbol{\xi}\cdot\boldsymbol{\eta}_{\parallel}$，而 $\boldsymbol{\eta}_{\perp}$ 仅通过其模的平方 $|\boldsymbol{\eta}_{\perp}|^{2}$ 进入键长的二阶项。
+式\eqref{eq:bond-length-sq}利用了 $\boldsymbol{\xi}\cdot\boldsymbol{\eta}_{\perp}=0$（由 $\boldsymbol{\eta}_{\perp}$ 的定义）。由此可看出轴向分量与偏斜分量对键长改变的贡献具有不同量级：$\boldsymbol{\eta}_{\parallel}$ 直接进入键长的线性项 $2\boldsymbol{\xi}\cdot\boldsymbol{\eta}_{\parallel}$，而 $\boldsymbol{\eta}_{\perp}$ 仅通过其模的平方 $|\boldsymbol{\eta}_{\perp}|^{2}$ 进入键长的二阶项。
 
 \subsection{小变形近似}
 
-当位移梯度远小于 1，即 $|\boldsymbol{\eta}|\ll|\boldsymbol{\xi}|$ 时，键伸长率可作线性化展开。将式\eqref{eq:bond-length-sq}代入伸长率定义并保留到一阶项，有
+当位移梯度远小于 1，即 $|\boldsymbol{\eta}|\ll|\boldsymbol{\xi}|$ 时，键伸长率可作线性化展开。将式\eqref{eq:bond-length-sq}代入伸长率定义，先写出
 \begin{equation}
   s=\frac{|\boldsymbol{\xi}+\boldsymbol{\eta}|-|\boldsymbol{\xi}|}{|\boldsymbol{\xi}|}
-  =\frac{\boldsymbol{\xi}\cdot\boldsymbol{\eta}}{|\boldsymbol{\xi}|^{2}}+O\!\left(\frac{|\boldsymbol{\eta}|^{2}}{|\boldsymbol{\xi}|^{2}}\right)
+  =\frac{\sqrt{|\boldsymbol{\xi}|^{2}+2\,\boldsymbol{\xi}\cdot\boldsymbol{\eta}_{\parallel}+|\boldsymbol{\eta}_{\parallel}|^{2}+|\boldsymbol{\eta}_{\perp}|^{2}}-\,|\boldsymbol{\xi}|}{|\boldsymbol{\xi}|}
+\end{equation}
+由于 $|\boldsymbol{\eta}|\ll|\boldsymbol{\xi}|$，根号内各项除以 $|\boldsymbol{\xi}|^{2}$ 后对伸长率的贡献量级分别为：线性项 $2\,\boldsymbol{\xi}\cdot\boldsymbol{\eta}_{\parallel}/|\boldsymbol{\xi}|^{2}$ 为 $O(|\boldsymbol{\eta}|/|\boldsymbol{\xi}|)$，属一阶小量；而 $|\boldsymbol{\eta}_{\parallel}|^{2}/|\boldsymbol{\xi}|^{2}$ 与 $|\boldsymbol{\eta}_{\perp}|^{2}/|\boldsymbol{\xi}|^{2}$ 均为 $O\!\left(|\boldsymbol{\eta}|^{2}/|\boldsymbol{\xi}|^{2}\right)$，属二阶小量。在 $|\boldsymbol{\eta}|\ll|\boldsymbol{\xi}|$ 条件下，二阶项比一阶项小一个数量级，可暂忽略。将根号内保留到一阶项，并提取 $|\boldsymbol{\xi}|^{2}$，得
+\begin{equation}
+  s\approx\frac{\sqrt{|\boldsymbol{\xi}|^{2}+2\,\boldsymbol{\xi}\cdot\boldsymbol{\eta}_{\parallel}}-\,|\boldsymbol{\xi}|}{|\boldsymbol{\xi}|}
+  =\frac{|\boldsymbol{\xi}|\sqrt{1+\dfrac{2\,\boldsymbol{\xi}\cdot\boldsymbol{\eta}_{\parallel}}{|\boldsymbol{\xi}|^{2}}}-\,|\boldsymbol{\xi}|}{|\boldsymbol{\xi}|}
+\end{equation}
+再令根号内保留到一阶项后的小量为
+\begin{equation}
+  \chi=\frac{2\,\boldsymbol{\xi}\cdot\boldsymbol{\eta}_{\parallel}}{|\boldsymbol{\xi}|^{2}}
+\end{equation}
+由于 $|\boldsymbol{\eta}|\ll|\boldsymbol{\xi}|$，显然 $\chi\ll 1$。对 $\sqrt{1+\chi}\approx 1+\chi/2$ 作一阶泰勒展开，得
+\begin{equation}
+  s\approx\frac{|\boldsymbol{\xi}|\left(1+\dfrac{\boldsymbol{\xi}\cdot\boldsymbol{\eta}_{\parallel}}{|\boldsymbol{\xi}|^{2}}\right)-|\boldsymbol{\xi}|}{|\boldsymbol{\xi}|}
+  =\frac{\boldsymbol{\xi}\cdot\boldsymbol{\eta}_{\parallel}}{|\boldsymbol{\xi}|^{2}}
+\end{equation}
+注意到 $\boldsymbol{\xi}\cdot\boldsymbol{\eta}=\boldsymbol{\xi}\cdot\boldsymbol{\eta}_{\parallel}+\boldsymbol{\xi}\cdot\boldsymbol{\eta}_{\perp}=\boldsymbol{\xi}\cdot\boldsymbol{\eta}_{\parallel}$（因为 $\boldsymbol{\xi}\perp\boldsymbol{\eta}_{\perp}$），上式可写成更简洁的形式
+\begin{equation}
+  s=\frac{\boldsymbol{\xi}\cdot\boldsymbol{\eta}}{|\boldsymbol{\xi}|^{2}}+O\!\left(\frac{|\boldsymbol{\eta}|^{2}}{|\boldsymbol{\xi}|^{2}}\right)
   \label{eq:stretch-linear}
 \end{equation}
-式\eqref{eq:stretch-linear}表明，在小变形近似下键伸长率仅依赖轴向分量 $\boldsymbol{\eta}_{\parallel}$，偏斜分量 $\boldsymbol{\eta}_{\perp}$ 的贡献为高阶小量。这一结果有一个重要推论：对均匀变形 $\mathbf{u}(\mathbf{x})=\boldsymbol{\varepsilon}\cdot\mathbf{x}$（$\boldsymbol{\varepsilon}$ 为常小应变张量），相对位移 $\boldsymbol{\eta}=\boldsymbol{\varepsilon}\cdot\boldsymbol{\xi}$，代入式\eqref{eq:stretch-linear}得
+式\eqref{eq:stretch-linear}表明，在小变形近似下键伸长率仅依赖轴向分量 $\boldsymbol{\eta}_{\parallel}$，偏斜分量 $\boldsymbol{\eta}_{\perp}$ 的贡献为高阶小量。其物理含义是：键的伸长主要由轴向分量 $\boldsymbol{\eta}_{\parallel}$ 引起，而偏斜分量 $\boldsymbol{\eta}_{\perp}$ 仅使键发生偏转、对键长的改变是二阶效应，这类似于经典小应变理论中刚体转动不产生应变。这一结果有一个重要推论：对均匀变形 $\mathbf{u}(\mathbf{x})=\boldsymbol{\varepsilon}\cdot\mathbf{x}$（$\boldsymbol{\varepsilon}$ 为常小应变张量），相对位移 $\boldsymbol{\eta}=\boldsymbol{\varepsilon}\cdot\boldsymbol{\xi}$，代入式\eqref{eq:stretch-linear}得
 \begin{equation}
   s\approx\frac{\boldsymbol{\xi}\cdot\boldsymbol{\varepsilon}\cdot\boldsymbol{\xi}}{|\boldsymbol{\xi}|^{2}}
   \label{eq:stretch-uniform}

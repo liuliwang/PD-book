@@ -2,7 +2,7 @@
 
 ## 项目性质
 
-专著《近场动力学理论与数值方法》的 LaTeX 书籍项目。当前完成状态：**第1章绪论**（386 行，10 幅插图）；**第2章"近场动力学基本理论框架"2.1–2.8 节**（922 行，11 幅 TikZ 图，含 3 个守恒律严格证明；2026-08 新增 2.1.3 节近场域定义图 fig:horizon-definition（图2.4）、删除与第 1 章图重复的综合概念图 fig:family-horizon（原图2.6）、在 2.2.1 节新增参考构型与变形构型映射示意图 fig:reference-deformation（图2.6，双栏对比图，经 5 方向优化：补全 y(x′,t) 点与变形键、u 箭头起点锚定参考位置、两栏映射对齐、正文补键变形描述、视觉细节），现图序 2.1–2.11 连续；已按第 1 章格式优化：章级导言路线图、节级导言段、remark 精简为 4 条、章末收尾段；2026-08 已完成 2.2 节"伸长"→"伸长率"术语统一与公式解释补充）；**第6章常规态型 6.1–6.4 节**（654 行，2 幅图；6.1 态型理论基础、6.2 弹性本构、6.3 弹塑性本构、6.4 断裂参数标定）；**第7章非常规态型已成章**（672 行，7 节：NOSB 框架、非局部变形梯度与本构对应、隐式线性/非线性求解、零能模式、稳定化、高阶模型分类）。其余章节（第3-5、8-19章）仍为骨架文件（11-18 行，仅含 \input 占位或空 \chapter）；全部附录（appA–appE）1-2 行。
+专著《近场动力学理论与数值方法》的 LaTeX 书籍项目。当前完成状态：**第1章绪论**（386 行，10 幅插图）；**第2章"近场动力学基本理论框架"2.1–2.8 节**（945 行，11 幅 TikZ 图，含 3 个守恒律严格证明；2026-08 新增 2.1.3 节近场域定义图 fig:horizon-definition（图2.4）、删除与第 1 章图重复的综合概念图 fig:family-horizon（原图2.6）、在 2.2.1 节新增参考构型与变形构型映射示意图 fig:reference-deformation（图2.6，双栏对比图，经 5 方向优化：补全 y(x′,t) 点与变形键、u 箭头起点锚定参考位置、两栏映射对齐、正文补键变形描述、视觉细节），现图序 2.1–2.11 连续；已按第 1 章格式优化：章级导言路线图、节级导言段、remark 精简为 4 条、章末收尾段；2026-08 已完成 2.2 节"伸长"→"伸长率"术语统一与公式解释补充；2026-08 于 2.2.3 节补充小变形近似的推导细节：原公式(2.13)拆分为"提取 $|\boldsymbol{\xi}|^{2}$ 过渡式 + 泰勒展开"两步、以显式定义的 $\chi$ 替代泰勒展开参数 $\varepsilon$（避免与小应变张量 $\boldsymbol{\varepsilon}$ 符号冲突）、并注明"高阶小量"相对一阶项 $2\boldsymbol{\xi}\cdot\boldsymbol{\eta}_{\parallel}\sim O(|\boldsymbol{\xi}||\boldsymbol{\eta}|)$ 的比较基准）；**第6章常规态型 6.1–6.4 节**（654 行，2 幅图；6.1 态型理论基础、6.2 弹性本构、6.3 弹塑性本构、6.4 断裂参数标定）；**第7章非常规态型已成章**（672 行，7 节：NOSB 框架、非局部变形梯度与本构对应、隐式线性/非线性求解、零能模式、稳定化、高阶模型分类）。其余章节（第3-5、8-19章）仍为骨架文件（11-18 行，仅含 \input 占位或空 \chapter）；全部附录（appA–appE）1-2 行。
 
 ## 编译
 
@@ -20,13 +20,13 @@ xelatex main.tex
 xelatex main.tex
 ```
 
-产物 `main.pdf`（当前约 139 页，随内容增长）。编译临时文件（.aux/.log/.toc 等）虽已被 git 跟踪（见 Git 节），提交时勿手动 stage。
+产物 `main.pdf`（当前 141 页，随内容增长）。编译临时文件（.aux/.log/.toc 等）虽已被 git 跟踪（见 Git 节），提交时勿手动 stage。
 
 **编译门禁验证**：`xelatex -interaction=nonstopmode -halt-on-error main.tex` 跑两遍后，过滤 `Error|undefined|Warning: Reference` 应零命中；`main.aux` 中 `\newlabel{fig:xxx}{{2.1}{16}...}` 可核对图号与交叉引用页。注意：大小写不敏感过滤 `Error` 会命中 1 处良性行——`main.log` 中 `Package: infwarerr ... Providing info/warning/error messages`（宏包自述文本，非错误），核对时排除该行。
 
 **已知良性警告**（勿误判为错误）：仅个别 `Underfull \vbox`（LaTeX 排版固有，不影响内容）；曾有的 `caption Warning`（Unused \captionsetup[table]）与 notation.tex `Overfull \hbox` 已随列宽修正消失（2026-08 复核 log 零命中）；`infwarerr` 宏包加载描述行（"Providing info/warning/error messages"）非警告，会被 `Error` 过滤器误匹配（详见编译门禁验证）。
 
-**PowerShell 行数/检索坑**：`Get-Content` 在 UTF-8 无 BOM 中文文件上按 ANSI 误读，行数统计不可靠（实测 ch02 报 788 行，实际 922 行）。统计行数或逐行处理用 `[System.IO.File]::ReadAllLines(...)`；检索用 `Select-String`（等价 grep）。VS Code latex-workshop 已配置等价编译配方（settings.json：快速 xelatex×2 / 完整含 bibtex）。
+**PowerShell 行数/检索坑**：`Get-Content` 在 UTF-8 无 BOM 中文文件上按 ANSI 误读，行数统计不可靠（实测 ch02 报 788 行，实际 945 行）。统计行数或逐行处理用 `[System.IO.File]::ReadAllLines(...)`；检索用 `Select-String`（等价 grep）。VS Code latex-workshop 已配置等价编译配方（settings.json：快速 xelatex×2 / 完整含 bibtex）。
 
 ## 文件组织
 
@@ -110,7 +110,7 @@ xelatex main.tex
 
 ## Git
 
-- 当前分支 `add-近场动力学基本理论框架`（非 `main`），已有提交（第1、2、6、7章相关，最近提交"第2章：2.2节内容正确性验证" 4aa26c2，2026-08-04；此前工作区多计划未提交改动已随该提交清理）
-- `.gitignore` 实际仅 1 行（内容为 `.gitignore` 自身），LaTeX 编译产物 `main.pdf`/`main.aux`/`main.bbl`/`main.blg`/`main.log`/`main.out`/`main.toc`/`main.fls`/`main.fdb_latexmk`/`main.xdv`/`indent.log`/`chapters/ch01_introduction.log` 均已被 git 跟踪——每次编译后 `git status` 显示这些文件 modified 属正常，勿误报；提交时只 stage 源文件（`.tex`/`.bib` 等）
+- 当前分支 `add-近场动力学基本理论框架`（非 `main`），已有提交（第1、2、6、7章相关，最近提交"第2章：修改图2.6" 96cf9cc，2026-08-04，其前为"第2章：2.2节内容正确性验证" 4aa26c2；此前工作区多计划未提交改动已随该提交清理）
+- `.gitignore` 实际仅 1 行（内容为 `.gitignore` 自身），LaTeX 编译产物 `main.pdf`/`main.aux`/`main.bbl`/`main.blg`/`main.log`/`main.out`/`main.toc`/`main.synctex.gz`/`main.fls`/`main.fdb_latexmk`/`main.xdv`/`indent.log`/`chapters/ch01_introduction.log` 均已被 git 跟踪——每次编译后 `git status` 显示这些文件 modified 属正常，勿误报；提交时只 stage 源文件（`.tex`/`.bib` 等）
 - 工作区可能同时积累多个独立计划的未提交改动，`git diff`（对比 HEAD）显示累积状态，排查改动归属时须区分各计划
 - 不要自动commit和push等操作，人工会进行commit和push等工作。

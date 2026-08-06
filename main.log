@@ -1,10 +1,9 @@
-This is XeTeX, Version 3.141592653-2.6-0.999998 (MiKTeX 26.5) (preloaded format=xelatex 2026.7.31)  4 AUG 2026 18:20
+This is XeTeX, Version 3.141592653-2.6-0.999998 (MiKTeX 26.5) (preloaded format=xelatex 2026.7.31)  6 AUG 2026 11:13
 entering extended mode
  restricted \write18 enabled.
- file:line:error style messages enabled.
  %&-line parsing enabled.
-**d:/PD-book/main.tex
-(d:/PD-book/main.tex
+**./main.tex
+(main.tex
 LaTeX2e <2026-06-01>
 L3 programming layer <2026-06-18>
 (C:\Users\Admin\AppData\Local\Programs\MiKTeX\tex/latex/ctex\ctexbook.cls
@@ -1480,102 +1479,102 @@ File: figures/diehl2022_fig7.png Graphic file (type bmp)
 ]
 第2章
 [15] [16] [17] [18] [19] [20] [21] [22] [23] [24] [25] [26] [27] [28] [29]
-[30] [31] [32] [33]) (chapters/ch03_ccm_pd.tex [34]
-第3章
-) (chapters/ch04_bond_based.tex [35
+[30] [31] [32] [33] [34]) (chapters/ch03_ccm_pd.tex [35] [36
 
-] [36
+]
+第3章
+) (chapters/ch04_bond_based.tex [37] [38
 
 ]
 第4章
-) (chapters/ch05_bond_improved.tex [37] [38
+) (chapters/ch05_bond_improved.tex [39] [40
 
 ]
 第5章
-) (chapters/ch06_ordinary_state.tex [39] [40
+) (chapters/ch06_ordinary_state.tex [41] [42
 
 ]
 第6章
-[41] [42] [43] [44] [45] [46] [47] [48] [49] [50] [51] [52] [53] [54] [55]
-[56]) (chapters/ch07_nonordinary_state.tex [57] [58
+[43] [44] [45] [46] [47] [48] [49] [50] [51] [52] [53] [54] [55] [56] [57]
+[58]) (chapters/ch07_nonordinary_state.tex [59] [60
 
 ]
 第7章
-[59] [60] [61] [62] [63] [64] [65] [66] [67] [68] [69] [70] [71] [72] [73]
-[74] [75] [76] [77] [78]) (chapters/ch08_constitutive.tex [79] [80
+[61] [62] [63] [64] [65] [66] [67] [68] [69] [70] [71] [72] [73] [74] [75]
+[76] [77] [78] [79] [80]) (chapters/ch08_constitutive.tex [81] [82
 
 ]
 第8章
-) (chapters/ch09_discretization.tex [81] [82
+) (chapters/ch09_discretization.tex [83] [84
 
 ]
 第9章
-) (chapters/ch10_boundary.tex [83] [84
+) (chapters/ch10_boundary.tex [85] [86
 
 ]
 第10章
-) (chapters/ch11_crack_damage.tex [85] [86
+) (chapters/ch11_crack_damage.tex [87] [88
 
 ]
 第11章
-) (chapters/ch12_pd_fem.tex [87] [88
+) (chapters/ch12_pd_fem.tex [89] [90
 
 ]
 第12章
-) (chapters/ch13_thermal.tex [89] [90
+) (chapters/ch13_thermal.tex [91] [92
 
 ]
 第13章
-) (chapters/ch14_multiphysics.tex [91] [92
+) (chapters/ch14_multiphysics.tex [93] [94
 
 ]
 第14章
-) (chapters/ch15_pddo.tex [93] [94
+) (chapters/ch15_pddo.tex [95] [96
 
 ]
 第15章
-) (chapters/ch16_frontier.tex [95] [96
+) (chapters/ch16_frontier.tex [97] [98
 
 ]
 第16章
-) (chapters/ch17_programming.tex [97] [98
+) (chapters/ch17_programming.tex [99] [100
 
 ]
 第17章
-) (chapters/ch18_software.tex [99] [100
+) (chapters/ch18_software.tex [101] [102
 
 ]
 第18章
-) (chapters/ch19_benchmark.tex [101] [102
+) (chapters/ch19_benchmark.tex [103] [104
 
 ]
 第19章
-) (appendices/appA_math.tex [103] [104
+) (appendices/appA_math.tex [105] [106
 
 ]
 附录 A
-) (appendices/appB_ccm.tex [105] [106
+) (appendices/appB_ccm.tex [107] [108
 
 ]
 附录 B
-) (appendices/appC_codes.tex [107] [108
+) (appendices/appC_codes.tex [109] [110
 
 ]
 附录 C
-) (appendices/appD_notation.tex [109] [110
+) (appendices/appD_notation.tex [111] [112
 
 ]
 附录 D
-) (appendices/appE_references.tex [111] [112
+) (appendices/appE_references.tex [113] [114
 
 ]
 附录 E
-) [113] [114
+) [115] [116
 
-] (main.bbl [115
+] (main.bbl [117
 
-] [116] [117] [118] [119] [120] [121] [122])
-[123] (main.aux)
+] [118] [119] [120] [121] [122] [123] [124])
+[125] (main.aux)
  ***********
 LaTeX2e <2026-06-01>
 L3 programming layer <2026/07/22>
@@ -1585,11 +1584,11 @@ Package rerunfilecheck Info: File `main.out' has not changed.
  ) 
 Here is how much of TeX's memory you used:
  34287 strings out of 402629
- 768366 string characters out of 5439127
- 1178860 words of memory out of 5000000
- 62766 multiletter control sequences out of 15000+600000
+ 768358 string characters out of 5439127
+ 1178903 words of memory out of 5000000
+ 62767 multiletter control sequences out of 15000+600000
  641944 words of font info for 131 fonts, out of 8000000 for 9000
  1348 hyphenation exceptions out of 8191
- 93i,14n,111p,1214b,956s stack positions out of 10000i,1000n,20000p,200000b,200000s
+ 93i,14n,111p,1205b,956s stack positions out of 10000i,1000n,20000p,200000b,200000s
 
-Output written on main.pdf (139 pages).
+Output written on main.pdf (141 pages).
