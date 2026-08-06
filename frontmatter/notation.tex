@@ -120,3 +120,37 @@
   $\varepsilon_{\mathrm{tol}}$ & 非线性迭代收敛容差 \\
   $\mathcal{B}$ & 物体所占区域 \\
 \end{longtable}
+
+\section*{本构模型专题（第 8 章）}
+
+\begin{longtable}{@{}p{4.8cm}>{\raggedright\arraybackslash}p{10.2cm}@{}}
+  $\Psi(\mathbf{F})$ & 超弹性应变能密度函数（参考构型单位体积），$\mathbf{P}=\partial\Psi/\partial\mathbf{F}$ \\
+  $\mathbf{C}$ & 右 Cauchy--Green 张量，$\mathbf{C}=\mathbf{F}^{\mathrm{T}}\mathbf{F}$ \\
+  $\mathbf{E}$ & Green--Lagrange 应变张量，$\mathbf{E}=\tfrac{1}{2}(\mathbf{C}-\mathbf{I})$ \\
+  $\mathbf{S}$ & 第二类 Piola--Kirchhoff 应力张量，$\mathbf{S}=2\,\partial\Psi/\partial\mathbf{C}$，$\mathbf{P}=\mathbf{F}\mathbf{S}$ \\
+  $I_1,I_2,I_3$ & 右 Cauchy--Green 张量的三个主不变量，$I_3=J^{2}$ \\
+  $\lambda,\mu$ & Lam\'e 常数（$\mu$ 亦为剪切模量） \\
+  $C_{10},C_{01}$ & Mooney--Rivlin 模型材料常数，$2(C_{10}+C_{01})=\mu$ \\
+  $\kappa$ & 体积模量 \\
+  $\mathbb{C}$ & 材料切线模量张量（四阶），$\mathbb{C}=\partial\mathbf{P}/\partial\mathbf{F}$ \\
+  $G(t)$ & 剪切松弛模量（$G_{0}$ 瞬时值，$G_{\infty}$ 平衡值） \\
+  $K(t)$ & 体积松弛模量 \\
+  $\mathbf{s}$，$\mathbf{e}$ & 偏应力张量、偏应变张量，$\mathbf{s}=\boldsymbol{\sigma}-\tfrac{1}{3}(\operatorname{tr}\boldsymbol{\sigma})\mathbf{I}$ \\
+  $\tau_{R}$ & 松弛时间，$\tau_{R}=\eta/E$ \\
+  $E$，$\eta$ & 弹簧模量、阻尼器黏度（Maxwell/Kelvin--Voigt 模型） \\
+  $\mathbf{h}^{n}$ & 黏弹性记忆项（历史应变递推向量） \\
+  $\boldsymbol{\varepsilon}^{e}$，$\boldsymbol{\varepsilon}^{vp}$ & 弹性应变、黏塑性应变 \\
+  $\gamma$ & 黏性参数（Perzyna 流动系数） \\
+  $f(\boldsymbol{\sigma},\boldsymbol{q})$ & 屈服函数（$\boldsymbol{q}$ 为内变量） \\
+  $\langle\cdot\rangle$ & Macaulay 括号（$\langle x\rangle=x$ 若 $x>0$，否则 $0$） \\
+  $\sigma_{e}$，$\sigma_{y}$ & von Mises 等效应力、屈服应力 \\
+  $J_{2}$ & 偏应力第二不变量，$J_{2}=\tfrac{1}{2}\mathbf{s}:\mathbf{s}$ \\
+  $\varepsilon^{c}$，$\boldsymbol{\varepsilon}^{c}$ & 蠕变应变（标量/张量），$\boldsymbol{\varepsilon}^{c}$ 为偏量 \\
+  $B$，$n$ & Norton 幂律材料常数（应力指数 $n$） \\
+  $D$ & 损伤变量，$D\in[0,1]$（$D=0$ 完好，$D=1$ 失效） \\
+  $\tilde{\sigma}$ & 有效应力，$\tilde{\sigma}=\sigma/(1-D)$ \\
+  $A$，$q$，$q_{1}$，$q_{2}$ & 损伤演化材料常数（Kachanov--Rabotnov / Liu--Murakami） \\
+  $C_{m}$，$n_{2}$ & Liu--Murakami 蠕变材料常数 \\
+  $\sigma_{1}$ & 最大主应力 \\
+  $D_{\mathrm{cr}}$ & 临界损伤（材料失效判据，通常取 $0.99$） \\
+\end{longtable}

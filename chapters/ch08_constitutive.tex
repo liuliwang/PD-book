@@ -1,11 +1,591 @@
 % 第8章 本构模型专题
 \chapter{本构模型专题}
 
-\section{超弹性材料}
+\section{超弹性材料}\label{sec:hyperelastic}
 
-\section{黏弹性与黏塑性材料}
+第 7 章建立了非常规态型（NOSB）的本构对应机制：经典本构关系经由非局部变形梯度（式\eqref{eq:nonlocal-deformation-gradient}）与力态（式\eqref{eq:nosb-force-state}）直接嵌入近场动力学框架，无需改写。这一机制的价值在于，经典连续介质力学百年积累的本构理论——弹性、塑性、黏弹性、损伤等——都可以不经修改地移植进近场动力学。本章依次讨论这些经典本构在 NOSB 框架下的嵌入形式与数值实现，本节先从最基础、也是应用最广泛的超弹性材料开始。超弹性（hyperelastic）本构是经典有限变形弹性的标准形式：材料响应完全由应变能密度函数 $\Psi(\mathbf{F})$ 决定，应力是 $\Psi$ 关于变形梯度的导数。本节首先建立超弹性本构的基本框架，明确应变能密度、第一类 Piola--Kirchhoff 应力与客观性要求之间的关系（\ref{sec:hyper-framework}节）；进而介绍三类经典超弹性模型——St.~Venant--Kirchhoff 模型、neo-Hookean 模型与 Mooney--Rivlin 模型，并给出各自的应变能密度与应力表达式（\ref{sec:hyper-models}节）；最后说明超弹性本构在 NOSB 框架中的嵌入流程、切线刚度与数值实现要点（\ref{sec:hyper-nosb}节）。本节内容主要依据 Ogden 的经典专著 \cite{Ogden1997} 与原始文献 \cite{Mooney1940,Rivlin1948,Ogden1972}，近场动力学框架下的实现参见第 7 章 \cite{Silling2007,Warren2009}。
 
-\section{蠕变材料}
+\subsection{超弹性本构的基本框架}\label{sec:hyper-framework}
+
+超弹性材料的本构行为由参考构型单位体积的应变能密度函数 $\Psi(\mathbf{F})$ 完全刻画，其中 $\mathbf{F}$ 为变形梯度。材料框架不变性（见第 3 章）要求 $\Psi$ 在任意刚体转动 $\mathbf{Q}$ 下保持不变，即
+\begin{equation}
+  \Psi(\mathbf{Q}\mathbf{F})=\Psi(\mathbf{F})
+  \label{eq:hyper-objectivity}
+\end{equation}
+对一切正交张量 $\mathbf{Q}$ 成立。式\eqref{eq:hyper-objectivity}是超弹性本构的客观性要求：材料响应只依赖于变形本身，与观察者的刚体转动无关。
+
+由式\eqref{eq:hyper-objectivity}可以推出应变能密度实际上只依赖于右 Cauchy--Green 张量 $\mathbf{C}=\mathbf{F}^{\mathrm{T}}\mathbf{F}$。为此，利用变形梯度的极分解（第 3 章式\eqref{eq:polar-decomposition}），将 $\mathbf{F}$ 分解为式\eqref{eq:hyper-polar}的形式
+\begin{equation}
+  \mathbf{F}=\mathbf{R}\,\mathbf{U}
+  \label{eq:hyper-polar}
+\end{equation}
+其中 $\mathbf{R}$ 为正交张量（刚体转动），$\mathbf{U}$ 为对称正定的右拉伸张量。在式\eqref{eq:hyper-objectivity}中取 $\mathbf{Q}=\mathbf{R}^{\mathrm{T}}$，注意到 $\mathbf{Q}\mathbf{F}=\mathbf{R}^{\mathrm{T}}\mathbf{R}\mathbf{U}=\mathbf{U}$（正交性 $\mathbf{R}^{\mathrm{T}}\mathbf{R}=\mathbf{I}$），于是
+\begin{equation}
+  \Psi(\mathbf{F})=\Psi(\mathbf{R}^{\mathrm{T}}\mathbf{F})=\Psi(\mathbf{U})
+  \label{eq:hyper-w-u}
+\end{equation}
+式\eqref{eq:hyper-w-u}表明 $\Psi$ 只依赖极分解的右拉伸张量 $\mathbf{U}$，而与转动 $\mathbf{R}$ 无关。另一方面，右 Cauchy--Green 张量可写为
+\begin{equation}
+  \mathbf{C}=\mathbf{F}^{\mathrm{T}}\mathbf{F}=(\mathbf{R}\mathbf{U})^{\mathrm{T}}(\mathbf{R}\mathbf{U})
+  =\mathbf{U}^{\mathrm{T}}\mathbf{R}^{\mathrm{T}}\mathbf{R}\mathbf{U}=\mathbf{U}^{2}
+  \label{eq:hyper-c-u2}
+\end{equation}
+其中利用了 $\mathbf{U}^{\mathrm{T}}=\mathbf{U}$（对称性）与 $\mathbf{R}^{\mathrm{T}}\mathbf{R}=\mathbf{I}$（正交性）。由于 $\mathbf{U}$ 对称正定，式\eqref{eq:hyper-c-u2}的平方根唯一，即 $\mathbf{U}$ 由 $\mathbf{C}$ 唯一确定；反之 $\mathbf{U}^{2}=\mathbf{C}$ 亦唯一给出 $\mathbf{U}$。故式\eqref{eq:hyper-w-u}与式\eqref{eq:hyper-c-u2}结合，存在函数 $\hat{\Psi}$ 使得
+\begin{equation}
+  \Psi(\mathbf{F})=\hat{\Psi}(\mathbf{C})
+  \label{eq:hyper-w-c}
+\end{equation}
+这一结论也可直接验证：$(\mathbf{Q}\mathbf{F})^{\mathrm{T}}(\mathbf{Q}\mathbf{F})=\mathbf{F}^{\mathrm{T}}\mathbf{Q}^{\mathrm{T}}\mathbf{Q}\mathbf{F}=\mathbf{F}^{\mathrm{T}}\mathbf{F}$，即 $\mathbf{C}$ 本身在刚体转动下不变，故式\eqref{eq:hyper-w-c}中 $\hat{\Psi}$ 的定义自洽 \cite{Ogden1997}。
+
+第一类 Piola--Kirchhoff 应力张量 $\mathbf{P}$ 定义为应变能密度关于变形梯度的导数
+\begin{equation}
+  \mathbf{P}=\frac{\partial\Psi(\mathbf{F})}{\partial\mathbf{F}},
+  \qquad
+  P_{iK}=\frac{\partial\Psi}{\partial F_{iK}}
+  \label{eq:hyper-pk1}
+\end{equation}
+式\eqref{eq:hyper-pk1}是式\eqref{eq:piola-stress}在第 7 章本构对应框架中的具体形式：对超弹性材料，本构对应能量式\eqref{eq:correspondence-energy}中的 $\mathbf{P}$ 恰好由式\eqref{eq:hyper-pk1}给出 \cite{Silling2007}。注意式\eqref{eq:hyper-pk1}的分量形式中，下标 $i$ 对应变形构型、$K$ 对应参考构型，故 $\mathbf{P}$ 是"两点张量"（two-point tensor）\cite{Ogden1997}。
+
+第二类 Piola--Kirchhoff 应力张量 $\mathbf{S}$ 与 Green--Lagrange 应变张量 $\mathbf{E}=\tfrac{1}{2}(\mathbf{C}-\mathbf{I})$ 能量共轭，定义为
+\begin{equation}
+  \mathbf{S}=2\,\frac{\partial\hat{\Psi}(\mathbf{C})}{\partial\mathbf{C}}
+  \label{eq:hyper-pk2-def}
+\end{equation}
+其中因子 $2$ 源于 $\mathbf{E}$ 与 $\mathbf{C}$ 的关系：由 $\mathbf{E}=\tfrac{1}{2}(\mathbf{C}-\mathbf{I})$ 得 $\partial\mathbf{E}/\partial\mathbf{C}=\tfrac{1}{2}\mathbf{I}$，能量共轭关系 $\delta\hat{\Psi}=\mathbf{S}:\delta\mathbf{E}=\tfrac{1}{2}\mathbf{S}:\delta\mathbf{C}$ 与 $\delta\hat{\Psi}=(\partial\hat{\Psi}/\partial\mathbf{C}):\delta\mathbf{C}$ 对比即得式\eqref{eq:hyper-pk2-def} \cite{Ogden1997}。
+
+$\mathbf{P}$ 与 $\mathbf{S}$ 的关系由链式法则确定。把 $\hat{\Psi}$ 视为 $\mathbf{C}$ 的函数，而 $\mathbf{C}=\mathbf{C}(\mathbf{F})$，则
+\begin{equation}
+  \mathbf{P}=\frac{\partial\Psi}{\partial\mathbf{F}}
+  =\frac{\partial\hat{\Psi}}{\partial\mathbf{C}}:\frac{\partial\mathbf{C}}{\partial\mathbf{F}}
+  \label{eq:hyper-chain-rule}
+\end{equation}
+其中第四阶张量 $\partial\mathbf{C}/\partial\mathbf{F}$ 的分量为
+\begin{equation}
+  \frac{\partial C_{IJ}}{\partial F_{kL}}
+  =\frac{\partial}{\partial F_{kL}}\bigl(F_{mI}F_{mJ}\bigr)
+  =\delta_{km}\delta_{IL}F_{mJ}+F_{mI}\delta_{km}\delta_{JL}
+  =\delta_{IL}F_{kJ}+\delta_{JL}F_{kI}
+  \label{eq:hyper-dcdf}
+\end{equation}
+式\eqref{eq:hyper-dcdf}中第一步用了 $\mathbf{C}=\mathbf{F}^{\mathrm{T}}\mathbf{F}$ 的分量式 $C_{IJ}=F_{mI}F_{mJ}$，第二步是乘积求导，第三步用了 $\delta_{km}F_{mJ}=F_{kJ}$ 与 $\delta_{km}F_{mI}=F_{kI}$（$m$ 为哑指标）。把式\eqref{eq:hyper-dcdf}代入式\eqref{eq:hyper-chain-rule}，并按分量展开
+\begin{equation}
+  P_{kL}=\frac{\partial\hat{\Psi}}{\partial C_{IJ}}\frac{\partial C_{IJ}}{\partial F_{kL}}
+  =\frac{\partial\hat{\Psi}}{\partial C_{IJ}}\bigl(\delta_{IL}F_{kJ}+\delta_{JL}F_{kI}\bigr)
+  =F_{kJ}\frac{\partial\hat{\Psi}}{\partial C_{LJ}}+F_{kI}\frac{\partial\hat{\Psi}}{\partial C_{IL}}
+  \label{eq:hyper-chain-explicit}
+\end{equation}
+由于 $\mathbf{S}$ 对称（$\hat{\Psi}$ 关于 $\mathbf{C}$ 对称，$\partial\hat{\Psi}/\partial\mathbf{C}$ 亦对称），式\eqref{eq:hyper-chain-explicit}中两项可合并：$F_{kJ}\frac{\partial\hat{\Psi}}{\partial C_{LJ}}+F_{kI}\frac{\partial\hat{\Psi}}{\partial C_{IL}}=2F_{kJ}\frac{\partial\hat{\Psi}}{\partial C_{LJ}}$（利用 $\partial\hat{\Psi}/\partial C_{LJ}=\partial\hat{\Psi}/\partial C_{JL}$ 与哑指标重命名 $I\leftrightarrow J$）。再代入式\eqref{eq:hyper-pk2-def}得
+\begin{equation}
+  \mathbf{P}=\mathbf{F}\,\mathbf{S}
+  \label{eq:hyper-pk2}
+\end{equation}
+式\eqref{eq:hyper-pk2}即第一类与第二类 Piola--Kirchhoff 应力之间的关系 \cite{Ogden1997}。Cauchy 应力张量 $\boldsymbol{\sigma}$ 与 $\mathbf{P}$ 的关系由式\eqref{eq:piola-cauchy}给出：$\boldsymbol{\sigma}=J^{-1}\mathbf{P}\mathbf{F}^{\mathrm{T}}$，其中 $J=\det\mathbf{F}$。
+
+对各向同性超弹性材料，$\hat{\Psi}$ 可进一步表示为 $\mathbf{C}$（或 $\mathbf{F}$）的三个主不变量 $I_1,I_2,I_3$ 的函数
+\begin{equation}
+  \Psi=\Psi(I_1,I_2,I_3),\qquad
+  I_1=\operatorname{tr}\mathbf{C},\qquad
+  I_2=\tfrac{1}{2}\bigl[(\operatorname{tr}\mathbf{C})^{2}-\operatorname{tr}(\mathbf{C}^{2})\bigr],\qquad
+  I_3=\det\mathbf{C}=J^{2}
+  \label{eq:hyper-invariants}
+\end{equation}
+式\eqref{eq:hyper-invariants}中各向同性意味着应变能密度在参考构型的任意正交变换下不变，由 Cayley--Hamilton 定理，$\mathbf{C}$ 的任意各向同性标量函数可表为主不变量的函数 \cite{Ogden1997}。
+
+为把式\eqref{eq:hyper-pk2-def}化为不变量形式，需先求三个主不变量关于 $\mathbf{C}$ 的导数。第一个不变量 $I_1=\operatorname{tr}\mathbf{C}=C_{II}$ 对 $\mathbf{C}$ 的分量 $C_{IJ}$ 求导
+\begin{equation}
+  \frac{\partial I_1}{\partial\mathbf{C}}=\mathbf{I},
+  \qquad
+  \frac{\partial I_1}{\partial C_{IJ}}=\delta_{IJ}
+  \label{eq:hyper-dI1}
+\end{equation}
+式\eqref{eq:hyper-dI1}由 $\partial C_{KK}/\partial C_{IJ}=\delta_{IK}\delta_{JK}=\delta_{IJ}$ 直接得到（利用了 $\delta_{IK}\delta_{JK}=\delta_{IJ}$）。
+
+第二个不变量 $I_2=\tfrac{1}{2}\bigl[(\operatorname{tr}\mathbf{C})^{2}-\operatorname{tr}(\mathbf{C}^{2})\bigr]$ 对 $\mathbf{C}$ 求导。先分别求两个被减项的导数：$\partial(\operatorname{tr}\mathbf{C})^{2}/\partial\mathbf{C}=2(\operatorname{tr}\mathbf{C})\,\mathbf{I}$（由式\eqref{eq:hyper-dI1}及复合求导），以及 $\partial\operatorname{tr}(\mathbf{C}^{2})/\partial\mathbf{C}=2\mathbf{C}$（分量式：$\operatorname{tr}(\mathbf{C}^{2})=C_{IJ}C_{JI}$，$\partial(C_{IJ}C_{JI})/\partial C_{KL}=\delta_{IK}\delta_{JL}C_{JI}+C_{IJ}\delta_{JK}\delta_{IL}=C_{LK}+C_{KL}=2C_{KL}$，利用了 $C_{LK}=C_{KL}$ 的对称性）。合并得
+\begin{equation}
+  \frac{\partial I_2}{\partial\mathbf{C}}
+  =\frac{1}{2}\Bigl(2(\operatorname{tr}\mathbf{C})\,\mathbf{I}-2\mathbf{C}\Bigr)
+  =I_1\,\mathbf{I}-\mathbf{C}
+  \label{eq:hyper-dI2}
+\end{equation}
+式\eqref{eq:hyper-dI2}中最后一步代入了 $I_1=\operatorname{tr}\mathbf{C}$。
+
+第三个不变量 $I_3=\det\mathbf{C}$ 对 $\mathbf{C}$ 的导数用行列式的伴随矩阵公式（Jacobi 公式）
+\begin{equation}
+  \frac{\partial\det\mathbf{C}}{\partial\mathbf{C}}=\det\mathbf{C}\;\mathbf{C}^{-\mathrm{T}}=\det\mathbf{C}\;\mathbf{C}^{-1}
+  \label{eq:hyper-dI3-jacobi}
+\end{equation}
+式\eqref{eq:hyper-dI3-jacobi}中第二个等号利用了 $\mathbf{C}$ 的对称性（$\mathbf{C}^{-\mathrm{T}}=\mathbf{C}^{-1}$）。由于 $\det\mathbf{C}=I_3$ 且 $\det\mathbf{C}=J^{2}$，式\eqref{eq:hyper-dI3-jacobi}亦可写为 $\partial I_3/\partial\mathbf{C}=I_3\,\mathbf{C}^{-1}$。Jacobi 公式的分量推导为：$\partial(\det\mathbf{C})/\partial C_{IJ}=(\det\mathbf{C})(\mathbf{C}^{-1})_{JI}$，其中 $(\mathbf{C}^{-1})_{JI}$ 为伴随矩阵的转置 \cite{Ogden1997}。
+
+将式\eqref{eq:hyper-dI1}、式\eqref{eq:hyper-dI2}与式\eqref{eq:hyper-dI3-jacobi}代入式\eqref{eq:hyper-pk2-def}的链式法则
+\begin{equation}
+  \mathbf{S}=2\,\frac{\partial\hat{\Psi}}{\partial\mathbf{C}}
+  =2\left[\frac{\partial\Psi}{\partial I_1}\frac{\partial I_1}{\partial\mathbf{C}}
+  +\frac{\partial\Psi}{\partial I_2}\frac{\partial I_2}{\partial\mathbf{C}}
+  +\frac{\partial\Psi}{\partial I_3}\frac{\partial I_3}{\partial\mathbf{C}}\right]
+  \label{eq:hyper-chain-invariants}
+\end{equation}
+把三个导数式\eqref{eq:hyper-dI1}、式\eqref{eq:hyper-dI2}、式\eqref{eq:hyper-dI3-jacobi}代入式\eqref{eq:hyper-chain-invariants}，整理得
+\begin{equation}
+  \mathbf{S}=2\left[\left(\frac{\partial\Psi}{\partial I_1}+I_1\frac{\partial\Psi}{\partial I_2}\right)\mathbf{I}
+  -\frac{\partial\Psi}{\partial I_2}\,\mathbf{C}
+  +I_3\frac{\partial\Psi}{\partial I_3}\,\mathbf{C}^{-1}\right]
+  \label{eq:hyper-s-invariants}
+\end{equation}
+式\eqref{eq:hyper-s-invariants}是各向同性超弹性本构的一般形式：其中 $\mathbf{I}$ 项由式\eqref{eq:hyper-dI1}贡献，$\mathbf{C}$ 项由式\eqref{eq:hyper-dI2}的 $-I_1\mathbf{I}$ 与 $-\mathbf{C}$ 中的 $\mathbf{C}$ 部分合并整理（$\partial\Psi/\partial I_1$ 与 $I_1\partial\Psi/\partial I_2$ 同乘 $\mathbf{I}$），$\mathbf{C}^{-1}$ 项由式\eqref{eq:hyper-dI3-jacobi}贡献 \cite{Ogden1997,Ogden1972}。后续各超弹性模型（\ref{sec:hyper-models}节）都是式\eqref{eq:hyper-s-invariants}的特例。
+
+\subsection{经典超弹性模型}\label{sec:hyper-models}
+
+\subsubsection{St.~Venant--Kirchhoff 模型}
+
+St.~Venant--Kirchhoff 模型是线性弹性本构向有限变形的最直接推广：将线性弹性中的无穷小应变替换为 Green--Lagrange 应变 $\mathbf{E}$，应变能密度取为 $\mathbf{E}$ 的二次型
+\begin{equation}
+  \Psi(\mathbf{E})=\frac{\lambda}{2}\bigl(\operatorname{tr}\mathbf{E}\bigr)^{2}+\mu\,\mathbf{E}:\mathbf{E}
+  \label{eq:svk-energy}
+\end{equation}
+其中 $\lambda$、$\mu$ 为 Lam\'e 常数。由式\eqref{eq:svk-energy}求 $\Psi$ 关于 $\mathbf{C}$ 的导数以代入式\eqref{eq:hyper-pk2-def}。注意到 $\mathbf{E}=\tfrac{1}{2}(\mathbf{C}-\mathbf{I})$，由链式法则，$\Psi$ 关于 $\mathbf{C}$ 的导数含两部分：对 $\operatorname{tr}\mathbf{E}$ 的导数（经 $\partial(\operatorname{tr}\mathbf{E})^{2}/\partial\mathbf{C}=2(\operatorname{tr}\mathbf{E})\,\partial\mathbf{E}/\partial\mathbf{C}=2(\operatorname{tr}\mathbf{E})\cdot\tfrac{1}{2}\mathbf{I}=(\operatorname{tr}\mathbf{E})\mathbf{I}$，其中第一式由式\eqref{eq:hyper-dI1}类比、第二式用了 $\partial\mathbf{E}/\partial\mathbf{C}=\tfrac{1}{2}\mathbf{I}$）与对 $\mathbf{E}:\mathbf{E}$ 的导数（经 $\partial(\mathbf{E}:\mathbf{E})/\partial\mathbf{C}=\partial(\mathbf{E}:\mathbf{E})/\partial\mathbf{E}:\partial\mathbf{E}/\partial\mathbf{C}=2\mathbf{E}:\tfrac{1}{2}\mathbf{I}=\mathbf{E}$，其中 $\partial(\mathbf{E}:\mathbf{E})/\partial\mathbf{E}=2\mathbf{E}$ 由式\eqref{eq:hyper-dI2}中 $\partial\operatorname{tr}(\mathbf{C}^{2})/\partial\mathbf{C}=2\mathbf{C}$ 的类比直接得到）。合并得
+\begin{equation}
+  \frac{\partial\Psi}{\partial\mathbf{C}}
+  =\frac{\lambda}{2}\cdot 2(\operatorname{tr}\mathbf{E})\,\frac{\partial\mathbf{E}}{\partial\mathbf{C}}+\mu\cdot 2\mathbf{E}:\frac{\partial\mathbf{E}}{\partial\mathbf{C}}
+  =\lambda(\operatorname{tr}\mathbf{E})\,\frac{1}{2}\mathbf{I}+\mu\cdot 2\mathbf{E}:\frac{1}{2}\mathbf{I}
+  =\frac{1}{2}\bigl[\lambda(\operatorname{tr}\mathbf{E})\mathbf{I}+2\mu\mathbf{E}\bigr]
+  \label{eq:svk-dpsidc}
+\end{equation}
+式\eqref{eq:svk-dpsidc}中的两个 $\tfrac{1}{2}$ 因子均来自 $\partial\mathbf{E}/\partial\mathbf{C}=\tfrac{1}{2}\mathbf{I}$。代入式\eqref{eq:hyper-pk2-def}（$\mathbf{S}=2\,\partial\Psi/\partial\mathbf{C}$）即得第二类 Piola--Kirchhoff 应力
+\begin{equation}
+  \mathbf{S}=\lambda\bigl(\operatorname{tr}\mathbf{E}\bigr)\mathbf{I}+2\mu\,\mathbf{E}
+  \label{eq:svk-stress}
+\end{equation}
+式\eqref{eq:svk-stress}在形式上与线性弹性应力--应变关系完全一致，区别仅在于应变度量是非线性的 Green--Lagrange 应变。第一类 Piola--Kirchhoff 应力由式\eqref{eq:hyper-pk2}第二式 $\mathbf{P}=\mathbf{F}\mathbf{S}$ 给出，是关于 $\mathbf{F}$ 的三次多项式。St.~Venant--Kirchhoff 模型计算简单、便于推导切线刚度，但在强压缩下表现出非物理的软化行为（压缩超过约 $58\%$ 后抗力开始下降直至归零），故适用于中等变形与以转动为主的场景 \cite{Ogden1997}。
+
+\subsubsection{neo-Hookean 模型}
+
+neo-Hookean 模型源于橡胶弹性分子网络理论：长链分子网络的统计力学分析给出应变能密度的形式 \cite{Treloar1943}。其可压缩形式为
+\begin{equation}
+  \Psi=\frac{\mu}{2}\bigl(I_1-3\bigr)-\mu\ln J+\frac{\lambda}{2}\bigl(\ln J\bigr)^{2}
+  \label{eq:neo-hookean-energy}
+\end{equation}
+其中 $\mu$ 为初始剪切模量，$\lambda$ 为 Lam\'e 常数，$J=\sqrt{I_3}=\det\mathbf{F}$。式\eqref{eq:neo-hookean-energy}中第一项惩罚等容剪切变形，后两项控制体积变化：$\ln J$ 项保证当 $J\to0$（材料完全压扁）时应变能趋于无穷，从而强抵抗非物理压缩。
+
+为求 $\Psi$ 关于 $\mathbf{C}$ 的导数，分别处理式\eqref{eq:neo-hookean-energy}的三项。第一项经式\eqref{eq:hyper-dI1}（$\partial I_1/\partial\mathbf{C}=\mathbf{I}$）
+\begin{equation}
+  \frac{\partial}{\partial\mathbf{C}}\Bigl[\frac{\mu}{2}(I_1-3)\Bigr]=\frac{\mu}{2}\,\mathbf{I}
+  \label{eq:nh-term1}
+\end{equation}
+第二项与第三项均涉及 $\ln J$ 关于 $\mathbf{C}$ 的导数。由 $J^{2}=I_3$（式\eqref{eq:hyper-invariants}）与式\eqref{eq:hyper-dI3-jacobi}（$\partial I_3/\partial\mathbf{C}=I_3\mathbf{C}^{-1}$），链式法则给出
+\begin{equation}
+  \frac{\partial\ln J}{\partial\mathbf{C}}
+  =\frac{1}{J}\,\frac{\partial J}{\partial\mathbf{C}}
+  =\frac{1}{J}\cdot\frac{1}{2J}\,\frac{\partial I_3}{\partial\mathbf{C}}
+  =\frac{1}{2J^{2}}\,I_3\,\mathbf{C}^{-1}
+  =\frac{1}{2}\,\mathbf{C}^{-1}
+  \label{eq:nh-dlnj}
+\end{equation}
+式\eqref{eq:nh-dlnj}中第一步由 $\partial\ln J/\partial\mathbf{C}=(1/J)\partial J/\partial\mathbf{C}$，第二步由 $J=\sqrt{I_3}$ 得 $\partial J/\partial\mathbf{C}=\tfrac{1}{2}I_3^{-1/2}\partial I_3/\partial\mathbf{C}$，第三步代入 $J^{2}=I_3$。基于式\eqref{eq:nh-dlnj}，第三项的导数用链式法则
+\begin{equation}
+  \frac{\partial}{\partial\mathbf{C}}\Bigl[\frac{\lambda}{2}(\ln J)^{2}\Bigr]
+  =\frac{\lambda}{2}\cdot 2\ln J\,\frac{\partial\ln J}{\partial\mathbf{C}}
+  =\lambda\ln J\cdot\frac{1}{2}\mathbf{C}^{-1}
+  =\frac{\lambda}{2}\ln J\,\mathbf{C}^{-1}
+  \label{eq:nh-term3}
+\end{equation}
+合并三项式\eqref{eq:nh-term1}、式\eqref{eq:nh-dlnj}（第二项贡献 $-\mu\partial\ln J/\partial\mathbf{C}=-\tfrac{\mu}{2}\mathbf{C}^{-1}$）与式\eqref{eq:nh-term3}，得式\eqref{eq:nh-dpsidc}
+\begin{equation}
+  \frac{\partial\Psi}{\partial\mathbf{C}}
+  =\frac{\mu}{2}\,\mathbf{I}-\frac{\mu}{2}\,\mathbf{C}^{-1}+\frac{\lambda}{2}\ln J\,\mathbf{C}^{-1}
+  =\frac{1}{2}\bigl[\mu\mathbf{I}+(\lambda\ln J-\mu)\mathbf{C}^{-1}\bigr]
+  \label{eq:nh-dpsidc}
+\end{equation}
+代入式\eqref{eq:hyper-pk2-def}（$\mathbf{S}=2\,\partial\Psi/\partial\mathbf{C}$）即得第二类 Piola--Kirchhoff 应力为式\eqref{eq:neo-hookean-stress}
+\begin{equation}
+  \mathbf{S}=\mu\bigl(\mathbf{I}-\mathbf{C}^{-1}\bigr)+\lambda\ln J\,\mathbf{C}^{-1}
+  \label{eq:neo-hookean-stress}
+\end{equation}
+对应的 Cauchy 应力为 $\boldsymbol{\sigma}=J^{-1}\bigl[\mu(\mathbf{B}-\mathbf{I})+\lambda\ln J\,\mathbf{I}\bigr]$，其中 $\mathbf{B}=\mathbf{F}\mathbf{F}^{\mathrm{T}}$ 为左 Cauchy--Green 张量，其推导为：由 $\boldsymbol{\sigma}=J^{-1}\mathbf{P}\mathbf{F}^{\mathrm{T}}$（式\eqref{eq:piola-cauchy}）与 $\mathbf{P}=\mathbf{F}\mathbf{S}$（式\eqref{eq:hyper-pk2}），$\boldsymbol{\sigma}=J^{-1}\mathbf{F}\mathbf{S}\mathbf{F}^{\mathrm{T}}=J^{-1}[\mu(\mathbf{F}\mathbf{F}^{\mathrm{T}}-\mathbf{F}\mathbf{C}^{-1}\mathbf{F}^{\mathrm{T}})+\lambda\ln J\,\mathbf{F}\mathbf{C}^{-1}\mathbf{F}^{\mathrm{T}}]$，其中 $\mathbf{F}\mathbf{C}^{-1}\mathbf{F}^{\mathrm{T}}=\mathbf{F}(\mathbf{F}^{\mathrm{T}}\mathbf{F})^{-1}\mathbf{F}^{\mathrm{T}}=\mathbf{I}$，故得上述表达式 \cite{Ogden1997}。在小应变极限下，式\eqref{eq:neo-hookean-energy}退化为线性弹性应变能，Lam\'e 常数与弹性常数一致，故 neo-Hookean 模型与线性弹性在小变形下平滑衔接 \cite{Ogden1997,Treloar1943}。
+
+\subsubsection{Mooney--Rivlin 模型}
+
+Mooney 从唯象角度提出的橡胶弹性理论 \cite{Mooney1940}，经 Rivlin 的不变量框架系统化后 \cite{Rivlin1948}，成为描述橡胶类材料大变形的标准模型。其可压缩形式为
+\begin{equation}
+  \Psi=C_{10}\bigl(I_1-3\bigr)+C_{01}\bigl(I_2-3\bigr)
+  +\frac{\kappa}{2}\bigl(J-1\bigr)^{2}
+  \label{eq:mooney-rivlin-energy}
+\end{equation}
+其中 $C_{10}$、$C_{01}$ 为材料常数（$C_{10}$ 对应小应变剪切模量的一半，$2(C_{10}+C_{01})=\mu$），$\kappa$ 为体积模量。式\eqref{eq:mooney-rivlin-energy}的前两项分别刻画等容变形中主伸长比的平方和与平方倒数和的影响，第三项惩罚体积变化；当 $C_{01}=0$ 时退化为 neo-Hookean 模型。
+
+为求 $\Psi$ 关于 $\mathbf{C}$ 的导数，分别处理式\eqref{eq:mooney-rivlin-energy}的三项。第一项经式\eqref{eq:hyper-dI1}
+\begin{equation}
+  \frac{\partial}{\partial\mathbf{C}}\bigl[C_{10}(I_1-3)\bigr]=C_{10}\,\mathbf{I}
+  \label{eq:mr-term1}
+\end{equation}
+第二项经式\eqref{eq:hyper-dI2}（$\partial I_2/\partial\mathbf{C}=I_1\mathbf{I}-\mathbf{C}$）
+\begin{equation}
+  \frac{\partial}{\partial\mathbf{C}}\bigl[C_{01}(I_2-3)\bigr]=C_{01}\,(I_1\mathbf{I}-\mathbf{C})
+  \label{eq:mr-term2}
+\end{equation}
+第三项含 $J$ 关于 $\mathbf{C}$ 的导数。由式\eqref{eq:nh-dlnj}（$\partial\ln J/\partial\mathbf{C}=\tfrac{1}{2}\mathbf{C}^{-1}$）与链式法则
+\begin{equation}
+  \frac{\partial J}{\partial\mathbf{C}}=J\,\frac{\partial\ln J}{\partial\mathbf{C}}
+  =\frac{J}{2}\,\mathbf{C}^{-1}
+  \label{eq:mr-dJ}
+\end{equation}
+式\eqref{eq:mr-dJ}中第一步由 $\partial J/\partial\mathbf{C}=J\,\partial\ln J/\partial\mathbf{C}$（即 $J=e^{\ln J}$ 的复合求导）。于是第三项的导数为
+\begin{equation}
+  \frac{\partial}{\partial\mathbf{C}}\Bigl[\frac{\kappa}{2}(J-1)^{2}\Bigr]
+  =\kappa(J-1)\,\frac{\partial J}{\partial\mathbf{C}}
+  =\kappa(J-1)\cdot\frac{J}{2}\,\mathbf{C}^{-1}
+  =\frac{\kappa}{2}J(J-1)\,\mathbf{C}^{-1}
+  \label{eq:mr-term3}
+\end{equation}
+合并三项式\eqref{eq:mr-term1}、式\eqref{eq:mr-term2}与式\eqref{eq:mr-term3}，得式\eqref{eq:mr-dpsidc}
+\begin{equation}
+  \frac{\partial\Psi}{\partial\mathbf{C}}
+  =C_{10}\,\mathbf{I}+C_{01}\,(I_1\mathbf{I}-\mathbf{C})+\frac{\kappa}{2}J(J-1)\,\mathbf{C}^{-1}
+  \label{eq:mr-dpsidc}
+\end{equation}
+代入式\eqref{eq:hyper-pk2-def}（$\mathbf{S}=2\,\partial\Psi/\partial\mathbf{C}$）即得第二类 Piola--Kirchhoff 应力为式\eqref{eq:mooney-rivlin-stress}
+\begin{equation}
+  \mathbf{S}=2C_{10}\mathbf{I}+2C_{01}\bigl(I_1\mathbf{I}-\mathbf{C}\bigr)
+  +\kappa(J-1)J\,\mathbf{C}^{-1}
+  \label{eq:mooney-rivlin-stress}
+\end{equation}
+Mooney--Rivlin 模型对橡胶在中等拉伸范围（主伸长比约 $1.5$ 倍以内）的实验数据拟合良好，是工程中最常用的超弹性模型之一 \cite{Mooney1940,Rivlin1948,Ogden1972}。
+
+\subsection{超弹性本构在 NOSB 中的嵌入}\label{sec:hyper-nosb}
+
+将式\eqref{eq:hyper-pk1}给出的第一类 Piola--Kirchhoff 应力代入第 7 章的力态公式（式\eqref{eq:nosb-force-state}），即得超弹性材料在 NOSB 框架中的力态
+\begin{equation}
+  \underline{\mathbf{T}}\langle\boldsymbol{\xi}\rangle
+  =\omega(|\boldsymbol{\xi}|)\,\frac{\partial\Psi(\mathbf{F})}{\partial\mathbf{F}}\,\mathbf{K}^{-1}\boldsymbol{\xi}
+  \label{eq:hyper-force-state}
+\end{equation}
+其中非局部变形梯度 $\mathbf{F}$ 由式\eqref{eq:nonlocal-deformation-gradient}给出。式\eqref{eq:hyper-force-state}的推导与第 7 章本构对应的推导完全一致（\ref{sec:correspondence}节）：把式\eqref{eq:correspondence-energy}的超弹性对应能量 $W(\underline{\mathbf{Y}})=\Psi(\mathbf{F}(\underline{\mathbf{Y}}))$ 代入力态的变分定义式\eqref{eq:frechet-def}，经式\eqref{eq:frechet-chain}--\eqref{eq:frechet-df}的链式法则即得，其中超弹性的特殊性仅在于 $\mathbf{P}=\partial\Psi/\partial\mathbf{F}$ 由式\eqref{eq:hyper-pk1}给出 \cite{Silling2007}。
+
+式\eqref{eq:hyper-force-state}表明，超弹性本构的嵌入流程是：由近场域内键变形计算非局部变形梯度 $\mathbf{F}$，再经经典应变能密度 $\Psi$ 求导得到 $\mathbf{P}$，最后按式\eqref{eq:hyper-force-state}装配键力。这一流程与所选择的具体超弹性模型无关——无论是 St.~Venant--Kirchhoff（式\eqref{eq:svk-stress}）、neo-Hookean（式\eqref{eq:neo-hookean-stress}）还是 Mooney--Rivlin（式\eqref{eq:mooney-rivlin-stress}），只需把各自的 $\mathbf{P}=\mathbf{F}\mathbf{S}$（式\eqref{eq:hyper-pk2}）代入式\eqref{eq:hyper-force-state}即可，这正是 NOSB 本构对应机制"经典本构即插即用"的体现。第 7 章已经证明，在均匀变形下非局部变形梯度精确等于经典变形梯度（式\eqref{eq:fg-uniform}），故超弹性对应材料在均匀变形下精确恢复经典响应；由于 $\Psi$ 满足客观性式\eqref{eq:hyper-objectivity}，对应材料自动满足客观性要求 \cite{Silling2007}。
+
+数值实现中，隐式求解需要切线刚度（第 7 章\ref{sec:nl-tangent}节）。对超弹性材料，经典材料切线模量定义为第一类 Piola--Kirchhoff 应力关于变形梯度的导数
+\begin{equation}
+  \mathbb{C}=\frac{\partial\mathbf{P}}{\partial\mathbf{F}},
+  \qquad
+  \mathbb{C}_{iKjL}=\frac{\partial P_{iK}}{\partial F_{jL}}
+  =\frac{\partial^{2}\Psi(\mathbf{F})}{\partial F_{iK}\partial F_{jL}}
+  \label{eq:hyper-tangent}
+\end{equation}
+式\eqref{eq:hyper-tangent}是四阶张量，分量 $\mathbb{C}_{iKjL}$ 的两个指标对 $(i,j)$ 对应变形构型、$(K,L)$ 对应参考构型。由 $\mathbf{P}=\mathbf{F}\mathbf{S}$（式\eqref{eq:hyper-pk2}，分量 $P_{iK}=F_{iM}S_{MK}$）与乘积法则，材料切线为
+\begin{equation}
+  \mathbb{C}_{iKjL}
+  =\frac{\partial F_{iM}}{\partial F_{jL}}\,S_{MK}+F_{iM}\,\frac{\partial S_{MK}}{\partial F_{jL}}
+  =\delta_{ij}S_{LK}+F_{iM}\,\frac{\partial S_{MK}}{\partial F_{jL}}
+  \label{eq:hyper-tangent-pk2}
+\end{equation}
+其中第一项 $\delta_{ij}S_{LK}$ 是"初始应力（几何）部分"，反映当前应力状态在后续变形中的转动效应；第二项是"材料部分"。第二项中 $\partial S_{MK}/\partial F_{jL}$ 经 $\mathbf{S}=\mathbf{S}(\mathbf{C})$ 与 $\mathbf{C}=\mathbf{C}(\mathbf{F})$ 的链式法则展开。由式\eqref{eq:hyper-dcdf}映射指标（$I\to P,\,J\to Q,\,k\to j,\,L\to L$）
+\begin{equation}
+  \frac{\partial C_{PQ}}{\partial F_{jL}}=\delta_{PL}F_{jQ}+\delta_{QL}F_{jP}
+  \label{eq:hyper-dcpq}
+\end{equation}
+代入链式法则 $\partial S_{MK}/\partial F_{jL}=(\partial S_{MK}/\partial C_{PQ})(\partial C_{PQ}/\partial F_{jL})$，得
+\begin{equation}
+  \frac{\partial S_{MK}}{\partial F_{jL}}
+  =\sum_{P}\frac{\partial S_{MK}}{\partial C_{PL}}F_{jP}
+  +\sum_{Q}\frac{\partial S_{MK}}{\partial C_{LQ}}F_{jQ}
+  \label{eq:hyper-dsdf}
+\end{equation}
+式\eqref{eq:hyper-dsdf}中第一项来自式\eqref{eq:hyper-dcpq}的 $\delta_{PL}$ 项（$P=L$ 留下 $F_{jQ}$，哑指标 $Q$ 换名 $P$），第二项来自 $\delta_{QL}$ 项。式\eqref{eq:hyper-dsdf}代入式\eqref{eq:hyper-tangent-pk2}即得
+\begin{equation}
+  \mathbb{C}_{iKjL}
+  =\delta_{ij}S_{LK}+F_{iM}\Bigl[\sum_{P}\frac{\partial S_{MK}}{\partial C_{PL}}F_{jP}
+  +\sum_{Q}\frac{\partial S_{MK}}{\partial C_{LQ}}F_{jQ}\Bigr]
+  \label{eq:hyper-tangent-full}
+\end{equation}
+式\eqref{eq:hyper-tangent-full}是超弹性材料切线的统一表达式，其中 $\partial S_{MK}/\partial C_{PL}$ 是第二类 Piola--Kirchhoff 应力关于 $\mathbf{C}$ 的切线，对每个模型由式\eqref{eq:svk-stress}、式\eqref{eq:neo-hookean-stress}、式\eqref{eq:mooney-rivlin-stress}分别对 $\mathbf{C}$ 求导得到。以 St.~Venant--Kirchhoff 模型为例，由式\eqref{eq:svk-stress}与 $\partial E_{PQ}/\partial C_{RS}=\tfrac{1}{2}\delta_{PR}\delta_{QS}$，并利用 $\operatorname{tr}\mathbf{E}=\tfrac{1}{2}(\operatorname{tr}\mathbf{C}-3)$（$\partial(\operatorname{tr}\mathbf{E})/\partial C_{PL}=\tfrac{1}{2}\delta_{PL}$），得
+\begin{equation}
+  \frac{\partial S_{MK}}{\partial C_{PL}}
+  =\frac{\lambda}{2}\,\delta_{PL}\delta_{MK}+\mu\,\delta_{MP}\delta_{KL}
+  \label{eq:svk-dsdc}
+\end{equation}
+式\eqref{eq:svk-dsdc}代入式\eqref{eq:hyper-tangent-full}即得 St.~Venant--Kirchhoff 模型完整的四阶切线张量。其余两个模型的 $\partial\mathbf{S}/\partial\mathbf{C}$ 表达式由式\eqref{eq:neo-hookean-stress}、式\eqref{eq:mooney-rivlin-stress}类似求导得到，此处不再逐一展开，其数值验证见附录数值算例 \cite{SimoHughes1998}。
+
+需要指出的是，式\eqref{eq:hyper-tangent-full}给出的是经典本构自身的材料切线，而 NOSB 完整切线刚度还须包含非局部变形梯度对键变形的依赖（见第 7 章\ref{sec:nl-tangent}节）。完整切线刚度矩阵的族级表达式为
+\begin{equation}
+  \mathbf{K}_{\mathrm{t}}
+  =\sum_{n\in H_{j}}\Bigl[
+    \omega_{jn}\Bigl(\mathbb{C}(\mathbf{x}_{j}):
+    \frac{\partial\mathbf{F}(\mathbf{x}_{j})}{\partial\mathbf{u}_{k}}\Bigr)
+    \mathbf{K}(\mathbf{x}_{j})^{-1}\boldsymbol{\xi}_{jn}
+    -\omega_{nj}\Bigl(\mathbb{C}(\mathbf{x}_{n}):
+    \frac{\partial\mathbf{F}(\mathbf{x}_{n})}{\partial\mathbf{u}_{k}}\Bigr)
+    \mathbf{K}(\mathbf{x}_{n})^{-1}\boldsymbol{\xi}_{nj}\Bigr]V_{n}
+  \label{eq:hyper-full-tangent}
+\end{equation}
+其中 $\mathbb{C}:\partial\mathbf{F}/\partial\mathbf{u}_{k}$ 表示式\eqref{eq:hyper-tangent-full}的材料切线张量与式\eqref{eq:kinematic-tangent}的运动学部分作双点积，式\eqref{eq:hyper-full-tangent}与第 7 章式\eqref{eq:tangent-nosb}完全一致，只是把通用的材料切线 $\mathbf{A}$ 特化为超弹性的 $\mathbb{C}$ \cite{Hashim2020}。
+
+\section{黏弹性与黏塑性材料}\label{sec:visco}
+
+8.1 节讨论的超弹性材料假设材料响应与时间无关：应力完全由当前变形状态决定，不依赖变形历史。然而，许多工程材料（聚合物、金属高温蠕变、岩石、生物软组织等）表现出显著的率相关行为——应力不仅取决于当前变形，还取决于变形历史与变形速率。这类"时间依赖本构"在近场动力学框架中同样可以通过本构对应机制嵌入，且由于 NOSB 在每一材料点直接调用经典本构，经典黏弹性与黏塑性理论几乎不加改写即可移植。本节依次介绍两类最常用的率相关本构。首先建立黏弹性的基本理论：从线性黏弹性的积分型本构（松弛模量、蠕变柔度）出发，引入 Maxwell 与 Kelvin--Voigt 等力学模型（\ref{sec:visco-theory}节）；进而说明黏弹性本构在 NOSB 中的嵌入方式，重点讨论历史依赖的时间离散（\ref{sec:visco-nosb}节）；最后介绍黏塑性理论及其在近场动力学中的实现，以 Perzyna 型过应力模型为代表，并衔接第 7 章已提及的 Foster 等黏塑性模型 \cite{Foster2010}（\ref{sec:viscoplastic}节）。本节黏弹性内容主要依据 Christensen 的经典专著 \cite{Christensen1982}，黏塑性依据 Perzyna 的原始文献 \cite{Perzyna1966}，近场动力学实现参见 \cite{Foster2010,Galadima2024}。
+
+\subsection{黏弹性基本理论}\label{sec:visco-theory}
+
+线性黏弹性理论以 Boltzmann 叠加原理为基础：材料在当前时刻的应力是所有过去时刻变形贡献的线性叠加，历史越久远的贡献越小（记忆衰减）。Boltzmann 叠加原理可表述为：若材料在时刻 $\tau$ 承受应变增量 $\mathrm{d}\boldsymbol{\varepsilon}(\tau)$，则该增量对时刻 $t>\tau$ 的应力贡献为 $\mathbf{C}(t-\tau):\mathrm{d}\boldsymbol{\varepsilon}(\tau)$，其中 $\mathbf{C}(t)$ 为松弛函数张量（随时间衰减，刻画记忆衰减）。对所有过去时刻的贡献求和（积分），即得线性黏弹性的积分型本构（Stieltjes 卷积形式）
+\begin{equation}
+  \boldsymbol{\sigma}(t)=\int_{0}^{t}\mathbf{C}(t-\tau):\mathrm{d}\boldsymbol{\varepsilon}(\tau)
+  =\mathbf{C}(t):\boldsymbol{\varepsilon}(0)+\int_{0}^{t}\mathbf{C}(t-\tau):\dot{\boldsymbol{\varepsilon}}(\tau)\,d\tau
+  \label{eq:visco-integral}
+\end{equation}
+其中 $\boldsymbol{\varepsilon}$ 为（小变形）应变张量，$\mathbf{C}(t)$ 为松弛函数张量（$t=0$ 时取瞬时弹性张量 $\mathbf{C}^{0}=\mathbf{C}(0)$，各分量随 $t$ 衰减），$\boldsymbol{\varepsilon}(0)$ 为初始时刻的应变。式\eqref{eq:visco-integral}中第一个等号是 Boltzmann 叠加的直接结果，第二个等号由分部积分得到：$\int_{0}^{t}\mathbf{C}(t-\tau):\mathrm{d}\boldsymbol{\varepsilon}(\tau)=\bigl[\mathbf{C}(t-\tau):\boldsymbol{\varepsilon}(\tau)\bigr]_{0}^{t}-\int_{0}^{t}\mathbf{C}'(t-\tau):\boldsymbol{\varepsilon}(\tau)\,\mathrm{d}\tau$，其中边界项给出 $\mathbf{C}(0):\boldsymbol{\varepsilon}(t)-\mathbf{C}(t):\boldsymbol{\varepsilon}(0)$，与 Stieltjes 积分内部的结构合并后即得式\eqref{eq:visco-integral}的第二个等号 \cite{Christensen1982}。式\eqref{eq:visco-integral}的物理内涵是"记忆衰减"：时刻 $t$ 的应力依赖 $[0,t]$ 全时段的历史应变，历史越久远的应变（$\tau$ 小）经衰减的 $\mathbf{C}(t-\tau)$ 加权后贡献越小。
+
+对各向同性材料，松弛函数张量 $\mathbf{C}(t)$ 可分解为体积与偏斜两部分。由各向同性张量的表示定理，四阶张量 $\mathbf{C}(t)$ 可写为
+\begin{equation}
+  \mathbf{C}(t)=3K(t)\,\mathbf{I}^{\mathrm{vol}}+2G(t)\,\mathbf{I}^{\mathrm{dev}}
+  \label{eq:visco-c-decomp}
+\end{equation}
+其中 $\mathbf{I}^{\mathrm{vol}}=\tfrac{1}{3}\mathbf{I}\otimes\mathbf{I}$ 与 $\mathbf{I}^{\mathrm{dev}}=\mathbf{I}^{\mathrm{sym}}-\mathbf{I}^{\mathrm{vol}}$ 分别为体积与偏斜投影张量（$\mathbf{I}^{\mathrm{sym}}$ 为四阶对称单位张量，$(\mathbf{I}^{\mathrm{sym}})_{ijkl}=\tfrac{1}{2}(\delta_{ik}\delta_{jl}+\delta_{il}\delta_{jk})$），$K(t)$ 与 $G(t)$ 分别为体积与剪切松弛模量 \cite{Christensen1982}。把式\eqref{eq:visco-c-decomp}代入式\eqref{eq:visco-integral}，利用投影性质 $\mathbf{I}^{\mathrm{vol}}:\boldsymbol{\varepsilon}=\tfrac{1}{3}(\operatorname{tr}\boldsymbol{\varepsilon})\mathbf{I}$ 与 $\mathbf{I}^{\mathrm{dev}}:\boldsymbol{\varepsilon}=\mathbf{e}$（$\mathbf{e}$ 为偏应变张量），应力张量分解为 $\boldsymbol{\sigma}=\tfrac{1}{3}(\operatorname{tr}\boldsymbol{\sigma})\mathbf{I}+\mathbf{s}$。其中偏斜部分为
+\begin{equation}
+  \mathbf{s}(t)=2G(t)\mathbf{e}(0)+2\int_{0}^{t}G(t-\tau)\,\dot{\mathbf{e}}(\tau)\,d\tau
+  \label{eq:visco-deviatoric}
+\end{equation}
+其中 $\mathbf{s}=\boldsymbol{\sigma}-\tfrac{1}{3}(\operatorname{tr}\boldsymbol{\sigma})\mathbf{I}$ 为偏应力张量，$\mathbf{e}=\boldsymbol{\varepsilon}-\tfrac{1}{3}(\operatorname{tr}\boldsymbol{\varepsilon})\mathbf{I}$ 为偏应变张量，$G(t)$ 为剪切松弛模量（$t=0$ 时取瞬时值 $G_{0}=G(0)$，$t\to\infty$ 时取平衡值 $G_{\infty}$）\cite{Christensen1982}。式\eqref{eq:visco-deviatoric}中第一项 $2G(t)\mathbf{e}(0)$ 来自式\eqref{eq:visco-integral}的边界项 $\mathbf{C}(t):\boldsymbol{\varepsilon}(0)$ 经式\eqref{eq:visco-c-decomp}投影到偏斜部分（因子 $2$ 来自 $2G(t)\mathbf{I}^{\mathrm{dev}}:\mathbf{e}(0)=2G(t)\mathbf{e}(0)$），第二项为历史积分，反映剪切变形的记忆效应。体积部分类似地以体积松弛模量 $K(t)$ 表述：$\operatorname{tr}\boldsymbol{\sigma}=3K(t)\operatorname{tr}\boldsymbol{\varepsilon}(0)+3\int_{0}^{t}K(t-\tau)\operatorname{tr}\dot{\boldsymbol{\varepsilon}}(\tau)\,d\tau$，此处不再展开。
+
+松弛模量的具体形式由力学模型确定。最常用的两个基本模型是 Maxwell 模型与 Kelvin--Voigt 模型。Maxwell 模型把弹簧（弹性元，模量 $E$）与阻尼器（黏性元，黏度 $\eta$）串联。串联元件的总应变是两元件应变之和：$\varepsilon=\varepsilon^{e}+\varepsilon^{v}$，其中弹簧应变 $\varepsilon^{e}=\sigma/E$、阻尼器应变率 $\dot{\varepsilon}^{v}=\sigma/\eta$，且串联元件应力相等。对时间求导并代入，得一维本构方程
+\begin{equation}
+  \dot{\varepsilon}=\frac{\dot{\sigma}}{E}+\frac{\sigma}{\eta},
+  \qquad
+  \tau_{R}=\frac{\eta}{E}
+  \label{eq:maxwell-model}
+\end{equation}
+其中 $\tau_{R}$ 为松弛时间（relaxation time）。式\eqref{eq:maxwell-model}是常系数一阶线性常微分方程，其松弛解（恒定应变 $\varepsilon=\varepsilon_{0}$，即 $\dot{\varepsilon}=0$）为：$\dot{\sigma}/E+\sigma/\eta=0$，即 $\dot{\sigma}=-\sigma/\tau_{R}$，积分得
+\begin{equation}
+  \sigma(t)=\sigma_{0}\,e^{-t/\tau_{R}}
+  \label{eq:maxwell-relaxation}
+\end{equation}
+其中 $\sigma_{0}=E\varepsilon_{0}$ 为初始应力。式\eqref{eq:maxwell-relaxation}表明 Maxwell 材料在恒定应变下应力按指数衰减（松弛）。其蠕变解（恒定应力 $\sigma=\sigma_{0}$，即 $\dot{\sigma}=0$）为 $\dot{\varepsilon}=\sigma_{0}/\eta$，积分得 $\varepsilon(t)=\sigma_{0}/E+\sigma_{0}t/\eta$，即应变线性增长（蠕变，对应黏性流动），故 Maxwell 模型描述黏弹性流体 \cite{Christensen1982}。
+
+Kelvin--Voigt 模型把弹簧与阻尼器并联。并联元件的总应力是两元件应力之和：$\sigma=\sigma^{e}+\sigma^{v}$，其中弹簧应力 $\sigma^{e}=E\varepsilon$、阻尼器应力 $\sigma^{v}=\eta\dot{\varepsilon}$，且并联元件应变相等，故其一维本构为
+\begin{equation}
+  \sigma=E\varepsilon+\eta\dot{\varepsilon}
+  \label{eq:kv-model}
+\end{equation}
+式\eqref{eq:kv-model}的蠕变解（恒定应力 $\sigma_{0}$）为常系数一阶线性常微分方程 $E\varepsilon+\eta\dot{\varepsilon}=\sigma_{0}$，其特解 $\varepsilon=\sigma_{0}/E$，通解为
+\begin{equation}
+  \varepsilon(t)=\frac{\sigma_{0}}{E}\Bigl(1-e^{-t/\tau_{R}}\Bigr)
+  \label{eq:kv-creep}
+\end{equation}
+其中 $\tau_{R}=\eta/E$ 与式\eqref{eq:maxwell-model}同形（初值 $\varepsilon(0)=0$，因阻尼器不允许瞬时应变）。式\eqref{eq:kv-creep}表明 Kelvin--Voigt 材料在恒定应力下应变按指数趋向平衡值 $\sigma_{0}/E$（蠕变），而在恒定应变下应力恒定（不松弛，因阻尼器在零应变率下无贡献），故描述黏弹性固体 \cite{Christensen1982}。
+
+真实固体的松弛行为需要同时捕捉瞬时响应与长期松弛，由标准线性固体（standard linear solid, SLS）模型——一个 Maxwell 元与弹簧并联——描述。设并联弹簧模量为 $E_{\infty}$，Maxwell 元中弹簧模量为 $E_{1}$、黏度 $\eta_{1}$。对剪切情形，SLS 模型的松弛模量为
+\begin{equation}
+  G(t)=G_{\infty}+(G_{0}-G_{\infty})\,e^{-t/\tau_{R}}
+  \label{eq:sls-relaxation}
+\end{equation}
+其中 $G_{0}=G_{\infty}+G_{1}$ 为瞬时模量（$t=0$ 时两弹簧并联刚度之和），$G_{\infty}$ 为平衡模量（$t\to\infty$ 时 Maxwell 元完全松弛、只剩并联弹簧），$G_{1}$ 与 $\tau_{R}=\eta_{1}/G_{1}$ 分别为 Maxwell 元的弹簧模量与松弛时间。式\eqref{eq:sls-relaxation}的推导：SLS 的微分本构为 $\sigma+\tau_{R}\dot{\sigma}=E_{\infty}\varepsilon+(E_{\infty}+E_{1})\tau_{R}\dot{\varepsilon}$，对阶跃应变 $\varepsilon=\varepsilon_{0}H(t)$ 求解该一阶常微分方程即得式\eqref{eq:sls-relaxation}形式的单指数松弛 \cite{Christensen1982}。式\eqref{eq:sls-relaxation}是工程中最常用的松弛模量形式，其从 $G_{0}$（$t=0$）单调衰减到 $G_{\infty}$（$t\to\infty$），时间尺度由 $\tau_{R}$ 控制。
+
+\subsection{黏弹性本构在 NOSB 中的嵌入}\label{sec:visco-nosb}
+
+把式\eqref{eq:visco-integral}—\eqref{eq:visco-deviatoric}的黏弹性本构嵌入 NOSB 的关键在于：本构对应机制要求本构以第一类 Piola--Kirchhoff 应力 $\mathbf{P}$（或 Cauchy 应力 $\boldsymbol{\sigma}$）为输出（第 7 章\ref{sec:constitutive-embedding}节），而黏弹性本构式\eqref{eq:visco-integral}的应力依赖变形历史——这并不构成障碍，因为 $\boldsymbol{\sigma}(t)$ 在每一时刻仍是当前应变 $\boldsymbol{\varepsilon}(t)$ 与内变量（历史状态）的显式函数，与本构对应机制对"本构为当前状态函数"的要求相容。嵌入流程为：在每一材料点维护历史变量（如式\eqref{eq:visco-recurrence}的记忆向量 $\mathbf{h}^{n}$），按式\eqref{eq:visco-integral}在当前时刻计算 $\boldsymbol{\sigma}(t)$，再经式\eqref{eq:piola-cauchy}（$\mathbf{P}=J\boldsymbol{\sigma}\mathbf{F}^{-\mathrm{T}}$，其中 $J=\det\mathbf{F}$）转成第一类 Piola--Kirchhoff 应力，最后按式\eqref{eq:hyper-force-state}构造力态
+\begin{equation}
+  \underline{\mathbf{T}}\langle\boldsymbol{\xi}\rangle
+  =\omega(|\boldsymbol{\xi}|)\,\mathbf{P}(\mathbf{F},\boldsymbol{\sigma}(t))\,\mathbf{K}^{-1}\boldsymbol{\xi}
+  \label{eq:visco-force-state}
+\end{equation}
+其中 $\mathbf{P}$ 通过 $\boldsymbol{\sigma}(t)$ 显式依赖变形历史。式\eqref{eq:visco-force-state}与第 7 章式\eqref{eq:force-state-cauchy}的 Cauchy 应力嵌入形式完全一致，区别仅在于 $\boldsymbol{\sigma}(t)$ 由黏弹性本构式\eqref{eq:visco-integral}而非超弹性本构给出。值得强调的是，黏弹性嵌入在 NOSB 中与超弹性（8.1 节）的唯一差异是应力更新需携带历史：非局部变形梯度式\eqref{eq:nonlocal-deformation-gradient}与形状张量仍按当前构型计算，历史信息仅通过 $\boldsymbol{\sigma}(t)$ 进入力态 \cite{Galadima2024}。小变形情形下（第 9 章离散），应变由位移场的对称梯度 $\boldsymbol{\varepsilon}=\tfrac{1}{2}(\nabla\mathbf{u}+\nabla\mathbf{u}^{\mathrm{T}})$ 给出，式\eqref{eq:visco-force-state}即退化到经典的线黏弹性--近场动力学耦合形式。
+
+数值实现中，历史积分式\eqref{eq:visco-integral}的时间离散是关键。对式\eqref{eq:visco-deviatoric}采用递推方案，其核心是把全历史积分转化为单内变量更新。为导出正确的递推形式，先把式\eqref{eq:visco-deviatoric}改写为遗传积分形式：由分部积分 $\int_{0}^{t}G(t-\tau)\dot{\mathbf{e}}(\tau)\,d\tau=G(0)\mathbf{e}(t)-G(t)\mathbf{e}(0)-\int_{0}^{t}G'(t-\tau)\mathbf{e}(\tau)\,d\tau$（$G'(s)=dG/ds<0$），式\eqref{eq:visco-deviatoric}化为
+\begin{equation}
+  \mathbf{s}(t)=2G_{0}\,\mathbf{e}(t)-2\int_{0}^{t}G'(t-\tau)\,\mathbf{e}(\tau)\,d\tau
+  \label{eq:visco-genetic}
+\end{equation}
+其中 $G_{0}=G(0)$ 为瞬时模量。式\eqref{eq:visco-genetic}中历史项以 $\mathbf{e}(\tau)$（而非 $\dot{\mathbf{e}}$）为被积函数，且核函数 $G'(t-\tau)<0$，故式\eqref{eq:visco-genetic}的积分项为正（$-\int G'\mathbf{e}\,d\tau$）。把时间区间离散为 $t_{n}=n\Delta t$，对式\eqref{eq:visco-genetic}作矩形离散，并令 $r=e^{-\Delta t/\tau_{R}}$（对 SLS 松弛模量式\eqref{eq:sls-relaxation}，$G'(s)=-(G_{0}-G_{\infty})\tau_{R}^{-1}e^{-s/\tau_{R}}$，故 $G'(k\Delta t)$ 构成等比序列），历史项化为等比级数
+\begin{equation}
+  -\int_{0}^{t_{n}}G'(t_{n}-\tau)\mathbf{e}(\tau)\,d\tau
+  \approx (G_{0}-G_{\infty})(1-r)\sum_{k=0}^{n-1}r^{k}\mathbf{e}^{n-1-k}
+  =(G_{0}-G_{\infty})(1-r)\,\mathbf{h}^{n}
+  \label{eq:visco-hist-sum}
+\end{equation}
+其中定义了历史记忆向量
+\begin{equation}
+  \mathbf{h}^{n}=\sum_{k=0}^{n-1}r^{k}\mathbf{e}^{n-1-k}
+  \label{eq:visco-h-def}
+\end{equation}
+式\eqref{eq:visco-h-def}满足一阶递推关系：把 $\mathbf{h}^{n}$ 与 $\mathbf{h}^{n-1}=\sum_{k=0}^{n-2}r^{k}\mathbf{e}^{n-2-k}$ 对比，$\mathbf{h}^{n}=\mathbf{e}^{n-1}+r\mathbf{h}^{n-1}$（首项 $\mathbf{e}^{n-1}$ 对应 $k=0$，其余项 $k\ge1$ 提出因子 $r$ 后即 $r\mathbf{h}^{n-1}$）。把式\eqref{eq:visco-hist-sum}代入式\eqref{eq:visco-genetic}，得偏应力的递推更新式
+\begin{equation}
+  \mathbf{s}^{n}=2G_{0}\mathbf{e}^{n}-2(G_{0}-G_{\infty})(1-r)\,\mathbf{h}^{n},
+  \qquad
+  \mathbf{h}^{n}=\mathbf{e}^{n-1}+r\,\mathbf{h}^{n-1}
+  \label{eq:visco-recurrence}
+\end{equation}
+式\eqref{eq:visco-recurrence}是黏弹性递推积分的核心：每一时间步只需更新单内变量 $\mathbf{h}^{n}$（向量），并由当前偏应变 $\mathbf{e}^{n}$ 与 $\mathbf{h}^{n}$ 组合出 $\mathbf{s}^{n}$，避免了存储全部历史应变 $\{\mathbf{e}^{0},\ldots,\mathbf{e}^{n}\}$ 的 $O(n)$ 存储与 $O(n^{2})$ 计算开销，降为 $O(1)$ 存储与 $O(1)$ 每步计算。这一递推技巧在近场动力学的显式时间积分（第 9 章）中可自然嵌入：每一材料点独立维护 $\mathbf{h}^{n}$，载荷步间只需一次向量更新 \cite{Galadima2024}。
+
+\subsection{黏塑性理论及其近场动力学实现}\label{sec:viscoplastic}
+
+黏塑性（viscoplasticity）描述屈服后具有率相关塑性流动的材料行为：与率无关塑性（第 6 章）不同，黏塑性材料的塑性应变率与过应力（overstress）成比例，屈服不再是硬性的"弹性/塑性"切换，而是光滑的率相关过渡。Perzyna 型黏塑性是最经典的表述 \cite{Perzyna1966}。其基本假设是总应变率分解为弹性与黏塑性两部分（式\eqref{eq:perzyna-decomp}）
+\begin{equation}
+  \dot{\boldsymbol{\varepsilon}}=\dot{\boldsymbol{\varepsilon}}^{e}+\dot{\boldsymbol{\varepsilon}}^{vp}
+  \label{eq:perzyna-decomp}
+\end{equation}
+其中弹性部分经弹性本构与应力率关联，黏塑性部分沿屈服面的外法向（关联流动）且幅值由过应力决定
+\begin{equation}
+  \dot{\boldsymbol{\varepsilon}}^{vp}
+  =\gamma\,\langle\phi(f)\rangle\,\frac{\partial f}{\partial\boldsymbol{\sigma}}
+  \label{eq:perzyna-flow}
+\end{equation}
+其中 $\gamma$ 为黏性参数（流动系数，量纲为时间的倒数），$f(\boldsymbol{\sigma},\boldsymbol{q})$ 为屈服函数（$\boldsymbol{q}$ 为内变量），$\langle\cdot\rangle$ 为 Macaulay 括号（$\langle x\rangle=x$ 若 $x>0$，否则 $0$），$\phi$ 为过应力函数。式\eqref{eq:perzyna-flow}的结构体现了黏塑性区别于率无关塑性的两个特征：其一，流动方向取 $\partial f/\partial\boldsymbol{\sigma}$（屈服面外法向），与率无关塑性中塑性流动方向一致（关联流动假设，由最大塑性耗散原理导出，见第 6 章）；其二，流动幅值由过应力函数 $\phi(f)$ 控制，$f>0$ 时 $\langle\phi(f)\rangle>0$，产生率相关的塑性流动，而 $f\le0$ 时无流动。式\eqref{eq:perzyna-flow}中当 $\gamma\to\infty$ 时恢复率无关塑性（过应力瞬时耗散），当 $\gamma\to0$ 时材料退化为弹性。常用的过应力函数为幂律形式
+\begin{equation}
+  \phi(f)=\Bigl(\frac{f}{\sigma_{0}}\Bigr)^{N}
+  \label{eq:perzyna-overstress}
+\end{equation}
+其中 $\sigma_{0}$ 为参考应力、$N$ 为率敏感指数（$N=1$ 为线性黏塑性，$N>1$ 表示率敏感性随过应力增强）\cite{Perzyna1966}。式\eqref{eq:perzyna-overstress}代入式\eqref{eq:perzyna-flow}即得完整的 Perzyna 黏塑性流动法则：当屈服函数 $f<0$（弹性区）时 $\langle\phi(f)\rangle=0$，无黏塑性流动；当 $f>0$（过应力区）时塑性流动率与过应力的 $N$ 次幂成比例 \cite{Perzyna1966}。
+
+对 von Mises 屈服准则 $f=\sqrt{3J_{2}}-\sigma_{y}$（$J_{2}=\tfrac{1}{2}\mathbf{s}:\mathbf{s}$ 为偏应力第二不变量，$\sigma_{y}$ 为屈服应力），取线性过应力函数式\eqref{eq:perzyna-overstress}的 $N=1$、$\sigma_{0}=1$，式\eqref{eq:perzyna-flow}化为 von Mises 黏塑性流动法则。其推导需要屈服函数关于 $\boldsymbol{\sigma}$ 的导数：由 $f=\sqrt{3J_{2}}-\sigma_{y}$ 与 $J_{2}=\tfrac{1}{2}s_{ij}s_{ij}$（$s_{ij}=\sigma_{ij}-\tfrac{1}{3}\sigma_{kk}\delta_{ij}$ 为偏应力分量），链式法则给出
+\begin{equation}
+  \frac{\partial f}{\partial\boldsymbol{\sigma}}
+  =\frac{\partial f}{\partial J_{2}}\frac{\partial J_{2}}{\partial\mathbf{s}}:\frac{\partial\mathbf{s}}{\partial\boldsymbol{\sigma}}
+  =\frac{3}{2}\,\frac{\mathbf{s}}{\sigma_{e}}
+  \label{eq:perzyna-dfdv}
+\end{equation}
+式\eqref{eq:perzyna-dfdv}的推导：$\partial f/\partial J_{2}=\sqrt{3}/(2\sqrt{J_{2}})=3/(2\sigma_{e})$（由 $f=\sqrt{3J_{2}}-\sigma_{y}$ 与 $\sigma_{e}=\sqrt{3J_{2}}$）；$\partial J_{2}/\partial\mathbf{s}=\mathbf{s}$（由 $J_{2}=\tfrac{1}{2}\mathbf{s}:\mathbf{s}$）；$\partial\mathbf{s}/\partial\boldsymbol{\sigma}=\mathbf{I}^{\mathrm{dev}}$（偏斜投影张量，式\eqref{eq:visco-c-decomp}）。三项复合即 $\tfrac{3}{2\sigma_{e}}\,\mathbf{s}:\mathbf{I}^{\mathrm{dev}}=\tfrac{3}{2}\mathbf{s}/\sigma_{e}$（利用 $\mathbf{I}^{\mathrm{dev}}:\mathbf{s}=\mathbf{s}$）。把式\eqref{eq:perzyna-dfdv}代入式\eqref{eq:perzyna-flow}得
+\begin{equation}
+  \dot{\boldsymbol{\varepsilon}}^{vp}
+  =\frac{3\gamma}{2}\,\frac{\mathbf{s}}{\sigma_{e}}\,\langle\sigma_{e}-\sigma_{y}\rangle
+  \label{eq:perzyna-vm}
+\end{equation}
+其中 $\sigma_{e}=\sqrt{3J_{2}}$ 为 von Mises 等效应力。式\eqref{eq:perzyna-vm}是工程黏塑性最常用的形式，其流动方向 $\mathbf{s}/\sigma_{e}$ 为归一化偏应力，与式\eqref{eq:perzyna-dfdv}一致 \cite{Perzyna1966,Foster2010}。
+
+黏塑性本构嵌入 NOSB 的方式与黏弹性类似：在每一材料点维护内变量（黏塑性应变 $\boldsymbol{\varepsilon}^{vp}$、等效应变等），按式\eqref{eq:perzyna-vm}在当前时刻计算黏塑性应变率，用显式或隐式时间积分更新应力，再经式\eqref{eq:hyper-force-state}构造力态。这一路径与第 7 章 L278 所述"第 6 章建立的弹塑性、粘塑性模型可以不经改写直接嵌入 NOSB"完全一致 \cite{Foster2010}。
+
+数值上，黏塑性应力更新采用算子分裂（operator split）的显式 Euler 格式：对时间步 $[t_{n},t_{n+1}]$，给定当前应力 $\boldsymbol{\sigma}^{n}$ 与内变量（黏塑性应变 $\boldsymbol{\varepsilon}^{vp,n}$），先由弹性预测步计算试探应力
+\begin{equation}
+  \boldsymbol{\sigma}^{n+1,\mathrm{trial}}=\boldsymbol{\sigma}^{n}+\mathbf{C}^{e}:(\Delta\boldsymbol{\varepsilon}-\Delta\boldsymbol{\varepsilon}^{vp})
+  \label{eq:vp-trial-stress}
+\end{equation}
+其中 $\mathbf{C}^{e}$ 为弹性张量，$\Delta\boldsymbol{\varepsilon}$ 为总应变增量，$\Delta\boldsymbol{\varepsilon}^{vp}$ 为黏塑性应变增量。对 Perzyna 模型，黏塑性应变增量由式\eqref{eq:perzyna-vm}显式给出
+\begin{equation}
+  \Delta\boldsymbol{\varepsilon}^{vp}
+  =\frac{3\gamma\Delta t}{2}\,\frac{\mathbf{s}^{n}}{\sigma_{e}^{n}}\,\langle\sigma_{e}^{n}-\sigma_{y}\rangle
+  \label{eq:vp-explicit-update}
+\end{equation}
+其中 $\mathbf{s}^{n}$、$\sigma_{e}^{n}$ 用当前步（第 $n$ 步）的应力状态计算（显式格式）。式\eqref{eq:vp-explicit-update}代入式\eqref{eq:vp-trial-stress}即得 $\boldsymbol{\sigma}^{n+1}$，随后更新内变量 $\boldsymbol{\varepsilon}^{vp,n+1}=\boldsymbol{\varepsilon}^{vp,n}+\Delta\boldsymbol{\varepsilon}^{vp}$。这一显式格式无需率无关塑性中的返回映射（return mapping）迭代——因为黏塑性流动率由式\eqref{eq:perzyna-vm}直接给出，不存在"求满足屈服条件的塑性乘子"的隐式方程 \cite{Foster2010}。Foster 等 2010 年在 NOSB 框架内实现了这一 Perzyna 型黏塑性模型，用于金属的率相关塑性变形分析，验证了对应材料在率相关加载下的响应 \cite{Foster2010}。与率无关塑性相比，黏塑性在 NOSB 中的实现有两个便利：其一，塑性应变率由式\eqref{eq:perzyna-flow}显式给出，无需返回映射迭代（如上所述）；其二，黏性项 $\gamma$ 起正则化作用，缓解了率无关塑性在隐式求解中切线刚度突变的收敛困难（第 7 章\ref{sec:nl-tangent}节）\cite{Foster2010,Hashim2020}。需要指出的是，显式格式式\eqref{eq:vp-explicit-update}的稳定性受黏性参数约束。对式\eqref{eq:vp-explicit-update}作单步线性化分析：设 $\sigma_{e}>\sigma_{y}$ 且流动方向近似固定，则 $\Delta\boldsymbol{\varepsilon}^{vp}$ 与当前应力线性相关，代入式\eqref{eq:vp-trial-stress}后应力更新成为 $\boldsymbol{\sigma}^{n+1}=\boldsymbol{\sigma}^{n}-\gamma\Delta t\,\mathbf{C}^{e}:\boldsymbol{\mathcal{A}}:\boldsymbol{\sigma}^{n}+\ldots$（$\boldsymbol{\mathcal{A}}=\tfrac{3}{2}\mathbf{I}^{\mathrm{dev}}/\sigma_{e}$），其特征值须满足 $|1-\gamma\Delta t\,\lambda_{\max}(\mathbf{C}^{e}:\boldsymbol{\mathcal{A}})|<1$，故稳定条件为 $\gamma\Delta t\,\|\mathbf{C}^{e}\|=O(1)$，即黏塑性时间步 $\Delta t$ 须随 $\gamma^{-1}$ 与弹性刚度的乘积受限 \cite{Foster2010}。这一约束在近场动力学显式时间积分（第 9 章）中与弹性 CFL 条件共同决定时间步长。
+
+\section{蠕变材料}\label{sec:creep}
+
+8.2 节讨论了黏弹性与黏塑性材料，两者都涉及时间依赖的变形响应，但时间尺度通常较短（力学加载历程量级）。蠕变（creep）则指材料在恒定应力（或恒定载荷）下随时间持续变形的现象，是高温结构（汽轮机、航空发动机热端部件、核电站管道等）长期服役的主要失效模式。蠕变在机制上源于高温下位错攀移、晶界滑移、扩散等热激活过程，其时间尺度可达数万小时，与黏弹性的短时记忆行为有本质区别。本节建立蠕变材料的本构理论及其近场动力学实现。首先介绍蠕变的基本现象与唯象描述：蠕变曲线的三阶段特征与 Norton 幂律蠕变本构（\ref{sec:creep-theory}节）；进而引入蠕变损伤模型，重点讨论 Kachanov--Rabotnov 型损伤演化与 Liu--Murakami 模型的改进（\ref{sec:creep-damage}节）；最后说明蠕变本构在 NOSB 框架中的嵌入方式，衔接 8.2 节的率相关本构嵌入思路，并介绍基于本构对应的蠕变--近场动力学实现（\ref{sec:creep-nosb}节）。本节蠕变理论依据 Norton 的经典专著 \cite{Norton1929} 与 Liu--Murakami 损伤文献 \cite{LiuMurakami1998,MurakamiLiu1995}，近场动力学实现参见 \cite{KulkarniTabarraei2020}。
+
+\subsection{蠕变基本理论与 Norton 幂律}\label{sec:creep-theory}
+
+在恒定应力 $\sigma_{0}$ 作用下，材料的蠕变应变 $\varepsilon^{c}(t)$ 随时间典型地呈现三个阶段（图略）：第一阶段（primary/transient creep）应变率随时间递减，称为减速蠕变；第二阶段（secondary/steady-state creep）应变率近似恒定，称为稳态蠕变；第三阶段（tertiary creep）应变率加速增长直至断裂，称为加速蠕变。蠕变的微观机制是高温下的热激活过程——位错攀移绕过障碍、晶界滑移与扩散蠕变（Nabarro--Herring 体扩散、Coble 晶界扩散）——其共同特征是变形率与温度和应力的组合相关 \cite{Norton1929}。
+
+第一阶段减速蠕变可用 Andrade 律描述
+\begin{equation}
+  \varepsilon^{c}(t)=a\,t^{1/3}
+  \label{eq:andrade-law}
+\end{equation}
+其中 $a$ 为材料常数。式\eqref{eq:andrade-law}对应蠕变率 $\dot{\varepsilon}^{c}=\tfrac{1}{3}at^{-2/3}\propto t^{-2/3}$ 随时间的递减行为，反映了蠕变初始阶段位错滑移与回复竞争导致的应变率下降 \cite{Norton1929}。工程设计中，稳态蠕变阶段占据服役寿命的主要部分，其应变率近似恒定，由经典 Norton 幂律描述 \cite{Norton1929}
+\begin{equation}
+  \dot{\varepsilon}^{c}=B\,\sigma^{n}
+  \label{eq:norton-law}
+\end{equation}
+其中 $B$ 与 $n$ 为材料常数（$n$ 称应力指数，金属典型值 $3\sim 10$），$\sigma$ 为（单轴）应力。式\eqref{eq:norton-law}是蠕变分析最常用的唯象本构，其对数形式 $\ln\dot{\varepsilon}^{c}=\ln B+n\ln\sigma$ 表明 $\dot{\varepsilon}^{c}$ 与 $\sigma$ 在对数坐标下呈线性关系，斜率即应力指数 $n$，截距确定 $B$。稳态蠕变率对温度 $T$ 的依赖常用 Arrhenius 形式补充：$B=B_{0}\exp(-Q/RT)$，其中 $Q$ 为蠕变激活能、$R$ 为气体常数，但本节限于等温情形，$B$ 视为常数 \cite{Norton1929}。
+
+对多轴应力状态，Norton 律推广为 von Mises 形式的率型本构：蠕变应变率张量与偏应力同向（体积不变），幅值由等效应力控制。设式\eqref{eq:norton-law}在多轴情形的推广为
+\begin{equation}
+  \dot{\boldsymbol{\varepsilon}}^{c}=\lambda\,\mathbf{s}
+  \label{eq:norton-multiaxial-ansatz}
+\end{equation}
+即蠕变应变率与偏应力同向（此即体积不变条件 $\operatorname{tr}\dot{\boldsymbol{\varepsilon}}^{c}=0$，因 $\operatorname{tr}\mathbf{s}=0$；也对应金属蠕变不可压的物理事实），$\lambda$ 为待定流动系数。把式\eqref{eq:norton-multiaxial-ansatz}代入 von Mises 等效关系
+\begin{equation}
+  \dot{\boldsymbol{\varepsilon}}^{c}:\dot{\boldsymbol{\varepsilon}}^{c}
+  =\frac{3}{2}\bigl(\dot{\varepsilon}^{c}_{e}\bigr)^{2},
+  \qquad
+  \dot{\varepsilon}^{c}_{e}=B\,\sigma_{e}^{n}
+  \label{eq:norton-equivalence}
+\end{equation}
+其中 $\dot{\varepsilon}^{c}_{e}$ 为等效蠕变率（由单轴式\eqref{eq:norton-law}以 $\sigma\to\sigma_{e}$ 代入得到）。式\eqref{eq:norton-equivalence}左侧代入式\eqref{eq:norton-multiaxial-ansatz}得 $\dot{\boldsymbol{\varepsilon}}^{c}:\dot{\boldsymbol{\varepsilon}}^{c}=\lambda^{2}\mathbf{s}:\mathbf{s}$，而 $\mathbf{s}:\mathbf{s}=\tfrac{2}{3}\sigma_{e}^{2}$（由 $\sigma_{e}^{2}=\tfrac{3}{2}\mathbf{s}:\mathbf{s}$），故 $\lambda^{2}\cdot\tfrac{2}{3}\sigma_{e}^{2}=\tfrac{3}{2}B^{2}\sigma_{e}^{2n}$，解出 $\lambda=\tfrac{3}{2}B\sigma_{e}^{n-1}$（取正号，因蠕变率与应力同号）。代入式\eqref{eq:norton-multiaxial-ansatz}即得多轴 Norton 律
+\begin{equation}
+  \dot{\boldsymbol{\varepsilon}}^{c}
+  =\frac{3}{2}\,B\,\sigma_{e}^{n-1}\,\mathbf{s}
+  \label{eq:norton-multiaxial}
+\end{equation}
+其中 $\sigma_{e}=\sqrt{\tfrac{3}{2}\mathbf{s}:\mathbf{s}}=\sqrt{3J_{2}}$ 为 von Mises 等效应力（与式\eqref{eq:perzyna-vm}同定义），$\mathbf{s}$ 为偏应力张量。式\eqref{eq:norton-multiaxial}是稳态蠕变分析的标准本构，与 8.2 节黏塑性式\eqref{eq:perzyna-vm}的区别在于：蠕变没有屈服阈值，任何非零应力都产生蠕变变形（$\sigma_{e}>0$ 恒有流动），而黏塑性仅在过应力 $\sigma_{e}>\sigma_{y}$ 时流动。
+
+\subsection{蠕变损伤模型}\label{sec:creep-damage}
+
+稳态蠕变假设忽略了第三阶段的损伤累积。实际高温构件在长期服役中，蠕变损伤（孔洞萌生与长大、微裂纹）随应变累积而发展，导致材料承载能力下降、蠕变率加速，最终断裂。这一阶段由蠕变损伤力学描述。连续损伤力学的出发点（Kachanov 1958）是：损伤表现为材料内部微缺陷（孔洞、微裂纹）的分布，使实际承载面积小于表观面积。设材料点的表观截面积为 $A_{0}$，微缺陷占据的有效面积为 $A_{\mathrm{def}}$，则损伤变量定义为缺陷面积分数
+\begin{equation}
+  D=\frac{A_{\mathrm{def}}}{A_{0}}
+  \label{eq:creep-damage-def}
+\end{equation}
+$D=0$ 对应无损伤（$A_{\mathrm{def}}=0$），$D=1$ 对应完全失效（$A_{\mathrm{def}}=A_{0}$）。在表观应力 $\sigma$（外力除以表观面积）作用下，实际由未损伤材料承受的力在有效面积 $A_{0}-A_{\mathrm{def}}=A_{0}(1-D)$ 上产生放大应力，即有效应力
+\begin{equation}
+  \tilde{\sigma}=\frac{\sigma}{1-D}
+  \label{eq:creep-effective-stress}
+\end{equation}
+式\eqref{eq:creep-effective-stress}是 Kachanov 损伤理论的基石：损伤使实际承载面积减小，有效应力增大，材料在相同的表观载荷下经历更严酷的应力状态。这一"净应力"概念是式\eqref{eq:creep-damage-def}代入平衡条件 $\sigma A_{0}=\tilde{\sigma}(A_{0}-A_{\mathrm{def}})$ 的直接结果 \cite{MurakamiLiu1995}。
+
+把式\eqref{eq:creep-effective-stress}代入 Norton 律式\eqref{eq:norton-law}，并假设损伤演化率同样由有效应力驱动（Kachanov--Rabotnov 假设），得蠕变--损伤耦合本构
+\begin{equation}
+  \dot{\varepsilon}^{c}=B\Bigl(\frac{\sigma}{1-D}\Bigr)^{n},
+  \qquad
+  \dot{D}=A\,\frac{\sigma^{q}}{(1-D)^{q}}
+  \label{eq:k-r-model}
+\end{equation}
+其中 $A$、$q$ 为损伤演化材料常数。式\eqref{eq:k-r-model}中蠕变方程表明损伤 $D$ 增大时有效应力 $\sigma/(1-D)$ 增大，蠕变率随之加速；损伤方程表明损伤演化率同样随 $D$ 增大而加速（$(1-D)^{-q}$ 项）——二者的耦合正是第三阶段蠕变的机制 \cite{MurakamiLiu1995}。当 $D\to1$ 时 $\dot{\varepsilon}^{c},\dot{D}\to\infty$，材料在有限时间内失效。失效时间由式\eqref{eq:k-r-model}的损伤方程积分得到：把 $\dot{D}=A\sigma^{q}(1-D)^{-q}$ 分离变量并积分
+\begin{equation}
+  t_{R}=\int_{0}^{t_{R}}dt
+  =\int_{0}^{1}\frac{(1-D)^{q}}{A\sigma^{q}}\,dD
+  =\frac{1}{A\sigma^{q}}\cdot\frac{1}{q+1}
+  =\frac{1}{A\sigma^{q}(q+1)}
+  \label{eq:kr-failure-time}
+\end{equation}
+式\eqref{eq:kr-failure-time}中第二步用了 $\int_{0}^{1}(1-D)^{q}dD=1/(q+1)$（作代换 $u=1-D$ 得 $\int_{0}^{1}u^{q}du=1/(q+1)$）。式\eqref{eq:kr-failure-time}表明失效时间随应力按幂律缩短（$t_{R}\propto\sigma^{-q}$），且 $q$ 越大失效越快 \cite{MurakamiLiu1995}。
+
+Kachanov--Rabotnov 模型形式简洁，但存在数值上的病态应力敏感性：损伤后期 $(1-D)^{-q}$ 随 $D\to1$ 趋于无穷，导致损伤局部化与网格依赖。Liu 与 Murakami 提出了改进模型，引入指数型应力敏感项缓解这一病态 \cite{LiuMurakami1998}
+\begin{equation}
+  \dot{\boldsymbol{\varepsilon}}^{c}
+  =\frac{3}{2}\,C_{m}\,\sigma_{e}^{n_{2}-1}
+  \exp\Bigl[\frac{2(n_{2}+1)}{\pi}\sqrt{1+\frac{3}{n_{2}}}\,\frac{\sigma_{1}}{\sigma_{e}}\Bigr]
+  \,\mathbf{s}\,D^{3/2}
+  \label{eq:lm-creep}
+\end{equation}
+其中 $C_{m}$、$n_{2}$ 为材料常数，$\sigma_{1}$ 为最大主应力（表征三轴应力状态对蠕变的增强），$D^{3/2}$ 为损伤耦合项。式\eqref{eq:lm-creep}与式\eqref{eq:norton-multiaxial}结构相似，区别在于：指数项反映三轴应力 $\sigma_{1}/\sigma_{e}$ 对蠕变的增强效应（$\sigma_{1}/\sigma_{e}>0$ 时蠕变增强，如拉伸裂纹前沿的三轴区），$D^{3/2}$ 项耦合损伤——损伤通过有效面积概念进入蠕变率。$D^{3/2}$ 的指数 $3/2$ 源于微孔洞长大理论的几何考虑：孔洞长大率正比于损伤的 $3/2$ 次幂（球形孔洞的半径增长率与体积率关系），其具体取值经实验标定 \cite{LiuMurakami1998}。对应的损伤演化方程为
+\begin{equation}
+  \dot{D}=A\,\frac{1-e^{-q_{2}}}{q_{2}}\,\sigma_{e}^{q_{1}}
+  \exp\Bigl(q_{2}\frac{\sigma_{1}}{\sigma_{e}}\Bigr)\,D^{3/2}
+  \label{eq:lm-damage}
+\end{equation}
+其中 $A$、$q_{1}$、$q_{2}$ 为损伤材料常数。式\eqref{eq:lm-damage}与式\eqref{eq:lm-creep}的 $D^{3/2}$ 项使损伤在前期缓慢发展（$D$ 小时 $\dot{D}\propto D^{3/2}\ll1$）、后期加速，且指数型应力敏感项 $\exp(q_{2}\sigma_{1}/\sigma_{e})$ 比式\eqref{eq:k-r-model}的 $(1-D)^{-q}$ 更温和（$D\to1$ 时 $\dot{D}\to A(1-e^{-q_{2}})/q_{2}\cdot\sigma_{e}^{q_{1}}e^{q_{2}\sigma_{1}/\sigma_{e}}$ 有界，不趋于无穷），显著缓解了损伤局部化与网格依赖 \cite{LiuMurakami1998}。损伤达到临界值 $D_{\mathrm{cr}}$（通常取 $0.99$）时材料失效。
+
+\subsection{蠕变本构在 NOSB 中的嵌入}\label{sec:creep-nosb}
+
+蠕变本构嵌入 NOSB 的方式与 8.2 节黏弹性/黏塑性完全一致：在每一材料点维护内变量（蠕变应变 $\boldsymbol{\varepsilon}^{c}$、损伤 $D$），按式\eqref{eq:lm-creep}在当前时刻计算蠕变应变率，按式\eqref{eq:lm-damage}更新损伤，用显式时间积分更新应力，再经式\eqref{eq:hyper-force-state}构造力态。这一嵌入的完整性依赖本构对应机制（第 7 章\ref{sec:correspondence}节）：非局部变形梯度式\eqref{eq:nonlocal-deformation-gradient}在当前时刻按构型计算，经典蠕变损伤本构以 Cauchy 应力 $\boldsymbol{\sigma}$ 为输出，二者经力态式\eqref{eq:hyper-force-state}耦合。与 8.2.3 节黏塑性式\eqref{eq:vp-explicit-update}的算子分裂格式一致，蠕变应力更新采用显式 Euler 预测：把总应变增量 $\Delta\boldsymbol{\varepsilon}$ 分解为弹性与蠕变两部分（$\Delta\boldsymbol{\varepsilon}=\Delta\boldsymbol{\varepsilon}^{e}+\Delta\boldsymbol{\varepsilon}^{c}$，对应式\eqref{eq:lm-creep}的率形式离散），试探应力为
+\begin{equation}
+  \boldsymbol{\sigma}^{n+1,\mathrm{trial}}
+  =\boldsymbol{\sigma}^{n}+\mathbf{C}^{e}:\bigl(\Delta\boldsymbol{\varepsilon}-\Delta\boldsymbol{\varepsilon}^{c}\bigr)
+  \label{eq:creep-trial}
+\end{equation}
+其中蠕变应变增量 $\Delta\boldsymbol{\varepsilon}^{c}$ 由式\eqref{eq:lm-creep}以第 $n$ 步状态显式积分
+\begin{equation}
+  \Delta\boldsymbol{\varepsilon}^{c}
+  =\frac{3}{2}\,C_{m}\,\sigma_{e}^{n_{2}-1}
+  \exp\Bigl[\frac{2(n_{2}+1)}{\pi}\sqrt{1+\frac{3}{n_{2}}}\,\frac{\sigma_{1}^{n}}{\sigma_{e}^{n}}\Bigr]
+  \,\mathbf{s}^{n}\,(D^{n})^{3/2}\,\Delta t
+  \label{eq:creep-update}
+\end{equation}
+式\eqref{eq:creep-trial}与式\eqref{eq:creep-update}的算子分裂结构与 8.2.3 节式\eqref{eq:vp-trial-stress}--\eqref{eq:vp-explicit-update}完全同构，区别仅在于蠕变增量式\eqref{eq:creep-update}含损伤耦合 $(D^{n})^{3/2}$ 与三轴增强项。式\eqref{eq:creep-update}中 $\mathbf{s}^{n}$、$\sigma_{e}^{n}$、$\sigma_{1}^{n}$、$D^{n}$ 均用第 $n$ 步的已知状态计算（显式格式），故 $\Delta\boldsymbol{\varepsilon}^{c}$ 直接可得，无需迭代。
+
+损伤演化同样显式更新
+\begin{equation}
+  D^{n+1}=D^{n}+A\,\frac{1-e^{-q_{2}}}{q_{2}}\,(\sigma_{e}^{n})^{q_{1}}
+  \exp\Bigl(q_{2}\frac{\sigma_{1}^{n}}{\sigma_{e}^{n}}\Bigr)\,(D^{n})^{3/2}\,\Delta t
+  \label{eq:creep-damage-update}
+\end{equation}
+式\eqref{eq:creep-damage-update}的显式格式与式\eqref{eq:creep-update}共享时间步 $\Delta t$，其稳定性受损伤率与 $\Delta t$ 的乘积约束（类比黏塑性式\eqref{eq:vp-explicit-update}的稳定性分析，损伤越接近临界值演化越快，需相应缩小 $\Delta t$）。式\eqref{eq:creep-damage-update}更新后若 $D^{n+1}\ge D_{\mathrm{cr}}$（临界损伤，通常取 $0.99$），则该材料点失效。
+
+损伤进入 NOSB 力态的方式是蠕变--近场动力学实现的核心。第 8.2 节讨论的黏弹性与黏塑性本构不改变力态的线性结构，而蠕变损伤通过有效应力概念（式\eqref{eq:creep-effective-stress}）改变材料点承受的载荷：损伤材料点的键力应按损伤比例衰减。这一机制通过在力态式\eqref{eq:hyper-force-state}中引入损伤权重实现
+\begin{equation}
+  \underline{\mathbf{T}}\langle\boldsymbol{\xi}\rangle
+  =\omega(|\boldsymbol{\xi}|)\,(1-D_{\mathbf{x}})\,\mathbf{P}(\mathbf{F},\boldsymbol{\sigma}(t))\,\mathbf{K}^{-1}\boldsymbol{\xi}
+  \label{eq:creep-force-state}
+\end{equation}
+其中 $D_{\mathbf{x}}=D(\mathbf{x},t)$ 为材料点 $\mathbf{x}$ 的损伤变量，$(1-D_{\mathbf{x}})$ 为损伤权重。式\eqref{eq:creep-force-state}表明：损伤使该材料点的键力整体按 $1-D$ 衰减，$D=0$ 时退化为无损力态式\eqref{eq:hyper-force-state}，$D\to D_{\mathrm{cr}}$ 时键力趋近于零，材料点失去承载能力 \cite{KulkarniTabarraei2020}。值得强调的是，式\eqref{eq:creep-force-state}的损伤权重基于材料点（而非键）的损伤——这与键型近场动力学的键断裂准则（第 11 章，损伤定义在键上）不同，反映了蠕变损伤作为材料点内变量的物理本质。当相邻材料点的损伤权重 $(1-D_{\mathbf{x}})$ 与 $(1-D_{\mathbf{x}'})$ 不同时，键两端力态衰减不一致，需注意这一非对称性对线动量守恒的影响：严格处理须把式\eqref{eq:creep-force-state}改为对称形式 $\sqrt{(1-D_{\mathbf{x}})(1-D_{\mathbf{x}'})}$（几何平均）以保证相互作用力成对相等 \cite{KulkarniTabarraei2020}。实际实现中，材料点 $D$ 达到 $D_{\mathrm{cr}}$ 后该点从邻域中移除（键力置零），裂纹随损伤区扩展而自然萌生与推进，无需网格重划分。
+
+综上，蠕变本构在 NOSB 中的完整计算流程为：每一时间步 $[t_{n},t_{n+1}]$ 内，（1）由当前构型计算非局部变形梯度式\eqref{eq:nonlocal-deformation-gradient}与应变；（2）按式\eqref{eq:creep-update}计算蠕变应变增量，按式\eqref{eq:creep-damage-update}更新损伤；（3）按式\eqref{eq:creep-trial}更新试探应力，结合损伤状态按式\eqref{eq:creep-force-state}构造力态；（4）代入态型运动方程（第 7 章）求解加速度并推进位移。这一流程与 8.2 节黏弹性（式\eqref{eq:visco-recurrence}的记忆向量）、黏塑性（式\eqref{eq:vp-explicit-update}的显式流动）完全同构，验证了 NOSB 本构对应机制对"历史依赖本构"的统一处理：黏弹性、黏塑性、蠕变都归结为"点级内变量更新 + 经典本构调用 + 力态装配"的统一模式。
 
 \section{晶体弹塑性}
 
