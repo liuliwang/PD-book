@@ -10,11 +10,11 @@
 ## 项目概览
 
 专著《近场动力学理论与数值方法》的 LaTeX 书籍项目（ctexbook，A4，11pt）。
-当前完成状态：ch01-02、ch06-07 已完成；ch03-05、ch08-19 为骨架；appA-E 待写。
+章节完成度参差：ch01、ch02、ch06、ch07 为完整章节（数百行），是写作新章节时的范例；ch03–ch05、ch08–ch19 目前仅为十余行占位骨架；附录 appA–appE 为占位空文件（动手前先 Read 确认行数）。
 
 ## 编译
 
-必须用 XeLaTeX（ctexbook + 中文）。TeX 发行版：MiKTeX 26.5。
+必须用 XeLaTeX（ctexbook + 中文）。TeX 发行版：MiKTeX 26.5。以下命令顺序即 `.vscode/settings.json` 中 latex-workshop 的 recipe「完整编译 (含参考文献)」；autoBuild/autoClean 均为 never，不会自动编译清理。
 
 ```powershell
 xelatex main.tex
@@ -46,10 +46,11 @@ xelatex main.tex
 - **页眉页脚**：居中章名（`\leftmark`），居中页码（`fancyhdr`）
 - **图注**：`caption` 包，`font=small`，`labelsep=quad`（编号与文字间空格，无冒号）
 - **代码环境**：`listings` 包（`frame=single`、`breaklines`、左行号）
+- **链接颜色**：`hyperref` 已配置 colorlinks，PDF 中交叉引用/文献链接为蓝色（预期行为，勿当错误）
 
 ### 插图
 
-- **TikZ**：直接内联在章节 `.tex` 中，`xshift`/`yshift` 必须带单位（如 `xshift=6cm`）
+- **TikZ**：直接内联在章节 `.tex` 中，`xshift`/`yshift` 必须带单位（如 `xshift=6cm`）；preamble 未加载 TikZ 库，用到的 `\usetikzlibrary{...}` 在章节文件头自行声明（如 ch02 的 `arrows.meta, positioning, calc`），漏声明会导致编译失败
 - **CC-BY 图**：下载到 `figures/`（`\graphicspath` 已指向），用 `\includegraphics` 插入
   - 来源标注：`\cite{XXX}`，无冒号，无"CC BY 4.0"字样
   - 宽度通常 `width=0.9\textwidth`
@@ -129,13 +130,15 @@ xelatex main.tex
 
 ## 文献与可复现性
 
-- **参考文献**：GB/T 7714—2025；统一由 `bibliography.bib` 管理
+- **参考文献**：统一由 `bibliography.bib` 管理（约百条）；当前 `main.tex` 用 `\bibliographystyle{plain}`（非 GB/T 7714），若切换 GB/T 7714 须更换 bibstyle 并引入 `gbt7714` 宏包
 - **编译质量门禁**：xelatex + bibtex 无 error；无 undefined reference/citation 警告
+- **编译验证执行方式**：涉及 xelatex 编译验证的 QA 任务（如最终编译检查、F-wave 验证），**由当前会话直接本地执行**，不委托子代理。原因：章节文件（`chNN_*.tex`）不能单独编译，必须由 `main.tex` 入口编译；子代理可能编译错误文件、PowerShell 环境差异导致阻塞、或未按格式输出 `VERDICT` 导致 boulder 暂停。
 
 ## Git 约定
 
 - 提交时只 stage 源文件（`.tex`/`.bib` 等）
 - 不要自动 commit/push
+- 编译产物（`*.aux`/`*.log`/`*.pdf`/`*.bbl` 等）与 `.omo/` 已被 `.gitignore` 忽略，勿手动 stage
 
 ## 对话约定
 
@@ -149,5 +152,5 @@ xelatex main.tex
 
 - 这是 **AI 指令集**，不是项目文档
 - 禁止包含：历史记录、变更日志、动态信息、个人笔记、行号引用
-- 相关内容请写入：`README.md`（项目介绍）、`CHANGELOG.md`（变更历史）、`.omo/notes.md`（个人笔记）
+- 项目介绍/变更历史等文档性内容请另立文件（当前仓库尚无 README.md、CHANGELOG.md）；工作记录写入 `.omo/notepads/` 对应目录
 - 修改本文件须经团队 review
