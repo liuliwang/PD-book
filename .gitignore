@@ -1,3 +1,23 @@
 .gitignore
-main.pdf
-/.omo/
+# LaTeX 编译产物
+*.aux
+*.log
+*.toc
+*.out
+*.bbl
+*.blg
+*.fls
+*.fdb_latexmk
+*.synctex.gz
+*.xdv
+*.ind
+*.ilg
+*.idx
+*.nlo
+*.lot
+*.lof
+*.nls
+*.pdf
+# opencode 运行时
+/.omo
+.opencode/node_modules/
