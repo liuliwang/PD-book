@@ -1,6 +1,6 @@
 {
   "latex-workshop.latex.autoBuild.run": "never",
-  "latex-workshop.latex.recipe.default": "lastUsed",
+  "latex-workshop.latex.recipe.default": "完整编译 (含参考文献)",
   "latex-workshop.formatting.latex": "latexindent",
   "editor.formatOnSave": false,
   "latex-workshop.latex.tools": [
@@ -23,13 +23,6 @@
     }
   ],
   "latex-workshop.latex.recipes": [
-    {
-      "name": "快速编译 (xelatex×2)",
-      "tools": [
-        "xelatex",
-        "xelatex"
-      ]
-    },
     {
       "name": "完整编译 (含参考文献)",
       "tools": [
