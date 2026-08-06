@@ -2,7 +2,7 @@
 
 ## 项目性质
 
-专著《近场动力学理论与数值方法》的 LaTeX 书籍项目。当前完成状态：**第1章绪论**（386 行，10 幅插图）；**第2章"近场动力学基本理论框架"2.1–2.8 节**（884 行，10 幅 TikZ 图，含 3 个守恒律严格证明；2026-08 新增 2.1.3 节近场域定义图 fig:horizon-definition（图2.4）、删除与第 1 章图重复的综合概念图 fig:family-horizon（原图2.6），现图序 2.1–2.10 连续；已按第 1 章格式优化：章级导言路线图、节级导言段、remark 精简为 4 条、章末收尾段）；**第6章常规态型 6.1–6.4 节**（654 行，2 幅图；6.1 态型理论基础、6.2 弹性本构、6.3 弹塑性本构、6.4 断裂参数标定）；**第7章非常规态型已成章**（672 行，7 节：NOSB 框架、非局部变形梯度与本构对应、隐式线性/非线性求解、零能模式、稳定化、高阶模型分类）。其余章节（第3-5、8-19章）仍为骨架文件（11-18 行，仅含 \input 占位或空 \chapter）；全部附录（appA–appE）1-2 行。
+专著《近场动力学理论与数值方法》的 LaTeX 书籍项目。当前完成状态：**第1章绪论**（386 行，10 幅插图）；**第2章"近场动力学基本理论框架"2.1–2.8 节**（945 行，11 幅 TikZ 图，含 3 个守恒律严格证明；2026-08 新增 2.1.3 节近场域定义图 fig:horizon-definition（图2.4）、删除与第 1 章图重复的综合概念图 fig:family-horizon（原图2.6）、在 2.2.1 节新增参考构型与变形构型映射示意图 fig:reference-deformation（图2.6，双栏对比图，经 5 方向优化：补全 y(x′,t) 点与变形键、u 箭头起点锚定参考位置、两栏映射对齐、正文补键变形描述、视觉细节），现图序 2.1–2.11 连续；已按第 1 章格式优化：章级导言路线图、节级导言段、remark 精简为 4 条、章末收尾段；2026-08 已完成 2.2 节"伸长"→"伸长率"术语统一与公式解释补充；2026-08 于 2.2.3 节补充小变形近似的推导细节：原公式(2.13)拆分为"提取 $|\boldsymbol{\xi}|^{2}$ 过渡式 + 泰勒展开"两步、以显式定义的 $\chi$ 替代泰勒展开参数 $\varepsilon$（避免与小应变张量 $\boldsymbol{\varepsilon}$ 符号冲突）、并注明"高阶小量"相对一阶项 $2\boldsymbol{\xi}\cdot\boldsymbol{\eta}_{\parallel}\sim O(|\boldsymbol{\xi}||\boldsymbol{\eta}|)$ 的比较基准）；**第6章常规态型 6.1–6.4 节**（654 行，2 幅图；6.1 态型理论基础、6.2 弹性本构、6.3 弹塑性本构、6.4 断裂参数标定）；**第7章非常规态型已成章**（672 行，7 节：NOSB 框架、非局部变形梯度与本构对应、隐式线性/非线性求解、零能模式、稳定化、高阶模型分类）。其余章节（第3-5、8-19章）仍为骨架文件（11-18 行，仅含 \input 占位或空 \chapter）；全部附录（appA–appE）1-2 行。
 
 ## 编译
 
@@ -20,11 +20,13 @@ xelatex main.tex
 xelatex main.tex
 ```
 
-产物 `main.pdf`（当前约 139 页，随内容增长）。编译临时文件（.aux/.log/.toc 等）勿提交。
+产物 `main.pdf`（当前 141 页，随内容增长）。编译临时文件（.aux/.log/.toc 等）虽已被 git 跟踪（见 Git 节），提交时勿手动 stage。
 
 **编译门禁验证**：`xelatex -interaction=nonstopmode -halt-on-error main.tex` 跑两遍后，过滤 `Error|undefined|Warning: Reference` 应零命中；`main.aux` 中 `\newlabel{fig:xxx}{{2.1}{16}...}` 可核对图号与交叉引用页。注意：大小写不敏感过滤 `Error` 会命中 1 处良性行——`main.log` 中 `Package: infwarerr ... Providing info/warning/error messages`（宏包自述文本，非错误），核对时排除该行。
 
 **已知良性警告**（勿误判为错误）：仅个别 `Underfull \vbox`（LaTeX 排版固有，不影响内容）；曾有的 `caption Warning`（Unused \captionsetup[table]）与 notation.tex `Overfull \hbox` 已随列宽修正消失（2026-08 复核 log 零命中）；`infwarerr` 宏包加载描述行（"Providing info/warning/error messages"）非警告，会被 `Error` 过滤器误匹配（详见编译门禁验证）。
+
+**PowerShell 行数/检索坑**：`Get-Content` 在 UTF-8 无 BOM 中文文件上按 ANSI 误读，行数统计不可靠（实测 ch02 报 788 行，实际 945 行）。统计行数或逐行处理用 `[System.IO.File]::ReadAllLines(...)`；检索用 `Select-String`（等价 grep）。VS Code latex-workshop 已配置等价编译配方（settings.json：快速 xelatex×2 / 完整含 bibtex）。
 
 ## 文件组织
 
@@ -38,6 +40,7 @@ xelatex main.tex
 | `appendices/appA–appE` | 5 个附录，文件名格式`appX_英文主题.tex`                  |
 | `bibliography.bib`      | BibTeX 文献库（115 条，持续增长中）                        |
 | `figures/`              | 插图目录（CC-BY 论文插图、TikZ 自绘图）                    |
+| `.omo/`                 | 计划工作流目录：`plans/`（已批准计划）、`notepads/`（跨计划智慧）、`drafts/`、`evidence/`、`boulder.json`（当前任务状态） |
 
 ## 项目特定约定
 
@@ -58,11 +61,11 @@ xelatex main.tex
   - 来源标注格式：`（图片来源\cite{XXX}）`（无冒号，无"CC BY 4.0"字样）
   - 图片宽度：通常 `width=0.9\textwidth`，根据内容调整
 - **图注中不得使用冒号**：已通过 `\captionsetup[figure]{labelsep=quad}` 全局去除，子图图名需在图下方，居中对齐
-- **图注简单明了，图名在正文中引用后还要适当进行解释或描述，提高读者阅读体验感，图名或子图名需在图片正下方，居中对齐
+- **图注简单明了**，图名在正文中引用后还要适当进行解释或描述，提高读者阅读体验感，图名或子图名需在图片正下方，居中对齐
 - **一图一主题**：单个 TikZ 图若承载多个层次的主题（如同时含几何关系与物理状态），应拆分为多个独立 `figure`（先例：2.1.2 节 fig:bond-kinematics 于 2026-08 拆分为 fig:bond-geometry + fig:bond-stretch-states，拆后图注更聚焦、纵向空间更紧凑）
 - **图文位置即时对应**：图的描述应紧跟其概念的首次定义处，实现"定义→见图→解释"节奏；禁止把图描述全部堆在图号之后形成超长段。图含 (a)(b) 等多子图且各子图对应不同概念时，各子图描述分别嵌入对应概念定义处（先例：2.1.2 节图 2.2 于 2026-08 重构——ξ 定义处描述 (a) 参考构型、η 定义处描述 (b) 变形构型，图 2.3 三种状态描述留在 s 定义后）；单段图描述控制在 300 字内，超长须拆分
 - **图描述与正文定义不重复**：图描述中涉及的变量若正文已定义，只引用不重述；需在描述中交代的新变量与其在正文的首次定义处合并，同一变量全书只完整定义一次（先例：2.1.2 节 y、y′ 完整定义置于 η 处图描述中，ξ 处正文只记位移 u）
-- **图表合规自查**（2026-08 核查中曾在 ch02 发现 3 处违规并修复）：每个 `\label{fig:xxx}` 必须至少有 1 处正文 `\ref{fig:xxx}` 引用（图 2.7 pairwise-potential、图 2.8 state-concept 曾缺引用）；TikZ 坐标轴节点须标注物理量与单位，如 `node[right] {$s$（伸长率）}`、`node[above] {$|\mathbf{f}|$（N/m$^6$）}`（图 2.9 曾只标 `$s$`、`$|\mathbf{f}|$` 无单位）；改动后可用 grep 核对 `\label{fig:` 与 `\ref{fig:` 一一对应；2026-08 曾修复 ch02 三幅图 caption 过长问题（fig:material-point-comparison、fig:force-stretch、fig:boundary-force-conversion 将正文级解释塞进图注，已精简为标题式，详细说明移入正文或保持正文原样）
+- **图表合规自查**（2026-08 核查中曾在 ch02 发现 3 处违规并修复）：每个 `\label{fig:xxx}` 必须至少有 1 处正文 `\ref{fig:xxx}` 引用（fig:pairwise-potential、fig:state-concept 曾缺引用）；TikZ 坐标轴节点须标注物理量与单位，如 `node[right] {$s$（伸长率）}`、`node[above] {$|\mathbf{f}|$（N/m$^6$）}`（fig:force-stretch 曾只标 `$s$`、`$|\mathbf{f}|$` 无单位）；改动后可用 grep 核对 `\label{fig:` 与 `\ref{fig:` 一一对应；2026-08 曾修复 ch02 三幅图 caption 过长问题（fig:material-point-comparison、fig:force-stretch、fig:boundary-force-conversion 将正文级解释塞进图注，已精简为标题式，详细说明移入正文或保持正文原样）
 
 ## 书籍编写规范
 
@@ -89,7 +92,7 @@ xelatex main.tex
 
 - **标点符号**：符合 GB/T 15834《标点符号用法》
 - **数字用法**：符合 GB/T 15835《出版物上数字用法》
-- **科技术语**：符合 CY/T 119《学术出版规范 科学技术名词》；全书术语统一，英文缩写首次出现须给全称（如"近场动力学（peridynamics，PD）"）。stretch 统一译「伸长率」而非「伸长」（s 为无量纲量，不是绝对伸长）；键伸长率 s 的定义式位于 2.1.2 节（式 2.1，`\label{eq:bond-stretch}`），正文与图注须用 `\eqref{eq:bond-stretch}` 引用，勿再内联重复完整公式；第 1 章 1.4 节「键的伸长（stretch）定义为」仍为旧表述残留（现位于第 150 行），第 2 章第 271 行「键的伸长 $s=(|\boldsymbol{\xi}+\boldsymbol{\eta}|-|\boldsymbol{\xi}|)/|\boldsymbol{\xi}|$」亦为旧表述——改稿时统一为「伸长率」
+- **科技术语**：符合 CY/T 119《学术出版规范 科学技术名词》；全书术语统一，英文缩写首次出现须给全称（如"近场动力学（peridynamics，PD）"）。stretch 统一译「伸长率」而非「伸长」（s 为无量纲量，不是绝对伸长）；键伸长率 s 的定义式位于 2.1.2 节（式 2.1，`\label{eq:bond-stretch}`），正文与图注须用 `\eqref{eq:bond-stretch}` 引用，勿再内联重复完整公式；第 2 章已于 2026-08 全部统一为「伸长率」，**第 1 章仍存旧表述残留**（改稿时统一）：行 100「键的伸长成正比」「键伸长超过临界值」、行 150「键的伸长（stretch）定义为」、行 164「键的伸长超过临界值」；行 271「键的伸长方向」与行 307「伸长循环」为动作/状态描述，可保留
 - **量与单位**：符合 GB 3100—1993《国际单位制及其应用》、GB/T 3101—1993《有关量、单位和符号的一般原则》；量符号斜体，单位符号正体，矢量用粗体或箭头标注
 - **符号表维护**：新符号须在 `frontmatter/notation.tex` 登记，并在正文中首次出现时定义。按章新增 `\section*{第 X 章 ...}` 小节，短表用 `p{0.22\textwidth}p{0.65\textwidth}`、长表（第 6、7 章先例）用 `p{4.8cm}>{\raggedright\arraybackslash}p{10.2cm}` 的 longtable 列宽防溢出（曾用 `ll` 致 Overfull，已全部修正，勿再用 `ll`）
 
@@ -124,7 +127,7 @@ xelatex main.tex
 
 ## Git
 
-- 当前分支 `add-近场动力学基本理论框架`（非 `main`），已有提交（第1、2、6、7章相关，最近提交"第2章：修改图2.2和图2.3" 96b04e7）
-- `.gitignore` 实际仅 1 行，LaTeX 编译产物 `main.pdf`/`main.aux`/`main.log`/`main.out`/`main.toc` 均已被 git 跟踪——每次编译后 `git status` 显示这些文件 modified 属正常，勿误报；提交时只 stage 源文件（`.tex`/`.bib` 等）
-- 工作区常有多个独立计划的未提交改动，`git diff`（对比 HEAD）显示累积状态，排查改动归属时须区分各计划
+- 当前分支 `add-近场动力学基本理论框架`（非 `main`），已有提交（第1、2、6、7章相关，最近提交"第2章：修改图2.6" 96cf9cc，2026-08-04，其前为"第2章：2.2节内容正确性验证" 4aa26c2；此前工作区多计划未提交改动已随该提交清理）
+- `.gitignore` 实际仅 1 行（内容为 `.gitignore` 自身），LaTeX 编译产物 `main.pdf`/`main.aux`/`main.bbl`/`main.blg`/`main.log`/`main.out`/`main.toc`/`main.synctex.gz`/`main.fls`/`main.fdb_latexmk`/`main.xdv`/`indent.log`/`chapters/ch01_introduction.log` 均已被 git 跟踪——每次编译后 `git status` 显示这些文件 modified 属正常，勿误报；提交时只 stage 源文件（`.tex`/`.bib` 等）
+- 工作区可能同时积累多个独立计划的未提交改动，`git diff`（对比 HEAD）显示累积状态，排查改动归属时须区分各计划
 - 不要自动commit和push等操作，人工会进行commit和push等工作。

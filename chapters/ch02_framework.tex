@@ -3,7 +3,7 @@
 
 \leavevmode\usetikzlibrary{arrows.meta, positioning, calc}
 
-第1章以科普的口吻介绍了近场动力学的基本思想与历史背景，本章的任务则是建立其严格的数学理论框架。为此，本章首先给出物质点、键、近场域与族四个基本概念的定义与物理含义（2.1节），进而建立参考构型与变形构型下的位移与伸长描述（2.2节），并引入点对力函数与微弹性材料模型刻画物质点间的相互作用（2.3节）。在此基础上，本章将近场动力学的描述从键基模型推广到态基模型，引入近场动力学状态的概念（2.4节），并建立应变能密度与能量守恒的严格表述（2.5节），进而推导线动量、角动量与能量守恒律的相容性条件（2.6节）。随后，本章引入临界伸长准则与损伤变量，建立损伤与破坏的描述框架（2.7节），最后讨论非局部边界条件的处理与表面效应的修正方法（2.8节）。本章的目的不在于穷尽所有本构模型的细节，而在于构建一个自洽、完备且与经典力学相容的理论基础。第1章的定性描述将在本章得到严格的数学表述，而本章所建立的理论框架将为第3章分析近场动力学与经典连续介质力学的关系奠定基础。
+第1章以科普的口吻介绍了近场动力学的基本思想与历史背景，本章的任务则是建立其严格的数学理论框架。为此，本章首先给出物质点、键、近场域与族四个基本概念的定义与物理含义（2.1节），进而建立参考构型与变形构型下的位移与伸长率描述（2.2节），并引入点对力函数与微弹性材料模型刻画物质点间的相互作用（2.3节）。在此基础上，本章将近场动力学的描述从键基模型推广到态基模型，引入近场动力学状态的概念（2.4节），并建立应变能密度与能量守恒的严格表述（2.5节），进而推导线动量、角动量与能量守恒律的相容性条件（2.6节）。随后，本章引入临界伸长率准则与损伤变量，建立损伤与破坏的描述框架（2.7节），最后讨论非局部边界条件的处理与表面效应的修正方法（2.8节）。本章的目的不在于穷尽所有本构模型的细节，而在于构建一个自洽、完备且与经典力学相容的理论基础。第1章的定性描述将在本章得到严格的数学表述，而本章所建立的理论框架将为第3章分析近场动力学与经典连续介质力学的关系奠定基础。
 
 \section{基本概念：物质点、键、近场域与族}
 
@@ -254,7 +254,7 @@
 
 \section{变形描述：键的运动学}
 
-2.1 节在引入键的概念时已经给出了键的基本几何量——参考相对位置矢量 $\boldsymbol{\xi}$、相对位移矢量 $\boldsymbol{\eta}$ 以及伸长 $s$。本节对这些运动学量作更系统的展开，目的是为后续的受力描述（2.3 节）与应变能密度（2.5 节）提供几何基础。本节首先形式化参考构型与变形构型的映射关系，继而将相对位移分解为沿键方向的轴向分量与垂直于键方向的偏斜分量，并讨论键伸长在小变形下的线性近似，最后证明键伸长在刚性旋转下的不变性，即客观性。
+2.1 节在引入键的概念时已经给出了键的基本几何量——参考相对位置矢量 $\boldsymbol{\xi}$、相对位移矢量 $\boldsymbol{\eta}$ 以及伸长率 $s$。本节对这些运动学量作更系统的展开，目的是为后续的受力描述（2.3 节）与应变能密度（2.5 节）提供几何基础。本节首先形式化参考构型与变形构型的映射关系，继而将相对位移分解为沿键方向的轴向分量与垂直于键方向的偏斜分量，并讨论键伸长率在小变形下的线性近似，最后证明键伸长率在刚性旋转下的不变性，即客观性。
 
 \subsection{参考构型与变形构型}
 
@@ -263,25 +263,57 @@
   \mathbf{y}(\mathbf{x},t)=\mathbf{x}+\mathbf{u}(\mathbf{x},t)
   \label{eq:motion-config}
 \end{equation}
-式\eqref{eq:motion-config}定义的映射 $\mathbf{y}:\mathcal{B}\times\mathbb{R}^{+}\to\mathbb{R}^{3}$ 把参考构型中的每个物质点映为其当前构型中的位置。与经典理论不同，近场动力学不要求 $\mathbf{y}$ 在裂纹面或不连续面上可微，因为运动方程不含空间导数；唯一需要的是 $\mathbf{y}$ 本身有定义，使键的两端位置可被确定。
+式\eqref{eq:motion-config}定义的映射 $\mathbf{y}:\mathcal{B}\times\mathbb{R}^{+}\to\mathbb{R}^{3}$ 中，符号 $\times$ 表示笛卡尔积，$\mathcal{B}\times\mathbb{R}^{+}$ 为所有位置-时间对 $(\mathbf{x},t)$ 的集合；该映射把参考构型中的每个物质点映为其当前构型中的位置。与经典理论不同，近场动力学不要求 $\mathbf{y}$ 在裂纹面或不连续面上可微，因为运动方程不含空间导数；唯一需要的是 $\mathbf{y}$ 本身有定义，使键的两端位置可被确定。
 
-连接物质点 $\mathbf{x}$ 与 $\mathbf{x}'$ 的键在参考构型中的方向矢量为 $\boldsymbol{\xi}=\mathbf{x}'-\mathbf{x}$，变形后两端点的相对位置变为
+图\ref{fig:reference-deformation} 示意了从参考构型到变形构型的映射关系，其中位移场 $\mathbf{u}$ 将每个物质点从参考位置映到当前位置，参考键 $\boldsymbol{\xi}$ 相应变为变形后的 $\boldsymbol{\xi}+\boldsymbol{\eta}$。连接物质点 $\mathbf{x}$ 与 $\mathbf{x}'$ 的键在参考构型中的方向矢量为 $\boldsymbol{\xi}=\mathbf{x}'-\mathbf{x}$，变形后两端点的相对位置变为
 \begin{equation}
   \boldsymbol{\xi}+\boldsymbol{\eta}=\mathbf{y}(\mathbf{x}',t)-\mathbf{y}(\mathbf{x},t)
   \label{eq:deformed-bond}
 \end{equation}
 其中 $\boldsymbol{\eta}=\mathbf{u}(\mathbf{x}',t)-\mathbf{u}(\mathbf{x},t)$ 为相对位移。式\eqref{eq:deformed-bond}表明，变形后键的几何完全由两端的位移差决定，无需计算位移的梯度。这是近场动力学运动学的基本特征：变形信息以键为单位组织，而非以点的导数组织。
 
+\begin{figure}[htbp]
+  \centering
+  \begin{tikzpicture}[scale=1.0]
+    % 左 panel：参考构型
+    \draw[thick, fill=blue!8] plot[smooth cycle] coordinates {(0.0,0.2) (1.8,-0.9) (3.8,-0.8) (5.1,0.4) (4.9,2.3) (3.2,3.4) (1.2,3.1) (-0.6,1.7)};
+    \node at (4.0,2.5) {$\mathcal{B}$};
+    \draw[dashed, thick] (2.6,1.6) circle (1.5);
+    \draw[dash dot, gray, thin] (2.6,1.6) -- (4.1,1.6) node[midway, below] {$\delta$};
+    \filldraw (2.6,1.6) circle (2.5pt) node[below left] {$\mathbf{x}$};
+    \filldraw (1.9,2.7) circle (2.5pt) node[above right] {$\mathbf{x}'$};
+    \draw[thick, -{Stealth}] (2.6,1.6) -- (1.9,2.7);
+    \node[above] at (2.25,2.15) {$\boldsymbol{\xi}$};
+    \node at (2.2,-1.15) {（a）参考构型};
+    % 右 panel：变形构型
+    \begin{scope}[xshift=6cm]
+      \draw[thick, fill=orange!8] plot[smooth cycle] coordinates {(0.3,0.4) (1.9,-0.8) (3.9,-0.5) (5.1,1.0) (5.0,2.8) (3.3,3.8) (1.3,3.3) (-0.1,1.9)};
+      \draw[gray, dashed] (2.6,1.6) circle (2.5pt);
+      \draw[blue, thick, -{Stealth}] (2.6,1.6) -- (3.6,2.8);
+      \node[blue, above] at (3.1,2.2) {$\mathbf{u}$};
+      \filldraw[red] (3.6,2.8) circle (2.5pt) node[below right, red] {$\mathbf{y}(\mathbf{x},t)$};
+      \draw[thick, red, -{Stealth}] (3.6,2.8) -- (3.0,3.6);
+      \node[red, left] at (3.3,3.2) {$\boldsymbol{\xi}+\boldsymbol{\eta}$};
+      \filldraw[red] (3.0,3.6) circle (2.5pt) node[right, red] {$\mathbf{y}(\mathbf{x}',t)$};
+      \node at (2.5,-1.15) {（b）变形构型};
+    \end{scope}
+  \end{tikzpicture}
+  \caption{参考构型与变形构型的映射关系}
+  \label{fig:reference-deformation}
+\end{figure}
+
+
+
 \subsection{相对位移的轴向—偏斜分解}
 
-键的伸长 $s=(|\boldsymbol{\xi}+\boldsymbol{\eta}|-|\boldsymbol{\xi}|)/|\boldsymbol{\xi}|$ 同时包含了体积变形与形状变形的贡献。为区分这两类贡献，将相对位移 $\boldsymbol{\eta}$ 分解为沿参考键方向的轴向分量 $\boldsymbol{\eta}_{\parallel}$ 与垂直于参考键方向的偏斜分量 $\boldsymbol{\eta}_{\perp}$
+键的伸长率 $s=(|\boldsymbol{\xi}+\boldsymbol{\eta}|-|\boldsymbol{\xi}|)/|\boldsymbol{\xi}|$ 同时包含了体积变形与形状变形的贡献。为区分这两类贡献，将相对位移 $\boldsymbol{\eta}$ 分解为沿参考键方向的轴向分量 $\boldsymbol{\eta}_{\parallel}$ 与垂直于参考键方向的偏斜分量 $\boldsymbol{\eta}_{\perp}$
 \begin{equation}
   \boldsymbol{\eta}=\boldsymbol{\eta}_{\parallel}+\boldsymbol{\eta}_{\perp},\qquad
   \boldsymbol{\eta}_{\parallel}=\frac{\boldsymbol{\eta}\cdot\boldsymbol{\xi}}{|\boldsymbol{\xi}|^{2}}\,\boldsymbol{\xi},\qquad
   \boldsymbol{\eta}_{\perp}=\boldsymbol{\eta}-\boldsymbol{\eta}_{\parallel}
   \label{eq:eta-decomp}
 \end{equation}
-其中 $\boldsymbol{\eta}_{\parallel}$ 描述两物质点沿键方向的相对分离或靠近，$\boldsymbol{\eta}_{\perp}$ 描述两物质点垂直于键方向的相对错动。这一分解的几何意义如图\ref{fig:bond-decomp}所示：轴向分量使键伸长或缩短而不改变方向，偏斜分量使键偏转而在小变形下对键长的改变为高阶小量。
+式中点积 $\boldsymbol{\eta}\cdot\boldsymbol{\xi}$ 是一个标量，它表示 $\boldsymbol{\eta}$ 在参考键方向上的投影大小；分母 $|\boldsymbol{\xi}|^{2}$ 与外乘的 $\boldsymbol{\xi}$ 共同完成矢量投影：除以 $|\boldsymbol{\xi}|^{2}$ 得到标量投影系数，再乘以方向矢量 $\boldsymbol{\xi}$ 得到沿参考键方向的矢量分量。其中 $\boldsymbol{\eta}_{\parallel}$ 描述两物质点沿键方向的相对分离或靠近，$\boldsymbol{\eta}_{\perp}$ 描述两物质点垂直于键方向的相对错动。这一分解的几何意义如图\ref{fig:bond-decomp}所示：轴向分量使键伸长或缩短而不改变方向，偏斜分量使键偏转而在小变形下对键长的改变为高阶小量。
 
 \begin{figure}[htbp]
   \centering
@@ -315,29 +347,52 @@
 
 利用式\eqref{eq:eta-decomp}，变形后键长的平方可以展开为
 \begin{equation}
+  |\boldsymbol{\xi}+\boldsymbol{\eta}|^{2}=|\boldsymbol{\xi}|^{2}+2\,\boldsymbol{\xi}\cdot\boldsymbol{\eta}+|\boldsymbol{\eta}|^{2}
+  \label{eq:bond-length-expand}
+\end{equation}
+再将 $\boldsymbol{\eta}=\boldsymbol{\eta}_{\parallel}+\boldsymbol{\eta}_{\perp}$ 代入，并利用 $\boldsymbol{\xi}\cdot\boldsymbol{\eta}_{\perp}=0$（由 $\boldsymbol{\eta}_{\perp}$ 的定义），得
+\begin{equation}
   |\boldsymbol{\xi}+\boldsymbol{\eta}|^{2}=|\boldsymbol{\xi}|^{2}+2\,\boldsymbol{\xi}\cdot\boldsymbol{\eta}_{\parallel}+|\boldsymbol{\eta}_{\parallel}|^{2}+|\boldsymbol{\eta}_{\perp}|^{2}
   \label{eq:bond-length-sq}
 \end{equation}
-式\eqref{eq:bond-length-sq}中已利用 $\boldsymbol{\xi}\cdot\boldsymbol{\eta}_{\perp}=0$（由 $\boldsymbol{\eta}_{\perp}$ 的定义）。由此可看出轴向分量与偏斜分量对键长改变的贡献具有不同量级：$\boldsymbol{\eta}_{\parallel}$ 直接进入键长的线性项 $2\boldsymbol{\xi}\cdot\boldsymbol{\eta}_{\parallel}$，而 $\boldsymbol{\eta}_{\perp}$ 仅通过其模的平方 $|\boldsymbol{\eta}_{\perp}|^{2}$ 进入键长的二阶项。
+式\eqref{eq:bond-length-sq}利用了 $\boldsymbol{\xi}\cdot\boldsymbol{\eta}_{\perp}=0$（由 $\boldsymbol{\eta}_{\perp}$ 的定义）。由此可看出轴向分量与偏斜分量对键长改变的贡献具有不同量级：$\boldsymbol{\eta}_{\parallel}$ 直接进入键长的线性项 $2\boldsymbol{\xi}\cdot\boldsymbol{\eta}_{\parallel}$，而 $\boldsymbol{\eta}_{\perp}$ 仅通过其模的平方 $|\boldsymbol{\eta}_{\perp}|^{2}$ 进入键长的二阶项。
 
 \subsection{小变形近似}
 
-当位移梯度远小于 1，即 $|\boldsymbol{\eta}|\ll|\boldsymbol{\xi}|$ 时，键伸长可作线性化展开。将式\eqref{eq:bond-length-sq}代入伸长定义并保留到一阶项，有
+当位移梯度远小于 1，即 $|\boldsymbol{\eta}|\ll|\boldsymbol{\xi}|$ 时，键伸长率可作线性化展开。将式\eqref{eq:bond-length-sq}代入伸长率定义，先写出
 \begin{equation}
   s=\frac{|\boldsymbol{\xi}+\boldsymbol{\eta}|-|\boldsymbol{\xi}|}{|\boldsymbol{\xi}|}
-  =\frac{\boldsymbol{\xi}\cdot\boldsymbol{\eta}}{|\boldsymbol{\xi}|^{2}}+O\!\left(\frac{|\boldsymbol{\eta}|^{2}}{|\boldsymbol{\xi}|^{2}}\right)
+  =\frac{\sqrt{|\boldsymbol{\xi}|^{2}+2\,\boldsymbol{\xi}\cdot\boldsymbol{\eta}_{\parallel}+|\boldsymbol{\eta}_{\parallel}|^{2}+|\boldsymbol{\eta}_{\perp}|^{2}}-\,|\boldsymbol{\xi}|}{|\boldsymbol{\xi}|}
+\end{equation}
+由于 $|\boldsymbol{\eta}|\ll|\boldsymbol{\xi}|$，根号内各项除以 $|\boldsymbol{\xi}|^{2}$ 后对伸长率的贡献量级分别为：线性项 $2\,\boldsymbol{\xi}\cdot\boldsymbol{\eta}_{\parallel}/|\boldsymbol{\xi}|^{2}$ 为 $O(|\boldsymbol{\eta}|/|\boldsymbol{\xi}|)$，属一阶小量；而 $|\boldsymbol{\eta}_{\parallel}|^{2}/|\boldsymbol{\xi}|^{2}$ 与 $|\boldsymbol{\eta}_{\perp}|^{2}/|\boldsymbol{\xi}|^{2}$ 均为 $O\!\left(|\boldsymbol{\eta}|^{2}/|\boldsymbol{\xi}|^{2}\right)$，属二阶小量。在 $|\boldsymbol{\eta}|\ll|\boldsymbol{\xi}|$ 条件下，二阶项比一阶项小一个数量级，可暂忽略。将根号内保留到一阶项，并提取 $|\boldsymbol{\xi}|^{2}$，得
+\begin{equation}
+  s\approx\frac{\sqrt{|\boldsymbol{\xi}|^{2}+2\,\boldsymbol{\xi}\cdot\boldsymbol{\eta}_{\parallel}}-\,|\boldsymbol{\xi}|}{|\boldsymbol{\xi}|}
+  =\frac{|\boldsymbol{\xi}|\sqrt{1+\dfrac{2\,\boldsymbol{\xi}\cdot\boldsymbol{\eta}_{\parallel}}{|\boldsymbol{\xi}|^{2}}}-\,|\boldsymbol{\xi}|}{|\boldsymbol{\xi}|}
+\end{equation}
+再令根号内保留到一阶项后的小量为
+\begin{equation}
+  \chi=\frac{2\,\boldsymbol{\xi}\cdot\boldsymbol{\eta}_{\parallel}}{|\boldsymbol{\xi}|^{2}}
+\end{equation}
+由于 $|\boldsymbol{\eta}|\ll|\boldsymbol{\xi}|$，显然 $\chi\ll 1$。对 $\sqrt{1+\chi}\approx 1+\chi/2$ 作一阶泰勒展开，得
+\begin{equation}
+  s\approx\frac{|\boldsymbol{\xi}|\left(1+\dfrac{\boldsymbol{\xi}\cdot\boldsymbol{\eta}_{\parallel}}{|\boldsymbol{\xi}|^{2}}\right)-|\boldsymbol{\xi}|}{|\boldsymbol{\xi}|}
+  =\frac{\boldsymbol{\xi}\cdot\boldsymbol{\eta}_{\parallel}}{|\boldsymbol{\xi}|^{2}}
+\end{equation}
+注意到 $\boldsymbol{\xi}\cdot\boldsymbol{\eta}=\boldsymbol{\xi}\cdot\boldsymbol{\eta}_{\parallel}+\boldsymbol{\xi}\cdot\boldsymbol{\eta}_{\perp}=\boldsymbol{\xi}\cdot\boldsymbol{\eta}_{\parallel}$（因为 $\boldsymbol{\xi}\perp\boldsymbol{\eta}_{\perp}$），上式可写成更简洁的形式
+\begin{equation}
+  s=\frac{\boldsymbol{\xi}\cdot\boldsymbol{\eta}}{|\boldsymbol{\xi}|^{2}}+O\!\left(\frac{|\boldsymbol{\eta}|^{2}}{|\boldsymbol{\xi}|^{2}}\right)
   \label{eq:stretch-linear}
 \end{equation}
-式\eqref{eq:stretch-linear}表明，在小变形近似下键伸长仅依赖轴向分量 $\boldsymbol{\eta}_{\parallel}$，偏斜分量 $\boldsymbol{\eta}_{\perp}$ 的贡献为高阶小量。这一结果有一个重要推论：对均匀变形 $\mathbf{u}(\mathbf{x})=\boldsymbol{\varepsilon}\cdot\mathbf{x}$（$\boldsymbol{\varepsilon}$ 为常小应变张量），相对位移 $\boldsymbol{\eta}=\boldsymbol{\varepsilon}\cdot\boldsymbol{\xi}$，代入式\eqref{eq:stretch-linear}得
+式\eqref{eq:stretch-linear}表明，在小变形近似下键伸长率仅依赖轴向分量 $\boldsymbol{\eta}_{\parallel}$，偏斜分量 $\boldsymbol{\eta}_{\perp}$ 的贡献为高阶小量。其物理含义是：键的伸长主要由轴向分量 $\boldsymbol{\eta}_{\parallel}$ 引起，而偏斜分量 $\boldsymbol{\eta}_{\perp}$ 仅使键发生偏转、对键长的改变是二阶效应，这类似于经典小应变理论中刚体转动不产生应变。这一结果有一个重要推论：对均匀变形 $\mathbf{u}(\mathbf{x})=\boldsymbol{\varepsilon}\cdot\mathbf{x}$（$\boldsymbol{\varepsilon}$ 为常小应变张量），相对位移 $\boldsymbol{\eta}=\boldsymbol{\varepsilon}\cdot\boldsymbol{\xi}$，代入式\eqref{eq:stretch-linear}得
 \begin{equation}
   s\approx\frac{\boldsymbol{\xi}\cdot\boldsymbol{\varepsilon}\cdot\boldsymbol{\xi}}{|\boldsymbol{\xi}|^{2}}
   \label{eq:stretch-uniform}
 \end{equation}
-式\eqref{eq:stretch-uniform}将键伸长与经典小应变张量 $\boldsymbol{\varepsilon}$ 联系起来，是近场动力学与经典理论衔接的关键关系之一，其深入分析将在第 3 章展开。
+式\eqref{eq:stretch-uniform}将键伸长率与经典小应变张量 $\boldsymbol{\varepsilon}$ 联系起来，是近场动力学与经典理论衔接的关键关系之一，其深入分析将在第 3 章展开。
 
-\subsection{键伸长的客观性}
+\subsection{键伸长率的客观性}
 
-客观性（objectivity）也称标架无差异性（frame indifference），是连续介质本构理论的基本公理之一，要求本构关系在刚性旋转加平移的坐标变换下保持形式不变。本节证明键伸长 $s$ 满足客观性，这是近场动力学键基本构能够满足客观性要求的几何前提。
+客观性（objectivity）也称标架无差异性（frame indifference），是连续介质本构理论的基本公理之一，要求本构关系在刚性旋转加平移的坐标变换下保持形式不变。本节证明键伸长率 $s$ 满足客观性，这是近场动力学键基模型能够满足客观性要求的几何前提。
 
 设物体经历刚性旋转 $\mathbf{R}(t)$（$\mathbf{R}$ 为正交张量，$\mathbf{R}^{T}\mathbf{R}=\mathbf{I}$）叠加平移 $\mathbf{c}(t)$，变形后位置变为
 \begin{equation}
@@ -348,20 +403,20 @@
 \[
   \mathbf{y}^{*}(\mathbf{x}',t)-\mathbf{y}^{*}(\mathbf{x},t)=\mathbf{R}(t)\bigl[\mathbf{y}(\mathbf{x}',t)-\mathbf{y}(\mathbf{x},t)\bigr]=\mathbf{R}(t)(\boldsymbol{\xi}+\boldsymbol{\eta})
 \]
-由于正交变换保模，$|\mathbf{R}(\boldsymbol{\xi}+\boldsymbol{\eta})|=|\boldsymbol{\xi}+\boldsymbol{\eta}|$，故刚性旋转后的键伸长为
+由于正交变换保模，$|\mathbf{R}(\boldsymbol{\xi}+\boldsymbol{\eta})|=|\boldsymbol{\xi}+\boldsymbol{\eta}|$，故刚性旋转后的键伸长率为
 \begin{equation}
   s^{*}=\frac{|\mathbf{R}(\boldsymbol{\xi}+\boldsymbol{\eta})|-|\boldsymbol{\xi}|}{|\boldsymbol{\xi}|}=\frac{|\boldsymbol{\xi}+\boldsymbol{\eta}|-|\boldsymbol{\xi}|}{|\boldsymbol{\xi}|}=s
   \label{eq:stretch-objective}
 \end{equation}
-式\eqref{eq:stretch-objective}表明键伸长在任意刚性旋转下保持不变，即 $s$ 是客观量。这一性质保证了以 $s$ 为自变量的键基本构（第 4 章）自动满足客观性公理。需要指出的是，态型本构的客观性要求更复杂，力态 $\underline{\mathbf{T}}$ 的客观性需要本构层面的额外约束，将在 2.6 节角动量守恒的讨论中涉及，第 6 章给出态型本构客观性的具体条件 \cite{Silling2007,LeBobaru2018Obj}。
+式\eqref{eq:stretch-objective}表明键伸长率在任意刚性旋转下保持不变，即 $s$ 是客观量。这一性质保证了以 $s$ 为自变量的键基模型（bond-based peridynamics，第 4 章）自动满足客观性公理。需要指出的是，态型本构的客观性要求更复杂，力态 $\underline{\mathbf{T}}$ 的客观性需要本构层面的额外约束，将在 2.6 节角动量守恒的讨论中涉及，第 6 章给出态型本构客观性的具体条件 \cite{Silling2007,LeBobaru2018Obj}。
 
 \begin{remark}
-  键伸长 $s$ 的客观性源于一个更深的几何事实：键的运动学量 $|\boldsymbol{\xi}+\boldsymbol{\eta}|$ 只依赖变形后两点的相对距离，而不依赖它们在空间中的绝对方位。刚性旋转改变的是后者的坐标表示，而不改变前者。近场动力学以键为基本单元的描述方式，天然把"两点间距离"这种客观量置于核心地位，这是其运动学与经典理论以变形梯度为核心的一个本质区别。
+  键伸长率 $s$ 的客观性源于一个更深的几何事实：键的运动学量 $|\boldsymbol{\xi}+\boldsymbol{\eta}|$ 只依赖变形后两点的相对距离，而不依赖它们在空间中的绝对方位。刚性旋转改变的是后者的坐标表示，而不改变前者。近场动力学以键为基本单元的描述方式，天然把"两点间距离"这种客观量置于核心地位，这是其运动学与经典理论以变形梯度为核心的一个本质区别。
 \end{remark}
 
 \section{受力描述与运动方程}
 
-2.1 节在给出运动方程 \eqref{eq:motion} 时已经引入了对力函数 $\mathbf{f}(\boldsymbol{\eta},\boldsymbol{\xi})$，并指出它必须满足反作用条件 \eqref{eq:reaction} 与中心力条件 \eqref{eq:central-force}。本节从物理意义和数学结构两个角度对这两个约束作更系统的阐述，进而引入成对势（pairwise potential）的概念，说明对力函数如何由势函数导出，最后讨论运动方程的量纲与线性化形式，为第 4 章键基本构模型做铺垫。
+2.1 节在给出运动方程 \eqref{eq:motion} 时已经引入了对力函数 $\mathbf{f}(\boldsymbol{\eta},\boldsymbol{\xi})$，并指出它必须满足反作用条件 \eqref{eq:reaction} 与中心力条件 \eqref{eq:central-force}。本节从物理意义和数学结构两个角度对这两个约束作更系统的阐述，进而引入成对势（pairwise potential）的概念，说明对力函数如何由势函数导出，最后讨论运动方程的量纲与线性化形式，为第 4 章键基模型做铺垫。
 
 \subsection{对力函数的物理意义}
 
@@ -461,12 +516,12 @@
 
 键基对力 $\mathbf{f}(\boldsymbol{\eta},\boldsymbol{\xi})$ 只依赖单条键的相对位移 $\boldsymbol{\eta}$，与该物质点其他键的变形无关。这意味着每条键独立承担自己的恢复力，键与键之间无耦合。对线性各向同性材料，这一限制导致一个固定的泊松比。
 
-考虑均匀各向同性变形 $\boldsymbol{\varepsilon}=\varepsilon\,\mathbf{I}$（$\varepsilon$ 为体应变，$\mathbf{I}$ 为单位张量），由式\eqref{eq:stretch-uniform} 键伸长为 $s=\varepsilon$。线性化对力 \eqref{eq:linear-force} 沿键方向，模 $|\mathbf{f}|=C(|\boldsymbol{\xi}|)\,\varepsilon\,|\boldsymbol{\xi}|$（$C$ 为微模量标量函数，各向同性假设下只依赖 $|\boldsymbol{\xi}|$）。横向与纵向响应由同一 $C$ 决定，无法独立调节，导致泊松比被锁定为
+考虑均匀各向同性变形 $\boldsymbol{\varepsilon}=\varepsilon\,\mathbf{I}$（$\varepsilon$ 为体应变，$\mathbf{I}$ 为单位张量），由式\eqref{eq:stretch-uniform} 键伸长率为 $s=\varepsilon$。线性化对力 \eqref{eq:linear-force} 沿键方向，模 $|\mathbf{f}|=C(|\boldsymbol{\xi}|)\,\varepsilon\,|\boldsymbol{\xi}|$（$C$ 为微模量标量函数，各向同性假设下只依赖 $|\boldsymbol{\xi}|$）。横向与纵向响应由同一 $C$ 决定，无法独立调节，导致泊松比被锁定为
 \begin{equation}
   \nu_{\text{键基}}=\frac{1}{4}\quad(\text{三维}),\qquad \nu_{\text{键基}}=\frac{1}{3}\quad(\text{二维平面应力})
   \label{eq:poisson-limit}
 \end{equation}
-式\eqref{eq:poisson-limit}是键基理论的标志性局限 \cite{Silling2000}。其物理根源在于：键基对力无法区分"体积变形"与"形状变形"，因为每条键只感知自身的伸长，不知道邻居键的总体变形状态。实际材料（如金属 $\nu\approx 0.3$、橡胶 $\nu\approx 0.5$）大多不满足式\eqref{eq:poisson-limit}，因此键基理论虽适合作为入门和定性分析，但对定量预测有本质不足。
+式\eqref{eq:poisson-limit}是键基理论的标志性局限 \cite{Silling2000}。其物理根源在于：键基对力无法区分"体积变形"与"形状变形"，因为每条键只感知自身的伸长率，不知道邻居键的总体变形状态。实际材料（如金属 $\nu\approx 0.3$、橡胶 $\nu\approx 0.5$）大多不满足式\eqref{eq:poisson-limit}，因此键基理论虽适合作为入门和定性分析，但对定量预测有本质不足。
 
 \subsection{态的概念与基本定义}
 
@@ -767,7 +822,7 @@ $\mu$ 不可逆：键一旦断裂便永久失去承载能力，这与脆性材�
 \end{equation}
 其中 $V_{H_{\mathbf{x}}} = \int_{H_{\mathbf{x}}} dV_{\boldsymbol{\xi}}$ 为近场域 $H_{\mathbf{x}}$ 的体积（三维为 $\frac{4}{3}\pi\delta^3$，二维为 $\pi\delta^2$）。由定义知 $0\leqslant\varphi\leqslant 1$：$\varphi=0$ 表示所有键完好，$\varphi=1$ 表示该物质点的族内所有键均已断裂、该点完全失去承载能力。
 
-损伤变量 $\varphi$ 与连续损伤力学的 Kachanov 变量（见 1.2 节对 \cite{Kachanov1958} 的讨论）在数学形式上类似，但二者有本质区别。CDM 中损伤变量是本构方程的状态变量，其演化律由外部经验关系（如 $\dot{D}=f(\sigma)$）给出，演化律的形式与参数高度依赖材料与加载条件。而 PD 中 $\varphi$ 是从微观量 $\mu$ 经积分涌现的导出量，本构方程只控制单键的力-伸长关系，断键准则 \eqref{eq:history-variable} 是材料常数级的简单规则，$\varphi$ 的空间分布与时间演化完全由运动方程 \eqref{eq:motion} 的求解自动给出。这正是 PD 相对 CDM 的根本优势：损伤演化从微观规则涌现，无需外部唯象律。需要特别注意的是边界附近的损伤读数：如 2.1 节图\ref{fig:boundary-truncation} 所示，边界附近物质点的族不完整（$V_{H_{\mathbf{x}}}$ 小于内部物质点），即便所有键都完好，$\varphi$ 也不能直接与内部物质点比较——这是近场动力学表面效应的根源，其严格分析与修正方法留待第 10 章讨论。
+损伤变量 $\varphi$ 与连续损伤力学的 Kachanov 变量（见 1.2 节对 \cite{Kachanov1958} 的讨论）在数学形式上类似，但二者有本质区别。CDM 中损伤变量是本构方程的状态变量，其演化律由外部经验关系（如 $\dot{D}=f(\sigma)$）给出，演化律的形式与参数高度依赖材料与加载条件。而 PD 中 $\varphi$ 是从微观量 $\mu$ 经积分涌现的导出量，本构方程只控制单键的力-伸长率关系，断键准则 \eqref{eq:history-variable} 是材料常数级的简单规则，$\varphi$ 的空间分布与时间演化完全由运动方程 \eqref{eq:motion} 的求解自动给出。这正是 PD 相对 CDM 的根本优势：损伤演化从微观规则涌现，无需外部唯象律。需要特别注意的是边界附近的损伤读数：如 2.1 节图\ref{fig:boundary-truncation} 所示，边界附近物质点的族不完整（$V_{H_{\mathbf{x}}}$ 小于内部物质点），即便所有键都完好，$\varphi$ 也不能直接与内部物质点比较——这是近场动力学表面效应的根源，其严格分析与修正方法留待第 10 章讨论。
 
 \subsection{临界伸长率与断裂韧度的标定关系}
 
