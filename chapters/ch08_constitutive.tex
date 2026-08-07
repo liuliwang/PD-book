@@ -755,29 +755,74 @@ FCC 多晶在随机取向下的 Taylor 因子取经典值 $M\approx3.06$，即�
 
 \subsection{晶体塑性在 NOSB 中的嵌入}\label{sec:cp-nosb}
 
-晶体塑性嵌入 NOSB 的路径与 8.1--8.3 节完全一致——本构对应机制（第 7 章\ref{sec:correspondence}节）：由非局部变形梯度构造经典应变度量，调用经典本构得到应力，再经力态公式构造键力。晶体塑性的特殊之处在于两点：其一，本构以晶格坐标系为参考系，需要把非局部变形梯度从全局坐标系旋转到晶格坐标系（取向映射）；其二，滑移率与硬化是路径相关的历史依赖本构，需要在每一材料点维护滑移系内变量（$g^{\alpha}$ 及累积滑移 $\gamma^{\alpha}$），并按 8.2 节的算子分裂格式推进 \cite{SunSundararaghavan2014,Littlewood2011}。
+晶体塑性嵌入 NOSB 的路径与 8.1--8.3 节完全一致——本构对应机制（第 7 章\ref{sec:correspondence}节）：由非局部变形梯度构造经典应变度量，调用经典本构得到应力，再经力态公式构造键力。晶体塑性的特殊之处在于三点。其一，本构以晶格坐标系为参考系，需要把非局部变形梯度从全局坐标系旋转到晶格坐标系（取向映射），本构输出的 Cauchy 应力自动回到全局基（式\eqref{eq:cp-cauchy-lattice}后说明）。其二，滑移率与硬化是路径相关的历史依赖本构，需要在每一材料点维护滑移系内变量（滑移阻力 $g^{\alpha}$ 及塑性变形梯度 $\mathbf{F}^{\mathrm{p}}$），并按 8.2 节的算子分裂格式推进。其三，本构输出经 Piola 变换转换为第一类 Piola--Kirchhoff 应力后构造力态 \cite{SunSundararaghavan2014,Littlewood2011}。本节依次给出取向映射与力态构造的显式公式、晶格旋转的处理、多晶微结构的离散与零能模式的处理，并以 Sun--Sundararaghavan、Luo 与 Gu 等的实现为例说明数值要点。
 
 取向映射是嵌入的第一步。设晶格取向由旋转矩阵 $\mathbf{R}_{0}$ 描述（晶体坐标系到全局坐标系），材料点 $\mathbf{x}$ 的非局部变形梯度 $\mathbf{F}$（式\eqref{eq:nonlocal-deformation-gradient}）在晶格坐标系中表示为
 \begin{equation}
   \tilde{\mathbf{F}}=\mathbf{F}\,\mathbf{R}_{0}
   \label{eq:cp-lattice-deformation-gradient}
 \end{equation}
-式\eqref{eq:cp-lattice-deformation-gradient}的约定：$\mathbf{F}$ 的列矢量是全局基矢的变形像，右乘 $\mathbf{R}_{0}$ 把参考基矢从晶体坐标系旋转到全局坐标系（与文献 \cite{SunSundararaghavan2014,GuZhangMadenci2019} 一致）。对超弹性—塑性分解（式\eqref{eq:cp-f-decomp}），晶格系中的弹性变形梯度由 $\tilde{\mathbf{F}}^{\mathrm{e}}=\tilde{\mathbf{F}}\tilde{\mathbf{F}}^{\mathrm{p}-1}$ 给出，其中 $\tilde{\mathbf{F}}^{\mathrm{p}}$ 为晶格系中的塑性变形梯度（由滑移率积分更新，见下文数值流程），弹性 Green--Lagrange 应变按式\eqref{eq:cp-green-lagrange}计算 $\tilde{\mathbf{E}}^{\mathrm{e}}=\tfrac{1}{2}(\tilde{\mathbf{F}}^{\mathrm{eT}}\tilde{\mathbf{F}}^{\mathrm{e}}-\mathbf{I})$。由 $\tilde{\mathbf{E}}^{\mathrm{e}}$ 经晶格弹性本构（各向异性弹性张量 $\mathbb{C}^{\mathrm{lat}}$，式\eqref{eq:cp-second-piola}）计算第二类 Piola--Kirchhoff 应力 $\tilde{\mathbf{S}}=\mathbb{C}^{\mathrm{lat}}:\tilde{\mathbf{E}}^{\mathrm{e}}$，再推得 Cauchy 应力
+式\eqref{eq:cp-lattice-deformation-gradient}的约定：$\mathbf{F}$ 的列矢量是全局基矢的变形像，右乘 $\mathbf{R}_{0}$ 把参考基矢从晶体坐标系旋转到全局坐标系（与文献 \cite{SunSundararaghavan2014,GuZhangMadenci2019} 一致）。对超弹性—塑性分解（式\eqref{eq:cp-f-decomp}），晶格系中的弹性变形梯度由 $\tilde{\mathbf{F}}^{\mathrm{e}}=\tilde{\mathbf{F}}\tilde{\mathbf{F}}^{\mathrm{p}-1}$ 给出，其中 $\tilde{\mathbf{F}}^{\mathrm{p}}$ 为晶格系中的塑性变形梯度。需说明 $\tilde{\mathbf{F}}^{\mathrm{p}}$ 与 8.4.2 节全局系塑性变形梯度 $\mathbf{F}^{\mathrm{p}}$ 的关系：由 $\tilde{\mathbf{F}}=\mathbf{F}\mathbf{R}_{0}$ 与乘法分解 $\mathbf{F}=\mathbf{F}^{\mathrm{e}}\mathbf{F}^{\mathrm{p}}$，取 $\tilde{\mathbf{F}}^{\mathrm{p}}=\mathbf{F}^{\mathrm{p}}\mathbf{R}_{0}$、$\tilde{\mathbf{F}}^{\mathrm{e}}=\mathbf{F}^{\mathrm{e}}$，则 $\tilde{\mathbf{F}}^{\mathrm{e}}\tilde{\mathbf{F}}^{\mathrm{p}}=\mathbf{F}^{\mathrm{e}}\mathbf{F}^{\mathrm{p}}\mathbf{R}_{0}=\tilde{\mathbf{F}}$ 恰为式\eqref{eq:cp-lattice-deformation-gradient}的分解——即 $\mathbf{R}_{0}$ 为常数时塑性变形梯度只需右乘取向矩阵即可转入晶格系，弹性部分不变。弹性 Green--Lagrange 应变按式\eqref{eq:cp-green-lagrange}计算 $\tilde{\mathbf{E}}^{\mathrm{e}}=\tfrac{1}{2}(\tilde{\mathbf{F}}^{\mathrm{eT}}\tilde{\mathbf{F}}^{\mathrm{e}}-\mathbf{I})$。由 $\tilde{\mathbf{E}}^{\mathrm{e}}$ 经晶格弹性本构（各向异性弹性张量 $\mathbb{C}^{\mathrm{lat}}$，式\eqref{eq:cp-second-piola}）计算第二类 Piola--Kirchhoff 应力 $\tilde{\mathbf{S}}=\mathbb{C}^{\mathrm{lat}}:\tilde{\mathbf{E}}^{\mathrm{e}}$，再推得 Cauchy 应力
 \begin{equation}
   \tilde{\boldsymbol{\sigma}}=\frac{1}{J^{\mathrm{e}}}\,\tilde{\mathbf{F}}^{\mathrm{e}}
   \tilde{\mathbf{S}}\,\tilde{\mathbf{F}}^{\mathrm{eT}},\qquad
   J^{\mathrm{e}}=\det\tilde{\mathbf{F}}^{\mathrm{e}}
   \label{eq:cp-cauchy-lattice}
 \end{equation}
-式\eqref{eq:cp-cauchy-lattice}中 $\tilde{\boldsymbol{\sigma}}$ 为晶格系中的 Cauchy 应力，最后旋转回全局坐标系 $\boldsymbol{\sigma}=\mathbf{R}_{0}\tilde{\boldsymbol{\sigma}}\mathbf{R}_{0}^{\mathrm{T}}$（与第 7 章式\eqref{eq:rotate-back}的极分解—旋转流程一致 \cite{Warren2009}），经式\eqref{eq:hyper-force-state}构造力态。滑移率式\eqref{eq:cp-slip-rate-powerlaw}在晶格系中以分切应力 $\tilde{\tau}^{\alpha}=\tilde{\boldsymbol{\sigma}}:\mathbf{P}^{\alpha}_{\mathrm{sym}}$ 计算，其推导与式\eqref{eq:cp-resolved-shear}相同，仅应力张量换为晶格系值。
+式\eqref{eq:cp-cauchy-lattice}中 $\tilde{\boldsymbol{\sigma}}$ 由晶格系弹性本构求得，需特别说明其坐标基底：$\tilde{\mathbf{F}}^{\mathrm{e}}=\tilde{\mathbf{F}}\tilde{\mathbf{F}}^{\mathrm{p}-1}$ 的参考基在晶体系、当前基在全局系（因 $\tilde{\mathbf{F}}$ 的当前基即全局基），故式\eqref{eq:cp-cauchy-lattice}经 Piola 变换得到的 $\tilde{\boldsymbol{\sigma}}$ 直接就是全局基中的 Cauchy 应力 $\boldsymbol{\sigma}$，无需再旋转（这一点与第 7 章未旋转构型方法式\eqref{eq:rotate-back}的回旋操作不同，后者对 $\tilde{\mathbf{D}}$ 作的是双边相似变换）。滑移率式\eqref{eq:cp-slip-rate-powerlaw}以分切应力为驱动力。由于 $\tilde{\boldsymbol{\sigma}}$ 是全局基 Cauchy 应力而 Schmid 张量 $\mathbf{P}^{\alpha}_{\mathrm{sym}}$ 定义在晶体系（8.4.1 节），分切应力须在一致基下计算：由 8.4.1 节式\eqref{eq:cp-resolved-shear}的推导，$\tilde{\tau}^{\alpha}=\tilde{\boldsymbol{\sigma}}:(\mathbf{R}_{0}\mathbf{P}^{\alpha}_{\mathrm{sym}}\mathbf{R}_{0}^{\mathrm{T}})$（把 Schmid 张量旋入全局基）与 $\tilde{\tau}^{\alpha}=(\mathbf{R}_{0}^{\mathrm{T}}\tilde{\boldsymbol{\sigma}}\mathbf{R}_{0}):\mathbf{P}^{\alpha}_{\mathrm{sym}}$（把应力旋入晶体系）数值相等，均为基无关的标量。实现中常用后者：把 $\tilde{\boldsymbol{\sigma}}$ 旋转到晶体系后与固定的晶体系 Schmid 张量双点积，可预先存储 $\mathbf{P}^{\alpha}_{\mathrm{sym}}$ 不变。
+
+力态构造是嵌入链条的最后一环。晶体塑性本构输出的 $\tilde{\boldsymbol{\sigma}}$ 已是全局基 Cauchy 应力（$\boldsymbol{\sigma}=\tilde{\boldsymbol{\sigma}}$，见式\eqref{eq:cp-cauchy-lattice}后的说明），经 Piola 变换（第 7 章式\eqref{eq:piola-cauchy}）得第一类 Piola--Kirchhoff 应力 $\mathbf{P}=J\boldsymbol{\sigma}\mathbf{F}^{-\mathrm{T}}$（$J=\det\mathbf{F}$），代入力态定义式\eqref{eq:nosb-force-state}得晶体塑性力态
+\begin{equation}
+  \underline{\mathbf{T}}\langle\boldsymbol{\xi}\rangle
+  =\omega(|\boldsymbol{\xi}|)\,J\,\boldsymbol{\sigma}\,\mathbf{F}^{-\mathrm{T}}\mathbf{K}^{-1}\boldsymbol{\xi}
+  \label{eq:cp-lattice-force-state}
+\end{equation}
+式\eqref{eq:cp-lattice-force-state}的推导：由式\eqref{eq:cp-cauchy-lattice}得全局基 Cauchy 应力 $\boldsymbol{\sigma}=\tilde{\boldsymbol{\sigma}}$，代入 Piola 变换式\eqref{eq:piola-cauchy}得 $\mathbf{P}$，再代入力态定义式\eqref{eq:nosb-force-state}即得。式\eqref{eq:cp-lattice-force-state}与第 7 章 Cauchy 应力嵌入形式式\eqref{eq:force-state-cauchy}完全一致，区别仅在于 $\boldsymbol{\sigma}$ 由晶体塑性本构（8.4.2 节）给出，而非超弹性或黏弹性本构。这一链条表明：晶体塑性在 NOSB 中的实现与其他本构的唯一差异在于应力更新（8.4.2 节的滑移系分解与晶格弹性），力态装配与运动方程求解完全沿用 NOSB 框架 \cite{SunSundararaghavan2014,Littlewood2011}。
+
+晶体塑性的晶格旋转由弹性变形梯度的极分解显式刻画。式\eqref{eq:cp-f-decomp}的弹性部分可极分解为
+\begin{equation}
+  \mathbf{F}^{\mathrm{e}}=\mathbf{R}^{\mathrm{e}}\mathbf{U}^{\mathrm{e}}
+  \label{eq:cp-lattice-rotation}
+\end{equation}
+其中 $\mathbf{R}^{\mathrm{e}}$ 为正交张量（晶格旋转），$\mathbf{U}^{\mathrm{e}}$ 为对称正定的右伸长张量（与第 7 章式\eqref{eq:polar-decomposition}的记号一致）。式\eqref{eq:cp-lattice-rotation}表明晶格方向的转动完全由 $\mathbf{R}^{\mathrm{e}}$ 描述：滑移方向随晶格转动进入当前构型（$\mathbf{m}^{\alpha*}=\mathbf{F}^{\mathrm{e}}\mathbf{m}^{\alpha}$，见 8.4.2 节），其转动部分即 $\mathbf{R}^{\mathrm{e}}\mathbf{m}^{\alpha}$。在取向固定的晶格系实现中，$\mathbf{R}_{0}$ 固定不变，晶格转动由式\eqref{eq:cp-lattice-rotation}逐时间步更新进入弹性变形梯度，无需单独追踪 $\mathbf{R}^{\mathrm{e}}$——这是 Sun--Sundararaghavan 方案 \cite{SunSundararaghavan2014} 与第 7 章未旋转构型方法（式\eqref{eq:unrotated-frame}）的关键区别：后者每步显式更新 $\mathbf{R}$（式\eqref{eq:rotate-back}），前者把转动隐含在 $\mathbf{F}^{\mathrm{e}}$ 中，仅当需要输出晶格取向（如织构演化）时才做式\eqref{eq:cp-lattice-rotation}的极分解。
 
 \begin{remark}
-  式\eqref{eq:cp-lattice-deformation-gradient}的旋转方向需与全书符号一致核对：第 7 章未旋转构型方法（式\eqref{eq:unrotated-frame}）以极分解转动更新本构，本章晶体塑性以固定取向矩阵 $\mathbf{R}_{0}$ 把变形梯度旋转到晶格系，二者数学等价（都把本构放在随晶格转动的坐标系中执行），但实现路径不同：前者每步更新 $\mathbf{R}$，后者仅在初始化时固定 $\mathbf{R}_{0}$，晶格转动由 $\tilde{\mathbf{F}}^{\mathrm{e}}$ 的极分解隐式吸收 \cite{SunSundararaghavan2014}。
+  式\eqref{eq:cp-lattice-deformation-gradient}的旋转方向须与全书符号一致核对：第 7 章未旋转构型方法以极分解转动 $\mathbf{R}$（式\eqref{eq:unrotated-frame}、式\eqref{eq:rotate-back}）更新本构，本章晶体塑性以固定取向矩阵 $\mathbf{R}_{0}$ 把变形梯度旋转到晶格系。注意二者变换形制不同：式\eqref{eq:cp-lattice-deformation-gradient}的 $\tilde{\mathbf{F}}=\mathbf{F}\mathbf{R}_{0}$ 是单边右乘（把参考基矢从晶体坐标旋转到全局坐标，再取变形像，参考基在晶体系、当前基在全局系），而式\eqref{eq:unrotated-frame}的 $\tilde{\mathbf{D}}=\mathbf{R}^{\mathrm{T}}\mathbf{D}\mathbf{R}$ 是双边相似变换（把当前构型量旋转到未旋转构型）。形制的差异直接导致应力回旋的有无：本章 $\tilde{\boldsymbol{\sigma}}$ 因当前基在全局系而无需回旋（式\eqref{eq:cp-cauchy-lattice}后说明），第 7 章 $\tilde{\boldsymbol{\sigma}}$ 定义在未旋转构型则须回旋（式\eqref{eq:rotate-back}）。二者数学上等价、实现路径不同，切不可混用左右乘约定 \cite{SunSundararaghavan2014}。
 \end{remark}
 
-多晶微结构的离散是第二步。多晶材料由取向各异的晶粒组成，每一晶粒赋予固定的取向矩阵 $\mathbf{R}_{0}$（由实验测得或随机生成），材料点按所在晶粒继承取向。在近场动力学离散中，材料点携带取向信息：点 $\mathbf{x}$ 的取向 $\mathbf{R}_{0}(\mathbf{x})$ 逐点赋值，晶界表现为相邻材料点取向的间断（图略，取向场 $\mathbf{R}_{0}(\mathbf{x})$ 的分片常数分布）。Sun 与 Sundararaghavan 2014 年首先把晶体塑性嵌入 NOSB，用隐式非线性求解器分析了平面多晶的弹塑性变形与剪切带演化 \cite{SunSundararaghavan2014}；Luo 等 2018 年引入自适应动力松弛（ADR）求解器处理准静态问题，捕捉了多晶中的微尺度剪切带 \cite{Luo2018}；Gu 等 2019 年加入罚函数稳定化并采用显式/隐式双求解器，实现了多晶的弹塑性变形与动态开裂的模拟，其中晶界处材料点的失效由第 11 章的损伤判据控制 \cite{GuZhangMadenci2019}。Littlewood 2011 年在 NOSB 中实现了晶体弹粘塑性模型，用于分析含硬质颗粒的铝合金单晶中的塑性变形与损伤累积，指出晶格取向对材料响应有强影响 \cite{Littlewood2011}。
+多晶微结构的离散是第二步。多晶材料由取向各异的晶粒组成，每一晶粒赋予固定的取向矩阵 $\mathbf{R}_{0}$（由实验测得或随机生成），材料点按所在晶粒继承取向。在近场动力学离散中，取向场为逐点赋值的分片常数分布
+\begin{equation}
+  \mathbf{R}_{0}(\mathbf{x})=\mathbf{R}_{0}^{(g)},\qquad
+  \mathbf{x}\in\Omega_{g}
+  \label{eq:cp-orientation-field}
+\end{equation}
+其中 $\Omega_{g}$ 为第 $g$ 个晶粒占据的区域，$\mathbf{R}_{0}^{(g)}$ 为该晶粒的取向矩阵。式\eqref{eq:cp-orientation-field}表明晶界表现为相邻材料点取向矩阵的间断（图略，取向场的分片常数分布）：跨越晶界的键的变形梯度式\eqref{eq:nonlocal-deformation-gradient}由分属不同晶粒的材料点共同贡献，取向间断被非局部平均光滑化，形成宽度约 $\delta$ 的过渡层——这是 NOSB 多晶模拟的固有特征，宏观晶界能、晶界滑移等微观机制不在本构描述范围内（第 11 章损伤判据可附加晶界失效）。Sun 与 Sundararaghavan 2014 年首先把晶体塑性嵌入 NOSB，用隐式非线性求解器分析了平面多晶的弹塑性变形与剪切带演化 \cite{SunSundararaghavan2014}；Luo 等 2018 年引入自适应动力松弛（ADR）求解器处理准静态问题，捕捉了多晶中的微尺度剪切带 \cite{Luo2018}；Gu 等 2019 年加入罚函数稳定化并采用显式/隐式双求解器，实现了多晶的弹塑性变形与动态开裂的模拟，其中晶界处材料点的失效由第 11 章的损伤判据控制 \cite{GuZhangMadenci2019}。Littlewood 2011 年在 NOSB 中实现了晶体弹粘塑性模型，用于分析含硬质颗粒的铝合金单晶中的塑性变形与损伤累积，指出晶格取向对材料响应有强影响 \cite{Littlewood2011}。
 
-数值实现的关键问题是 NOSB 的零能模式失稳（第 7 章\ref{sec:zero-energy}节）与滑移内变量的时间积分。零能模式源于非局部变形梯度式\eqref{eq:nonlocal-deformation-gradient}对近场域内高频变形模式的不敏感，在晶体塑性模拟中表现为变形场的数值振荡。文献中的处理包括罚函数稳定化（Gu 等 2019 \cite{GuZhangMadenci2019}）、应力点法（Luo--Sundararaghavan \cite{LuoSundararaghavan2018}）与高阶变形梯度近似（Littlewood 2011 \cite{Littlewood2011}），其原理在第 7 章统一讨论。滑移内变量的时间积分采用与 8.2--8.3 节一致的算子分裂格式：每一时间步内，（1）由当前构型计算非局部变形梯度式\eqref{eq:nonlocal-deformation-gradient}并经式\eqref{eq:cp-lattice-deformation-gradient}旋转到晶格系；（2）由式\eqref{eq:cp-plastic-velocity-gradient}计算塑性速度梯度，按式\eqref{eq:cp-slip-rate-powerlaw}求滑移率，用显式 Euler 格式更新 $\mathbf{F}^{\mathrm{p}}$ 与滑移阻力式\eqref{eq:cp-hardening-linear}；（3）由弹性部分式\eqref{eq:cp-f-decomp}计算 $\tilde{\mathbf{E}}^{\mathrm{e}}$ 与 $\tilde{\boldsymbol{\sigma}}$（式\eqref{eq:cp-cauchy-lattice}）；（4）旋转回全局系并经式\eqref{eq:hyper-force-state}构造力态，代入运动方程推进位移。该流程与 8.2--8.3 节的统一模式（点级内变量更新 + 经典本构调用 + 力态装配）完全一致，区别仅在于内变量由标量（记忆向量 $\mathbf{h}^{n}$、损伤 $D$）变为滑移系向量 $g^{\alpha}$ 与 $\mathbf{F}^{\mathrm{p}}$，体现了 NOSB 本构对应机制对"微结构内变量本构"的承载能力 \cite{SunSundararaghavan2014,GuZhangMadenci2019}。
+数值实现的关键问题是 NOSB 的零能模式失稳（第 7 章\ref{sec:zero-energy}节）与滑移内变量的时间积分。零能模式源于非局部变形梯度式\eqref{eq:nonlocal-deformation-gradient}对近场域内高频变形模式的不敏感，在晶体塑性模拟中表现为变形场的数值振荡。晶体塑性实现中应用最广的抑制手段是把第 7 章的稳定化力态式\eqref{eq:stabilization-force}叠加到晶体塑性力态式\eqref{eq:cp-lattice-force-state}上，即
+\begin{equation}
+  \underline{\mathbf{T}}\langle\boldsymbol{\xi}\rangle
+  =\omega(|\boldsymbol{\xi}|)\Bigl(J\boldsymbol{\sigma}\,\mathbf{F}^{-\mathrm{T}}\mathbf{K}^{-1}\boldsymbol{\xi}
+  +\gamma\,\underline{\mathbf{z}}\langle\boldsymbol{\xi}\rangle\Bigr)
+  \label{eq:cp-stabilized-force}
+\end{equation}
+其中 $\gamma$ 为稳定化参数（按式\eqref{eq:stabilization-gamma}标定），$\underline{\mathbf{z}}\langle\boldsymbol{\xi}\rangle=\underline{\mathbf{Y}}\langle\boldsymbol{\xi}\rangle-\mathbf{F}\boldsymbol{\xi}$ 为变形的非均匀部分（式\eqref{eq:nonuniform-part}），即键的实际变形与变形梯度所预示的均匀变形之差。式\eqref{eq:cp-stabilized-force}的推导与第 7 章稳定化力态式\eqref{eq:stabilization-force}一致：第二项 $\gamma\omega\underline{\mathbf{z}}$ 惩罚键变形对均匀变形的偏离，由于 $\underline{\mathbf{z}}$ 与变形梯度正交（式\eqref{eq:z-orthogonality}），该项不改变均匀变形下的经典响应，只对零能模式（$\delta\mathbf{F}=\mathbf{0}$、$\delta\underline{\mathbf{z}}\neq\mathbf{0}$）提供正的能量贡献，从而恢复式\eqref{eq:zero-energy-stability-condition}的稳定性条件。Gu 等 2019 年采用的罚函数稳定化即属此类 \cite{GuZhangMadenci2019}。此外，Luo--Sundararaghavan 2018 年把应力点法引入 NOSB 对应模型，通过在近场域内布置错位应力点计算场量导数，完全阻尼了零能模式且不引入附加参数 \cite{LuoSundararaghavan2018}；高阶变形梯度近似是另一条路线 \cite{YaghoobiChorzepa2017}。需要指出的是，Littlewood 2011 的晶体塑性 NOSB 实现未引入稳定化项，其力态即式\eqref{eq:cp-lattice-force-state}的纯对应形式，零能模式的抑制被列为后续工作 \cite{Littlewood2011}。
+
+滑移内变量的时间积分采用与 8.2--8.3 节一致的算子分裂格式。每一时间步 $[t_{n},t_{n+1}]$ 内：（1）由当前构型计算非局部变形梯度式\eqref{eq:nonlocal-deformation-gradient}并经式\eqref{eq:cp-lattice-deformation-gradient}旋转到晶格系；（2）由式\eqref{eq:cp-f-decomp}计算弹性部分 $\tilde{\mathbf{F}}^{\mathrm{e}}=\tilde{\mathbf{F}}\tilde{\mathbf{F}}^{\mathrm{p}-1}$（其中 $\tilde{\mathbf{F}}^{\mathrm{p}}=\mathbf{F}^{\mathrm{p}}\mathbf{R}_{0}$ 由晶格系关系式\eqref{eq:cp-lattice-deformation-gradient}后的说明给出，$\mathbf{F}^{\mathrm{p}}$ 为存储的全局系塑性变形梯度），经晶格弹性本构计算 $\tilde{\mathbf{E}}^{\mathrm{e}}$ 与 $\tilde{\boldsymbol{\sigma}}$（式\eqref{eq:cp-cauchy-lattice}），再经式\eqref{eq:cp-lattice-force-state}构造力态；（3）由式\eqref{eq:cp-slip-rate-powerlaw}按当前状态求滑移率 $\dot{\gamma}^{\alpha,n}$，用显式 Euler 格式更新塑性变形梯度
+\begin{equation}
+  \mathbf{F}^{\mathrm{p},n+1}
+  =\bigl(\mathbf{I}+\mathbf{L}^{\mathrm{p},n}\Delta t\bigr)\mathbf{F}^{\mathrm{p},n},
+  \qquad
+  \mathbf{L}^{\mathrm{p},n}=\sum_{\alpha}\dot{\gamma}^{\alpha,n}\,\mathbf{m}^{\alpha}\otimes\mathbf{n}^{\alpha}
+  \label{eq:cp-fp-update}
+\end{equation}
+其中 $\mathbf{L}^{\mathrm{p},n}$ 由式\eqref{eq:cp-plastic-velocity-gradient}在当前状态求值。式\eqref{eq:cp-fp-update}的推导：由演化方程式\eqref{eq:cp-fp-evolution}（$\dot{\mathbf{F}}^{\mathrm{p}}=\mathbf{L}^{\mathrm{p}}\mathbf{F}^{\mathrm{p}}$）作显式 Euler 离散 $\mathbf{F}^{\mathrm{p},n+1}=\mathbf{F}^{\mathrm{p},n}+\Delta t\,\mathbf{L}^{\mathrm{p},n}\mathbf{F}^{\mathrm{p},n}$，提取公因子 $\mathbf{F}^{\mathrm{p},n}$ 即得。式\eqref{eq:cp-fp-update}中 $\operatorname{tr}\mathbf{L}^{\mathrm{p},n}=0$（式\eqref{eq:cp-det-fp}），故 $\det(\mathbf{I}+\mathbf{L}^{\mathrm{p},n}\Delta t)=1+O(\Delta t^{2})$，体积不变性式\eqref{eq:cp-det-fp}在一阶精度内保持（用 $\det(\mathbf{I}+\varepsilon\mathbf{A})=1+\varepsilon\operatorname{tr}\mathbf{A}+O(\varepsilon^{2})$）。滑移阻力同样显式更新
+\begin{equation}
+  g^{\alpha,n+1}=g^{\alpha,n}+\dot{g}^{\alpha,n}\Delta t,
+  \qquad
+  \dot{g}^{\alpha,n}=\sum_{\beta}h_{\alpha\beta}\,|\dot{\gamma}^{\beta,n}|
+  \label{eq:cp-hardening-update}
+\end{equation}
+其中 $\dot{g}^{\alpha,n}$ 由式\eqref{eq:cp-hardening-linear}在当前状态求值（潜硬化形式式\eqref{eq:cp-hardening-latent}可直接代入）。式\eqref{eq:cp-hardening-update}与式\eqref{eq:cp-fp-update}共同构成滑移系内变量的完整更新：$\mathbf{F}^{\mathrm{p}}$ 与 $g^{\alpha}$ 都只需当前步状态即可显式推进，无需迭代。（4）由式\eqref{eq:cp-cauchy-lattice}得全局基 Cauchy 应力并经式\eqref{eq:cp-stabilized-force}构造力态，代入态型运动方程推进位移。该流程与 8.2--8.3 节的统一模式（点级内变量更新 + 经典本构调用 + 力态装配）完全一致，区别仅在于内变量由标量（记忆向量 $\mathbf{h}^{n}$、损伤 $D$）变为滑移系向量 $g^{\alpha}$ 与张量 $\mathbf{F}^{\mathrm{p}}$，体现了 NOSB 本构对应机制对"微结构内变量本构"的承载能力 \cite{SunSundararaghavan2014,GuZhangMadenci2019}。
 
 综上，晶体弹塑性在 NOSB 中的实现把第 6 章经典塑性理论从"宏观屈服面"推进到"微观滑移系"层面：Schmid 定律式\eqref{eq:cp-schmid-law}取代 von Mises 准则式\eqref{eq:von-mises}，滑移率幂律式\eqref{eq:cp-slip-rate-powerlaw}与硬化律式\eqref{eq:cp-hardening-linear}取代塑性乘子式\eqref{eq:classical-plastic-multiplier}，变形梯度乘法分解式\eqref{eq:cp-f-decomp}取代小变形加法分解。这使得近场动力学能够描述金属的各向异性屈服、织构演化与微尺度剪切带——这些是 8.1--8.3 节各向同性本构无法触及的现象。8.5 节将转向另一类重要材料——准脆性材料（陶瓷、岩石），其 JH-2 本构以压力相关屈服与损伤累积为核心，与本节晶体塑性的滑移机制形成互补。
 
