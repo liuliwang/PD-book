@@ -10,7 +10,7 @@
 ## 项目概览
 
 专著《近场动力学理论与数值方法》的 LaTeX 书籍项目（ctexbook，A4，11pt）。
-章节完成度参差：ch01、ch02、ch06、ch07 为完整章节（数百行），是写作新章节时的范例；ch03–ch05、ch08–ch19 目前仅为十余行占位骨架；附录 appA–appE 为占位空文件（动手前先 Read 确认行数）。
+章节完成度参差：ch01、ch02、ch03、ch06、ch07 为完整章节（数百行），是写作新章节时的范例；ch04、ch05、ch08–ch19 目前仅为十余行占位骨架；附录 appA–appE 为占位空文件（动手前先 Read 确认行数）。
 
 ## 编译
 
@@ -130,7 +130,7 @@ xelatex main.tex
 
 ## 文献与可复现性
 
-- **参考文献**：统一由 `bibliography.bib` 管理（约百条）；当前 `main.tex` 用 `\bibliographystyle{plain}`（非 GB/T 7714），若切换 GB/T 7714 须更换 bibstyle 并引入 `gbt7714` 宏包
+- **参考文献**：统一由 `bibliography.bib` 管理（121 条）；当前 `main.tex` 用 `\bibliographystyle{plain}`（非 GB/T 7714），若切换 GB/T 7714 须更换 bibstyle 并引入 `gbt7714` 宏包
 - **编译质量门禁**：xelatex + bibtex 无 error；无 undefined reference/citation 警告
 - **编译验证执行方式**：涉及 xelatex 编译验证的 QA 任务（如最终编译检查、F-wave 验证），**由当前会话直接本地执行**，不委托子代理。原因：章节文件（`chNN_*.tex`）不能单独编译，必须由 `main.tex` 入口编译；子代理可能编译错误文件、PowerShell 环境差异导致阻塞、或未按格式输出 `VERDICT` 导致 boulder 暂停。
 
