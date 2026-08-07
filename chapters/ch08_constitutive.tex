@@ -587,7 +587,199 @@ Kachanov--Rabotnov 模型形式简洁，但存在数值上的病态应力敏感�
 
 综上，蠕变本构在 NOSB 中的完整计算流程为：每一时间步 $[t_{n},t_{n+1}]$ 内，（1）由当前构型计算非局部变形梯度式\eqref{eq:nonlocal-deformation-gradient}与应变；（2）按式\eqref{eq:creep-update}计算蠕变应变增量，按式\eqref{eq:creep-damage-update}更新损伤；（3）按式\eqref{eq:creep-trial}更新试探应力，结合损伤状态按式\eqref{eq:creep-force-state}构造力态；（4）代入态型运动方程（第 7 章）求解加速度并推进位移。这一流程与 8.2 节黏弹性（式\eqref{eq:visco-recurrence}的记忆向量）、黏塑性（式\eqref{eq:vp-explicit-update}的显式流动）完全同构，验证了 NOSB 本构对应机制对"历史依赖本构"的统一处理：黏弹性、黏塑性、蠕变都归结为"点级内变量更新 + 经典本构调用 + 力态装配"的统一模式。
 
-\section{晶体弹塑性}
+\section{晶体弹塑性}\label{sec:crystal-plasticity}
+
+8.1--8.3 节讨论的超弹性、黏弹性与蠕变本构都以各向同性或横向各向同性材料为对象，本构响应由宏观应变张量的不变量或线性化应变刻画，不涉及材料微结构。工程金属的实际塑性变形却源于晶体内部的位错滑移：宏观屈服与硬化的各向异性、织构演化、剪切带萌生等现象都必须从晶粒尺度的滑移机制出发才能定量描述。本节建立晶体弹塑性（crystal plasticity）本构理论及其在非常规态型（NOSB）框架中的实现，其主线是把第 6 章基于 von Mises 屈服面的经典塑性理论推广到"以滑移系为基本载体"的晶体塑性形式。首先介绍晶体塑性的物理基础与运动学描述：滑移系、Schmid 定律与分切应力的推导（\ref{sec:cp-slip-systems}节）；进而建立晶体塑性的本构方程——变形梯度的乘法分解、滑移率幂律与滑移硬化律，并说明其与第 6 章率无关塑性的联系与区别（\ref{sec:cp-constitutive}节）；最后给出晶体塑性在 NOSB 中的嵌入流程——晶格取向映射、非局部变形梯度的旋转、多晶微结构的离散与零能模式的处理，并以 Sun--Sundararaghavan、Luo 与 Gu 等的实现为例说明数值要点（\ref{sec:cp-nosb}节）。本节晶体塑性的理论框架依据 Taylor 的奠基工作 \cite{Taylor1938}、Hill 的增量本构 \cite{Hill1966}、Rice 的内变量理论 \cite{Rice1971} 与 Asaro 的经典综述 \cite{Asaro1983}，近场动力学实现参见 \cite{SunSundararaghavan2014,Littlewood2011,Luo2018,GuZhangMadenci2019}。
+
+\subsection{滑移系与 Schmid 定律}\label{sec:cp-slip-systems}
+
+晶体塑性理论建立在位错滑移这一微观机制之上。金属单晶中，塑性变形通过位错在特定晶面上沿特定晶向滑移实现，这些晶面—晶向组合称为滑移系（slip system）。滑移系由晶体对称性决定，各主要金属晶体结构的滑移系构成列于表\ref{tab:cp-slip-systems} \cite{Taylor1938,Asaro1983,Roters2010}。面心立方（FCC）晶体的滑移面为 $\{111\}$ 族、滑移方向为 $\langle110\rangle$ 族：$\{111\}$ 族含 $4$ 个滑移面（$(111)$、$(1\bar{1}1)$、$(\bar{1}11)$、$(11\bar{1})$），每个滑移面内有 $3$ 个 $\langle110\rangle$ 滑移方向（与该面法向正交），故共 $12$ 个滑移系。体心立方（BCC）晶体除 $\{110\}\langle111\rangle$ 的 $12$ 个主滑移系外，还包含 $\{112\}\langle111\rangle$ 的 $12$ 个与 $\{123\}\langle111\rangle$ 的 $24$ 个滑移系，共 $48$ 个（不同温度下主导滑移面不同）。密排六方（HCP）晶体的滑移系数量较少：基面 $\{0001\}\langle11\bar{2}0\rangle$ 仅 $3$ 个，另有柱面 $\{10\bar{1}0\}\langle11\bar{2}0\rangle$ 的 $3$ 个与锥面 $\{10\bar{1}1\}\langle11\bar{2}3\rangle$ 的 $6$ 个，且 $\langle c+a\rangle$ 方向的锥面滑移通常需要较高分切应力才启动 \cite{Roters2010}。记第 $\alpha$ 个滑移系的滑移方向单位矢量为 $\mathbf{m}^{\alpha}$、滑移面外法向单位矢量为 $\mathbf{n}^{\alpha}$，二者互相垂直（$|\mathbf{m}^{\alpha}|=|\mathbf{n}^{\alpha}|=1$，$\mathbf{m}^{\alpha}\cdot\mathbf{n}^{\alpha}=0$）。对 FCC 晶体，滑移矢量 $\mathbf{m}^{\alpha}$ 为 $\tfrac{1}{2}\langle110\rangle$ 型，其端点位于最近邻原子方向（面心位置），滑移一个 Burgers 矢量即恢复完整晶格，故 $\tfrac{1}{2}\langle110\rangle$ 是 FCC 的全位错 Burgers 矢量 \cite{Asaro1983}。
+
+\begin{table}[htbp]
+  \centering
+  \caption{常见金属晶体结构的滑移系 \cite{Roters2010}}
+  \label{tab:cp-slip-systems}
+  \begin{tabular}{lccl}
+    \toprule
+    晶体结构 & 滑移面族 & 滑移方向族 & 滑移系数目 \\
+    \midrule
+    FCC & $\{111\}$ & $\langle110\rangle$ & $4\times3=12$ \\
+    BCC & $\{110\},\{112\},\{123\}$ & $\langle111\rangle$ & $12+12+24=48$ \\
+    HCP（基面） & $\{0001\}$ & $\langle11\bar{2}0\rangle$ & $3$ \\
+    HCP（柱面） & $\{10\bar{1}0\}$ & $\langle11\bar{2}0\rangle$ & $3$ \\
+    HCP（锥面） & $\{10\bar{1}1\}$ & $\langle11\bar{2}3\rangle$ & $6$ \\
+    \bottomrule
+  \end{tabular}
+\end{table}
+
+\begin{remark}
+  本书统一约定：$\mathbf{m}^{\alpha}$ 与 $\mathbf{n}^{\alpha}$ 定义在晶体坐标系（随晶格转动）中。当晶格相对全局坐标系旋转 $\mathbf{R}_{0}$ 时，全局坐标下的滑移方向与滑移面法向为 $\mathbf{m}^{\alpha}_{\mathrm{g}}=\mathbf{R}_{0}\mathbf{m}^{\alpha}$、$\mathbf{n}^{\alpha}_{\mathrm{g}}=\mathbf{R}_{0}\mathbf{n}^{\alpha}$。滑移系几何描述的具体数值（如 FCC 的 $\tfrac{1}{2}\langle110\rangle\{111\}$）详见 \cite{Roters2010}，本节推导不依赖具体晶型，仅用到 $\mathbf{m}^{\alpha}\cdot\mathbf{n}^{\alpha}=0$ 与滑移系的完备性。
+\end{remark}
+
+晶体塑性的核心判据是 Schmid 定律（Schmid's law）：滑移系在分切应力（resolved shear stress）达到临界值时启动滑移。需要指出的是，下面的推导仅用到滑移系几何（$\mathbf{m}^{\alpha},\mathbf{n}^{\alpha}$ 正交且单位化），对任意晶体结构成立；表\ref{tab:cp-slip-systems}只决定滑移系的数量与方向集合，不改变推导结构。分切应力是宏观应力张量在滑移系上的投影。设材料点的 Cauchy 应力为 $\boldsymbol{\sigma}$，则滑移系 $(\mathbf{m}^{\alpha},\mathbf{n}^{\alpha})$ 上的分切应力定义为滑移方向与滑移面法向的双点投影
+\begin{equation}
+  \tau^{\alpha}=\mathbf{m}^{\alpha}\cdot\boldsymbol{\sigma}\,\mathbf{n}^{\alpha}
+  =\boldsymbol{\sigma}:(\mathbf{m}^{\alpha}\otimes\mathbf{n}^{\alpha})
+  \label{eq:cp-resolved-shear}
+\end{equation}
+式\eqref{eq:cp-resolved-shear}的推导：作用于滑移面（法向 $\mathbf{n}^{\alpha}$）上的应力矢量为 $\boldsymbol{\sigma}\mathbf{n}^{\alpha}$，其在滑移方向 $\mathbf{m}^{\alpha}$ 上的分量即式\eqref{eq:cp-resolved-shear}的第一等式；第二等式由 $\mathbf{a}\cdot(\mathbf{A}\mathbf{b})=\mathbf{A}:(\mathbf{a}\otimes\mathbf{b})$ 的张量恒等式得到。由于 $\boldsymbol{\sigma}$ 对称，式\eqref{eq:cp-resolved-shear}中 $\mathbf{m}^{\alpha}\otimes\mathbf{n}^{\alpha}$ 的反对称部分对 $\tau^{\alpha}$ 无贡献，故常引入对称 Schmid 张量
+\begin{equation}
+  \mathbf{P}^{\alpha}_{\mathrm{sym}}
+  =\frac{1}{2}\bigl(\mathbf{m}^{\alpha}\otimes\mathbf{n}^{\alpha}+\mathbf{n}^{\alpha}\otimes\mathbf{m}^{\alpha}\bigr)
+  \label{eq:cp-schmid-tensor}
+\end{equation}
+分切应力改写为 $\tau^{\alpha}=\boldsymbol{\sigma}:\mathbf{P}^{\alpha}_{\mathrm{sym}}$。式\eqref{eq:cp-schmid-tensor}的对称化在塑性功共轭推导中（8.4.2 节）起关键作用：塑性功率 $\boldsymbol{\sigma}:\mathbf{L}^{\mathrm{p}}$ 只有取对称 Schmid 张量才能与滑移率 $\dot{\gamma}^{\alpha}$ 构成功共轭对 \cite{Asaro1983}。这里需要强调式\eqref{eq:cp-resolved-shear}的符号约定：$\tau^{\alpha}$ 是带符号的标量，其正负决定滑移系 $\alpha$ 上滑移的实际方向（$\dot{\gamma}^{\alpha}$ 的符号）；而 Schmid 定律的启动判据只关心分切应力的幅值，故用 $|\tau^{\alpha}|$（见式\eqref{eq:cp-schmid-law}）。
+
+为看清分切应力的几何含义，考虑单轴拉伸这一最简单情形。设拉伸轴方向单位矢量为 $\mathbf{e}$，单轴应力张量为 $\boldsymbol{\sigma}=\sigma\,\mathbf{e}\otimes\mathbf{e}$，其中 $\sigma$ 为轴向拉应力。把式\eqref{eq:cp-resolved-shear}代入并利用 $\mathbf{a}\cdot(\mathbf{A}\mathbf{b})=\mathbf{A}:(\mathbf{a}\otimes\mathbf{b})$ 恒等式，得
+\begin{equation}
+  \tau^{\alpha}
+  =\sigma\,\bigl(\mathbf{e}\cdot\mathbf{m}^{\alpha}\bigr)\bigl(\mathbf{e}\cdot\mathbf{n}^{\alpha}\bigr)
+  =\sigma\,\cos\lambda^{\alpha}\cos\phi^{\alpha}
+  \label{eq:cp-schmid-factor-geometry}
+\end{equation}
+其中 $\phi^{\alpha}$ 为拉伸轴 $\mathbf{e}$ 与滑移面法向 $\mathbf{n}^{\alpha}$ 的夹角，$\lambda^{\alpha}$ 为拉伸轴 $\mathbf{e}$ 与滑移方向 $\mathbf{m}^{\alpha}$ 的夹角（$\cos\phi^{\alpha}=\mathbf{e}\cdot\mathbf{n}^{\alpha}$，$\cos\lambda^{\alpha}=\mathbf{e}\cdot\mathbf{m}^{\alpha}$）。式\eqref{eq:cp-schmid-factor-geometry}的推导：$\tau^{\alpha}=\boldsymbol{\sigma}:(\mathbf{m}^{\alpha}\otimes\mathbf{n}^{\alpha})=\sigma\,(\mathbf{e}\otimes\mathbf{e}):(\mathbf{m}^{\alpha}\otimes\mathbf{n}^{\alpha})=\sigma\,(\mathbf{e}\cdot\mathbf{m}^{\alpha})(\mathbf{e}\cdot\mathbf{n}^{\alpha})$，其中利用了张量双重内积对张量积的分配律 $(\mathbf{a}\otimes\mathbf{b}):(\mathbf{c}\otimes\mathbf{d})=(\mathbf{a}\cdot\mathbf{c})(\mathbf{b}\cdot\mathbf{d})$。定义 Schmid 因子（Schmid factor）
+\begin{equation}
+  m^{\alpha}_{\mathrm{s}}=\cos\lambda^{\alpha}\cos\phi^{\alpha}
+  \label{eq:cp-schmid-factor-def}
+\end{equation}
+则式\eqref{eq:cp-schmid-factor-geometry}化为 $\tau^{\alpha}=\sigma\,m^{\alpha}_{\mathrm{s}}$。式\eqref{eq:cp-schmid-factor-def}表明 Schmid 因子是纯几何量，只依赖晶粒取向（拉伸轴与滑移系的相对关系），取值范围 $0\le |m^{\alpha}_{\mathrm{s}}|\le\tfrac{1}{2}$：当滑移方向与拉伸轴平行或垂直时（$\cos\lambda^{\alpha}=0$ 或 $\cos\phi^{\alpha}=0$）分切应力为零，该滑移系不受力；当 $\lambda^{\alpha}=\phi^{\alpha}=45^{\circ}$ 时取得最大值 $\tfrac{1}{2}$，分切应力最大，该滑移系最先启动 \cite{Taylor1938}。工程中常用最大 Schmid 因子 $m^{\max}_{\mathrm{s}}=\max_{\alpha}|m^{\alpha}_{\mathrm{s}}|$ 判断单晶最易开动的滑移系：单轴屈服应力 $\sigma_{y}$ 与临界分切应力 $\tau_{c}$ 的关系为 $\sigma_{y}=\tau_{c}/m^{\max}_{\mathrm{s}}$，即滑移系几何越有利（$m^{\max}_{\mathrm{s}}$ 越大），单晶宏观屈服强度越低 \cite{Asaro1983}。值得说明的是，对给定的晶体结构，$m^{\alpha}_{\mathrm{s}}$ 的取值集合是离散的（如 FCC 的 $12$ 个滑移系对应有限组 $(\cos\lambda^{\alpha},\cos\phi^{\alpha})$ 组合），这决定了单晶屈服强度的取向依赖性（各向异性屈服），详见 \cite{Roters2010}。Schmid 定律表述为：当且仅当
+\begin{equation}
+  |\tau^{\alpha}|=\tau_{c}^{\alpha}
+  \label{eq:cp-schmid-law}
+\end{equation}
+时滑移系 $\alpha$ 启动，其中 $\tau_{c}^{\alpha}$ 为该滑移系的临界分切应力（critical resolved shear stress，CRSS），反映位错滑移的阻力。式\eqref{eq:cp-schmid-law}与第 6 章 von Mises 屈服准则式\eqref{eq:von-mises}的本质区别在于：后者以等效应力 $\sigma_{\mathrm{eq}}$ 这一宏观不变量为判据，隐含各向同性；前者以各滑移系的分切应力为判据，天然携带晶体取向信息，从而能够描述各向异性屈服 \cite{Taylor1938,Asaro1983}。
+
+多滑移的协调条件由 Taylor 建立：多晶中每个晶粒要维持与相邻晶粒的变形协调，一般需要多个滑移系同时启动。对 FCC 晶体，任意体积不变的塑性变形可由 $5$ 个独立滑移系实现（$\det\mathbf{F}^{\mathrm{p}}=1$ 提供 1 个约束，$6$ 个应变分量减 1 个约束余 $5$ 个自由度），Taylor 假设各晶粒经历与宏观变形相同的塑性应变，并据此确定滑移系的开动组合 \cite{Taylor1938}。在 Taylor 假设下，各晶粒的塑性变形率由宏观变形率唯一确定，塑性功由全部活跃滑移系共同承担。由式\eqref{eq:cp-plastic-power}（该式在 8.4.2 节推导，其逐滑移系的功共轭形式此处可直接使用），多晶屈服应力 $\sigma_{y}$ 与临界分切应力 $\tau_{c}$ 的关系可由 Taylor 因子（Taylor factor）联系。对单晶，若只有一个滑移系最易开动，则由式\eqref{eq:cp-schmid-factor-geometry}有 $\sigma_{y}=\tau_{c}/m^{\max}_{\mathrm{s}}$（$m^{\max}_{\mathrm{s}}$ 为该取向的最大 Schmid 因子）；对多晶，各晶粒取向不同，宏观屈服应力是各晶粒响应按 Taylor 假设的均匀化结果。定义多晶 Taylor 因子
+\begin{equation}
+  M=\frac{\sigma_{y}}{\tau_{c}}
+  \label{eq:cp-taylor-factor}
+\end{equation}
+FCC 多晶在随机取向下的 Taylor 因子取经典值 $M\approx3.06$，即多晶屈服应力约为单晶临界分切应力的 $3$ 倍 \cite{Taylor1938,Kalidindi1992}。式\eqref{eq:cp-taylor-factor}把晶体塑性的微观参数（$\tau_{c}$，滑移系层面）与第 6 章宏观屈服准则中的 $\sigma_{y}$（von Mises 准则式\eqref{eq:von-mises}中的屈服应力）联系起来：对宏观各向同性多晶，$M$ 是常数，晶体塑性退化为第 6 章的 von Mises 型屈服；对织构多晶，$M$ 随取向分布变化，这正是晶体塑性相对经典塑性论的增益——它能描述织构导致的各向异性屈服 \cite{Kalidindi1992,Roters2010}。这一"Taylor 假设"（等应变假设）是多晶晶体塑性建模的基石：它把多晶的宏观响应简化为各晶粒响应的体积平均，单晶本构（8.4.2 节）与取向分布给定后，多晶响应即可由均匀化求得 \cite{Kalidindi1992,Roters2010}。更精细的均匀化方案（如自洽方法）可放宽等应变假设，但 Taylor 模型在工程织构预测中精度已足够，且形式最简洁，是本节后续 NOSB 嵌入的基础。
+
+\subsection{晶体塑性本构方程}\label{sec:cp-constitutive}
+
+晶体塑性的本构建立在变形梯度的乘法分解之上。设变形梯度 $\mathbf{F}$ 分解为弹性部分与塑性部分的乘积
+\begin{equation}
+  \mathbf{F}=\mathbf{F}^{\mathrm{e}}\mathbf{F}^{\mathrm{p}}
+  \label{eq:cp-f-decomp}
+\end{equation}
+其中 $\mathbf{F}^{\mathrm{p}}$ 描述位错滑移产生的不可逆变形（晶格不变形、不转动，仅晶格内部发生剪切），$\mathbf{F}^{\mathrm{e}}$ 描述晶格弹性变形与转动 \cite{Asaro1983,Rice1971}。式\eqref{eq:cp-f-decomp}的物理解释：先经塑性滑移（$\mathbf{F}^{\mathrm{p}}$）使中间构型产生剪切，再经弹性变形与晶格转动（$\mathbf{F}^{\mathrm{e}}$）到达当前构型。中间构型中晶格方向保持初始取向，故滑移系几何（$\mathbf{m}^{\alpha},\mathbf{n}^{\alpha}$）在中间构型中不变，滑移方向随晶格转动进入当前构型：$\mathbf{m}^{\alpha*}=\mathbf{F}^{\mathrm{e}}\mathbf{m}^{\alpha}$。式\eqref{eq:cp-f-decomp}与第 6 章经典塑性的加法分解式\eqref{eq:strain-decomposition}（$\boldsymbol{\varepsilon}=\boldsymbol{\varepsilon}^{\mathrm{e}}+\boldsymbol{\varepsilon}^{\mathrm{p}}$）不同：乘法分解适用于有限变形，加法分解是其小变形极限（$\mathbf{F}^{\mathrm{p}}\approx\mathbf{I}+\boldsymbol{\varepsilon}^{\mathrm{p}}$ 时二者一致），故晶体塑性天然面向大变形问题 \cite{Asaro1983}。
+
+塑性变形张量 $\mathbf{F}^{\mathrm{p}}$ 的演化由滑移率控制。单个滑移系 $(\mathbf{m}^{\alpha},\mathbf{n}^{\alpha})$ 的滑移剪切在中间构型中把滑移面两侧错动，位移间断沿 $\mathbf{m}^{\alpha}$ 方向、幅值正比于滑移量 $\gamma^{\alpha}$ 与面法向距离，其变形梯度恰为 $\mathbf{I}+\gamma^{\alpha}\mathbf{m}^{\alpha}\otimes\mathbf{n}^{\alpha}$ \cite{Asaro1983}。对多个滑移系同时滑移的一般情形，$\mathbf{F}^{\mathrm{p}}$ 由演化方程
+\begin{equation}
+  \dot{\mathbf{F}}^{\mathrm{p}}=\mathbf{L}^{\mathrm{p}}\mathbf{F}^{\mathrm{p}},\qquad
+  \mathbf{L}^{\mathrm{p}}=\sum_{\alpha}\dot{\gamma}^{\alpha}\,\mathbf{m}^{\alpha}\otimes\mathbf{n}^{\alpha}
+  \label{eq:cp-fp-evolution}
+\end{equation}
+确定，其中 $\mathbf{L}^{\mathrm{p}}$ 为塑性速度梯度（与式\eqref{eq:cp-plastic-velocity-gradient}一致）。式\eqref{eq:cp-fp-evolution}的物理解释：在无穷小时间 $\mathrm{d}t$ 内，塑性变形增量由当前滑移率组合 $\mathbf{L}^{\mathrm{p}}\mathrm{d}t$ 决定并左乘累积塑性变形。需要指出的是，多滑移时 $\mathbf{F}^{\mathrm{p}}$ 不能写成 $\mathbf{I}+\sum_{\alpha}\gamma^{\alpha}\mathbf{m}^{\alpha}\otimes\mathbf{n}^{\alpha}$ 的简单叠加（该形式忽略了不同滑移系剪切的交叉项，仅在单滑移时严格成立），须用式\eqref{eq:cp-fp-evolution}的演化形式积分 \cite{Asaro1983}。
+
+式\eqref{eq:cp-fp-evolution}保证塑性变形的体积不变性。由行列式的微分恒等式 $\tfrac{\mathrm{d}}{\mathrm{d}t}\det\mathbf{F}^{\mathrm{p}}=\det\mathbf{F}^{\mathrm{p}}\operatorname{tr}\mathbf{L}^{\mathrm{p}}$，而 $\operatorname{tr}\mathbf{L}^{\mathrm{p}}=\sum_{\alpha}\dot{\gamma}^{\alpha}\,\mathbf{m}^{\alpha}\cdot\mathbf{n}^{\alpha}=0$（因 $\mathbf{m}^{\alpha}\cdot\mathbf{n}^{\alpha}=0$），故
+\begin{equation}
+  \frac{\mathrm{d}}{\mathrm{d}t}\det\mathbf{F}^{\mathrm{p}}=0,\qquad
+  \det\mathbf{F}^{\mathrm{p}}(t)=\det\mathbf{F}^{\mathrm{p}}(0)=1
+  \label{eq:cp-det-fp}
+\end{equation}
+式\eqref{eq:cp-det-fp}的推导：$\operatorname{tr}\mathbf{L}^{\mathrm{p}}=\operatorname{tr}\sum_{\alpha}\dot{\gamma}^{\alpha}\mathbf{m}^{\alpha}\otimes\mathbf{n}^{\alpha}=\sum_{\alpha}\dot{\gamma}^{\alpha}(\mathbf{m}^{\alpha}\cdot\mathbf{n}^{\alpha})=0$（张量迹 $\operatorname{tr}(\mathbf{a}\otimes\mathbf{b})=\mathbf{a}\cdot\mathbf{b}$），代入行列式微分恒等式即得 $\det\mathbf{F}^{\mathrm{p}}$ 恒为初始值 $1$（初始无塑性变形 $\mathbf{F}^{\mathrm{p}}(0)=\mathbf{I}$）。这一结果与位错滑移的物理事实一致：位错滑移是纯剪切机制，不产生体积变化，故金属塑性变形不可压缩 \cite{Asaro1983}。式\eqref{eq:cp-det-fp}中的约束 $\det\mathbf{F}^{\mathrm{p}}=1$ 正是 8.4.1 节"任意体积不变的塑性变形可由 $5$ 个独立滑移系实现"论断中那个"1 个约束"的数学来源。
+
+塑性流动法则由滑移率给出。对式\eqref{eq:cp-f-decomp}求物质导数并整理，得塑性速度梯度
+\begin{equation}
+  \mathbf{L}^{\mathrm{p}}=\dot{\mathbf{F}}^{\mathrm{p}}\bigl(\mathbf{F}^{\mathrm{p}}\bigr)^{-1}
+  =\sum_{\alpha}\dot{\gamma}^{\alpha}\,\mathbf{m}^{\alpha}\otimes\mathbf{n}^{\alpha}
+  \label{eq:cp-plastic-velocity-gradient}
+\end{equation}
+其中 $\dot{\gamma}^{\alpha}$ 为第 $\alpha$ 滑移系的滑移率。式\eqref{eq:cp-plastic-velocity-gradient}的定义式 $\mathbf{L}^{\mathrm{p}}=\dot{\mathbf{F}}^{\mathrm{p}}(\mathbf{F}^{\mathrm{p}})^{-1}$ 与演化方程式\eqref{eq:cp-fp-evolution}一致；其滑移率叠加形式 $\mathbf{L}^{\mathrm{p}}=\sum_{\alpha}\dot{\gamma}^{\alpha}\mathbf{m}^{\alpha}\otimes\mathbf{n}^{\alpha}$ 由单滑移剪切 $\mathbf{I}+\gamma^{\alpha}\mathbf{m}^{\alpha}\otimes\mathbf{n}^{\alpha}$ 求导（$\dot{\gamma}^{\alpha}\mathbf{m}^{\alpha}\otimes\mathbf{n}^{\alpha}$）并按滑移系线性叠加得到（多滑移的交叉项在 $\mathbf{L}^{\mathrm{p}}$ 的率形式中不出现，故叠加公式对任意多滑移严格成立）。式\eqref{eq:cp-plastic-velocity-gradient}表明塑性变形率完全由各滑移系的滑移率决定，其可逆性（滑移可逆与否）由 $\dot{\gamma}^{\alpha}$ 的符号控制。需要指出的是，$\mathbf{L}^{\mathrm{p}}$ 一般不对称（$\mathbf{m}^{\alpha}\otimes\mathbf{n}^{\alpha}$ 非对称），其对称部分 $\mathbf{D}^{\mathrm{p}}=\tfrac{1}{2}(\mathbf{L}^{\mathrm{p}}+\mathbf{L}^{\mathrm{pT}})$ 为塑性应变率，反对称部分为塑性自旋。由于 $\boldsymbol{\sigma}$ 对称，塑性功率 $\boldsymbol{\sigma}:\mathbf{L}^{\mathrm{p}}$ 中反对称部分贡献为零（$\boldsymbol{\sigma}:\mathbf{W}^{\mathrm{p}}=\tfrac{1}{2}\boldsymbol{\sigma}:(\mathbf{L}^{\mathrm{p}}-\mathbf{L}^{\mathrm{pT}})=0$，因对称张量与反对称张量的双重内积为零），故 $\boldsymbol{\sigma}:\mathbf{L}^{\mathrm{p}}=\boldsymbol{\sigma}:\mathbf{D}^{\mathrm{p}}$。由式\eqref{eq:cp-plastic-velocity-gradient}与式\eqref{eq:cp-schmid-tensor}，塑性功率可写为
+\begin{equation}
+  \boldsymbol{\sigma}:\mathbf{D}^{\mathrm{p}}=\sum_{\alpha}\tau^{\alpha}\dot{\gamma}^{\alpha}
+  \label{eq:cp-plastic-power}
+\end{equation}
+式\eqref{eq:cp-plastic-power}的推导：$\boldsymbol{\sigma}:\mathbf{D}^{\mathrm{p}}=\boldsymbol{\sigma}:(\sum_{\alpha}\dot{\gamma}^{\alpha}\mathbf{P}^{\alpha}_{\mathrm{sym}})=\sum_{\alpha}\dot{\gamma}^{\alpha}(\boldsymbol{\sigma}:\mathbf{P}^{\alpha}_{\mathrm{sym}})=\sum_{\alpha}\tau^{\alpha}\dot{\gamma}^{\alpha}$，其中第三步用了 $\tau^{\alpha}=\boldsymbol{\sigma}:\mathbf{P}^{\alpha}_{\mathrm{sym}}$。这一功共轭关系正是引入对称 Schmid 张量式\eqref{eq:cp-schmid-tensor}的动机：塑性功率按滑移系分解为分切应力与滑移率的乘积之和，从而为逐滑移系的硬化与流动法则奠定能量基础 \cite{Asaro1983}。
+
+晶体塑性的弹性响应由晶格弹性本构给出。滑移本身不改变晶格结构，弹性变形集中在晶格上，故弹性本构以晶格坐标系中的弹性应变度量与应力张量表述，且保持晶体的各向异性弹性性质。弹性 Green--Lagrange 应变定义于弹性部分
+\begin{equation}
+  \mathbf{E}^{\mathrm{e}}=\frac{1}{2}\bigl(\mathbf{F}^{\mathrm{eT}}\mathbf{F}^{\mathrm{e}}-\mathbf{I}\bigr)
+  \label{eq:cp-green-lagrange}
+\end{equation}
+第二类 Piola--Kirchhoff 应力由晶格各向异性弹性张量 $\mathbb{C}^{\mathrm{lat}}$（四阶张量，在晶格坐标系中分量恒定，由单晶弹性常数确定）作用给出
+\begin{equation}
+  \mathbf{S}=\mathbb{C}^{\mathrm{lat}}:\mathbf{E}^{\mathrm{e}}
+  \label{eq:cp-second-piola}
+\end{equation}
+其中 $\mathbf{S}$ 为定义在中间构型上的第二类 Piola--Kirchhoff 应力。Cauchy 应力由式\eqref{eq:cp-second-piola}经 Piola 变换得到
+\begin{equation}
+  \boldsymbol{\sigma}=\frac{1}{J^{\mathrm{e}}}\,\mathbf{F}^{\mathrm{e}}\mathbf{S}\,\mathbf{F}^{\mathrm{eT}},\qquad
+  J^{\mathrm{e}}=\det\mathbf{F}^{\mathrm{e}}
+  \label{eq:cp-cauchy}
+\end{equation}
+式\eqref{eq:cp-cauchy}是经典连续介质力学中第二类 Piola--Kirchhoff 应力到 Cauchy 应力的标准 Piola 变换，$J^{\mathrm{e}}$ 为弹性体积比。它与第 7 章式\eqref{eq:piola-cauchy}（$\mathbf{P}=J\boldsymbol{\sigma}\mathbf{F}^{-\mathrm{T}}$，第一类 Piola--Kirchhoff 应力与 Cauchy 应力的关系）及式\eqref{eq:piola-stress}（$\mathbf{P}=\partial\Psi/\partial\mathbf{F}$，第一类 Piola--Kirchhoff 应力由超弹性势导出）互为补充：式\eqref{eq:piola-cauchy}连接 $\mathbf{P}$ 与 $\boldsymbol{\sigma}$，式\eqref{eq:cp-cauchy}连接 $\mathbf{S}$ 与 $\boldsymbol{\sigma}$，二者经 $\mathbf{P}=\mathbf{F}^{\mathrm{e}}\mathbf{S}$ 相容（第 3 章超弹性框架）。对立方晶系（FCC、BCC），$\mathbb{C}^{\mathrm{lat}}$ 在晶格坐标系中由 $3$ 个独立常数（$C_{11}$、$C_{12}$、$C_{44}$）确定；对 HCP 晶系由 $5$ 个独立常数确定 \cite{Roters2010}。这一各向异性弹性本构与第 6 章各向同性弹塑性中使用的各向同性弹性张量不同，是晶体塑性描述晶格取向相关弹性响应（如弹性各向异性导致的应力集中）的关键 \cite{Asaro1983,Rice1971}。值得注意的是，式\eqref{eq:cp-cauchy}中弹性张量 $\mathbb{C}^{\mathrm{lat}}$ 与弹性应变 $\mathbf{E}^{\mathrm{e}}$ 均定义在晶格坐标系中，随晶格转动而更新，从而自动满足材料客观性要求（晶格坐标系随材料旋转，本构关系形式不变），这与第 7 章未旋转构型方法式\eqref{eq:unrotated-frame}的处理思路一致 \cite{Asaro1983}。
+
+滑移率由率相关幂律给出。晶体塑性常用的粘塑性型（viscoplastic-type）滑移率与分切应力及当前滑移阻力相关
+\begin{equation}
+  \dot{\gamma}^{\alpha}=\dot{\gamma}_{0}
+  \left(\frac{|\tau^{\alpha}|}{g^{\alpha}}\right)^{N}
+  \operatorname{sign}(\tau^{\alpha})
+  \label{eq:cp-slip-rate-powerlaw}
+\end{equation}
+其中 $\dot{\gamma}_{0}$ 为参考滑移率，$N$ 为率敏感指数（金属典型值 $N\ge 20$），$g^{\alpha}$ 为第 $\alpha$ 滑移系当前的滑移阻力（内变量），$\operatorname{sign}$ 为符号函数。式\eqref{eq:cp-slip-rate-powerlaw}的结构与 8.2.3 节 Perzyna 黏塑性式\eqref{eq:perzyna-overstress}相似，但有两个本质区别：其一，式\eqref{eq:cp-slip-rate-powerlaw}的驱动力是分切应力 $\tau^{\alpha}$ 而非等效应力，流动方向由滑移系几何决定而非由屈服面法向决定；其二，式\eqref{eq:cp-slip-rate-powerlaw}对任何非零 $\tau^{\alpha}$ 都产生滑移（无显式屈服阈值），$|\tau^{\alpha}|/g^{\alpha}$ 接近 $1$ 时滑移率骤增，$N\to\infty$ 时趋近于率无关的临界分切应力判据式\eqref{eq:cp-schmid-law}。式\eqref{eq:cp-slip-rate-powerlaw}的率相关形式避免了率无关塑性中"求活跃滑移系组合"的组合优化问题，是晶体塑性数值实现（包括近场动力学）的主流选择 \cite{Peirce1983,Kalidindi1992}。
+
+率相关幂律式\eqref{eq:cp-slip-rate-powerlaw}与率无关极限的联系可以定量刻画。考察比值 $|\tau^{\alpha}|/g^{\alpha}$ 偏离 $1$ 时滑移率的渐近行为：由式\eqref{eq:cp-slip-rate-powerlaw}，当 $|\tau^{\alpha}|/g^{\alpha}<1$ 时
+\begin{equation}
+  \dot{\gamma}^{\alpha}\to 0\quad(N\to\infty),\qquad
+  \dot{\gamma}^{\alpha}\to\infty\quad(N\to\infty)\ \text{若 }|\tau^{\alpha}|/g^{\alpha}>1
+  \label{eq:cp-rate-limit}
+\end{equation}
+式\eqref{eq:cp-rate-limit}的推导：对 $|\tau^{\alpha}|/g^{\alpha}=r<1$，$r^{N}\to0$ 随 $N\to\infty$；对 $r>1$，$r^{N}\to\infty$。因此 $N\to\infty$ 时，滑移率在 $|\tau^{\alpha}|=g^{\alpha}$ 处发生从零到无穷的跳跃，恰好恢复率无关的 Schmid 判据式\eqref{eq:cp-schmid-law}（$|\tau^{\alpha}|=\tau_{c}^{\alpha}$ 且 $g^{\alpha}=\tau_{c}^{\alpha}$）。式\eqref{eq:cp-rate-limit}表明率敏感指数 $N$ 刻画了材料偏离理想 Schmid 行为的程度：$N$ 越大，滑移率对分切应力越过 $g^{\alpha}$ 的响应越陡峭，材料越接近率无关塑性。实际金属中 $N$ 取 $20\sim100$，此时式\eqref{eq:cp-slip-rate-powerlaw}给出的"准屈服"行为在数值上与率无关塑性几乎不可分辨，但保留了率相关形式的数值便利性 \cite{Peirce1983,Kalidindi1992}。当 $N\to\infty$ 且采用率无关极限时，需要 Anand--Kothari 提出的隐式求解程序确定活跃滑移系 \cite{Anand1996}。这一"率敏感指数越大越接近率无关"的规律与 8.2.3 节 Perzyna 黏塑性中 $\gamma\to\infty$ 恢复率无关塑性的行为（式\eqref{eq:perzyna-flow}）在结构上一致，反映了率相关正则化机制的普遍性。
+
+滑移阻力的演化由硬化律控制。最常用的线性硬化律为
+\begin{equation}
+  \dot{g}^{\alpha}=\sum_{\beta}h_{\alpha\beta}\,|\dot{\gamma}^{\beta}|
+  \label{eq:cp-hardening-linear}
+\end{equation}
+其中 $h_{\alpha\beta}$ 为硬化模量矩阵：对角元 $h_{\alpha\alpha}$ 为自硬化（self-hardening），非对角元 $h_{\alpha\beta}$（$\alpha\neq\beta$）为潜硬化（latent hardening）\cite{Asaro1983}。对 FCC 晶体，经典的自硬化形式为
+\begin{equation}
+  h_{\alpha\alpha}=h_{0}\operatorname{sech}^{2}\!\left(\frac{h_{0}\,\gamma_{\mathrm{acc}}}{\tau_{s}-\tau_{0}}\right)
+  \label{eq:cp-self-hardening}
+\end{equation}
+其中 $h_{0}$ 为初始硬化率，$\tau_{0}$ 与 $\tau_{s}$ 分别为初始与饱和临界分切应力，$\gamma_{\mathrm{acc}}=\sum_{\alpha}\int|\dot{\gamma}^{\alpha}|\,dt$ 为累积滑移量 \cite{Peirce1982}。式\eqref{eq:cp-self-hardening}的 $\operatorname{sech}^{2}$ 形式给出 Voce 型饱和硬化：初始硬化率 $h_{0}$ 随 $\gamma_{\mathrm{acc}}$ 增大而指数衰减，$g^{\alpha}$ 从 $\tau_{0}$ 单调趋近 $\tau_{s}$。为看清这一饱和行为，把式\eqref{eq:cp-self-hardening}代入式\eqref{eq:cp-hardening-linear}并对 $\gamma_{\mathrm{acc}}$ 积分。单滑移情形（只有滑移系 $\alpha$ 活跃，$\dot{\gamma}^{\alpha}\ne0$，$\gamma_{\mathrm{acc}}=\gamma^{\alpha}$）下，$\dot{g}^{\alpha}=h_{\alpha\alpha}|\dot{\gamma}^{\alpha}|=h_{\alpha\alpha}\dot{\gamma}_{\mathrm{acc}}$，即 $g^{\alpha}$ 作为 $\gamma_{\mathrm{acc}}$ 的函数满足 $\mathrm{d}g^{\alpha}/\mathrm{d}\gamma_{\mathrm{acc}}=h_{\alpha\alpha}(\gamma_{\mathrm{acc}})$，积分得
+\begin{equation}
+  g^{\alpha}(\gamma_{\mathrm{acc}})
+  =\tau_{0}+(\tau_{s}-\tau_{0})
+  \tanh\!\left(\frac{h_{0}\,\gamma_{\mathrm{acc}}}{\tau_{s}-\tau_{0}}\right)
+  \label{eq:cp-voce-hardening}
+\end{equation}
+式\eqref{eq:cp-voce-hardening}的推导：把式\eqref{eq:cp-self-hardening}代入 $\mathrm{d}g^{\alpha}/\mathrm{d}\gamma_{\mathrm{acc}}=h_{\alpha\alpha}(\gamma_{\mathrm{acc}})$ 并对 $\gamma_{\mathrm{acc}}$ 从 $0$ 到 $\gamma$ 积分，$\int_{0}^{\gamma}h_{0}\operatorname{sech}^{2}(h_{0}s/(\tau_{s}-\tau_{0}))\,\mathrm{d}s$。作换元 $u=h_{0}s/(\tau_{s}-\tau_{0})$（$\mathrm{d}s=(\tau_{s}-\tau_{0})\mathrm{d}u/h_{0}$），积分化为 $(\tau_{s}-\tau_{0})\int_{0}^{h_{0}\gamma/(\tau_{s}-\tau_{0})}\operatorname{sech}^{2}u\,\mathrm{d}u=(\tau_{s}-\tau_{0})\tanh(h_{0}\gamma/(\tau_{s}-\tau_{0}))$，其中最后一步用了 $\int\operatorname{sech}^{2}u\,\mathrm{d}u=\tanh u$ 与 $\tanh0=0$。叠加初始滑移阻力 $g^{\alpha}(0)=\tau_{0}$ 即得式\eqref{eq:cp-voce-hardening}。式\eqref{eq:cp-voce-hardening}表明 $g^{\alpha}$ 随 $\gamma_{\mathrm{acc}}$ 单调递增并饱和于 $\tau_{s}$：$\gamma_{\mathrm{acc}}\to0$ 时 $g^{\alpha}\to\tau_{0}$（初始阻力），$\gamma_{\mathrm{acc}}\to\infty$ 时 $g^{\alpha}\to\tau_{s}$（饱和阻力）。这是 Voce 型硬化（Voce hardening）的典型饱和特征，与多晶金属单轴拉伸应力--应变曲线在高应变区趋于平台的行为一致 \cite{Peirce1982}。潜硬化按各向同性假设取 $h_{\alpha\beta}=q\,h_{\alpha\alpha}$（$\alpha\neq\beta$），其中 $q$ 为潜硬化比，实验测定典型值 $1\sim1.4$ \cite{Peirce1982,Asaro1983}。此时式\eqref{eq:cp-hardening-linear}化为
+\begin{equation}
+  \dot{g}^{\alpha}=h_{\alpha\alpha}\Bigl(|\dot{\gamma}^{\alpha}|+q\sum_{\beta\neq\alpha}|\dot{\gamma}^{\beta}|\Bigr)
+  \label{eq:cp-hardening-latent}
+\end{equation}
+式\eqref{eq:cp-hardening-latent}的推导：把 $h_{\alpha\beta}=q\,h_{\alpha\alpha}$（$\alpha\neq\beta$）代入式\eqref{eq:cp-hardening-linear}，分离对角项 $\beta=\alpha$ 与非对角项 $\beta\neq\alpha$ 即得。式\eqref{eq:cp-hardening-latent}表明：$q>1$ 时，其他滑移系的滑移对滑移系 $\alpha$ 阻力的贡献大于其自身滑移的贡献（潜硬化强于自硬化），这反映了位错林（dislocation forest）强化机制——不同滑移系上的位错相互交割，形成阻碍进一步滑移的位错网络 \cite{Asaro1983}。把式\eqref{eq:cp-slip-rate-powerlaw}代入式\eqref{eq:cp-hardening-latent}，滑移阻力随塑性变形单调增长，构成完整的率相关晶体塑性本构。式\eqref{eq:cp-hardening-linear}—\eqref{eq:cp-hardening-latent}的硬化律是第 6 章各向同性硬化式\eqref{eq:isotropic-hardening}的逐滑移系推广：经典塑性中单个标量硬化变量 $\bar{\varepsilon}^{\mathrm{p}}$ 在这里被滑移系向量 $g^{\alpha}$ 取代，硬化模量矩阵 $h_{\alpha\beta}$ 编码了滑移系间的相互作用 \cite{Roters2010}。
+
+\subsection{晶体塑性在 NOSB 中的嵌入}\label{sec:cp-nosb}
+
+晶体塑性嵌入 NOSB 的路径与 8.1--8.3 节完全一致——本构对应机制（第 7 章\ref{sec:correspondence}节）：由非局部变形梯度构造经典应变度量，调用经典本构得到应力，再经力态公式构造键力。晶体塑性的特殊之处在于两点：其一，本构以晶格坐标系为参考系，需要把非局部变形梯度从全局坐标系旋转到晶格坐标系（取向映射）；其二，滑移率与硬化是路径相关的历史依赖本构，需要在每一材料点维护滑移系内变量（$g^{\alpha}$ 及累积滑移 $\gamma^{\alpha}$），并按 8.2 节的算子分裂格式推进 \cite{SunSundararaghavan2014,Littlewood2011}。
+
+取向映射是嵌入的第一步。设晶格取向由旋转矩阵 $\mathbf{R}_{0}$ 描述（晶体坐标系到全局坐标系），材料点 $\mathbf{x}$ 的非局部变形梯度 $\mathbf{F}$（式\eqref{eq:nonlocal-deformation-gradient}）在晶格坐标系中表示为
+\begin{equation}
+  \tilde{\mathbf{F}}=\mathbf{F}\,\mathbf{R}_{0}
+  \label{eq:cp-lattice-deformation-gradient}
+\end{equation}
+式\eqref{eq:cp-lattice-deformation-gradient}的约定：$\mathbf{F}$ 的列矢量是全局基矢的变形像，右乘 $\mathbf{R}_{0}$ 把参考基矢从晶体坐标系旋转到全局坐标系（与文献 \cite{SunSundararaghavan2014,GuZhangMadenci2019} 一致）。对超弹性—塑性分解（式\eqref{eq:cp-f-decomp}），晶格系中的弹性变形梯度由 $\tilde{\mathbf{F}}^{\mathrm{e}}=\tilde{\mathbf{F}}\tilde{\mathbf{F}}^{\mathrm{p}-1}$ 给出，其中 $\tilde{\mathbf{F}}^{\mathrm{p}}$ 为晶格系中的塑性变形梯度（由滑移率积分更新，见下文数值流程），弹性 Green--Lagrange 应变按式\eqref{eq:cp-green-lagrange}计算 $\tilde{\mathbf{E}}^{\mathrm{e}}=\tfrac{1}{2}(\tilde{\mathbf{F}}^{\mathrm{eT}}\tilde{\mathbf{F}}^{\mathrm{e}}-\mathbf{I})$。由 $\tilde{\mathbf{E}}^{\mathrm{e}}$ 经晶格弹性本构（各向异性弹性张量 $\mathbb{C}^{\mathrm{lat}}$，式\eqref{eq:cp-second-piola}）计算第二类 Piola--Kirchhoff 应力 $\tilde{\mathbf{S}}=\mathbb{C}^{\mathrm{lat}}:\tilde{\mathbf{E}}^{\mathrm{e}}$，再推得 Cauchy 应力
+\begin{equation}
+  \tilde{\boldsymbol{\sigma}}=\frac{1}{J^{\mathrm{e}}}\,\tilde{\mathbf{F}}^{\mathrm{e}}
+  \tilde{\mathbf{S}}\,\tilde{\mathbf{F}}^{\mathrm{eT}},\qquad
+  J^{\mathrm{e}}=\det\tilde{\mathbf{F}}^{\mathrm{e}}
+  \label{eq:cp-cauchy-lattice}
+\end{equation}
+式\eqref{eq:cp-cauchy-lattice}中 $\tilde{\boldsymbol{\sigma}}$ 为晶格系中的 Cauchy 应力，最后旋转回全局坐标系 $\boldsymbol{\sigma}=\mathbf{R}_{0}\tilde{\boldsymbol{\sigma}}\mathbf{R}_{0}^{\mathrm{T}}$（与第 7 章式\eqref{eq:rotate-back}的极分解—旋转流程一致 \cite{Warren2009}），经式\eqref{eq:hyper-force-state}构造力态。滑移率式\eqref{eq:cp-slip-rate-powerlaw}在晶格系中以分切应力 $\tilde{\tau}^{\alpha}=\tilde{\boldsymbol{\sigma}}:\mathbf{P}^{\alpha}_{\mathrm{sym}}$ 计算，其推导与式\eqref{eq:cp-resolved-shear}相同，仅应力张量换为晶格系值。
+
+\begin{remark}
+  式\eqref{eq:cp-lattice-deformation-gradient}的旋转方向需与全书符号一致核对：第 7 章未旋转构型方法（式\eqref{eq:unrotated-frame}）以极分解转动更新本构，本章晶体塑性以固定取向矩阵 $\mathbf{R}_{0}$ 把变形梯度旋转到晶格系，二者数学等价（都把本构放在随晶格转动的坐标系中执行），但实现路径不同：前者每步更新 $\mathbf{R}$，后者仅在初始化时固定 $\mathbf{R}_{0}$，晶格转动由 $\tilde{\mathbf{F}}^{\mathrm{e}}$ 的极分解隐式吸收 \cite{SunSundararaghavan2014}。
+\end{remark}
+
+多晶微结构的离散是第二步。多晶材料由取向各异的晶粒组成，每一晶粒赋予固定的取向矩阵 $\mathbf{R}_{0}$（由实验测得或随机生成），材料点按所在晶粒继承取向。在近场动力学离散中，材料点携带取向信息：点 $\mathbf{x}$ 的取向 $\mathbf{R}_{0}(\mathbf{x})$ 逐点赋值，晶界表现为相邻材料点取向的间断（图略，取向场 $\mathbf{R}_{0}(\mathbf{x})$ 的分片常数分布）。Sun 与 Sundararaghavan 2014 年首先把晶体塑性嵌入 NOSB，用隐式非线性求解器分析了平面多晶的弹塑性变形与剪切带演化 \cite{SunSundararaghavan2014}；Luo 等 2018 年引入自适应动力松弛（ADR）求解器处理准静态问题，捕捉了多晶中的微尺度剪切带 \cite{Luo2018}；Gu 等 2019 年加入罚函数稳定化并采用显式/隐式双求解器，实现了多晶的弹塑性变形与动态开裂的模拟，其中晶界处材料点的失效由第 11 章的损伤判据控制 \cite{GuZhangMadenci2019}。Littlewood 2011 年在 NOSB 中实现了晶体弹粘塑性模型，用于分析含硬质颗粒的铝合金单晶中的塑性变形与损伤累积，指出晶格取向对材料响应有强影响 \cite{Littlewood2011}。
+
+数值实现的关键问题是 NOSB 的零能模式失稳（第 7 章\ref{sec:zero-energy}节）与滑移内变量的时间积分。零能模式源于非局部变形梯度式\eqref{eq:nonlocal-deformation-gradient}对近场域内高频变形模式的不敏感，在晶体塑性模拟中表现为变形场的数值振荡。文献中的处理包括罚函数稳定化（Gu 等 2019 \cite{GuZhangMadenci2019}）、应力点法（Luo--Sundararaghavan \cite{LuoSundararaghavan2018}）与高阶变形梯度近似（Littlewood 2011 \cite{Littlewood2011}），其原理在第 7 章统一讨论。滑移内变量的时间积分采用与 8.2--8.3 节一致的算子分裂格式：每一时间步内，（1）由当前构型计算非局部变形梯度式\eqref{eq:nonlocal-deformation-gradient}并经式\eqref{eq:cp-lattice-deformation-gradient}旋转到晶格系；（2）由式\eqref{eq:cp-plastic-velocity-gradient}计算塑性速度梯度，按式\eqref{eq:cp-slip-rate-powerlaw}求滑移率，用显式 Euler 格式更新 $\mathbf{F}^{\mathrm{p}}$ 与滑移阻力式\eqref{eq:cp-hardening-linear}；（3）由弹性部分式\eqref{eq:cp-f-decomp}计算 $\tilde{\mathbf{E}}^{\mathrm{e}}$ 与 $\tilde{\boldsymbol{\sigma}}$（式\eqref{eq:cp-cauchy-lattice}）；（4）旋转回全局系并经式\eqref{eq:hyper-force-state}构造力态，代入运动方程推进位移。该流程与 8.2--8.3 节的统一模式（点级内变量更新 + 经典本构调用 + 力态装配）完全一致，区别仅在于内变量由标量（记忆向量 $\mathbf{h}^{n}$、损伤 $D$）变为滑移系向量 $g^{\alpha}$ 与 $\mathbf{F}^{\mathrm{p}}$，体现了 NOSB 本构对应机制对"微结构内变量本构"的承载能力 \cite{SunSundararaghavan2014,GuZhangMadenci2019}。
+
+综上，晶体弹塑性在 NOSB 中的实现把第 6 章经典塑性理论从"宏观屈服面"推进到"微观滑移系"层面：Schmid 定律式\eqref{eq:cp-schmid-law}取代 von Mises 准则式\eqref{eq:von-mises}，滑移率幂律式\eqref{eq:cp-slip-rate-powerlaw}与硬化律式\eqref{eq:cp-hardening-linear}取代塑性乘子式\eqref{eq:classical-plastic-multiplier}，变形梯度乘法分解式\eqref{eq:cp-f-decomp}取代小变形加法分解。这使得近场动力学能够描述金属的各向异性屈服、织构演化与微尺度剪切带——这些是 8.1--8.3 节各向同性本构无法触及的现象。8.5 节将转向另一类重要材料——准脆性材料（陶瓷、岩石），其 JH-2 本构以压力相关屈服与损伤累积为核心，与本节晶体塑性的滑移机制形成互补。
 
 \section{准脆性材料的 JH-2 本构}
 
