@@ -496,16 +496,18 @@
 
 \subsection{微弹性材料与成对势}
 
-在 2.3.1 节中，对力函数 $\mathbf{f}$ 仅由反作用条件和中心力条件约束，其具体形式尚未确定。若进一步要求对力可由某个标量势函数导出，则称该材料为\textbf{微弹性材料}（microelastic material）。
+在 2.3.1 节中，对力函数 $\mathbf{f}$ 仅由反作用条件和中心力条件约束，其具体形式尚未确定。若进一步要求对力可由某个标量势函数导出，则称该材料为\textbf{微弹性材料}（microelastic material）\cite{Silling2000}。
 这一假设的重要性在于：它不仅使对力的数学形式更具体，而且为后续能量守恒律（2.5 节）的建立、守恒量的严格证明（2.6 节）以及键基本构模型的构造（第 4 章）提供了必要的数学前提。
 
-并非所有对力函数都能从势能导出。若存在标量势函数 $w(\boldsymbol{\eta},\boldsymbol{\xi})$，使得对力函数可表示为其关于相对位移 $\boldsymbol{\eta}$ 的梯度
+具体而言，微弹性材料要求存在标量势函数 $w(\boldsymbol{\eta},\boldsymbol{\xi})$，使得对力函数可表示为其关于相对位移 $\boldsymbol{\eta}$ 的梯度
 \begin{equation}
   \mathbf{f}(\boldsymbol{\eta},\boldsymbol{\xi})=\nabla_{\boldsymbol{\eta}} w(\boldsymbol{\eta},\boldsymbol{\xi})
   \label{eq:pairwise-force-potential}
 \end{equation}
-则称该材料为\textbf{微弹性材料}（microelastic material）\cite{Silling2000}。这里的"微"指相互作用发生在键（微观）尺度，"弹性"指变形过程可逆、存在恢复势能。这一定义与经典弹性力学中"弹性体存在应变能密度"的提法完全平行：经典理论中，应力由应变能密度对变形的导数给出；近场动力学中，对力由成对势对相对位移的导数给出。
+这里的"微"指相互作用发生在键（微观）尺度，"弹性"指变形过程可逆、存在恢复势能。这一定义与经典弹性力学中"弹性体存在应变能密度"的提法完全平行：经典理论中，应力由应变能密度对变形的导数给出；近场动力学中，对力由成对势对相对位移的导数给出。
 式中 $\nabla_{\boldsymbol{\eta}}$ 表示对标量函数 $w$ 关于矢量自变量 $\boldsymbol{\eta}$ 的梯度，其分量为 $(\nabla_{\boldsymbol{\eta}} w)_i = \partial w / \partial \eta_i$（$i=1,2,3$）。由于 $w$ 是标量，$\nabla_{\boldsymbol{\eta}} w$ 是矢量，量纲为 $[w]/[\eta]$，与对力函数 $\mathbf{f}$ 的量纲 $[\mathbf{f}]=[\mathrm{N}/\mathrm{m}^6]$ 一致。
+
+需要指出的是，式\eqref{eq:pairwise-force-potential}并非对力函数的普遍性质，而是对 $\mathbf{f}$ 施加的一个额外约束：它要求对力场 $\mathbf{f}$ 在 $\boldsymbol{\eta}$ 空间中无旋，即 $\nabla_{\boldsymbol{\eta}}\times\mathbf{f}=\mathbf{0}$，这是矢量场能够表示为标量势梯度的必要条件。因此，并非所有满足反作用条件与中心力条件的对力函数都能从势能导出，微弹性材料只是对力函数空间中一个重要的子集；不满足该条件的对力函数对应非保守的相互作用，无法建立相应的势能描述。
 
 为清晰展示这一对应关系，表~\ref{tab:classical-peridynamics} 对比了经典弹性力学与近场动力学中的核心概念。
 
@@ -541,19 +543,30 @@
 \end{equation}
 即 $\mathbf{f}(-\boldsymbol{\eta},-\boldsymbol{\xi})=-\mathbf{f}(\boldsymbol{\eta},\boldsymbol{\xi})$，这正是反作用条件\eqref{eq:reaction}。
 
-如图\ref{fig:pairwise-potential}所示：成对势 $w$ 在键两端对称，导出的对力 $\mathbf{f}$ 沿变形后键方向作用（蓝色箭头）。
+关于中心力条件，需对成对势的形式作进一步限定。由客观性\eqref{eq:potential-objectivity}可知，$w$ 对任意旋转 $\mathbf{R}$ 满足 $w(\mathbf{R}\boldsymbol{\eta},\mathbf{R}\boldsymbol{\xi})=w(\boldsymbol{\eta},\boldsymbol{\xi})$。这一性质的含义需要仔细解读：若两个矢量对 $(\boldsymbol{\eta}_1,\boldsymbol{\xi}_1)$ 与 $(\boldsymbol{\eta}_2,\boldsymbol{\xi}_2)$ 可以通过某个旋转相互转化，即存在正交张量 $\mathbf{R}$ 使得 $\boldsymbol{\eta}_1=\mathbf{R}\boldsymbol{\eta}_2$ 且 $\boldsymbol{\xi}_1=\mathbf{R}\boldsymbol{\xi}_2$，则由客观性\eqref{eq:potential-objectivity}立得 $w(\boldsymbol{\eta}_1,\boldsymbol{\xi}_1)=w(\boldsymbol{\eta}_2,\boldsymbol{\xi}_2)$。换言之，$w$ 在旋转轨道上为常数，其值完全由刻画该轨道的不变量决定，而不可能再依赖矢量对中的其他信息。在三维空间中，两个矢量共有六个分量，旋转群 $\mathrm{SO}(3)$ 恰好消去三个自由度，因此独立旋转不变量共有三个，可取为
+\begin{equation}
+  I_1=|\boldsymbol{\xi}|,\quad I_2=|\boldsymbol{\eta}|,\quad I_3=\boldsymbol{\xi}\cdot\boldsymbol{\eta}
+  \label{eq:rotation-invariants}
+\end{equation}
+这三个量之所以是``独立''的，是因为：给定 $I_1,I_2,I_3$，矢量对 $(\boldsymbol{\eta},\boldsymbol{\xi})$ 在旋转意义下被完全确定——先取长度分别为 $I_1$ 与 $I_2$ 的两个矢量，使其夹角满足 $I_3=\boldsymbol{\xi}\cdot\boldsymbol{\eta}$，再通过旋转调整整体方位，即可得到任一具有相同不变量的矢量对。读者也可选择其他等价的不变量组，例如以 $|\boldsymbol{\xi}+\boldsymbol{\eta}|$、$|\boldsymbol{\xi}-\boldsymbol{\eta}|$ 和 $\boldsymbol{\xi}\cdot\boldsymbol{\eta}$ 为基，它们与 $I_1,I_2,I_3$ 之间可以相互表示；但无论选取哪组不变量，满足客观性的最一般成对势都是等价的。
 
-关于中心力条件，需对成对势的形式作进一步限定。由客观性\eqref{eq:potential-objectivity}可知，$w$ 只能依赖矢量对 $(\boldsymbol{\eta},\boldsymbol{\xi})$ 的旋转不变量，即 $|\boldsymbol{\xi}|$、$|\boldsymbol{\eta}|$ 与 $\boldsymbol{\xi}\cdot\boldsymbol{\eta}$；交换对称性\eqref{eq:potential-symmetry}对这些不变量不施加新的约束。要使导出的对力满足中心力条件，$w$ 须进一步只依赖变形后键长与参考键长：
+因此满足客观性的成对势可一般性地写为 $w=\hat{w}(I_1,I_2,I_3)$。交换对称性\eqref{eq:potential-symmetry}要求 $w$ 在 $(\boldsymbol{\eta},\boldsymbol{\xi})\to(-\boldsymbol{\eta},-\boldsymbol{\xi})$ 下保持不变；由于三个不变量 $I_1, I_2, I_3$ 均在该变换下不变（$|\boldsymbol{\xi}|$ 和 $|\boldsymbol{\eta}|$ 为模长，$\boldsymbol{\xi}\cdot\boldsymbol{\eta}$ 中两矢量同时反号时点积不变），故交换对称性不施加额外的约束。
+
+要使导出的对力满足中心力条件，需让 $\nabla_{\boldsymbol{\eta}}w$ 的方向与 $\boldsymbol{\xi}+\boldsymbol{\eta}$ 一致。注意到 $|\boldsymbol{\xi}+\boldsymbol{\eta}|$ 可由上述三个不变量表示为 $|\boldsymbol{\xi}+\boldsymbol{\eta}|=\sqrt{I_1^2+2I_3+I_2^2}$，因此若 $w$ 仅以 $|\boldsymbol{\xi}+\boldsymbol{\eta}|$ 和 $|\boldsymbol{\xi}|$ 为自变量，即
 \begin{equation}
   w(\boldsymbol{\eta},\boldsymbol{\xi}) = \hat{w}\bigl(|\boldsymbol{\xi}+\boldsymbol{\eta}|,\,|\boldsymbol{\xi}|\bigr)
   \label{eq:potential-bond-length}
 \end{equation}
-此时由链式法则
+则由链式法则，利用
+\[
+  \nabla_{\boldsymbol{\eta}}|\boldsymbol{\xi}+\boldsymbol{\eta}| = \frac{\boldsymbol{\xi}+\boldsymbol{\eta}}{|\boldsymbol{\xi}+\boldsymbol{\eta}|}
+\]
+得
 \begin{equation}
   \mathbf{f}(\boldsymbol{\eta},\boldsymbol{\xi}) = \nabla_{\boldsymbol{\eta}} w = \frac{\partial \hat{w}}{\partial |\boldsymbol{\xi}+\boldsymbol{\eta}|}\,\frac{\boldsymbol{\xi}+\boldsymbol{\eta}}{|\boldsymbol{\xi}+\boldsymbol{\eta}|}
   \label{eq:central-force-derivation}
 \end{equation}
-$\mathbf{f}$ 与 $\boldsymbol{\xi}+\boldsymbol{\eta}$ 共线，故中心力条件\eqref{eq:central-force}自动满足。键基模型（第 4 章）所采用的成对势均属此类。
+此时 $\mathbf{f}$ 与 $\boldsymbol{\xi}+\boldsymbol{\eta}$ 共线，故中心力条件\eqref{eq:central-force}自动满足。如图\ref{fig:pairwise-potential}所示，成对势 $w$ 的上述形式保证了对力 $\mathbf{f}$ 沿变形后键方向作用（蓝色箭头），同时满足反作用条件和中心力条件。键基模型（第 4 章）所采用的成对势均属此类。
 
 \begin{figure}[htbp]
   \centering
