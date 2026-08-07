@@ -320,28 +320,27 @@
   \begin{tikzpicture}[scale=1.2]
     % 参考键
     \filldraw (0,0) circle (2.5pt) node[below left] {$\mathbf{x}$};
-    \filldraw (3,0) circle (2.5pt) node[above right] {$\mathbf{x}'$};
+    \filldraw (3,0) circle (2.5pt) node[below left] {$\mathbf{x}'$};
     \draw[thick] (0,0) -- (3,0);
-    \node[above] at (1.5,0) {$\boldsymbol{\xi}$};
+    \node[below] at (1.5,0) {$\boldsymbol{\xi}$};
     % 变形后位置
     \filldraw[red] (0.2,0.1) circle (2pt) node[below left, red] {$\mathbf{y}$};
     \filldraw[red] (3.6,1.4) circle (2pt) node[above right, red] {$\mathbf{y}'$};
     \draw[thick, red] (0.2,0.1) -- (3.6,1.4);
-    \node[red, above] at (1.9,0.75) {$\boldsymbol{\xi}+\boldsymbol{\eta}$};
+    \node[red, above] at (1.9,0.85) {$\boldsymbol{\xi}+\boldsymbol{\eta}$};
     % 轴向分量 η_∥
-    \draw[blue, thick, -{Stealth}] (3,0) -- (3.55,0);
-    \node[blue, above] at (3.27,0) {$\boldsymbol{\eta}_{\parallel}$};
+    \draw[blue, thick, -{Stealth}] (3,0) -- (3.6,0);
+    \node[blue, below] at (3.7,-0.4) {$\boldsymbol{\eta}_{\parallel}$};
     % 偏斜分量 η_⊥
-    \draw[orange!80!black, thick, -{Stealth}] (3.55,0) -- (3.6,1.4);
-    \node[orange!80!black, right] at (3.55,0.7) {$\boldsymbol{\eta}_{\perp}$};
+    \draw[orange!80!black, thick, -{Stealth}] (3.6,0) -- (3.6,1.4);
+    \node[orange!80!black, right] at (3.65,0.7) {$\boldsymbol{\eta}_{\perp}$};
     % 完整相对位移 η
     \draw[gray, dashed, thick, -{Stealth}] (3,0) -- (3.6,1.4);
-    \node[gray, right] at (3.6,0.35) {$\boldsymbol{\eta}$};
+    \node[gray, left] at (3.3,0.7) {$\boldsymbol{\eta}$};
     % 辅助虚线
     \draw[gray, dashed] (0.2,0.1) -- (3,0);
-    \draw[gray, dashed] (3.55,0) -- (3.6,1.4);
   \end{tikzpicture}
-  \caption{相对位移的轴向—偏斜分解，$\boldsymbol{\eta}_{\parallel}$ 沿参考键方向改变键长，$\boldsymbol{\eta}_{\perp}$ 垂直于键方向引起偏转}
+  \caption{相对位移的轴向—偏斜分解}
   \label{fig:bond-decomp}
 \end{figure}
 
@@ -439,7 +438,7 @@
 \end{equation}
 该条件要求对力方向与变形后键的方向 $\boldsymbol{\xi}+\boldsymbol{\eta}$ 共线。从物理上看，反作用条件只保证成对力等大反向，但并不禁止对力含有垂直于键方向的分量。若存在这种横向分量，虽然两力仍彼此平衡，但作用线不共线，会形成一个力偶矩，使键两端物质点产生相对转动的趋势（图\ref{fig:central-force}）。中心力条件通过对力方向加以限制，消除了横向分量及其产生的力偶矩，从而保证角动量守恒。这一条件的严格数学推导将在 2.6 节给出。
 
-从几何角度看，中心力条件意味着对力可写为
+从向量代数可知，两个非零向量的叉积为零当且仅当它们平行（共线）。因此中心力条件\eqref{eq:central-force}意味着对力矢量 $\mathbf{f}$ 与变形后的键矢量 $\boldsymbol{\xi}+\boldsymbol{\eta}$ 平行，即存在某个标量函数使得 $\mathbf{f}$ 可写成该方向上的力。将这一方向用单位矢量 $\frac{\boldsymbol{\xi}+\boldsymbol{\eta}}{|\boldsymbol{\xi}+\boldsymbol{\eta}|}$ 表示，则对力可分解为该方向与力大小的乘积。从几何角度看，中心力条件意味着对力可写为
 \begin{equation}
   \mathbf{f}(\boldsymbol{\eta},\boldsymbol{\xi})=\frac{\boldsymbol{\xi}+\boldsymbol{\eta}}{|\boldsymbol{\xi}+\boldsymbol{\eta}|}\,g(|\boldsymbol{\xi}+\boldsymbol{\eta}|,\boldsymbol{\xi})
   \label{eq:central-force-form}
