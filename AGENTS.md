@@ -10,7 +10,7 @@
 ## 项目概览
 
 专著《近场动力学理论与数值方法》的 LaTeX 书籍项目（ctexbook，A4，11pt）。
-章节完成度参差：ch01、ch02、ch03、ch05、ch06、ch07 为完整章节（数百行），是写作新章节时的范例；ch04、ch08–ch19 目前为十余行占位骨架；附录 appA–appE 为1–2行占位空文件（动手前先 Read 确认行数）。
+章节完成度参差：ch01、ch02、ch03、ch04、ch06、ch07 为完整章节（数百行，是写作新章节时的范例）；ch05、ch08–ch19 目前仅为十余行占位骨架；附录 appA–appE 为占位空文件（动手前先 Read 确认行数）。ch04（键型模型）最近完成，主题直接衔接 ch05（键型改进模型），是撰写 ch05 的首选范例；ch04 的 6 节结构（假设→微势→PMB→率定→表面效应→局限）与每节末尾的 AI 声明样式值得沿用。
 
 ## 编译
 
@@ -90,7 +90,7 @@ xelatex main.tex
 - **文献引用**：引用须给出准确 `bibliography.bib` 中的 cite key，禁止编造文献；禁止模糊引用
 - **逻辑链**：因果链须完整，每个结论前须有足够前提支撑；禁止"显而易见""容易证明"等省略
 - **数值算例**：给出完整参数（材料常数、horizon δ、网格尺寸、时间步长等），数据来源须可溯源
-- **责任边界**：输出数学/物理内容时须声明"AI 辅助生成，需经专业审阅"；不得替代作者做物理假设或理论判断
+- **责任边界**：输出数学/物理内容时须声明"AI 辅助生成，需经专业审阅"；不得替代作者做物理假设或理论判断。实践格式：每节末尾加一行 `\emph{AI 辅助生成，需经专业审阅。}`（ch03、ch04 均已采用，新章节沿用）
 
 #### AI 自查清单
 
@@ -137,6 +137,7 @@ xelatex main.tex
 
 - **参考文献**：统一由 `bibliography.bib` 管理（124 条）；新增文献条目须先与作者确认书目信息，禁止编造 cite key；当前 `main.tex` 用 `\bibliographystyle{plain}`（非 GB/T 7714），若切换 GB/T 7714 须更换 bibstyle 并引入 `gbt7714` 宏包
 - **编译质量门禁**：xelatex + bibtex 无 error；无 undefined reference/citation 警告
+- **编译前清理**：完整验证前先删除残留 `*.aux`/`*.bbl`/`*.blg`/`*.log` 再全链重跑；脏 aux 会导致 bibtex 报 "File ended while scanning" 等连锁假错误（2026-08 实测，干净重跑即消失）
 - **编译验证执行方式**：涉及 xelatex 编译验证的 QA 任务（如最终编译检查、F-wave 验证），**由当前会话直接本地执行**，不委托子代理。原因：章节文件（`chNN_*.tex`）不能单独编译，必须由 `main.tex` 入口编译；子代理可能编译错误文件、PowerShell 环境差异导致阻塞、或未按格式输出 `VERDICT` 导致 boulder 暂停。
 - **编译执行细节**：整书编译耗时长，须先清理辅助文件（`Remove-Item main.aux,.toc,.out,.log,.bbl,.blg`）再按顺序执行，每次 `xelatex main.tex` 用重定向 `> compileN.log 2>&1` 并设长超时（≥900s）；检查点：`^!` 开头行为 error、`undefined` 为未解析引用、`Overfull \hbox` 为版式溢出。PowerShell 管道（`Select-String` 过滤）会干扰子进程，勿用。
 
