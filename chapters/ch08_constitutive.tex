@@ -828,4 +828,423 @@ FCC 多晶在随机取向下的 Taylor 因子取经典值 $M\approx3.06$，即�
 
 \section{准脆性材料的 JH-2 本构}
 
+8.4 节晶体塑性针对的是韧性金属，其失效前经历可观的塑性变形。本节转向另一类工程材料——准脆性材料（quasi-brittle materials），包括结构陶瓷（碳化硼、碳化硅、氧化铝、氮化铝等）、岩石、玻璃与混凝土。这类材料在冲击、侵彻与爆破等强动载荷下表现出与金属截然不同的力学行为：抗压强度远高于抗拉强度（压拉比可达 $5\sim10$），强度随静水压力显著增长，且呈现强烈的应变率敏感性；同时，材料在达到强度峰值后迅速损伤累积、承载能力急剧下降，失效前塑性变形很小，表现为脆性断裂。准脆性材料的这一特性使其难以用 8.4 节基于滑移系的晶体塑性或第 6 章基于 von Mises 屈服面的经典塑性描述，需要专门的压力相关损伤本构。Johnson 与 Holmquist 提出的 JH-2 模型（Johnson--Holmquist damage model）是目前应用最广的准脆性材料冲击本构：它以 Hugoniot 弹性极限为归一化基准，用完好材料与断裂材料两条强度面对材料的压力相关强度进行插值，并以累积塑性应变为损伤内变量描述强度的渐进退化，其核心是强度、压力与损伤三部分的耦合 \cite{JohnsonHolmquist1994}。本节首先介绍准脆性材料的强度特性与 JH-2 模型的框架，包括 Hugoniot 弹性极限与归一化变量（\ref{sec:jh2-framework}节）；进而建立强度面、压力--体积关系与损伤演化的具体公式，并说明其与 8.3 节蠕变损伤模型的区别（\ref{sec:jh2-strength}节）；最后给出 JH-2 在 NOSB 中的嵌入流程——非局部变形梯度到应变率、压力--偏应力分裂的应力更新、力态构造与零能模式处理，并以 Lai、Zhu 与 Yang 等在近场动力学中的实现为例说明数值要点（\ref{sec:jh2-nosb}节）。本节模型框架依据 Johnson 与 Holmquist 的原始文献 \cite{JohnsonHolmquist1994,JohnsonHolmquist1999,HolmquistJohnson2002,HolmquistTempletonBishnoi2001,JohnsonHolmquistBeissel2003}，近场动力学实现参见 \cite{Lai2018,ZhuZhao2021,YangGuZhangXia2021,CanSillingGuven2025}。
+
+\subsection{准脆性材料的强度特性与 JH-2 模型框架}\label{sec:jh2-framework}
+
+准脆性材料的强度特性可以概括为三点：压力相关性、应变率敏感性与损伤软化。压力相关性是准脆性材料最显著的特征。与金属的 von Mises 屈服准则（第 6 章式\eqref{eq:von-mises}，屈服与静水压力无关）不同，陶瓷与岩石的强度随围压（静水压力）增大而显著提高：无约束单轴压缩强度远低于高压约束下的强度，因为围压抑制了微裂纹的张开与扩展，迫使材料在更高的剪应力水平才发生失效 \cite{JohnsonHolmquist1994,JohnsonHolmquist1999}。应变率敏感性表现为动态强度高于静态强度：冲击加载下应变率可达 $10^{3}\sim10^{6}~\mathrm{s}^{-1}$，材料强度随应变率的对数近似线性增长 \cite{HolmquistTempletonBishnoi2001}。损伤软化表现为强度随损伤累积而降低：准脆性材料在载荷作用下萌生大量微裂纹，微裂纹的汇合与贯通使材料逐渐丧失承载能力，直至完全碎裂。这一"先强化后软化"的路径依赖行为是准脆性材料本构建模的核心困难，也是 JH-2 模型引入损伤变量的原因。
+
+JH-2 模型的归一化基准是 Hugoniot 弹性极限（Hugoniot elastic limit，HEL）。冲击平面波在材料中传播时，波阵面两侧的横向变形受连续性条件约束，材料近似处于横向应变被约束的单轴应变（uniaxial strain）状态。设波传播方向为 $x$，轴向压缩应变的幅值为 $e$（$\varepsilon_{x}=-e$），横向应变 $\varepsilon_{y}=\varepsilon_{z}=0$，以下各应力均取压缩幅值（正值），线弹性本构给出
+\begin{equation}
+  \sigma_{x}=(\lambda+2\mu)e,\qquad
+  \sigma_{y}=\sigma_{z}=\lambda e,\qquad
+  \sigma_{\mathrm{eq}}=2\mu e,\qquad
+  \tau=\mu e
+  \label{eq:jh2-uniaxial-strain}
+\end{equation}
+其中 $\lambda$、$\mu$ 为 Lam\'e 常数，$\sigma_{\mathrm{eq}}$ 为 von Mises 等效应力，$\tau$ 为最大剪应力。式\eqref{eq:jh2-uniaxial-strain}的推导：前两式是单轴应变状态（$\varepsilon_{y}=\varepsilon_{z}=0$）下的 Hooke 定律；第三式由等效应力定义 $\sigma_{\mathrm{eq}}=\sqrt{\tfrac{3}{2}\mathbf{s}:\mathbf{s}}$（$\mathbf{s}$ 为偏应力张量）代入偏应力分量 $s_{x}=\sigma_{x}-\tfrac{1}{3}(\sigma_{x}+\sigma_{y}+\sigma_{z})=\tfrac{4}{3}\mu e$、$s_{y}=s_{z}=-\tfrac{2}{3}\mu e$ 得到，即 $\sigma_{\mathrm{eq}}=\sqrt{\tfrac{3}{2}\bigl[\bigl(\tfrac{4}{3}\mu e\bigr)^{2}+2\bigl(-\tfrac{2}{3}\mu e\bigr)^{2}\bigr]}=2\mu e$；第四式由最大剪应力 $\tau=(\sigma_{x}-\sigma_{y})/2=\mu e$ 得到。随着压缩增强，纵向应力 $\sigma_{x}$ 与等效应力 $\sigma_{\mathrm{eq}}$ 线性增长；当 $\sigma_{\mathrm{eq}}$ 达到材料的剪切强度时，弹性关系不再成立，纵向应力--应变曲线偏离弹性 Hugoniot 直线，这一临界状态即 HEL。由单轴应变的应力分解 $\sigma_{x}=P+\tfrac{2}{3}\sigma_{\mathrm{eq}}$（推导：$\sigma_{x}-\tfrac{1}{3}(\sigma_{x}+\sigma_{y}+\sigma_{z})=\tfrac{2}{3}(\sigma_{x}-\sigma_{y})=\tfrac{2}{3}\sigma_{\mathrm{eq}}$，其中用了 $\sigma_{y}=\sigma_{z}$ 与 $\sigma_{\mathrm{eq}}=\sigma_{x}-\sigma_{y}$），HEL 处的纵向应力、压力与等效应力满足
+\begin{equation}
+  \mathrm{HEL}=P_{\mathrm{HEL}}+\frac{2}{3}\sigma_{\mathrm{HEL}},\qquad
+  \tau_{\mathrm{HEL}}=\frac{1}{2}\sigma_{\mathrm{HEL}}
+  \label{eq:jh2-hel-decomp}
+\end{equation}
+其中 $\tau_{\mathrm{HEL}}$ 为 HEL 处的剪切强度。式\eqref{eq:jh2-hel-decomp}的推导：第一式由 $\sigma_{x}=P+\tfrac{2}{3}\sigma_{\mathrm{eq}}$ 在 HEL 处取值；第二式由 $\tau=(\sigma_{x}-\sigma_{y})/2$ 与 $\sigma_{\mathrm{eq}}=\sigma_{x}-\sigma_{y}$ 在 HEL 处取值得到。式\eqref{eq:jh2-hel-decomp}表明 HEL 的三个特征量并非独立：给定 $\sigma_{\mathrm{HEL}}$ 与 $P_{\mathrm{HEL}}$ 即确定 HEL 与 $\tau_{\mathrm{HEL}}$。以表\ref{tab:jh2-eos-params}的 B$_{4}$C 数据验证：$P_{\mathrm{HEL}}+\tfrac{2}{3}\sigma_{\mathrm{HEL}}=8.71+\tfrac{2}{3}\times15.4=18.98\approx19.0~\mathrm{GPa}$，与实测 HEL 一致；SiC 与 AlN 的验证分别为 $5.90+\tfrac{2}{3}\times13.0=14.57\approx14.6~\mathrm{GPa}$ 与 $5.00+\tfrac{2}{3}\times6.0=9.00=9.0~\mathrm{GPa}$，均自洽 \cite{JohnsonHolmquist1994,HolmquistJohnson2002}。此外，由式\eqref{eq:jh2-uniaxial-strain}还可反推 HEL 处的轴向应变 $e_{\mathrm{HEL}}=\sigma_{\mathrm{HEL}}/(2\mu)$，与弹性波速实验测定的体积应变一致（B$_{4}$C：$15.4/(2\times197)=0.039$，实测约 $0.041$），这为 HEL 参数的自洽性提供了又一检验 \cite{JohnsonHolmquist1999}。需要指出的是，实际标定中 $\sigma_{\mathrm{HEL}}$、$P_{\mathrm{HEL}}$ 由冲击实验独立测定，理想弹性关系式\eqref{eq:jh2-hel-decomp}仅近似成立：以表\ref{tab:jh2-eos-params}数据反推 HEL 隐含的泊松比并与弹性常数 $K_{1}$、$G$ 给出的泊松比比较，B$_{4}$C 为 $0.159$ 对 $0.170$、AlN 为 $0.250$ 对 $0.239$、SiC 为 $0.099$ 对 $0.156$，偏差源于实验标定的独立性与材料在 HEL 附近有限的非弹性响应，属预期范围 \cite{JohnsonHolmquist1999,HolmquistJohnson2002}。JH-2 模型用 HEL 处的等效应力 $\sigma_{\mathrm{HEL}}$ 与压力 $P_{\mathrm{HEL}}$ 对强度与压力进行归一化，定义归一化等效应力、归一化压力、归一化最大拉伸静水压力与归一化应变率
+\begin{equation}
+  \sigma^{*}=\frac{\sigma}{\sigma_{\mathrm{HEL}}},\qquad
+  P^{*}=\frac{P}{P_{\mathrm{HEL}}},\qquad
+  T^{*}=\frac{T}{P_{\mathrm{HEL}}},\qquad
+  \dot{\varepsilon}^{*}=\frac{\dot{\varepsilon}}{\dot{\varepsilon}_{0}}
+  \label{eq:jh2-normalized}
+\end{equation}
+其中 $\sigma$ 为 von Mises 等效应力，$P$ 为压力（静水压力，压缩为正），$T$ 为材料可承受的最大拉伸静水压力，$\dot{\varepsilon}$ 为等效应变率，$\dot{\varepsilon}_{0}=1~\mathrm{s}^{-1}$ 为参考应变率 \cite{JohnsonHolmquist1994}。参数 $T$ 表征材料在纯拉伸（三向受拉）状态下能承受的最大压力幅值，远小于压缩强度（对比表\ref{tab:jh2-eos-params}中 $T$ 与 HEL：比值 $0.014\sim0.036$），通常由层裂（spallation）实验或静态拉伸强度估算确定，是完好强度面式\eqref{eq:jh2-intact}中拉伸分支的锚点。式\eqref{eq:jh2-normalized}的意义在于：不同材料的 HEL 不同，归一化后强度面与压力关系可在同一无量纲框架内比较与标定，材料的全部本构参数都以 HEL 处的量为基准给出（见表\ref{tab:jh2-strength-params}）。归一化以 HEL 为基准的做法也决定了 JH-2 模型的应用边界：模型通过完好强度面与断裂强度面分别刻画 HEL 前后的响应，但在远高于 HEL 的冲击压力下（材料发生相变或严重碎裂），模型需要 Johnson--Holmquist--Beissel 等扩展形式的修正 \cite{JohnsonHolmquistBeissel2003}。
+
+JH-2 模型是 Johnson--Holmquist 系列模型的第二代。第一代模型 JH-1 以多段线性强度面近似准脆性材料的压力相关强度，但没有显式的损伤演化描述——材料从完好到失效的退化被隐含在强度面的分段选择中，且一旦进入更高压力段即不可逆地采用该段强度，无法刻画损伤的渐进累积 \cite{JohnsonHolmquist1994}。JH-2 模型在 JH-1 的基础上引入了显式损伤变量 $D$（$0\le D\le1$），以累积等效塑性应变驱动损伤演化，使强度从完好强度面向断裂强度面连续退化，这是两者最本质的区别（详见 8.5.2 节式\eqref{eq:jh2-damage}）。JH-2 模型由强度模型、压力模型与损伤模型三部分组成。强度模型给出材料在任意压力、应变率与损伤状态下的等效应力；压力模型（状态方程）给出压力与体积压缩的关系，并在损伤后计入体积膨胀效应；损伤模型描述损伤随塑性变形的累积及其对强度的折减。三部分相互耦合：压力与应变率决定强度面，强度面决定当前应力是否超过极限从而产生塑性变形，塑性变形累积损伤，损伤又折减强度面并触发压力模型的体积膨胀。这一耦合结构使 JH-2 能够同时描述准脆性材料的压力相关屈服、应变率强化、损伤软化与体积膨胀四个基本特征 \cite{JohnsonHolmquist1994}。表\ref{tab:jh2-strength-params}列出了三种常用装甲陶瓷（碳化硼、碳化硅、氮化铝）的 JH-2 强度与损伤参数，表\ref{tab:jh2-eos-params}列出相应的 HEL 与状态方程参数，参数来源均为相应材料的原始标定文献；各参数的实验标定流程详见本节末的讨论。
+
+\begin{table}[htbp]
+  \centering
+  \small
+  \caption{常用装甲陶瓷的 JH-2 强度与损伤参数（$\rho_{0}$ 为初始密度，$G$ 为剪切模量，$A$、$B$、$C$、$M$、$N$ 为强度常数，$D_{1}$、$D_{2}$ 为损伤常数，$T$ 为最大拉伸静水压力）\cite{JohnsonHolmquist1999,HolmquistJohnson2002,HolmquistTempletonBishnoi2001}}
+  \label{tab:jh2-strength-params}
+  \begin{tabular}{lccccccccc}
+    \toprule
+    材料 & $\rho_{0}~(\mathrm{kg/m^{3}})$ & $G~(\mathrm{GPa})$ & $A$ & $B$ & $C$ & $M$ & $N$ & $D_{1}$ & $D_{2}$ \\
+    \midrule
+    碳化硼 B$_{4}$C & $2510$ & $197$ & $0.927$ & $0.700$ & $0.005$ & $0.85$ & $0.67$ & $0.001$ & $0.50$ \\
+    碳化硅 SiC & $3163$ & $183$ & $0.960$ & $0.350$ & $0.000$ & $1.00$ & $0.65$ & $0.480$ & $0.48$ \\
+    氮化铝 AlN & $3226$ & $127$ & $0.850$ & $0.310$ & $0.013$ & $0.21$ & $0.29$ & $0.020$ & $1.85$ \\
+    \bottomrule
+  \end{tabular}
+\end{table}
+
+\begin{table}[htbp]
+  \centering
+  \small
+  \caption{常用装甲陶瓷的 JH-2 Hugoniot 弹性极限与状态方程参数（$\sigma_{\mathrm{HEL}}$、$P_{\mathrm{HEL}}$ 为 HEL 处的等效应力与压力，$T$ 为最大拉伸静水压力，$K_{1}$、$K_{2}$、$K_{3}$ 为多项式状态方程系数，$\beta$ 为体积膨胀能量转化分数）\cite{JohnsonHolmquist1999,HolmquistJohnson2002,HolmquistTempletonBishnoi2001}}
+  \label{tab:jh2-eos-params}
+  \begin{tabular}{lcccccccc}
+    \toprule
+    材料 & HEL $(\mathrm{GPa})$ & $\sigma_{\mathrm{HEL}}~(\mathrm{GPa})$ & $P_{\mathrm{HEL}}~(\mathrm{GPa})$ & $T~(\mathrm{GPa})$ & $K_{1}~(\mathrm{GPa})$ & $K_{2}~(\mathrm{GPa})$ & $K_{3}~(\mathrm{GPa})$ & $\beta$ \\
+    \midrule
+    碳化硼 B$_{4}$C & $19.0$ & $15.4$ & $8.71$ & $0.26$ & $233$ & $-593$ & $2800$ & $1.0$ \\
+    碳化硅 SiC & $14.6$ & $13.0$ & $5.90$ & $0.37$ & $205$ & $0$ & $0$ & $1.0$ \\
+    氮化铝 AlN & $9.0$ & $6.0$ & $5.00$ & $0.32$ & $201$ & $260$ & $0$ & $1.0$ \\
+    \bottomrule
+  \end{tabular}
+\end{table}
+
+表\ref{tab:jh2-strength-params}与表\ref{tab:jh2-eos-params}体现了 JH-2 参数体系的两个特点。其一，不同陶瓷的归一化强度常数差别不大（$A$ 在 $0.85\sim0.96$、$N$ 在 $0.29\sim0.67$ 量级），而 HEL 的绝对值差别显著（$9\sim19~\mathrm{GPa}$），说明归一化框架确实剥离了材料绝对强度差异，将各材料的响应统一到相似的无量纲形式 \cite{JohnsonHolmquist1999,HolmquistJohnson2002}。其二，损伤参数 $D_{1}$、$D_{2}$ 的取值对材料碎裂行为敏感：B$_{4}$C 的 $D_{1}=0.001$ 远小于 SiC 与 AlN，表明其塑性应变累积到很小即进入损伤状态，碎裂更突然——这与 B$_{4}$C 在冲击下"脆性更强、失效更剧烈"的已知行为一致 \cite{JohnsonHolmquist1999}。
+
+JH-2 参数的标定方法随参数类型而异，且各参数并非都可直接由单一实验测定，这决定了 JH-2 作为唯象工程模型的标定属性。HEL 与归一化基准参数（$\sigma_{\mathrm{HEL}}$、$P_{\mathrm{HEL}}$）由平板撞击（plate impact）实验测定：实验给出纵向应力--时间曲线，其偏离弹性的拐点即 HEL，$P_{\mathrm{HEL}}$ 由状态方程式\eqref{eq:jh2-pressure}从 HEL 处体积压缩换算，$\sigma_{\mathrm{HEL}}$ 由式\eqref{eq:jh2-hel-decomp}从 HEL 与 $P_{\mathrm{HEL}}$ 解得 \cite{JohnsonHolmquist1999,HolmquistTempletonBishnoi2001}。完好强度参数（$A$、$N$、$C$）由约束压缩（confined compression）实验拟合：不同围压下测得强度--压力数据点，拟合式\eqref{eq:jh2-intact}的 $A$、$N$；$C$ 由不同应变率下的动态压缩实验确定。断裂强度参数（$B$、$M$）最难直接测定——碎裂材料（粉末或碎片）在受约束压缩下的强度由碎裂材料实验给出，但围压有限、难以覆盖侵彻过程的高压范围，通常需要结合侵彻算例反演修正 \cite{JohnsonHolmquist1999,HolmquistJohnson2002}。损伤参数（$D_{1}$、$D_{2}$）因准脆性材料塑性变形极小、难以直接实验测定，多由层裂或碎裂实验结合数值反演确定 \cite{HolmquistTempletonBishnoi2001}。最大拉伸静水压力 $T$ 由层裂（spallation）实验或静态拉伸强度估算。表\ref{tab:jh2-strength-params}、表\ref{tab:jh2-eos-params}所列参数即按上述流程标定，参数来源均为相应材料的原始标定文献 \cite{JohnsonHolmquist1999,HolmquistJohnson2002,HolmquistTempletonBishnoi2001}。
+
+\subsection{强度面、压力--体积关系与损伤演化}\label{sec:jh2-strength}
+
+JH-2 模型的强度模型用两条强度面对材料的压力相关强度进行刻画。完好材料（无损伤）的强度面由完好强度（intact strength）描述，其归一化形式为
+\begin{equation}
+  \sigma^{*}_{\mathrm{i}}
+  =A\bigl(P^{*}+T^{*}\bigr)^{N}\bigl(1+C\ln\dot{\varepsilon}^{*}\bigr)
+  \label{eq:jh2-intact}
+\end{equation}
+其中 $A$、$N$ 为完好强度系数与压力指数，$C$ 为应变率系数，$P^{*}$、$T^{*}$ 与 $\dot{\varepsilon}^{*}$ 由式\eqref{eq:jh2-normalized}定义。式\eqref{eq:jh2-intact}的物理含义：强度随压力幂律增长（$P^{*}+T^{*}$ 项），反映围压对强度的提升；强度随应变率对数增长（$1+C\ln\dot{\varepsilon}^{*}$ 项），反映动态强化效应。当 $P^{*}\to-T^{*}$（压力趋近于负的最大拉伸静水压力）时完好强度趋近于零，对应纯拉伸状态下材料在拉力达到 $T$ 时失效——这正是参数 $T$（最大拉伸静水压力）的物理意义，也是式\eqref{eq:jh2-intact}中 $P^{*}$ 以 $P^{*}+T^{*}$ 而非 $P^{*}$ 形式出现的几何原因 \cite{JohnsonHolmquist1994}。需要注意式\eqref{eq:jh2-intact}的定义域：当 $P^{*}+T^{*}\le0$（即拉伸压力幅值达到或超过 $T$）时，底数非正、幂次 $N$ 通常非整数，式\eqref{eq:jh2-intact}无实数值；此时材料已进入拉伸失效，实现中取 $\sigma^{*}_{\mathrm{i}}=0$，即完好强度面在 $P^{*}=-T^{*}$ 处终止于零、$P^{*}<-T^{*}$ 区域无强度 \cite{JohnsonHolmquist1994}。这一"在拉伸强度处截断"的处理保证了模型在纯拉伸加载下给出有限的失效判据，而不至于因幂函数对负底数无定义而产生数值异常。材料完全损伤后（$D=1$）的强度由断裂强度（fractured strength）面描述
+\begin{equation}
+  \sigma^{*}_{\mathrm{f}}
+  =B\bigl(P^{*}\bigr)^{M}\bigl(1+C\ln\dot{\varepsilon}^{*}\bigr)
+  \label{eq:jh2-fractured}
+\end{equation}
+其中 $B$、$M$ 为断裂强度系数与压力指数。式\eqref{eq:jh2-fractured}与完好强度式\eqref{eq:jh2-intact}的结构差异在于：断裂强度没有 $+T^{*}$ 项，即碎裂材料在拉伸方向不再具备承载能力（$P^{*}\to0$ 时 $\sigma^{*}_{\mathrm{f}}\to0$），这与物理事实一致——材料碎裂后微裂纹已贯通，无法承受拉力 \cite{JohnsonHolmquist1994,JohnsonHolmquist1999}。与式\eqref{eq:jh2-intact}同理，式\eqref{eq:jh2-fractured}仅对 $P^{*}\ge0$（压缩）有定义：$P^{*}<0$ 时底数 $P^{*}$ 为负、幂次 $M$ 非整数，实现中取 $\sigma^{*}_{\mathrm{f}}=0$，即断裂强度面只存在于压缩区、拉伸区无断裂强度 \cite{JohnsonHolmquist1994}。部分材料的断裂强度还设置上限 $\sigma^{*}_{\mathrm{f}}\le\sigma^{*}_{\mathrm{f,max}}$，避免高压下断裂强度过度增长 \cite{HolmquistTempletonBishnoi2001}。
+
+式\eqref{eq:jh2-intact}与式\eqref{eq:jh2-fractured}的相对位置决定了损伤材料的强度退化路径。在压缩区（$P^{*}>0$），完好强度面通常高于断裂强度面（$\sigma^{*}_{\mathrm{i}}>\sigma^{*}_{\mathrm{f}}$），损伤使强度从高位面退化到低位面；但在高压区，由于 $\sigma^{*}_{\mathrm{f}}\le\sigma^{*}_{\mathrm{f,max}}$ 的上限约束而完好强度可能继续增长，两条强度面随 $P^{*}$ 增大可能相交，此时 $\sigma^{*}_{\mathrm{i}}=\sigma^{*}_{\mathrm{f}}$，损伤不再折减强度——这对应于极高压力下材料即使碎裂也因体积膨胀而恢复承载能力的极限情形 \cite{JohnsonHolmquist1994,JohnsonHolmquist1999}。在拉伸区（$P^{*}\le0$），完好强度面在 $0\le\sigma^{*}_{\mathrm{i}}\le A(T^{*})^{N}(1+C\ln\dot{\varepsilon}^{*})$ 范围内、断裂强度面恒为零，损伤使强度单调退化至零。这两条强度面的几何关系如图（图略，完好与断裂强度面随归一化压力变化的示意图）：完好强度面从 $(-T^{*},0)$ 出发随 $P^{*}$ 幂律上升，断裂强度面从原点出发随 $P^{*}$ 上升且增速受 $M$ 控制，损伤状态面位于两者之间并按式\eqref{eq:jh2-strength}线性插值。
+
+处于完好与完全断裂之间的损伤态材料，其强度由两条强度面按损伤变量线性插值得到
+\begin{equation}
+  \sigma^{*}
+  =\sigma^{*}_{\mathrm{i}}-D\bigl(\sigma^{*}_{\mathrm{i}}-\sigma^{*}_{\mathrm{f}}\bigr),
+  \qquad 0\le D\le1
+  \label{eq:jh2-strength}
+\end{equation}
+其中 $D$ 为损伤变量（$D=0$ 完好、$D=1$ 完全断裂）。式\eqref{eq:jh2-strength}的推导：损伤变量 $D$ 度量材料从完好（$D=0$）到完全断裂（$D=1$）的中间状态，材料强度随损伤线性地从完好强度 $\sigma^{*}_{\mathrm{i}}$ 退化到断裂强度 $\sigma^{*}_{\mathrm{f}}$，即 $\sigma^{*}=(1-D)\sigma^{*}_{\mathrm{i}}+D\sigma^{*}_{\mathrm{f}}$，整理即得式\eqref{eq:jh2-strength} \cite{JohnsonHolmquist1994}。式\eqref{eq:jh2-strength}的极限行为可直接验证：$D=0$ 时 $\sigma^{*}=\sigma^{*}_{\mathrm{i}}$（完好强度）、$D=1$ 时 $\sigma^{*}=\sigma^{*}_{\mathrm{f}}$（断裂强度），插值在两端精确还原两条强度面，中间状态按 $D$ 线性过渡。式\eqref{eq:jh2-strength}表明：损伤使强度面从完好强度面向断裂强度面连续过渡，材料在压力增大时可能重新获得部分强度（断裂强度面随压力增长），这反映了碎裂材料在高压约束下仍能承受一定剪应力（如侵彻弹道中陶瓷碎裂区仍起抗侵彻作用）的物理特征 \cite{JohnsonHolmquist1999}。将式\eqref{eq:jh2-intact}与式\eqref{eq:jh2-fractured}代入式\eqref{eq:jh2-strength}，强度面完整写为
+\begin{equation}
+  \sigma^{*}
+  =\bigl(1-D\bigr)A\bigl(P^{*}+T^{*}\bigr)^{N}\bigl(1+C\ln\dot{\varepsilon}^{*}\bigr)
+  +DB\bigl(P^{*}\bigr)^{M}\bigl(1+C\ln\dot{\varepsilon}^{*}\bigr)
+  \label{eq:jh2-strength-full}
+\end{equation}
+式\eqref{eq:jh2-strength-full}是式\eqref{eq:jh2-strength}的显式展开，其适用范围与式\eqref{eq:jh2-intact}、式\eqref{eq:jh2-fractured}一致：完好项要求 $P^{*}+T^{*}>0$，断裂项要求 $P^{*}\ge0$；在拉伸区（$P^{*}\le0$）断裂项为零，式\eqref{eq:jh2-strength-full}退化为 $\sigma^{*}=(1-D)A(P^{*}+T^{*})^{N}(1+C\ln\dot{\varepsilon}^{*})$。需要注意，式\eqref{eq:jh2-strength}采用线性插值是 JH-2 模型的唯象假设，其合理性由与实验数据的对比保证，而非来自微机制推导；这体现了 JH-2 作为工程唯象模型的特点 \cite{JohnsonHolmquist1994}。值得指出的是，式\eqref{eq:jh2-strength-full}中完好项与断裂项共享应变率因子 $(1+C\ln\dot{\varepsilon}^{*})$，即应变率敏感性在损伤退化过程中保持不变——这是 JH-2 模型简化处理的一部分，意味着损伤只改变强度幅值、不改变其随压力的幂律指数与随应变率的对数斜率 \cite{JohnsonHolmquist1994,JohnsonHolmquist1999}。
+
+损伤的演化由累积塑性应变控制。JH-2 模型假设损伤随等效塑性应变增量线性累积
+\begin{equation}
+  D=\sum\frac{\Delta\varepsilon^{\mathrm{p}}}{\varepsilon^{\mathrm{p}}_{\mathrm{f}}}
+  \label{eq:jh2-damage}
+\end{equation}
+其中 $\Delta\varepsilon^{\mathrm{p}}$ 为单个时间步内的等效塑性应变增量，$\varepsilon^{\mathrm{p}}_{\mathrm{f}}$ 为当前压力下材料失效所需的等效塑性应变（塑性失效应变），分母上的求和表示损伤按塑性应变的历史累积。塑性失效应变由压力相关函数给出
+\begin{equation}
+  \varepsilon^{\mathrm{p}}_{\mathrm{f}}
+  =D_{1}\bigl(P^{*}+T^{*}\bigr)^{D_{2}},
+  \qquad
+  \varepsilon^{\mathrm{p}}_{\mathrm{f,min}}\le\varepsilon^{\mathrm{p}}_{\mathrm{f}}
+  \le\varepsilon^{\mathrm{p}}_{\mathrm{f,max}}
+  \label{eq:jh2-epsf}
+\end{equation}
+其中 $D_{1}$、$D_{2}$ 为损伤参数，$\varepsilon^{\mathrm{p}}_{\mathrm{f,min}}$、$\varepsilon^{\mathrm{p}}_{\mathrm{f,max}}$ 为塑性失效应变的上下限。式\eqref{eq:jh2-epsf}的物理含义：$P^{*}+T^{*}$ 项表明压力越大（约束越强），材料失效所需的塑性应变越大——高压下微裂纹扩展受抑制，材料能积累更多塑性变形才完全断裂；上下限约束保证了 $\varepsilon^{\mathrm{p}}_{\mathrm{f}}$ 在拉伸与高压极端情形下有界，避免损伤演化发散 \cite{JohnsonHolmquist1994,JohnsonHolmquist1999}。上下限的物理意义：在拉伸极限（$P^{*}\to-T^{*}$）处 $\varepsilon^{\mathrm{p}}_{\mathrm{f}}\to0$，若无下限约束则任意微小塑性应变即导致 $D\to1$、损伤瞬发，而下限 $\varepsilon^{\mathrm{p}}_{\mathrm{f,min}}$ 保证拉伸损伤演化有最小失效应变尺度；在高压极限（$P^{*}\to\infty$）处 $\varepsilon^{\mathrm{p}}_{\mathrm{f}}\to\infty$，若无上限约束则损伤几乎不累积、与高压下材料实际仍会碎裂的事实不符，上限 $\varepsilon^{\mathrm{p}}_{\mathrm{f,max}}$ 保证高压下损伤仍能发展 \cite{JohnsonHolmquist1994}。以表\ref{tab:jh2-strength-params}的 B$_{4}$C 参数为例：$D_{1}=0.001$、$D_{2}=0.5$，在 HEL 处（$P^{*}=1$、$T^{*}=T/P_{\mathrm{HEL}}=0.26/8.71=0.0299$），$\varepsilon^{\mathrm{p}}_{\mathrm{f}}=0.001\times(1.0299)^{0.5}=0.00101$——塑性失效应变仅约千分之一，这正是 B$_{4}$C "脆性极强"的量化体现：材料在很小塑性变形后即完全碎裂，与表\ref{tab:jh2-strength-params}中 B$_{4}$C 的 $D_{1}$ 远小于其他陶瓷的特点一致 \cite{JohnsonHolmquist1999}。由式\eqref{eq:jh2-damage}与式\eqref{eq:jh2-epsf}，损伤演化率正比于塑性应变率。把式\eqref{eq:jh2-damage}写为增量形式 $\Delta D=\Delta\varepsilon^{\mathrm{p}}/\varepsilon^{\mathrm{p}}_{\mathrm{f}}$ 并对时间取极限 $\Delta t\to0$，得连续形式的损伤演化方程
+\begin{equation}
+  \dot{D}
+  =\frac{\dot{\varepsilon}^{\mathrm{p}}}{\varepsilon^{\mathrm{p}}_{\mathrm{f}}(P^{*})},
+  \qquad
+  \dot{D}\ge0
+  \label{eq:jh2-damage-rate}
+\end{equation}
+其中 $\dot{\varepsilon}^{\mathrm{p}}$ 为等效塑性应变率，$\varepsilon^{\mathrm{p}}_{\mathrm{f}}(P^{*})$ 由式\eqref{eq:jh2-epsf}给出。式\eqref{eq:jh2-damage-rate}的推导：由式\eqref{eq:jh2-damage}，$D$ 是塑性应变路径的累积函数，其时间导数即被积函数 $\dot{D}=\dot{\varepsilon}^{\mathrm{p}}/\varepsilon^{\mathrm{p}}_{\mathrm{f}}$；由于 $\varepsilon^{\mathrm{p}}_{\mathrm{f}}>0$ 且塑性应变率非负（塑性变形不可逆），损伤演化率恒非负，损伤单调累积不恢复 \cite{JohnsonHolmquist1994}。式\eqref{eq:jh2-damage-rate}表明损伤演化只取决于当前压力与塑性应变率，与 8.3 节蠕变损伤的应力驱动（式\eqref{eq:lm-damage}）形成对比：JH-2 的损伤是"塑性应变驱动"，即使应力保持恒定，只要塑性流动持续，损伤就持续累积。损伤变量 $D$ 同时作用于强度面（式\eqref{eq:jh2-strength}）与压力模型（体积膨胀），构成 JH-2 模型三部分耦合的纽带 \cite{JohnsonHolmquist1994}。
+
+压力--体积关系由多项式状态方程描述。定义体积压缩比（volumetric compression）$\mu_{\mathrm{v}}=\rho/\rho_{0}-1$（$\rho$ 为当前密度、$\rho_{0}$ 为初始密度），则压缩状态（$\mu_{\mathrm{v}}\ge0$）下的压力为
+\begin{equation}
+  P=K_{1}\mu_{\mathrm{v}}+K_{2}\mu_{\mathrm{v}}^{2}+K_{3}\mu_{\mathrm{v}}^{3},
+  \qquad \mu_{\mathrm{v}}=\frac{\rho}{\rho_{0}}-1
+  \label{eq:jh2-pressure}
+\end{equation}
+其中 $K_{1}$、$K_{2}$、$K_{3}$ 为多项式状态方程系数（$K_{1}$ 即初始体积模量）。式\eqref{eq:jh2-pressure}在低压缩（$\mu_{\mathrm{v}}$ 小）时退化为线性关系 $P=K_{1}\mu_{\mathrm{v}}$，高阶项刻画冲击压缩下的非线性体积响应 \cite{JohnsonHolmquist1994}。拉伸状态（$\mu_{\mathrm{v}}<0$）下压力取线性关系 $P=K_{1}\mu_{\mathrm{v}}$（即令 $K_{2}=K_{3}=0$），因为拉伸时材料体积膨胀有限，不需要高阶项。
+
+式\eqref{eq:jh2-pressure}描述的是无损伤材料的压力--体积关系。材料损伤后，微裂纹的萌生与扩展使材料的体积响应发生本质改变：碎裂材料在卸载时不能完全恢复体积，且剪切强度降低所释放的弹性能部分转化为内能、导致压力额外升高——这一现象称为体积膨胀（bulking）。JH-2 模型用压力增量描述体积膨胀，损伤后总压力为 $P=K_{1}\mu_{\mathrm{v}}+K_{2}\mu_{\mathrm{v}}^{2}+K_{3}\mu_{\mathrm{v}}^{3}+\Delta P$，其中体积膨胀压力增量由能量平衡确定
+\begin{equation}
+  \Delta P
+  =-K_{1}\mu_{\mathrm{v}}
+  +\sqrt{\bigl(K_{1}\mu_{\mathrm{v}}+\Delta P_{\mathrm{prev}}\bigr)^{2}+2\beta K_{1}\Delta U}
+  \label{eq:jh2-bulking}
+\end{equation}
+其中 $\Delta P_{\mathrm{prev}}$ 为上一时刻的体积膨胀压力增量，$\beta$ 为弹性能转化为静水压能的分数（$0\le\beta\le1$，通常取 $1$），$\Delta U$ 为损伤导致的弹性能损失增量。式\eqref{eq:jh2-bulking}的推导基于能量守恒。线性化压力模型下，压力为 $K_{1}\mu_{\mathrm{v}}$ 时材料单位体积的静水弹性能为 $U=(K_{1}\mu_{\mathrm{v}})^{2}/(2K_{1})=K_{1}\mu_{\mathrm{v}}^{2}/2$；损伤后压力增至 $K_{1}\mu_{\mathrm{v}}+\Delta P$，弹性能变为 $(K_{1}\mu_{\mathrm{v}}+\Delta P)^{2}/(2K_{1})$。设上一时刻的膨胀压力为 $\Delta P_{\mathrm{prev}}$，本时刻新增的弹性能损失 $\beta\Delta U$ 转化为静水压能的增量，能量守恒要求
+\begin{equation}
+  \frac{\bigl(K_{1}\mu_{\mathrm{v}}+\Delta P\bigr)^{2}}{2K_{1}}
+  -\frac{\bigl(K_{1}\mu_{\mathrm{v}}+\Delta P_{\mathrm{prev}}\bigr)^{2}}{2K_{1}}
+  =\beta\Delta U
+  \label{eq:jh2-bulking-energy}
+\end{equation}
+式\eqref{eq:jh2-bulking-energy}的推导：弹性压力-应变关系 $P=K_{1}\mu_{\mathrm{v}}$ 下，静水弹性能 $U=\int_{0}^{\mu_{\mathrm{v}}}P\,d\mu'_{\mathrm{v}}=\tfrac{1}{2}K_{1}\mu_{\mathrm{v}}^{2}$，故压力从 $K_{1}\mu_{\mathrm{v}}+\Delta P_{\mathrm{prev}}$ 增至 $K_{1}\mu_{\mathrm{v}}+\Delta P$ 时能量增量为两项弹性能之差，即式\eqref{eq:jh2-bulking-energy}左端。对式\eqref{eq:jh2-bulking-energy}解二次方程并取正根（膨胀压力 $\Delta P$ 取使总压力增大的根）即得式\eqref{eq:jh2-bulking}。式\eqref{eq:jh2-bulking}的极限行为与物理直观一致：当 $\beta=0$（无能量转化为静水压能）或 $\Delta U=0$（无新损伤）时，$(K_{1}\mu_{\mathrm{v}}+\Delta P_{\mathrm{prev}})^{2}+0=(K_{1}\mu_{\mathrm{v}}+\Delta P_{\mathrm{prev}})^{2}$，开方后 $\Delta P=\Delta P_{\mathrm{prev}}$，膨胀压力保持上一时刻值不变——即不损伤不膨胀；当 $\beta>0$ 且 $\Delta U>0$ 时，$\Delta P>\Delta P_{\mathrm{prev}}$，膨胀压力单调增长。式\eqref{eq:jh2-bulking}的物理意义：损伤释放的弹性能部分转化为压力，使损伤材料在压缩下承受更高的静水压——这解释了准脆性材料在侵彻过程中碎裂区密度增大、抗侵彻能力不因损伤而完全丧失的现象 \cite{JohnsonHolmquist1999}。需要说明的是，式\eqref{eq:jh2-bulking}的推导采用了线性化压力模型（$P=K_{1}\mu_{\mathrm{v}}$）来计算弹性能，忽略了 $K_{2}\mu_{\mathrm{v}}^{2}+K_{3}\mu_{\mathrm{v}}^{3}$ 高阶项对能量的贡献——这是 JH-2 原始模型的简化处理，在高压区（$\mu_{\mathrm{v}}$ 大）高阶项贡献显著时该近似精度下降 \cite{JohnsonHolmquist1994}。
+
+\begin{remark}
+  JH-2 模型的损伤变量 $D$ 与 8.3.2 节蠕变损伤模型的损伤变量 $D$（式\eqref{eq:creep-damage-def}）记号相同，但物理机制与演化方程完全不同。蠕变损伤 $D=A_{\mathrm{def}}/A_{0}$ 基于缺陷面积分数，由应力驱动的时间积分演化（式\eqref{eq:lm-damage}），描述高温长时间蠕变下材料承载面积的减小；JH-2 损伤 $D=\sum\Delta\varepsilon^{\mathrm{p}}/\varepsilon^{\mathrm{p}}_{\mathrm{f}}$（式\eqref{eq:jh2-damage}）基于累积塑性应变，由塑性变形驱动演化，描述冲击载荷下微裂纹的累积。两者的共同点是都以 $D\in[0,1]$ 单调度量材料的劣化、都以有效应力或强度折减的形式进入本构，但时间尺度（秒级蠕变 vs 微秒级冲击）、驱动量（应力 vs 塑性应变）与失效判据（$D_{\mathrm{cr}}=0.99$ vs $D=1$）均不同。此外，蠕变损伤通过力态权重 $(1-D_{\mathbf{x}})$ 直接衰减键力（式\eqref{eq:creep-force-state}），而 JH-2 损伤通过强度面式\eqref{eq:jh2-strength}折减等效应力间接改变力态——前者是"键力整体衰减"，后者是"本构强度退化"，两者在 NOSB 中的实现路径也不同，使用时须注意区分。
+\end{remark}
+
+至此，JH-2 模型的三部分——强度面式\eqref{eq:jh2-strength}（由式\eqref{eq:jh2-intact}、式\eqref{eq:jh2-fractured}代入）、损伤演化式\eqref{eq:jh2-damage}（配合式\eqref{eq:jh2-epsf}）、压力模型式\eqref{eq:jh2-pressure}（配合体积膨胀式\eqref{eq:jh2-bulking}）——构成完整的率相关损伤本构。该本构在给定压力 $P$、应变率 $\dot{\varepsilon}$ 与损伤 $D$ 时，唯一确定材料的当前强度 $\sigma$；给定塑性应变增量则确定损伤增量。这一"状态驱动"结构使其可以像 8.2--8.4 节的黏塑性、蠕变与晶体塑性一样，作为点级本构嵌入 NOSB 框架，见 8.5.3 节。
+
+\subsection{JH-2 在 NOSB 中的嵌入}\label{sec:jh2-nosb}
+
+JH-2 本构嵌入 NOSB 的路径与 8.1--8.4 节完全一致——本构对应机制（第 7 章\ref{sec:correspondence}节）：由非局部变形梯度构造经典应变度量，调用经典本构得到应力，再经力态公式构造键力。JH-2 的特殊之处在于三点。其一，JH-2 是率相关本构，需要应变率输入，而第 7 章的对应框架以变形梯度为基本输入，须由变形梯度的时间导数构造应变率。其二，JH-2 是损伤本构，需要在每一材料点维护损伤内变量 $D$ 与塑性应变，并按 8.2--8.3 节的算子分裂格式推进。其三，JH-2 的应力更新采用压力--偏应力分裂，与 8.2 节黏塑性、8.3 节蠕变的统一更新格式略有不同。本节依次给出应变率的构造、应力更新的显式格式与力态构造，并以 Lai、Zhu 与 Yang 等的实现为例说明数值要点。
+
+应变率的构造是嵌入的第一步。设非局部变形梯度为 $\mathbf{F}$（式\eqref{eq:nonlocal-deformation-gradient}），其物质时间导数为 $\dot{\mathbf{F}}$（在显式时间积分中可由相邻两个时间步的变形梯度差分得到 $\dot{\mathbf{F}}^{n}=(\mathbf{F}^{n}-\mathbf{F}^{n-1})/\Delta t$，其中上标为时间步编号），则速度梯度与变形率张量为
+\begin{equation}
+  \mathbf{L}=\dot{\mathbf{F}}\mathbf{F}^{-1},
+  \qquad
+  \mathbf{D}=\frac{1}{2}\bigl(\mathbf{L}+\mathbf{L}^{\mathrm{T}}\bigr)
+  \label{eq:jh2-velocity-gradient}
+\end{equation}
+其中 $\mathbf{D}$ 为变形率张量（与第 7 章式\eqref{eq:rate-kinematics}同定义）。式\eqref{eq:jh2-velocity-gradient}的推导：$\mathbf{L}=\dot{\mathbf{F}}\mathbf{F}^{-1}$ 是经典速度梯度的定义（第 7 章式\eqref{eq:rate-kinematics}），其对称部分 $\mathbf{D}$ 即变形率。由变形率张量定义等效应变率（equivalent strain rate）
+\begin{equation}
+  \dot{\varepsilon}
+  =\sqrt{\frac{2}{3}\mathbf{D}:\mathbf{D}}
+  =\sqrt{\frac{2}{3}\operatorname{tr}\bigl(\mathbf{D}^{2}\bigr)}
+  \label{eq:jh2-equiv-strain-rate}
+\end{equation}
+式\eqref{eq:jh2-equiv-strain-rate}的推导：等效应变率的定义与 von Mises 等效应变的率形式一致，$\dot{\varepsilon}=\sqrt{\tfrac{2}{3}\mathbf{D}:\mathbf{D}}$ 是经典塑性理论中等效塑性应变率定义 $\dot{\varepsilon}^{\mathrm{p}}=\sqrt{\tfrac{2}{3}\dot{\mathbf{e}}^{\mathrm{p}}:\dot{\mathbf{e}}^{\mathrm{p}}}$（$\dot{\mathbf{e}}^{\mathrm{p}}$ 为偏塑性应变率）的总应变率类比，其中 $\mathbf{D}:\mathbf{D}=\operatorname{tr}(\mathbf{D}^{2})$ 是二阶张量双重内积的迹形式 \cite{Lai2018}。由式\eqref{eq:jh2-equiv-strain-rate}代入式\eqref{eq:jh2-normalized}得归一化应变率 $\dot{\varepsilon}^{*}=\dot{\varepsilon}/\dot{\varepsilon}_{0}$。需要指出的是，第 7 章式\eqref{eq:rate-kinematics}的 $\mathbf{D}$ 用于率形式本构的客观率更新，而式\eqref{eq:jh2-velocity-gradient}的 $\mathbf{D}$ 仅用于计算 JH-2 所需的标量应变率——JH-2 的强度面式\eqref{eq:jh2-strength}以等效应变率（而非变形率张量）为输入，因此不涉及客观率的选择，这也简化了嵌入 \cite{Lai2018,ZhuZhao2021}。
+
+应力更新采用压力--偏应力分裂格式。每一时间步 $[t_{n},t_{n+1}]$ 内：（1）由当前构型计算非局部变形梯度 $\mathbf{F}$（式\eqref{eq:nonlocal-deformation-gradient}）与体积压缩比 $\mu_{\mathrm{v}}=\rho/\rho_{0}-1$（在有限变形下 $\rho/\rho_{0}=1/\det\mathbf{F}$，故 $\mu_{\mathrm{v}}=1/\det\mathbf{F}-1$），由式\eqref{eq:jh2-pressure}计算当前压力 $P^{n}$（损伤后附加式\eqref{eq:jh2-bulking}的体积膨胀压力增量）；（2）由式\eqref{eq:jh2-velocity-gradient}与式\eqref{eq:jh2-equiv-strain-rate}计算等效应变率 $\dot{\varepsilon}^{n}$ 与归一化值 $\dot{\varepsilon}^{*,n}$，由式\eqref{eq:jh2-intact}、式\eqref{eq:jh2-fractured}与式\eqref{eq:jh2-strength}按当前损伤 $D^{n}$ 计算归一化强度 $\sigma^{*,n}$，进而由归一化定义式\eqref{eq:jh2-normalized}得到当前强度
+\begin{equation}
+  \sigma^{n}=\sigma^{*,n}\sigma_{\mathrm{HEL}}
+  \label{eq:jh2-current-strength}
+\end{equation}
+（3）由弹性本构计算试探应力。设时间步内的偏应变增量为 $\Delta\mathbf{e}^{n}=\mathbf{e}^{n}-\mathbf{e}^{n-1}$（$\mathbf{e}$ 为偏应变张量），弹性预测的试探偏应力为
+\begin{equation}
+  \mathbf{s}^{n}_{\mathrm{trial}}
+  =\mathbf{s}^{n-1}+2G\,\Delta\mathbf{e}^{n},
+  \qquad
+  \sigma^{n}_{\mathrm{eq,trial}}
+  =\sqrt{\frac{3}{2}\,\mathbf{s}^{n}_{\mathrm{trial}}:\mathbf{s}^{n}_{\mathrm{trial}}}
+  \label{eq:jh2-trial-stress}
+\end{equation}
+其中 $\mathbf{s}^{n-1}$ 为上一时刻的偏应力，$\sigma^{n}_{\mathrm{eq,trial}}$ 为试探等效应力。式\eqref{eq:jh2-trial-stress}的推导：偏应力按弹性剪切模量更新是径向返回算法的标准弹性预测步，即假设时间步内无塑性流动、偏应力增量全部由弹性变形贡献；试探等效应力由 von Mises 定义从试探偏应力计算 \cite{SimoHughes1998,Lai2018}。（4）将试探等效应力与当前强度 $\sigma^{n}$（式\eqref{eq:jh2-current-strength}）比较：若 $\sigma^{n}_{\mathrm{eq,trial}}\le\sigma^{n}$，则材料处于弹性状态，偏应力直接取试探值 $\mathbf{s}^{n}=\mathbf{s}^{n}_{\mathrm{trial}}$，塑性应变增量为零；若 $\sigma^{n}_{\mathrm{eq,trial}}>\sigma^{n}$，则按 JH-2 强度面限制偏应力，并把超出的部分视为塑性变形。塑性应变增量由径向返回（radial return）确定
+\begin{equation}
+  \Delta\varepsilon^{\mathrm{p},n}
+  =\frac{\sigma^{n}_{\mathrm{eq,trial}}-\sigma^{n}}{3G}
+  \label{eq:jh2-plastic-increment}
+\end{equation}
+其中 $G$ 为剪切模量。式\eqref{eq:jh2-plastic-increment}的推导：径向返回假设塑性流动沿试探偏应力方向（关联流动），引入单位偏张量 $\mathbf{n}_{\mathrm{trial}}=\mathbf{s}^{n}_{\mathrm{trial}}/|\mathbf{s}^{n}_{\mathrm{trial}}|$（$|\mathbf{s}^{n}_{\mathrm{trial}}|=\sqrt{\mathbf{s}^{n}_{\mathrm{trial}}:\mathbf{s}^{n}_{\mathrm{trial}}}$ 为偏应力张量的范数，$\mathbf{n}_{\mathrm{trial}}:\mathbf{n}_{\mathrm{trial}}=1$），则由试探等效应力定义式\eqref{eq:jh2-trial-stress}有 $\mathbf{s}^{n}_{\mathrm{trial}}=\sigma^{n}_{\mathrm{eq,trial}}\sqrt{\tfrac{2}{3}}\,\mathbf{n}_{\mathrm{trial}}$。塑性偏应变增量沿该方向 $\Delta\mathbf{e}^{\mathrm{p}}=\tfrac{3}{2}\Delta\varepsilon^{\mathrm{p}}\,\tfrac{\mathbf{s}^{n}_{\mathrm{trial}}}{\sigma^{n}_{\mathrm{eq,trial}}}=\tfrac{3}{2}\Delta\varepsilon^{\mathrm{p}}\cdot\sqrt{\tfrac{2}{3}}\,\mathbf{n}_{\mathrm{trial}}=\sqrt{\tfrac{3}{2}}\Delta\varepsilon^{\mathrm{p}}\,\mathbf{n}_{\mathrm{trial}}$（第一等式是 $J_{2}$ 塑性理论中塑性应变增量与塑性乘子的关联流动关系，$\tfrac{\mathbf{s}_{\mathrm{trial}}}{\sigma_{\mathrm{eq,trial}}}$ 为流动方向，第二等式代入 $\mathbf{s}^{n}_{\mathrm{trial}}$ 的表达式，第三等式利用 $\tfrac{3}{2}\sqrt{\tfrac{2}{3}}=\sqrt{\tfrac{3}{2}}$）。返回后偏应力为弹性预测减去塑性修正
+\begin{equation}
+  \mathbf{s}^{n}
+  =\mathbf{s}^{n}_{\mathrm{trial}}-2G\,\Delta\mathbf{e}^{\mathrm{p}}
+  =\Bigl(\sigma^{n}_{\mathrm{eq,trial}}\sqrt{\tfrac{2}{3}}-2G\sqrt{\tfrac{3}{2}}\Delta\varepsilon^{\mathrm{p}}\Bigr)\mathbf{n}_{\mathrm{trial}}
+  \label{eq:jh2-radial-return}
+\end{equation}
+式\eqref{eq:jh2-radial-return}的推导：把 $\mathbf{s}^{n}_{\mathrm{trial}}=\sigma^{n}_{\mathrm{eq,trial}}\sqrt{\tfrac{2}{3}}\,\mathbf{n}_{\mathrm{trial}}$ 与 $\Delta\mathbf{e}^{\mathrm{p}}=\sqrt{\tfrac{3}{2}}\Delta\varepsilon^{\mathrm{p}}\,\mathbf{n}_{\mathrm{trial}}$ 代入 $\mathbf{s}^{n}=\mathbf{s}^{n}_{\mathrm{trial}}-2G\Delta\mathbf{e}^{\mathrm{p}}$，合并同类项即得。由于 $\mathbf{s}^{n}$ 仍沿 $\mathbf{n}_{\mathrm{trial}}$ 方向，其等效应力为
+\begin{equation}
+  \sigma^{n}_{\mathrm{eq}}
+  =\sqrt{\frac{3}{2}\,\mathbf{s}^{n}:\mathbf{s}^{n}}
+  =\sqrt{\frac{3}{2}}\,\Bigl|\sigma^{n}_{\mathrm{eq,trial}}\sqrt{\tfrac{2}{3}}-2G\sqrt{\tfrac{3}{2}}\Delta\varepsilon^{\mathrm{p}}\Bigr|
+  =\sigma^{n}_{\mathrm{eq,trial}}-3G\,\Delta\varepsilon^{\mathrm{p},n}
+  \label{eq:jh2-radial-return-seq}
+\end{equation}
+式\eqref{eq:jh2-radial-return-seq}的推导：把式\eqref{eq:jh2-radial-return}代入等效应力定义，利用 $\mathbf{n}_{\mathrm{trial}}:\mathbf{n}_{\mathrm{trial}}=1$ 与 $\sqrt{\tfrac{3}{2}}\cdot\sqrt{\tfrac{2}{3}}=1$、$\sqrt{\tfrac{3}{2}}\cdot 2G\sqrt{\tfrac{3}{2}}=3G$；绝对值号内 $\sigma^{n}_{\mathrm{eq,trial}}\sqrt{\tfrac{2}{3}}\ge2G\sqrt{\tfrac{3}{2}}\Delta\varepsilon^{\mathrm{p}}$ 在 $\Delta\varepsilon^{\mathrm{p}}$ 由式\eqref{eq:jh2-plastic-increment}给出时恒成立：把 $\Delta\varepsilon^{\mathrm{p},n}=(\sigma^{n}_{\mathrm{eq,trial}}-\sigma^{n})/(3G)$ 代入左减右得 $\sigma^{n}_{\mathrm{eq,trial}}\sqrt{\tfrac{2}{3}}-2G\sqrt{\tfrac{3}{2}}\cdot\tfrac{\sigma^{n}_{\mathrm{eq,trial}}-\sigma^{n}}{3G}=\sqrt{\tfrac{2}{3}}\,\sigma^{n}\ge0$（其中 $\sqrt{\tfrac{3}{2}}\cdot\tfrac{2}{3}=\sqrt{\tfrac{2}{3}}$），由于强度面 $\sigma^{n}\ge0$（式\eqref{eq:jh2-current-strength}，$\sigma^{*,n}\ge0$ 且 $\sigma_{\mathrm{HEL}}>0$），绝对值号可直接去除。令返回后等效应力落在强度面上（$\sigma^{n}_{\mathrm{eq}}=\sigma^{n}$），由式\eqref{eq:jh2-radial-return-seq}解出 $\Delta\varepsilon^{\mathrm{p},n}=(\sigma^{n}_{\mathrm{eq,trial}}-\sigma^{n})/(3G)$，即式\eqref{eq:jh2-plastic-increment} \cite{Lai2018,JohnsonHolmquist1994}。需要说明的是，式\eqref{eq:jh2-plastic-increment}的推导涉及塑性流动的方向假设：径向返回隐含了关联流动（流动方向沿偏应力方向）的假设，而 JH-2 模型本身只给出强度面（屈服面）而未显式规定流动法则，工程实现中普遍采用径向返回近似，其合理性由算例验证 \cite{Lai2018,ZhuZhao2021}。（5）由式\eqref{eq:jh2-plastic-increment}的塑性应变增量计算损伤增量（式\eqref{eq:jh2-damage-update}），并把损伤导致的弹性能损失反馈到压力模型（体积膨胀式\eqref{eq:jh2-bulking}），完成本时间步的应力更新。
+
+损伤演化按式\eqref{eq:jh2-damage}显式更新
+\begin{equation}
+  D^{n+1}=D^{n}+\frac{\Delta\varepsilon^{\mathrm{p},n}}{\varepsilon^{\mathrm{p}}_{\mathrm{f}}(P^{*,n})},
+  \qquad
+  \varepsilon^{\mathrm{p}}_{\mathrm{f}}(P^{*,n})=D_{1}\bigl(P^{*,n}+T^{*}\bigr)^{D_{2}}
+  \label{eq:jh2-damage-update}
+\end{equation}
+其中 $\Delta\varepsilon^{\mathrm{p},n}$ 由式\eqref{eq:jh2-plastic-increment}给出，$\varepsilon^{\mathrm{p}}_{\mathrm{f}}$ 由式\eqref{eq:jh2-epsf}按当前归一化压力 $P^{*,n}=P^{n}/P_{\mathrm{HEL}}$ 计算。式\eqref{eq:jh2-damage-update}的显式格式与 8.2--8.3 节的内变量更新（式\eqref{eq:vp-explicit-update}、式\eqref{eq:creep-damage-update}）完全同构：损伤增量由当前状态显式确定，无需迭代。损伤更新后，若 $D^{n+1}\ge1$，则该材料点完全碎裂（损伤 $D$ 达到上限，强度退化为断裂强度面式\eqref{eq:jh2-fractured}）——与 8.3 节蠕变损伤 $D\ge D_{\mathrm{cr}}$ 判据（式\eqref{eq:creep-damage-update}后说明）不同，JH-2 中 $D=1$ 时材料并未立即从计算中移除，而是以断裂强度继续承载（可能已大幅弱化），是否移除取决于后续的断裂判据（见下）\cite{JohnsonHolmquist1994}。
+
+损伤增量还须反馈到压力模型。损伤导致的弹性能损失 $\Delta U$ 来源于强度折减释放的弹性能：由式\eqref{eq:jh2-radial-return-seq}，塑性流动使等效应力从试探值 $\sigma^{n}_{\mathrm{eq,trial}}$ 降至强度面 $\sigma^{n}$，应力幅值减小伴随偏弹性能的释放，释放量即为式\eqref{eq:jh2-bulking}中的能量损失项
+\begin{equation}
+  \Delta U
+  =\frac{(\sigma^{n}_{\mathrm{eq,trial}})^{2}-(\sigma^{n})^{2}}{6G}
+  \label{eq:jh2-bulking-energy-loss}
+\end{equation}
+式\eqref{eq:jh2-bulking-energy-loss}的推导：偏弹性能密度为 $U_{\mathrm{dev}}=\tfrac{1}{2}\mathbf{s}:\mathbf{e}^{\mathrm{e}}=\mathbf{s}:\mathbf{s}/(4G)$（利用 $\mathbf{s}=2G\mathbf{e}^{\mathrm{e}}$），故试探状态与返回后状态的偏弹性能之差为 $[\mathbf{s}_{\mathrm{trial}}:\mathbf{s}_{\mathrm{trial}}-\mathbf{s}^{n}:\mathbf{s}^{n}]/(4G)$。由于 $\mathbf{s}_{\mathrm{trial}}$ 与 $\mathbf{s}^{n}$ 均沿 $\mathbf{n}_{\mathrm{trial}}$ 方向（式\eqref{eq:jh2-radial-return}），由等效应力定义式\eqref{eq:jh2-trial-stress}与式\eqref{eq:jh2-radial-return-seq}有 $\mathbf{s}_{\mathrm{trial}}:\mathbf{s}_{\mathrm{trial}}=\tfrac{2}{3}\sigma^{2}_{\mathrm{eq,trial}}$、$\mathbf{s}^{n}:\mathbf{s}^{n}=\tfrac{2}{3}(\sigma^{n})^{2}$（因 $\sigma_{\mathrm{eq}}=\sqrt{\tfrac{3}{2}\mathbf{s}:\mathbf{s}}$ 即 $\mathbf{s}:\mathbf{s}=\tfrac{2}{3}\sigma_{\mathrm{eq}}^{2}$），代入得 $\Delta U=\tfrac{2}{3}[(\sigma^{n}_{\mathrm{eq,trial}})^{2}-(\sigma^{n})^{2}]/(4G)=[(\sigma^{n}_{\mathrm{eq,trial}})^{2}-(\sigma^{n})^{2}]/(6G)$ \cite{JohnsonHolmquist1994,JohnsonHolmquist1999}。式\eqref{eq:jh2-bulking-energy-loss}表明：塑性变形越大（$\sigma^{n}_{\mathrm{eq,trial}}-\sigma^{n}$ 越大），释放的弹性能越多，经式\eqref{eq:jh2-bulking}转化为体积膨胀压力的能量也越多。该能量损失项把损伤演化（式\eqref{eq:jh2-damage-update}）与压力模型（式\eqref{eq:jh2-bulking}）耦合起来：损伤通过式\eqref{eq:jh2-bulking-energy-loss}的 $\Delta U$ 进入体积膨胀压力，改变下一时间步的静水压力状态，进而影响强度面（式\eqref{eq:jh2-intact}的压力依赖）——这是 JH-2 三部分耦合在数值实现中的具体落点。
+
+力态构造是嵌入链条的最后一环。JH-2 本构输出的 Cauchy 应力由压力与偏应力合成 $\boldsymbol{\sigma}=\mathbf{s}-P\,\mathbf{I}$（$P$ 为正表示压缩），经 Piola 变换（第 7 章式\eqref{eq:piola-cauchy}）得第一类 Piola--Kirchhoff 应力 $\mathbf{P}_{1}=J\boldsymbol{\sigma}\mathbf{F}^{-\mathrm{T}}$（$J=\det\mathbf{F}$），代入力态定义式\eqref{eq:nosb-force-state}得 JH-2 力态
+\begin{equation}
+  \underline{\mathbf{T}}\langle\boldsymbol{\xi}\rangle
+  =\omega(|\boldsymbol{\xi}|)\,J\,\boldsymbol{\sigma}\,\mathbf{F}^{-\mathrm{T}}\mathbf{K}^{-1}\boldsymbol{\xi}
+  \label{eq:jh2-force-state}
+\end{equation}
+式\eqref{eq:jh2-force-state}与第 7 章 Cauchy 应力嵌入形式式\eqref{eq:force-state-cauchy}、8.4 节晶体塑性力态式\eqref{eq:cp-lattice-force-state}完全一致，区别仅在于 $\boldsymbol{\sigma}$ 由 JH-2 本构（8.5.2 节）给出。这一链条表明：JH-2 在 NOSB 中的实现与其他本构的唯一差异在于应力更新（压力--偏应力分裂 + 损伤折减），力态装配与运动方程求解完全沿用 NOSB 框架 \cite{Lai2018,ZhuZhao2021}。
+
+数值实现的关键问题是 NOSB 的零能模式失稳（第 7 章\ref{sec:zero-energy}节）与准脆性材料强动载下的数值稳定性。零能模式的处理与 8.4 节晶体塑性完全一致：把第 7 章的稳定化力态式\eqref{eq:stabilization-force}叠加到 JH-2 力态式\eqref{eq:jh2-force-state}上，即
+\begin{equation}
+  \underline{\mathbf{T}}\langle\boldsymbol{\xi}\rangle
+  =\omega(|\boldsymbol{\xi}|)\Bigl(J\boldsymbol{\sigma}\,\mathbf{F}^{-\mathrm{T}}\mathbf{K}^{-1}\boldsymbol{\xi}
+  +\gamma\,\underline{\mathbf{z}}\langle\boldsymbol{\xi}\rangle\Bigr)
+  \label{eq:jh2-stabilized-force}
+\end{equation}
+其中 $\gamma$ 为稳定化参数（按式\eqref{eq:stabilization-gamma}标定），$\underline{\mathbf{z}}\langle\boldsymbol{\xi}\rangle$ 为变形的非均匀部分（式\eqref{eq:nonuniform-part}）。式\eqref{eq:jh2-stabilized-force}与式\eqref{eq:cp-stabilized-force}结构相同，稳定性分析完全沿用 8.4 节：稳定化项不改变均匀变形下的经典响应，只对零能模式提供能量约束 \cite{Silling2017,GuZhangMadenciXia2019}。除零能模式外，准脆性材料冲击模拟还需关注三点。其一，冲击载荷下材料点可能经历大变形与高应变率，时间步长须满足显式积分的稳定性条件（第 9 章），且应变率由式\eqref{eq:jh2-velocity-gradient}的差分计算对时间步长敏感，$\Delta t$ 过大会导致 $\dot{\mathbf{F}}$ 的差分误差增大。其二，材料完全碎裂后（$D=1$ 且按断裂判据移除）会产生自由表面与碎片飞溅，需配合接触算法处理碎片的相互碰撞 \cite{Lai2018,ZhuZhao2021}。其三，$D=1$ 的完全碎裂材料点在计算中的处理方式需要明确约定。在 JH-2 框架中，$D=1$ 时材料仍以断裂强度面式\eqref{eq:jh2-fractured}继续承载（等效应力被限制在断裂强度以内），但此时材料的承载能力已大幅弱化；若该材料点进一步满足断裂判据（如局部损伤 $\varphi$ 超过临界值，或按第 11 章的键断裂准则判定其邻域键全部断裂），则该点从计算中移除——其力态置零、不再参与后续的力态装配与运动方程求解。这一"损伤退化（$D$ 折减强度）→ 断裂移除（键断裂准则）"的两阶段处理把 JH-2 的本构损伤与近场动力学的几何断裂衔接起来：前者控制材料点承载能力的渐进退化，后者控制裂纹的显式扩展，二者通过材料点状态（有效/失效）切换耦合 \cite{Lai2018,YangGuZhangXia2021}。
+
+JH-2 在近场动力学中的实现已有多个代表性工作。Lai 等 2018 年首先把修正的 JH-2 本构嵌入 NOSB，以有限变形框架模拟了陶瓷的边沿冲击（edge-on impact）与落球试验，验证了模型对陶瓷碎裂模式与损伤分布的预测能力，并指出零能模式稳定化对裂纹形态的重要性 \cite{Lai2018}。Zhu 与 Zhao 2021 年把 JH-2 嵌入更新拉格朗日形式的 NOSB，模拟了花岗岩中单孔爆破引起的裂纹萌生与扩展，通过与实验对比标定了岩石的 JH-2 参数，展示了 JH-2 在准脆性岩石动态断裂模拟中的适用性 \cite{ZhuZhao2021}。Yang 等 2021 年采用键关联（bond-associated）稳定化 NOSB 配合 JH-2 类损伤本构，模拟了混凝土在强冲击下的多重剥落（spalling），讨论了零能模式抑制对剥落层数预测的影响 \cite{YangGuZhangXia2021}。Can、Silling 与 Guven 2025 年进一步把 Johnson--Holmquist--Beissel（JHB）模型——JH-2 的扩展形式——引入近场动力学，模拟了陶瓷中的冲击波传播与高速侵彻，代表了 JH 系列模型与近场动力学结合的最新进展 \cite{CanSillingGuven2025}。这些工作表明：JH-2 作为压力相关损伤本构，与 NOSB 本构对应机制的"经典本构直接嵌入"范式高度契合，是近场动力学模拟装甲陶瓷、岩石爆破与混凝土冲击的主流选择。
+
+综上，JH-2 本构在 NOSB 中的实现把 8.1--8.4 节各向同性/晶体塑性本构扩展到了压力相关损伤材料的范畴：强度面式\eqref{eq:jh2-strength}取代 von Mises 准则式\eqref{eq:von-mises}，损伤演化式\eqref{eq:jh2-damage}以塑性应变（而非时间）为驱动量，压力模型式\eqref{eq:jh2-pressure}与体积膨胀式\eqref{eq:jh2-bulking}刻画静水压力与损伤的耦合。这使得近场动力学能够描述装甲陶瓷的侵彻碎裂、岩石的爆破断裂与混凝土的冲击剥落——这些是 8.1--8.4 节以金属为对象的各向同性本构无法触及的现象。JH-2 的损伤变量 $D$ 与第 6 章的局部损伤 $\varphi$（式\eqref{eq:local-damage}）是两类互补的损伤度量：$\varphi$ 基于近场域内断裂键的比例（几何损伤），$D$ 基于材料点的塑性应变累积（本构损伤）；在完整的多尺度模拟中，可先由 $D$ 判定材料点的本构退化，再由键的断裂准则（第 11 章）描述裂纹的几何扩展。8.6 节将统一回顾本章各本构在有限变形框架下的数值实现要点。
+
 \section{有限变形框架下的本构实现}
+
+本章 8.1--8.5 节依次建立了超弹性、黏弹性、黏塑性、蠕变、晶体弹塑性（晶体塑性）与 JH-2 六类本构模型，并逐一说明其在非常规态型（NOSB）框架中的嵌入方式。尽管这些本构的物理背景、内变量结构与应用对象各不相同，但它们在 NOSB 中的数值实现却遵循完全相同的模式——本构对应机制（第 7 章\ref{sec:correspondence}节）把任意经典本构转化为"以非局部变形梯度为输入、以力态为输出"的近场动力学本构，各类本构的差异被隔离在"点级本构调用"这一环节内。本节对本章各本构的有限变形实现作统一回顾，提炼这一统一模式，并讨论有限变形本构实现的若干关键问题。首先归纳本构对应框架下的统一实现模式，明确各本构在计算流程中的角色（\ref{sec:fd-unified}节）；进而讨论有限变形实现中的四个关键问题——客观性、历史依赖内变量的更新、切线刚度与零能模式，并说明各类本构的处理方式（\ref{sec:fd-key-issues}节）；最后给出各本构的适用性对比与工程选择指引（\ref{sec:fd-comparison}节），为后续章节的数值实现（第 9 章离散与时间积分、第 10 章边界条件、第 11 章断裂）奠定基础。
+
+\subsection{本构对应框架下的统一实现模式}\label{sec:fd-unified}
+
+本构对应机制（第 7 章\ref{sec:correspondence}节）的核心是：用非局部变形梯度式\eqref{eq:nonlocal-deformation-gradient}构造经典应变度量，调用经典本构得到应力，再经力态公式式\eqref{eq:nosb-force-state}构造键力。本章六类本构的嵌入都可归结为这一"三步模式"的实例，其差异仅在于"调用经典本构"这一中间环节的具体形式。为看清这一统一性，把本构调用抽象为输入--输出映射
+\begin{equation}
+  \boldsymbol{\sigma}(\mathbf{x},t)=\hat{\boldsymbol{\sigma}}\bigl(\mathbf{F}(\mathbf{x},t),\,\boldsymbol{\alpha}(\mathbf{x},t)\bigr)
+  \label{eq:fd-constitutive-map}
+\end{equation}
+其中 $\hat{\boldsymbol{\sigma}}$ 为经典本构的应力响应函数，$\mathbf{F}$ 为非局部变形梯度（式\eqref{eq:nonlocal-deformation-gradient}），$\boldsymbol{\alpha}$ 为材料点携带的内变量集合。式\eqref{eq:fd-constitutive-map}表明：本构对近场动力学的唯一接口是"由 $\mathbf{F}$ 与 $\boldsymbol{\alpha}$ 输出 $\boldsymbol{\sigma}$"，力态装配与运动方程求解完全独立于本构类型。内变量集合 $\boldsymbol{\alpha}$ 的取值空间随本构而异，可形式化地记为 $\boldsymbol{\alpha}\in\mathcal{A}$，其中 $\mathcal{A}$ 为内变量空间——对无历史本构（超弹性）$\mathcal{A}$ 退化为单点集（$\boldsymbol{\alpha}$ 恒为空，式\eqref{eq:fd-constitutive-map}退化为 $\hat{\boldsymbol{\sigma}}(\mathbf{F})$）；对标量内变量本构（黏弹性记忆向量 $\mathbf{h}^{n}$、蠕变与 JH-2 的损伤 $D$）$\mathcal{A}$ 为标量/向量空间；对张量内变量本构（黏塑性应变 $\boldsymbol{\varepsilon}^{vp}$、蠕变应变 $\boldsymbol{\varepsilon}^{c}$、晶体塑性 $\mathbf{F}^{\mathrm{p}}$）$\mathcal{A}$ 为二阶张量空间；对晶体塑性的滑移阻力 $g^{\alpha}$，$\mathcal{A}$ 为与滑移系数目相同的 $\mathbb{R}^{n_{\mathrm{slip}}}$ 空间。式\eqref{eq:fd-constitutive-map}的"当前状态驱动"性质是统一实现模式的前提：应力只依赖当前时刻的 $\mathbf{F}$ 与 $\boldsymbol{\alpha}$，不显式依赖变形历史——历史信息通过内变量的更新（8.6.2 节）携带，这使得显式时间积分（第 9 章）可逐时间步、逐材料点独立推进。各类本构在该抽象下的具体化列于表\ref{tab:fd-constitutive-summary}。
+
+\begin{table}[htbp]
+  \centering
+  \small
+  \caption{本章各本构在本构对应框架中的统一实现模式（$\mathbf{F}$ 为非局部变形梯度，$\boldsymbol{\alpha}$ 为内变量集合，输出为 Cauchy 应力 $\boldsymbol{\sigma}$ 或第一类 Piola--Kirchhoff 应力 $\mathbf{P}$，内变量更新均为显式格式）}
+  \label{tab:fd-constitutive-summary}
+  \begin{tabular}{p{2.6cm}p{4.4cm}p{4.0cm}p{1.9cm}p{2.0cm}}
+    \toprule
+    本构（节） & 应力响应函数 $\hat{\boldsymbol{\sigma}}$ & 内变量 $\boldsymbol{\alpha}$ & 输出应力 & 更新格式 \\
+    \midrule
+    超弹性（8.1） & $\mathbf{P}=\partial\Psi(\mathbf{F})/\partial\mathbf{F}$（式\eqref{eq:hyper-pk1}） & 无 & $\mathbf{P}$ & — \\
+    黏弹性（8.2） & 遗传积分式\eqref{eq:visco-integral} & 记忆向量 $\mathbf{h}^{n}$（式\eqref{eq:visco-recurrence}） & $\boldsymbol{\sigma}$ & 递推 \\
+    黏塑性（8.2） & Perzyna 流动式\eqref{eq:perzyna-vm} & 黏塑性应变 $\boldsymbol{\varepsilon}^{vp}$ & $\boldsymbol{\sigma}$ & 显式 \\
+    蠕变（8.3） & Norton/Liu--Murakami 式\eqref{eq:lm-creep} & 蠕变应变 $\boldsymbol{\varepsilon}^{c}$、损伤 $D$ & $\boldsymbol{\sigma}$ & 显式 \\
+    晶体塑性（8.4） & 滑移系分解式\eqref{eq:cp-cauchy-lattice} & $\mathbf{F}^{\mathrm{p}}$、滑移阻力 $g^{\alpha}$ & $\boldsymbol{\sigma}$ & 显式 Euler \\
+    JH-2（8.5） & 强度面插值式\eqref{eq:jh2-strength-full} & 损伤 $D$、压力 $P$ & $\boldsymbol{\sigma}$ & 显式/径向返回 \\
+    \bottomrule
+  \end{tabular}
+\end{table}
+
+表\ref{tab:fd-constitutive-summary}揭示了本章各本构的两个统一特征。其一，输出应力的转换路径统一：除超弹性直接输出第一类 Piola--Kirchhoff 应力 $\mathbf{P}$ 外，其余五类本构均输出 Cauchy 应力 $\boldsymbol{\sigma}$，再经 Piola 变换 $\mathbf{P}=J\boldsymbol{\sigma}\mathbf{F}^{-\mathrm{T}}$（第 7 章式\eqref{eq:piola-cauchy}）转成力态所需的 $\mathbf{P}$。这一"超弹性直接输出、率相关/损伤本构经 Piola 变换"的二分法与第 7 章\ref{sec:constitutive-embedding}节讨论的嵌入形式分类一致：超弹性以应变能密度为势（式\eqref{eq:hyper-force-state}直接由 $\partial\Psi/\partial\mathbf{F}$ 构造力态），而路径依赖本构以 Cauchy 应力为输出、经式\eqref{eq:force-state-cauchy}构造力态 \cite{Silling2007,Warren2009}。两类本构的力态构造可统一写为单一公式：把本构输出的应力（超弹性的 $\mathbf{P}=\partial\Psi/\partial\mathbf{F}$ 或其余本构经 Piola 变换的 $J\boldsymbol{\sigma}\mathbf{F}^{-\mathrm{T}}$）统一记为 $\bar{\mathbf{P}}(\mathbf{F},\boldsymbol{\alpha})$，代入力态定义式\eqref{eq:nosb-force-state}，得统一力态构造公式
+\begin{equation}
+  \underline{\mathbf{T}}\langle\boldsymbol{\xi}\rangle
+  =\omega(|\boldsymbol{\xi}|)\,\bar{\mathbf{P}}\bigl(\mathbf{F},\boldsymbol{\alpha}\bigr)\,\mathbf{K}^{-1}\boldsymbol{\xi},
+  \qquad
+  \bar{\mathbf{P}}=
+  \begin{cases}
+    \partial\Psi(\mathbf{F})/\partial\mathbf{F}, & \text{超弹性（势驱动）}\\
+    J\boldsymbol{\sigma}\mathbf{F}^{-\mathrm{T}}, & \text{率相关/损伤本构（应力驱动）}
+  \end{cases}
+  \label{eq:fd-force-state}
+\end{equation}
+其中 $J=\det\mathbf{F}$，$\mathbf{K}$ 为形状张量（式\eqref{eq:shape-tensor}）。式\eqref{eq:fd-force-state}的推导：两条分支分别由式\eqref{eq:hyper-force-state}（超弹性）与式\eqref{eq:force-state-cauchy}（Cauchy 应力嵌入）给出，两式共享相同的力态结构 $\underline{\mathbf{T}}\langle\boldsymbol{\xi}\rangle=\omega\,\bar{\mathbf{P}}\,\mathbf{K}^{-1}\boldsymbol{\xi}$，差异仅在 $\bar{\mathbf{P}}$ 的定义；对超弹性分支，$\bar{\mathbf{P}}=\partial\Psi/\partial\mathbf{F}$ 由式\eqref{eq:hyper-pk1}直接给出；对 Cauchy 应力分支，$\bar{\mathbf{P}}=J\boldsymbol{\sigma}\mathbf{F}^{-\mathrm{T}}$ 由 Piola 变换式\eqref{eq:piola-cauchy}给出，其中 $J\boldsymbol{\sigma}\mathbf{F}^{-\mathrm{T}}$ 与超弹性分支经 $\mathbf{P}=\mathbf{F}\mathbf{S}$（式\eqref{eq:hyper-pk2}）的关系相容（第 8.1 节超弹性框架）\cite{Silling2007,Warren2009}。式\eqref{eq:fd-force-state}是本章统一实现模式的核心公式：它表明无论本构类型如何，力态构造都归结为"由 $\mathbf{F}$ 与 $\boldsymbol{\alpha}$ 确定 $\bar{\mathbf{P}}$，再由 $\bar{\mathbf{P}}$ 经形状张量构造力态"，本构差异被完全隔离在 $\bar{\mathbf{P}}$ 的求值环节。其二，内变量结构随本构的物理复杂度递增：从无内变量（超弹性）到标量内变量（黏弹性的 $\mathbf{h}^{n}$、蠕变与 JH-2 的损伤 $D$），再到张量内变量（黏塑性与蠕变的应变、晶体塑性的 $\mathbf{F}^{\mathrm{p}}$）与向量族内变量（晶体塑性的 $g^{\alpha}$）。内变量的增加对应更高的本构复杂度与更丰富的历史信息，但都不改变式\eqref{eq:fd-constitutive-map}的接口形式与式\eqref{eq:fd-force-state}的力态结构。
+
+统一实现模式的具体计算流程可归纳为如下算法，其中时间步 $[t_{n},t_{n+1}]$ 内的每一步对全部材料点并行执行。算法的第四步（内变量更新）也可统一写为增量格式：本章所有携带内变量的本构（表\ref{tab:fd-constitutive-summary}除超弹性外）均以显式格式更新内变量，即内变量增量由当前状态显式确定
+\begin{equation}
+  \boldsymbol{\alpha}^{n+1}
+  =\boldsymbol{\alpha}^{n}+\Delta\boldsymbol{\alpha}\bigl(\mathbf{F}^{n},\boldsymbol{\sigma}^{n},\boldsymbol{\alpha}^{n},\Delta t\bigr)
+  \label{eq:fd-internal-update}
+\end{equation}
+其中 $\Delta\boldsymbol{\alpha}$ 为内变量增量函数，$\mathbf{F}^{n}$、$\boldsymbol{\sigma}^{n}$、$\boldsymbol{\alpha}^{n}$ 为第 $n$ 步的已知状态，$\Delta t$ 为时间步长。式\eqref{eq:fd-internal-update}的推导：把表\ref{tab:fd-constitutive-summary}的"更新格式"列展开——黏弹性记忆向量递推 $\mathbf{h}^{n}=\mathbf{e}^{n-1}+r\mathbf{h}^{n-1}$（式\eqref{eq:visco-recurrence}）是 $\Delta\boldsymbol{\alpha}=\mathbf{e}^{n-1}+r\boldsymbol{\alpha}^{n}-\boldsymbol{\alpha}^{n}$ 的简写；黏塑性应变 $\boldsymbol{\varepsilon}^{vp,n+1}=\boldsymbol{\varepsilon}^{vp,n}+\Delta\boldsymbol{\varepsilon}^{vp}$（式\eqref{eq:vp-explicit-update}后说明）与蠕变应变/损伤（式\eqref{eq:creep-update}、式\eqref{eq:creep-damage-update}）、JH-2 损伤（式\eqref{eq:jh2-damage-update}）均为 $\boldsymbol{\alpha}^{n+1}=\boldsymbol{\alpha}^{n}+\Delta\boldsymbol{\alpha}$ 的直接实例；晶体塑性的塑性变形梯度与滑移阻力（式\eqref{eq:cp-fp-update}、式\eqref{eq:cp-hardening-update}）是同一格式对张量/向量内变量的推广。式\eqref{eq:fd-internal-update}的"显式"性质（增量由当前状态确定、无迭代）是算法 8.1 可逐点并行推进的关键：若某本构采用隐式更新（需迭代求解内变量），则该步须单独处理，统一流程的并行性将受影响——这正是 8.6.2 节讨论的显式/隐式格式取舍问题的来源 \cite{Foster2010,SimoHughes1998}。
+
+\textbf{算法 8.1（NOSB 有限变形本构调用的统一流程）}
+\begin{enumerate}
+  \item 由当前构型计算非局部变形梯度 $\mathbf{F}^{n}$（式\eqref{eq:nonlocal-deformation-gradient}）与形状张量 $\mathbf{K}$（式\eqref{eq:shape-tensor}）；
+  \item 由 $\mathbf{F}^{n}$ 构造本构输入：应变度量（超弹性的 $\mathbf{C}$、率相关本构的变形率 $\mathbf{D}$、压力相关本构的 $\mu_{\mathrm{v}}$）与应变率 $\dot{\varepsilon}$（式\eqref{eq:jh2-equiv-strain-rate}）；
+  \item 调用本构 $\hat{\boldsymbol{\sigma}}$（式\eqref{eq:fd-constitutive-map}），由 $\mathbf{F}^{n}$ 与内变量 $\boldsymbol{\alpha}^{n}$ 计算应力：超弹性直接得 $\mathbf{P}$（式\eqref{eq:hyper-pk1}），其余本构得 $\boldsymbol{\sigma}$ 后经式\eqref{eq:piola-cauchy}转 $\mathbf{P}$；
+  \item 更新内变量 $\boldsymbol{\alpha}^{n}\to\boldsymbol{\alpha}^{n+1}$：黏弹性递推式\eqref{eq:visco-recurrence}、黏塑性式\eqref{eq:vp-explicit-update}、蠕变式\eqref{eq:creep-update}--\eqref{eq:creep-damage-update}、晶体塑性式\eqref{eq:cp-fp-update}--\eqref{eq:cp-hardening-update}、JH-2 式\eqref{eq:jh2-plastic-increment}--\eqref{eq:jh2-damage-update}；
+  \item 构造力态 $\underline{\mathbf{T}}\langle\boldsymbol{\xi}\rangle=\omega\,\mathbf{P}\,\mathbf{K}^{-1}\boldsymbol{\xi}$（式\eqref{eq:nosb-force-state}），含稳定化项（式\eqref{eq:jh2-stabilized-force}）后代入态型运动方程（第 7 章）；
+  \item 求解加速度并推进位移（时间积分见第 9 章），进入下一时间步。
+\end{enumerate}
+
+算法 8.1 的每一步在 8.1--8.5 节的各嵌入小节中均已分别给出（\ref{sec:hyper-nosb}、\ref{sec:visco-nosb}、\ref{sec:viscoplastic}、\ref{sec:creep-nosb}、\ref{sec:cp-nosb}、\ref{sec:jh2-nosb}节），此处把其共性提炼为统一流程。值得强调的是，这一流程的成立依赖第 7 章本构对应的三个性质。其一，非局部变形梯度式\eqref{eq:nonlocal-deformation-gradient}是当前构型的显式函数，不携带历史，历史信息全部由材料点内变量 $\boldsymbol{\alpha}$ 承载——这保证了第 2、3 步的"当前状态驱动"性质，使显式时间积分（第 9 章）可逐点推进。其二，力态构造式\eqref{eq:nosb-force-state}对本构类型透明，各类本构的力态差异仅体现在 $\bar{\mathbf{P}}$ 的取值上（式\eqref{eq:fd-force-state}）。其三，本构调用具有可组合性（composability）：由于本构以式\eqref{eq:fd-constitutive-map}的映射形式接入、内变量以式\eqref{eq:fd-internal-update}的增量格式更新，多个本构可以组合成单一"组合本构"而无需改动算法框架——组合本构的应力响应函数 $\hat{\boldsymbol{\sigma}}$ 取各组成本构响应的叠加或耦合（如黏弹性+黏塑性、蠕变+塑性、JH-2+损伤），内变量集合取各组成内变量的并集，其更新仍按式\eqref{eq:fd-internal-update}逐分量执行。这一可组合性是 NOSB 本构对应机制相对其他近场动力学框架（键型、OSB，需为每个本构重写标量力态）的核心优势，也是 8.6.3 节讨论的组合本构应用的数学基础 \cite{Silling2007,Javili2019,Hashim2020}。
+
+\subsection{有限变形实现的关键问题}\label{sec:fd-key-issues}
+
+统一模式给出的是计算流程框架，但各类本构在有限变形下的实际实现还须处理四个关键问题：客观性、历史依赖内变量的更新、切线刚度与零能模式。这些问题的处理方式随本构类型而异，是本章各嵌入小节数值要点的核心。
+
+\textbf{客观性（objectivity）。}有限变形本构必须满足材料客观性——本构响应不依赖观察者的刚体转动。本章六类本构的客观性处理分三种情形。其一，超弹性本构式\eqref{eq:hyper-objectivity}以右 Cauchy--Green 张量 $\mathbf{C}=\mathbf{F}^{\mathrm{T}}\mathbf{F}$ 为自变量，$\mathbf{C}$ 在刚体转动下不变（第 8.1 节推导），故客观性自动满足，无需额外处理 \cite{Ogden1997}。其二，以 Cauchy 应力为输出的率形式本构（黏塑性、蠕变、晶体塑性）在有限变形下须采用客观应力率或共转框架：第 7 章式\eqref{eq:unrotated-frame}--\eqref{eq:rotate-back}的未旋转构型方法把变形率与应力旋转到随材料转动的坐标系中积分，再旋转回当前构型，与 Green--Naghdi 客观率等价（第 7 章式\eqref{eq:objective-rate}）\cite{Warren2009,FlanaganTaylor1987}。本章 8.2--8.4 节的率形式本构均沿用这一框架，其中晶体塑性还通过晶格坐标系映射（式\eqref{eq:cp-lattice-deformation-gradient}）把本构固定在随晶格转动的参考系中，客观性由晶格旋转显式进入弹性变形梯度（式\eqref{eq:cp-lattice-rotation}）保证 \cite{SunSundararaghavan2014}。其三，JH-2 本构以等效应变率（标量）为输入、以等效应力幅值为强度判据，强度面式\eqref{eq:jh2-strength}不涉及应力/应变张量的方向信息，客观性对偏应力的方向更新无约束——但 JH-2 输出的偏应力张量 $\mathbf{s}$ 本身仍需按客观率更新（否则偏应力方向会随刚体转动漂移）。工程实现中通常把 JH-2 的偏应力更新与黏塑性一样置于未旋转构型中（第 7 章式\eqref{eq:unrotated-frame}），或采用简化处理：由于 JH-2 每步都从试探应力径向返回到强度面，径向返回本身沿当前偏应力方向，客观性的误差主要来自试探步的刚体转动，需用共转框架校正 \cite{Lai2018}。
+
+为把三类处理统一到同一数学框架，引入客观应力率的一般形式。率形式本构的应力演化可写为物质导数与客观率的关系
+\begin{equation}
+  \dot{\boldsymbol{\sigma}}
+  =\boldsymbol{\sigma}^{\nabla}+\boldsymbol{\Omega}\boldsymbol{\sigma}-\boldsymbol{\sigma}\boldsymbol{\Omega},
+  \qquad
+  \boldsymbol{\sigma}^{\nabla}=\mathbf{C}\bigl(\boldsymbol{\sigma},\boldsymbol{\alpha}\bigr):\mathbf{D}
+  \label{eq:fd-objectivity}
+\end{equation}
+其中 $\boldsymbol{\sigma}^{\nabla}$ 为客观应力率（本构响应的率），$\boldsymbol{\Omega}$ 为客观率对应的旋转张量（对 Green--Naghdi 率为 $\boldsymbol{\Omega}=\dot{\mathbf{R}}\mathbf{R}^{\mathrm{T}}$，$\mathbf{R}$ 为极分解转动张量；对 Jaumann 率为自旋 $\boldsymbol{\Omega}=\mathbf{W}$，第 7 章式\eqref{eq:rate-kinematics}），$\mathbf{C}(\boldsymbol{\sigma},\boldsymbol{\alpha})$ 为率形式切线模量。式\eqref{eq:fd-objectivity}的推导：把客观率的定义 $\boldsymbol{\sigma}^{\nabla}=\dot{\boldsymbol{\sigma}}-\boldsymbol{\Omega}\boldsymbol{\sigma}+\boldsymbol{\sigma}\boldsymbol{\Omega}$（即 $\dot{\boldsymbol{\sigma}}$ 减去刚体转动的贡献）移项即得；$\boldsymbol{\Omega}$ 对 Green--Naghdi 率取极分解转动的变化率（第 7 章式\eqref{eq:objective-rate}），对 Jaumann 率取自旋（第 7 章式\eqref{eq:rate-kinematics}），两者的选择不影响本构的物理响应，只影响率积分的数值路径。式\eqref{eq:fd-objectivity}统一了本章三类客观性处理：超弹性本构不出现率形式（$\mathbf{C}$ 由 $\partial^{2}\Psi/\partial\mathbf{C}^{2}$ 直接给出，见 8.6.2 节切线刚度讨论，客观性由 $\mathbf{C}$ 的转动不变性保证）；率形式本构按式\eqref{eq:fd-objectivity}积分（$\boldsymbol{\Omega}$ 取 Green--Naghdi 转动）；JH-2 的标量判据情形下 $\mathbf{C}$ 的作用退化为对等效应力幅值的约束，偏应力方向更新仍由式\eqref{eq:fd-objectivity}控制 \cite{FlanaganTaylor1987,Warren2009}。式\eqref{eq:fd-objectivity}还揭示了客观性的数值含义：刚体转动下 $\mathbf{D}=\mathbf{0}$（纯转动不产生变形率），由式\eqref{eq:fd-objectivity}得 $\boldsymbol{\sigma}^{\nabla}=\mathbf{0}$、$\dot{\boldsymbol{\sigma}}=\boldsymbol{\Omega}\boldsymbol{\sigma}-\boldsymbol{\sigma}\boldsymbol{\Omega}$，应力随转动按 $\boldsymbol{\sigma}(t)=\mathbf{R}(t)\boldsymbol{\sigma}(0)\mathbf{R}(t)^{\mathrm{T}}$ 客观变换，不产生虚假的应力增量——这一性质是率形式本构数值实现正确性的判据。
+
+\textbf{历史依赖内变量的更新。}表\ref{tab:fd-constitutive-summary}表明，除超弹性外本章各本构均携带内变量，其更新方式是区分各本构数值实现的本质特征。内变量更新可归为两类格式。其一，递推/显式格式——内变量增量由当前状态显式给出，无需迭代，即式\eqref{eq:fd-internal-update}的 $\boldsymbol{\alpha}^{n+1}=\boldsymbol{\alpha}^{n}+\Delta\boldsymbol{\alpha}(\mathbf{F}^{n},\boldsymbol{\sigma}^{n},\boldsymbol{\alpha}^{n},\Delta t)$，包括黏弹性的记忆向量递推式\eqref{eq:visco-recurrence}（把 $O(n)$ 存储的全历史积分降为 $O(1)$ 的单向量更新）、黏塑性的显式流动式\eqref{eq:vp-explicit-update}、蠕变的显式更新式\eqref{eq:creep-update}--\eqref{eq:creep-damage-update}、晶体塑性的显式 Euler 更新式\eqref{eq:cp-fp-update}--\eqref{eq:cp-hardening-update}与 JH-2 的径向返回式\eqref{eq:jh2-plastic-increment}--\eqref{eq:jh2-damage-update}。其二，返回映射/隐式格式——率无关塑性（第 6 章）需迭代求解塑性乘子，其一般形式为"试探状态 + 塑性修正"的隐式方程
+\begin{equation}
+  \mathbf{r}\bigl(\Delta\boldsymbol{\alpha}^{n+1}\bigr)
+  =\mathbf{0},\qquad
+  \Delta\boldsymbol{\alpha}^{n+1}\ \text{由}\ 
+  f\bigl(\boldsymbol{\sigma}(\mathbf{F}^{n+1},\boldsymbol{\alpha}^{n}+\Delta\boldsymbol{\alpha}^{n+1})\bigr)=0
+  \ \text{确定}
+  \label{eq:fd-implicit-update}
+\end{equation}
+其中 $f$ 为屈服函数（或强度面约束，如第 6 章 von Mises 屈服函数、8.5 节 JH-2 强度面），$\mathbf{r}$ 为内变量更新方程（残差），$\Delta\boldsymbol{\alpha}^{n+1}$ 为待求的隐式内变量增量。式\eqref{eq:fd-implicit-update}的推导：率无关塑性的内变量更新要求（i）应力满足屈服条件 $f(\boldsymbol{\sigma})=0$，（ii）内变量沿塑性流动方向更新，两者构成关于 $\Delta\boldsymbol{\alpha}^{n+1}$ 的方程组，即式\eqref{eq:fd-implicit-update}的 $\mathbf{r}=\mathbf{0}$；该方程组通常用 Newton 迭代求解。黏塑性以黏性正则化避免了这一迭代（8.2.3 节：流动率由式\eqref{eq:perzyna-vm}直接给出，不存在"求满足屈服条件的塑性乘子"的隐式方程），JH-2 的径向返回则是率无关返回映射的简化——其强度面约束 $f=\sigma^{n}_{\mathrm{eq}}-\sigma^{n}=0$ 退化为标量方程，由式\eqref{eq:jh2-plastic-increment}显式解出 $\Delta\varepsilon^{\mathrm{p}}$，无需迭代（8.5.3 节）。两类格式的选用直接影响计算效率与稳定性：显式格式每步无迭代但受稳定性约束（黏塑性的 $\gamma\Delta t$ 约束、JH-2 径向返回的 $3G$ 系数），隐式格式无条件稳定但每步需 Newton 迭代与切线刚度（式\eqref{eq:fd-implicit-update}对 $\Delta\boldsymbol{\alpha}^{n+1}$ 的 Jacobian 即算法切线）\cite{Foster2010,SimoHughes1998}。内变量更新的另一个共性问题是非负性与单调性：损伤变量 $D$（蠕变与 JH-2）必须满足 $D\ge0$ 单调累积（式\eqref{eq:jh2-damage-rate}），晶体塑性的塑性变形梯度须满足体积不变 $\det\mathbf{F}^{\mathrm{p}}=1$（式\eqref{eq:cp-det-fp}），这些约束在数值实现中须显式执行，否则内变量漂移会累积误差。
+
+\textbf{切线刚度。}隐式求解（第 7 章\ref{sec:nl-tangent}节）与拟静力分析需要本构的切线刚度。第 7 章式\eqref{eq:tangent-nosb}给出了 NOSB 切线刚度的一般形式：族级切线矩阵由材料切线 $\mathbf{A}=\partial\mathbf{P}/\partial\mathbf{F}$ 与运动学部分（式\eqref{eq:kinematic-tangent}）的乘积构成。本章各本构的材料切线 $\mathbf{A}$ 随本构类型不同：超弹性切线由应变能密度的二阶导数给出（式\eqref{eq:hyper-tangent-full}，$\mathbf{A}=\mathbb{C}(\mathbf{F})$），是闭式表达式；率相关与损伤本构的切线则须对本构的时间离散格式求导——黏塑性切线由 Perzyna 流动式的增量线性化得到，蠕变切线含损伤耦合项，晶体塑性切线由滑移率幂律的线性化给出（通常简化为弹性切线或一致性切线），JH-2 切线由强度面径向返回的一致性条件确定。对采用隐式/返回映射更新的本构（式\eqref{eq:fd-implicit-update}），其切线必须与离散格式一致，即所谓一致性切线（consistent tangent）或算法切线（algorithmic tangent）：它是离散应力更新对离散应变的导数，而非连续本构的材料切线
+\begin{equation}
+  \mathbf{C}^{\mathrm{alg}}
+  =\frac{\partial\boldsymbol{\sigma}^{n+1}}{\partial\boldsymbol{\varepsilon}^{n+1}}
+  \Bigr|_{\boldsymbol{\alpha}^{n+1}\ \text{满足式\eqref{eq:fd-implicit-update}}}
+  \label{eq:fd-consistent-tangent}
+\end{equation}
+其中 $\boldsymbol{\sigma}^{n+1}$ 为第 $n+1$ 步的离散应力更新，$\boldsymbol{\varepsilon}^{n+1}$ 为第 $n+1$ 步的应变。式\eqref{eq:fd-consistent-tangent}的定义表明：一致性切线把内变量更新式\eqref{eq:fd-implicit-update}的约束嵌入导数计算——对式\eqref{eq:fd-implicit-update}的解 $\Delta\boldsymbol{\alpha}^{n+1}(\boldsymbol{\varepsilon}^{n+1})$ 应用隐函数定理，$\mathbf{C}^{\mathrm{alg}}$ 含塑性修正项 $-\mathbf{C}^{e}:\partial\Delta\boldsymbol{\alpha}^{n+1}/\partial\boldsymbol{\varepsilon}^{n+1}$ 的贡献，与连续切线（不含该修正）不同。以 J2 塑性径向返回为例，一致性切线为 $\mathbf{C}^{\mathrm{alg}}=2G\bigl[\mathbf{I}^{\mathrm{dev}}-\tfrac{3}{2}\bigl(1-\tfrac{\sigma_{y}}{\sigma_{\mathrm{eq,trial}}}\bigr)\mathbf{n}\otimes\mathbf{n}\bigr]$（$\mathbf{n}$ 为流动方向），其沿流动方向的分量小于弹性剪切模量 $2G$，反映了塑性流动引起的应力增量软化；该式在塑性区给出收敛二次率的 Newton 迭代（隐式求解收敛速度的关键），若改用连续切线则退化为线性收敛 \cite{SimoHughes1998,Breitenfeld2014}。工程实现中，率相关与损伤本构的闭式一致性切线推导繁琐，常用数值微分（有限差分）近似
+\begin{equation}
+  \bigl(\mathbf{C}^{\mathrm{alg}}\bigr)_{ij}
+  \approx\frac{\boldsymbol{\sigma}^{n+1}\bigl(\boldsymbol{\varepsilon}^{n+1}+h\,\mathbf{e}_{i}\otimes_{s}\mathbf{e}_{j}\bigr)
+  -\boldsymbol{\sigma}^{n+1}\bigl(\boldsymbol{\varepsilon}^{n+1}-h\,\mathbf{e}_{i}\otimes_{s}\mathbf{e}_{j}\bigr)}{2h}
+  \label{eq:fd-numerical-tangent}
+\end{equation}
+其中 $h$ 为扰动步长（通常取 $h\sim10^{-6}\|\boldsymbol{\varepsilon}\|$），$\mathbf{e}_{i}\otimes_{s}\mathbf{e}_{j}$ 为对称化单位基张量。式\eqref{eq:fd-numerical-tangent}的推导：这是导数的中心差分近似，每列需两次本构求值（扰动正负方向各一次）；对 $n_{\mathrm{dim}}$ 维问题共需 $n_{\mathrm{dim}}(n_{\mathrm{dim}}+1)/2$ 次扰动（利用对称性），代价随维度平方增长，但免去闭式推导。或直接采用弹性切线 $\mathbf{C}^{\mathrm{alg}}\approx\mathbf{C}^{e}$ 加速收敛，再以收敛性检验补偿 \cite{Breitenfeld2014,Hashim2020}。切线刚度在显式时间积分（第 9 章）中并非必需，但在隐式求解与稳定性分析中不可或缺。
+
+\textbf{零能模式。}NOSB 对应模型的零能模式失稳（第 7 章\ref{sec:zero-energy}节）是本章各本构共有的数值问题，源于非局部变形梯度式\eqref{eq:nonlocal-deformation-gradient}对近场域内高频变形模式不敏感。处理方式在本章各本构中一致：在力态中叠加稳定化项（式\eqref{eq:jh2-stabilized-force}，晶体塑性见式\eqref{eq:cp-stabilized-force}，一般形式见第 7 章式\eqref{eq:stabilization-force}），其中稳定化参数 $\gamma$ 按式\eqref{eq:stabilization-gamma}标定。零能模式与稳定化项的能量关系可定量刻画。零能模式的数学特征是变形梯度不变而键变形改变，即 $\delta\mathbf{F}=\mathbf{0}$ 但 $\delta\underline{\mathbf{z}}\neq\mathbf{0}$（$\underline{\mathbf{z}}\langle\boldsymbol{\xi}\rangle=\underline{\mathbf{Y}}\langle\boldsymbol{\xi}\rangle-\mathbf{F}\boldsymbol{\xi}$ 为变形的非均匀部分，式\eqref{eq:nonuniform-part}）。稳定化力态式\eqref{eq:stabilization-force}对应的稳定化能量密度为
+\begin{equation}
+  W_{\mathrm{stab}}(\mathbf{x})
+  =\frac{\gamma}{2}\int_{H_{\mathbf{x}}}\omega(|\boldsymbol{\xi}|)\,
+  \underline{\mathbf{z}}\langle\boldsymbol{\xi}\rangle\cdot
+  \underline{\mathbf{z}}\langle\boldsymbol{\xi}\rangle\,dV_{\mathbf{x}'}
+  \label{eq:fd-zero-energy-energy}
+\end{equation}
+其中 $\gamma$ 为稳定化参数（式\eqref{eq:stabilization-gamma}）。式\eqref{eq:fd-zero-energy-energy}的推导：稳定化力态 $\underline{\mathbf{T}}_{\mathrm{stab}}\langle\boldsymbol{\xi}\rangle=\gamma\omega\,\underline{\mathbf{z}}\langle\boldsymbol{\xi}\rangle$（式\eqref{eq:stabilization-force}）对应的能量密度由其与变形态的功共轭积分给出 $W_{\mathrm{stab}}=\tfrac{1}{2}\int_{H_{\mathbf{x}}}\underline{\mathbf{T}}_{\mathrm{stab}}\langle\boldsymbol{\xi}\rangle\cdot\underline{\mathbf{z}}\langle\boldsymbol{\xi}\rangle\,dV_{\mathbf{x}'}$，代入力态表达式并利用 $\underline{\mathbf{z}}$ 与变形梯度的正交性（式\eqref{eq:z-orthogonality}）即得式\eqref{eq:fd-zero-energy-energy}（$\tfrac{1}{2}$ 因子来自功共轭对）。式\eqref{eq:fd-zero-energy-energy}的性质直接解释了稳定化机制：对零能模式（$\underline{\mathbf{z}}\neq\mathbf{0}$），$W_{\mathrm{stab}}>0$，稳定化能量提供正的能量贡献，约束零能模式的增长（第 7 章式\eqref{eq:zero-energy-stability-condition}）；对均匀变形（$\underline{\mathbf{z}}=\mathbf{0}$），$W_{\mathrm{stab}}=0$，稳定化项不改变均匀变形下的经典响应。零能模式的本构相关性也可由此定量理解：稳定化能量 $W_{\mathrm{stab}}$ 与经典响应能量 $W_{\mathrm{cl}}=\Psi(\mathbf{F})$ 的比值 $\gamma W_{\mathrm{stab}}/W_{\mathrm{cl}}$ 度量稳定化的相对强度——对超弹性与黏弹性这类"强本构"（$W_{\mathrm{cl}}$ 随 $\mathbf{F}$ 快速变化），经典响应本身对变形梯度敏感，零能模式受本构响应的自然阻尼较强，所需 $\gamma$ 较小；对晶体塑性与 JH-2 这类含强度面限制的本构（等效应力被强度面截断，$W_{\mathrm{cl}}$ 的梯度在截断处不连续），变形梯度的高频涨落不易被本构响应阻尼，零能模式更显著，需较大 $\gamma$ \cite{Silling2017,GuZhangMadenciXia2019}。这一差异在 8.4.3 与 8.5.3 节的实现中均有体现。
+
+\subsection{各本构的适用性对比与选择}\label{sec:fd-comparison}
+
+本章六类本构覆盖了从弹性到损伤的完整谱系，工程应用中须根据材料类型、载荷特征与关注响应选择适当的本构。表\ref{tab:fd-comparison}从适用材料、载荷特征、内变量复杂度、数值实现成本与典型应用场景五个维度对比本章各本构。
+
+\begin{table}[htbp]
+  \centering
+  \small
+  \caption{本章各本构的适用性对比}
+  \label{tab:fd-comparison}
+  \begin{tabular}{p{2.2cm}p{2.4cm}p{2.5cm}p{2.5cm}p{2.2cm}p{2.8cm}}
+    \toprule
+    本构 & 适用材料 & 载荷特征 & 时间尺度/应变率 & 内变量/实现成本 & 典型应用场景 \\
+    \midrule
+    超弹性 & 橡胶、生物软组织 & 有限变形、弹性 & 率无关，不限 & 无内变量，成本最低 & 大变形弹性、密封、软材料 \\
+    黏弹性 & 聚合物、沥青、生物组织 & 时间依赖、加载/卸载滞回 & 松弛时间量级（$10^{-2}\sim10^{2}$ s） & 记忆向量 $\mathbf{h}^{n}$，低 & 阻尼、蠕变回弹、周期加载 \\
+    黏塑性 & 金属（率相关）、焊料 & 高应变率、动态加载 & $10^{-4}\sim10^{6}~\mathrm{s}^{-1}$ & 黏塑性应变，低 & 冲击、高速成形、动态韧性 \\
+    蠕变 & 高温金属、陶瓷热端件 & 长期恒定载荷、高温 & $10^{3}\sim10^{8}$ s（长期） & 蠕变应变、损伤 $D$，中 & 高温结构寿命评估 \\
+    晶体塑性 & 金属多晶、单晶 & 各向异性、织构演化 & 率相关（幂律）或率无关 & $\mathbf{F}^{\mathrm{p}}$、$g^{\alpha}$，高 & 织构预测、微结构模拟 \\
+    JH-2 & 陶瓷、岩石、混凝土 & 强冲击、高压、高应变率 & $10^{3}\sim10^{7}~\mathrm{s}^{-1}$ & 损伤 $D$、压力 $P$，中 & 装甲侵彻、爆破、冲击碎裂 \\
+    \bottomrule
+  \end{tabular}
+\end{table}
+
+表\ref{tab:fd-comparison}的对比揭示了本构选择的三条原则。其一，按材料类型与载荷特征匹配：对经历大弹性变形的橡胶类材料选超弹性；对时间依赖响应的聚合物与高温蠕变分别选黏弹性与蠕变；对动态载荷下的金属选黏塑性（率相关）或晶体塑性（需描述各向异性）；对强冲击下的陶瓷岩石选 JH-2。其二，按关注响应的尺度平衡复杂度：若只关心宏观应力--应变响应，各向同性的超弹性、黏塑性或 JH-2 即可满足；若需描述织构演化、微尺度剪切带等微结构相关现象，必须采用携带微结构内变量的晶体塑性，即使其实现成本最高 \cite{Roters2010}。其三，考虑与断裂模拟的衔接：损伤类本构（蠕变、JH-2）自带损伤变量，可与第 11 章的断裂判据直接衔接（8.5.3 节讨论的两阶段处理）；非损伤类本构（超弹性、黏弹性、黏塑性、晶体塑性）的断裂须由键断裂准则（第 6 章临界伸长率、第 11 章）独立判定，损伤变量与本构强度退化无关。
+
+除三条原则外，本构选择还可遵循"层次递进"（hierarchical progression）的工程决策逻辑：从最简本构出发，仅在必要处逐级增加复杂度。具体地，对给定材料与载荷，先问三个递进问题——（i）是否需要有限变形描述？（否→线弹性/小变形塑性；是→超弹性或有限变形塑性）；（ii）材料响应是否时间相关？（否→弹性或率无关塑性；是→黏弹性/黏塑性/蠕变，按时间尺度选择）；（iii）是否需描述微结构或损伤？（是→晶体塑性或损伤类本构）。这一决策树把表\ref{tab:fd-comparison}的六类本构组织为从"弹性基线"到"最复杂微结构本构"的递增谱系：超弹性是基线，黏弹性与黏塑性在时间维度扩展，蠕变在长期时间尺度扩展，晶体塑性在微结构维度扩展，JH-2 在压力-损伤维度扩展。层次递进原则的工程意义在于：每一级增加的本构功能都有明确的应用需求对应，避免为不需要的特征付出实现成本（如只关心宏观响应的金属构件不必采用晶体塑性，只做短时冲击模拟不必引入蠕变）。这一逻辑与 8.6.2 节讨论的实现成本（内变量复杂度、切线刚度、零能模式处理）直接关联：本构越复杂，实现成本越高，只有在需求明确时才值得采用。
+
+值得指出的是，本章各本构并非彼此排斥，实际工程中常需组合使用。典型组合包括：黏弹性与黏塑性组合（统一考虑率相关弹塑性响应）、蠕变与塑性组合（高温下塑性变形与蠕变共存）、JH-2 与损伤型本构的耦合（准脆性材料的拉压不对称与碎裂）。这些组合在近场动力学框架中的实现仍遵循算法 8.1 的统一流程。组合本构的数学结构可形式化描述：设 $m$ 个组成本构的应力响应函数为 $\hat{\boldsymbol{\sigma}}_{(k)}$（$k=1,\ldots,m$），组合方式分为并联（应力叠加）与串联（应变分配）两类，其应力响应可统一写为
+\begin{equation}
+  \hat{\boldsymbol{\sigma}}_{\mathrm{comb}}\bigl(\mathbf{F},\boldsymbol{\alpha}_{\mathrm{comb}}\bigr)
+  =
+  \begin{cases}
+    \displaystyle\sum_{k=1}^{m}\hat{\boldsymbol{\sigma}}_{(k)}\bigl(\mathbf{F},\boldsymbol{\alpha}_{(k)}\bigr), & \text{并联（应力叠加）}\\
+    \hat{\boldsymbol{\sigma}}_{(1)}\bigl(\mathbf{F}_{(1)},\boldsymbol{\alpha}_{(1)}\bigr)
+    \quad\text{且}\quad
+    \mathbf{F}=\prod_{k=1}^{m}\mathbf{F}_{(k)}, & \text{串联（变形梯度分配）}
+  \end{cases}
+  \label{eq:fd-combined}
+\end{equation}
+其中 $\boldsymbol{\alpha}_{\mathrm{comb}}=(\boldsymbol{\alpha}_{(1)},\ldots,\boldsymbol{\alpha}_{(m)})$ 为组合内变量集合（各组成本构内变量的并集），$\mathbf{F}_{(k)}$ 为串联情形下分配给第 $k$ 个组成本构的变形梯度（$\mathbf{F}_{(1)}$ 为串联链中确定应力环节的变形梯度，如晶体塑性弹性-塑性分解中的弹性部分 $\mathbf{F}^{\mathrm{e}}$），$\boldsymbol{\varepsilon}_{(1)}$ 为小变形情形下应变分配后的应变输入。式\eqref{eq:fd-combined}的推导：并联组合（如黏弹性+黏塑性）假设各组成本构承受相同的变形、应力叠加，即 $\boldsymbol{\sigma}_{\mathrm{comb}}=\sum_{k}\boldsymbol{\sigma}_{(k)}$，代入式\eqref{eq:fd-constitutive-map}即得第一分支；串联组合（如晶体塑性的弹性-塑性乘法分解式\eqref{eq:cp-f-decomp}、蠕变+塑性的应变加法分解）假设总变形梯度分解为各组成变形梯度的乘积（有限变形，$\mathbf{F}=\mathbf{F}^{\mathrm{e}}\mathbf{F}^{\mathrm{p}}$）或总应变为各组成应变之和（小变形），应力由串联链中确定应力环节（弹性环节）的变形梯度/应变确定，即得第二分支。组合内变量的更新仍按式\eqref{eq:fd-internal-update}逐分量执行
+\begin{equation}
+  \boldsymbol{\alpha}_{(k)}^{n+1}
+  =\boldsymbol{\alpha}_{(k)}^{n}+\Delta\boldsymbol{\alpha}_{(k)}
+  \bigl(\mathbf{F}^{n},\boldsymbol{\sigma}^{n},\boldsymbol{\alpha}_{(k)}^{n},\Delta t\bigr),
+  \qquad k=1,\ldots,m
+  \label{eq:fd-combined-internal}
+\end{equation}
+式\eqref{eq:fd-combined-internal}表明组合本构的内变量更新是各组分更新的独立并行执行——各组成本构的内变量互不干扰，仅通过共享的应力 $\boldsymbol{\sigma}^{n}$ 与变形梯度 $\mathbf{F}^{n}$ 耦合。式\eqref{eq:fd-combined}与式\eqref{eq:fd-combined-internal}共同说明：组合本构在 NOSB 中的实现仅需把式\eqref{eq:fd-constitutive-map}的本构响应函数 $\hat{\boldsymbol{\sigma}}$ 替换为 $\hat{\boldsymbol{\sigma}}_{\mathrm{comb}}$，并把内变量集合 $\boldsymbol{\alpha}$ 扩展为 $\boldsymbol{\alpha}_{\mathrm{comb}}$，算法 8.1 的其余步骤（变形梯度计算、力态构造、运动方程推进）完全不变——这是 NOSB 本构对应机制相对其他近场动力学框架（键型、OSB，需为每个本构重写标量力态）的核心优势 \cite{Javili2019,Hashim2020}。以黏弹性+黏塑性并联组合为例，$\hat{\boldsymbol{\sigma}}_{\mathrm{comb}}=\hat{\boldsymbol{\sigma}}_{\mathrm{ve}}+\hat{\boldsymbol{\sigma}}_{\mathrm{vp}}$（式\eqref{eq:fd-combined}第一分支），内变量 $\boldsymbol{\alpha}_{\mathrm{comb}}=(\mathbf{h}^{n},\boldsymbol{\varepsilon}^{vp})$（式\eqref{eq:fd-combined-internal}），两组分的更新（式\eqref{eq:visco-recurrence}、式\eqref{eq:vp-explicit-update}）独立执行，总应力为两者之和——这一"并联叠加、内变量独立"的结构使得组合本构的数值实现与单一本构同样简单，是工程中处理多机制耦合（率相关+时间依赖、塑性+损伤）的通用范式。
+
+至此，本章从第 6、7 章建立的近场动力学理论出发，系统建立了六类经典本构在 NOSB 框架中的有限变形实现：超弹性（8.1 节）建立了本构对应的原型，黏弹性与黏塑性（8.2 节）、蠕变（8.3 节）把实现扩展到历史依赖本构并确立了"点级内变量更新 + 经典本构调用 + 力态装配"的统一模式，晶体塑性（8.4 节）进一步承载微结构内变量，JH-2（8.5 节）覆盖压力相关损伤材料，8.6 节则把六类本构统一到本构对应框架之下。这一体系的建立使近场动力学能够描述从弹性、黏弹塑性、蠕变损伤到晶体塑性与冲击碎裂的广阔材料行为谱系，为后续章节的数值实现奠定了基础：第 9 章将讨论本构调用所依赖的空间离散与时间积分方法——算法 8.1 第 1 步的非局部变形梯度式\eqref{eq:nonlocal-deformation-gradient}需在第 9 章的离散格式下求值，第 6 步的时间积分（显式 Velocity--Verlet 等）也在第 9 章给出；第 10 章讨论边界条件的施加，其中本构输出的力态式\eqref{eq:fd-force-state}是边界层节点受力计算的基础；第 11 章则在损伤类本构（蠕变、JH-2）的基础上系统建立裂纹萌生与扩展的模拟方法——损伤变量 $D$ 与局部损伤 $\varphi$（式\eqref{eq:local-damage}）的衔接（8.5.3 节两阶段处理）将在第 11 章结合断裂算例完整展开。

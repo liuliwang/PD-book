@@ -168,4 +168,13 @@
   $\tilde{\mathbf{F}}$，$\tilde{\boldsymbol{\sigma}}$ & 晶格系中的变形梯度、由晶格弹性本构求得的 Cauchy 应力（$\tilde{\mathbf{F}}=\mathbf{F}\mathbf{R}_{0}$ 单边右乘，$\tilde{\boldsymbol{\sigma}}$ 因当前基在全局系而即全局基应力 $\boldsymbol{\sigma}=\tilde{\boldsymbol{\sigma}}$） \\
   $\mathbf{R}^{\mathrm{e}}$，$\mathbf{U}^{\mathrm{e}}$ & 弹性变形梯度的极分解：晶格旋转张量、弹性右伸长张量（$\mathbf{F}^{\mathrm{e}}=\mathbf{R}^{\mathrm{e}}\mathbf{U}^{\mathrm{e}}$） \\
   $\mathbf{R}_{0}^{(g)}$ & 第 $g$ 个晶粒的取向矩阵（取向场 $\mathbf{R}_{0}(\mathbf{x})$ 在晶粒 $\Omega_{g}$ 上的取值） \\
+  $\sigma_{\mathrm{HEL}}$，$P_{\mathrm{HEL}}$ & Hugoniot 弹性极限（HEL）处的等效应力、压力 \\
+  $P^{*}$，$T^{*}$ & 归一化压力、归一化最大拉伸静水压力，$P^{*}=P/P_{\mathrm{HEL}}$，$T^{*}=T/P_{\mathrm{HEL}}$ \\
+  $\sigma^{*}$，$\dot{\varepsilon}^{*}$ & 归一化等效应力、归一化应变率，$\sigma^{*}=\sigma/\sigma_{\mathrm{HEL}}$，$\dot{\varepsilon}^{*}=\dot{\varepsilon}/\dot{\varepsilon}_{0}$（$\dot{\varepsilon}_{0}=1~\mathrm{s}^{-1}$） \\
+  $A$，$B$，$C$，$M$，$N$ & JH-2 强度模型常数：完好强度系数 $A$、断裂强度系数 $B$、应变率系数 $C$、压力指数 $M$、$N$（与 8.3 节 Kachanov 损伤常数 $A$、Norton 常数 $B$ 记号相同，按所在小节语境区分） \\
+  $D_{1}$，$D_{2}$ & JH-2 损伤演化常数 \\
+  $K_{1}$，$K_{2}$，$K_{3}$ & JH-2 多项式状态方程系数（$K_{1}$ 为初始体积模量） \\
+  $\mu_{\mathrm{v}}$ & 体积压缩比，$\mu_{\mathrm{v}}=\rho/\rho_{0}-1$（JH-2 状态方程自变量，与剪切模量 $\mu$ 区分） \\
+  $\beta$ & JH-2 体积膨胀（bulking）能量转化分数，$0\le\beta\le1$（与第 7 章稳定化参数 $\beta$ 记号不同） \\
+  $D$ & JH-2 模型损伤变量，$D\in[0,1]$，由等效塑性应变累积定义（式\eqref{eq:jh2-damage}），与 8.3.2 节 Kachanov 型蠕变损伤 $D$（式\eqref{eq:creep-damage-def}）记号相同但物理机制不同 \\
 \end{longtable}

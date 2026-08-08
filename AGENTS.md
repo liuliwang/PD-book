@@ -10,11 +10,11 @@
 ## 项目概览
 
 专著《近场动力学理论与数值方法》的 LaTeX 书籍项目（ctexbook，A4，11pt）。
-章节完成度参差：ch01、ch02、ch06、ch07 为完整章节（数百行），是写作新章节时的范例；ch03–ch05、ch08–ch19 目前仅为十余行占位骨架；附录 appA–appE 为占位空文件（动手前先 Read 确认行数）。
+章节完成度参差：ch01、ch02、ch06、ch07、ch08 为完整章节（数百至近千行），是写作新章节时的范例；ch03–ch05、ch09–ch19 目前仅为十余行占位骨架（仅含 `\chapter`/`\section` 标题，无正文）；附录 appA–appE 为占位空文件（动手前先 Read 确认行数）。
 
 ## 编译
 
-必须用 XeLaTeX（ctexbook + 中文）。TeX 发行版：MiKTeX 26.5。以下命令顺序即 `.vscode/settings.json` 中 latex-workshop 的 recipe「完整编译 (含参考文献)」；autoBuild/autoClean 均为 never，不会自动编译清理。
+必须用 XeLaTeX（ctexbook + 中文）。TeX 发行版：MiKTeX（本机 `xelatex --version` 实测 25.12）。以下命令顺序即 `.vscode/settings.json` 中 latex-workshop 的 recipe「完整编译 (含参考文献)」；autoBuild/autoClean 均为 never，不会自动编译清理。
 
 ```powershell
 xelatex main.tex
@@ -138,6 +138,8 @@ xelatex main.tex
 
 ## Git 约定
 
+- 远程**只有 `upstream`**（https://github.com/liuliwang/PD-book.git），**无 `origin`**；本地 `main` 跟踪 `upstream/main`，拉取用 `git pull upstream main`
+- 章节细化在独立工作分支上进行，命名惯例 `shuaiyangfu-No.Xrefine`（如 `shuaiyangfu-No.8refine`），完成后合并回 `main`
 - 提交时只 stage 源文件（`.tex`/`.bib` 等）
 - 不要自动 commit/push
 - 编译产物（`*.aux`/`*.log`/`*.pdf`/`*.bbl` 等）与 `.omo/` 已被 `.gitignore` 忽略，勿手动 stage
