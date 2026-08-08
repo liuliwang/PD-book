@@ -1,14 +1,398 @@
 % 第5章 键型模型的改进与扩展
 \chapter{键型模型的改进与扩展}
 
-\section{考虑长程力空间衰减的修正}
+第4章介绍的键型理论以对力函数为唯一的本构工具，其运动方程形式简洁、数值实现方便，在断裂模拟中获得了广泛应用。然而，对力函数仅依赖单根键的变形这一基本假设，使键型理论在描述一般工程材料时遭遇了根本困难：对三维各向同性材料，泊松比被迫固定为$1/4$；对二维平面应力问题，泊松比固定为$1/3$；体积模量与剪切模量不能独立取值，体积变形与剪切变形的独立响应无法刻画。本章从五个方向对键型理论进行改进与扩展：力函数的空间衰减特征（\ref{sec:influence-function}节）、键层次附加自由度——微梁模型（\ref{sec:micropolar-beam}节）、共轭键模型（\ref{sec:conjugated-bond}节）、键转动模型（\ref{sec:bond-rotation}节）、离散近场域的处理——对偶双影响域模型（\ref{sec:dual-horizon}节），以及面向各向异性材料的键型模型（\ref{sec:anisotropic-bond}节）。需要强调的是，这些改进方案本质上仍在成对相互作用的框架内修补，未能从根本上解除键型理论的限制；第6章将要介绍的态型理论，才是突破这一框架的系统性方案。
 
-\section{微梁模型}
+\section{考虑长程力空间衰减的修正}\label{sec:influence-function}
 
-\section{共轭键模型}
+在原始键型理论中，微模量$c$通常取为与键长无关的常数，这意味着近场域内所有键对材料点的贡献被等同对待。然而，物理直觉与数值实验均表明，距离较远的键对材料点力学响应的影响应当弱于邻近键。本节引入影响函数（influence function）来刻画这种空间衰减效应，讨论其对收敛性（\ref{sec:convergence-scaling}节）、尺度效应及断裂预测（\ref{sec:kernel-fracture}节）的影响。\ref{sec:kernel-types}节首先介绍影响函数与衰减核的类型，\ref{sec:convergence-scaling}节讨论近场范围与收敛性，\ref{sec:kernel-fracture}节分析衰减核对断裂预测的影响。本节内容主要基于Seleson与Parks的系统研究\cite{SelesonParks2011}，收敛性分析参见Bobaru等\cite{Bobaru2009}与Seleson等\cite{SelesonLittlewood2016}的工作，断裂预测方面的讨论见Wen等\cite{EWF2023}。
 
-\section{键转动键型近场动力学}
+\subsection{影响函数与衰减核的类型}\label{sec:kernel-types}
 
-\section{对偶双影响域模型}
+原始键型理论假设微模量$c$为常数，即近场域内每一根键对材料点合力贡献的权重相同。这一假设在数学上简化了推导，但物理上并不自然：距离材料点较远的键，其相互作用强度理应弱于邻近键。为描述这种空间衰减特征，Seleson与Parks\cite{SelesonParks2011}引入影响函数$\omega(|\boldsymbol{\xi}|)$，将微模量修正为
+\begin{equation}
+  c(|\boldsymbol{\xi}|)=c_{0}\,\omega(|\boldsymbol{\xi}|)
+  \label{eq:micromodulus-decay}
+\end{equation}
+其中$c_{0}$为与材料常数相关的基准微模量，$\omega(|\boldsymbol{\xi}|)$为影响函数，亦称衰减核（attenuation kernel），满足$\omega(|\boldsymbol{\xi}|)\ge 0$且当$|\boldsymbol{\xi}|\to\delta$时$\omega(|\boldsymbol{\xi}|)\to 0$。引入影响函数后，键型运动方程中的对力密度变为
+\begin{equation}
+  \mathbf{f}(\boldsymbol{\eta},\boldsymbol{\xi})=c_{0}\,\omega(|\boldsymbol{\xi}|)\,s\,\frac{\boldsymbol{\xi}+\boldsymbol{\eta}}{|\boldsymbol{\xi}+\boldsymbol{\eta}|}
+  \label{eq:force-influence}
+\end{equation}
+其中$s$为伸长率。式\eqref{eq:force-influence}表明，影响函数通过调节不同键长上的微模量来反映长程力的空间衰减，而键的力方向仍沿变形后键的方向，保持了键型理论的基本结构。
 
-\section{面向各向异性材料的键型模型}
+常见的衰减核类型如表\ref{tab:kernel-types}所示。常数核对应原始键型理论；线性衰减核与三角核在$|\boldsymbol{\xi}|=\delta$处光滑或连续地趋于零；指数核则在整个近场域内光滑衰减。不同核函数的选择会影响数值收敛速率、裂纹路径预测及能量耗散特性，将在后续小节中讨论。
+
+\begin{table}[htbp]
+  \centering
+  \caption{常见衰减核函数及其表达式}
+  \label{tab:kernel-types}
+  \begin{tabular}{p{0.22\textwidth}p{0.65\textwidth}}
+    \toprule
+    核函数名称 & 表达式 \\
+    \midrule
+    常数核 & $\omega(|\boldsymbol{\xi}|)=1$ \\
+    线性衰减核 & $\omega(|\boldsymbol{\xi}|)=1-\dfrac{|\boldsymbol{\xi}|}{\delta}$ \\
+    三角核 & $\omega(|\boldsymbol{\xi}|)=\dfrac{1+\cos\left(\pi\dfrac{|\boldsymbol{\xi}|}{\delta}\right)}{2}$ \\
+    指数核 & $\omega(|\boldsymbol{\xi}|)=\exp\left(-\dfrac{|\boldsymbol{\xi}|^{2}}{2\delta^{2}}\right)$ \\
+    \bottomrule
+  \end{tabular}
+\end{table}
+
+需要说明的是，影响函数$\omega(|\boldsymbol{\xi}|)$的符号与第6章态型理论中的权重函数一致，二者在数学形式上可以统一理解。但应注意与第2章表面修正中的截断比例函数$\alpha(\mathbf{x})$以及第3章morphing耦合函数$\alpha(\mathbf{x})$区分，后者是位置相关的标量场，而非键长相关的衰减核。
+
+\begin{remark}
+  影响函数的引入在物理上反映了非局部相互作用的衰减特征，在数学上则为数值收敛性分析提供了额外的调节参数。Seleson与Parks\cite{SelesonParks2011}的研究表明，光滑衰减的核函数（如指数核）能够改善数值稳定性，而尖锐截断的核函数（如常数核）则可能在边界附近引入额外的数值误差。
+\end{remark}
+
+% --- 本节说明：本节介绍了影响函数的概念，定义了衰减核的一般形式，列出了四种典型核函数。表5.1为三线表格式。新符号：无（$\omega(|\boldsymbol{\xi}|)$已在notation.tex中登记为权重函数）。 ---
+
+\subsection{近场范围、收敛性与尺度效应}\label{sec:convergence-scaling}
+
+影响函数的引入不仅改变了键力的空间分布，还对数值收敛性与尺度效应产生了深远影响。本节讨论近场范围$\delta$与离散间距$\Delta x$的关系、收敛比$m=\delta/\Delta x$的选取原则，以及非局部模型向局部模型过渡的极限行为。
+
+在数值实现中，近场范围$\delta$与离散间距$\Delta x$的比值$m=\delta/\Delta x$是决定计算精度与效率的关键参数。Seleson与Littlewood\cite{SelesonLittlewood2016}通过系统的网格收敛研究表明，对于一维问题，当$m\ge 4$时，数值解能够稳定收敛到参考解；而在二维和三维问题中，由于几何复杂性的增加，通常需要更大的$m$值才能保证收敛。具体而言，收敛误差随$m$的增大而减小，但计算量随近场域内节点数目的增加而急剧上升，因此需要在精度与效率之间取得平衡。
+
+Bobaru等\cite{Bobaru2009}在一维键型模型的收敛性分析中进一步揭示了尺度效应的物理根源。当$\delta$与特征结构尺寸相当时，非局部效应显著，材料的表观刚度会随$\delta$的增大而降低；只有当$\delta$远小于特征尺寸且$m$足够大时，非局部解才能逼近局部弹性解。这一结论意味着，键型近场动力学在概念上是一种非局部理论，其解在$\delta\to 0$的极限下应当回归经典连续介质力学。Bobaru与Hu\cite{BobaruHu2012}从物理角度阐释了近场范围$\delta$的选取原则，指出$\delta$不仅是一个数值参数，更与材料的微观断裂过程区尺度密切相关。过小的$\delta$无法捕捉裂纹尖端的非局部损伤累积，而过大的$\delta$则会抹平局部应力集中，导致裂纹路径的分叉行为失准。
+
+非局部模型向局部模型的过渡可以通过$\delta\to 0$的极限来理解。当近场范围趋于零时，近场域收缩为一个点，非局部积分退化为局部微分，键型运动方程在形式上应当回归经典运动方程。然而，由于数值离散化的存在，$\delta\to 0$的极限与$\Delta x\to 0$的极限并不交换：先令$\delta\to 0$再离散化，与先固定$\delta$再令$\Delta x\to 0$，会得到不同的结果。这一非交换性是非局部数值方法中的一个基本问题，在实际计算中需要谨慎处理。
+
+% --- 本节说明：本节讨论了$\delta$与$\Delta x$的关系、收敛比$m$的选取、尺度效应及$\delta\to 0$极限。引用了SelesonLittlewood2016、Bobaru2009、BobaruHu2012。新符号：无。 ---
+
+\subsection{衰减核与临界伸长率对断裂预测的影响}\label{sec:kernel-fracture}
+
+衰减核的选择不仅影响弹性响应，还对断裂预测具有显著影响。本节讨论临界伸长率$s_{c}$的标定、horizon与临界伸长率对断裂预测的综合影响，以及动态裂纹扩展中核函数的作用。
+
+回顾第4章，临界伸长率$s_{c}$与断裂韧度$G_{c}$之间的关系通过能量释放率标定得到。引入影响函数后，单键断裂能的计算需要通过积分考虑衰减核的贡献。对于三维问题，单键断裂能密度$g_{0}$与临界伸长率$s_{c}$的关系修正为
+\begin{equation}
+  g_{0}=\int_{0}^{s_{c}}c_{0}\,\omega(|\boldsymbol{\xi}|)\,s\,|\boldsymbol{\xi}|\,ds=\frac{1}{2}c_{0}\,\omega(|\boldsymbol{\xi}|)\,s_{c}^{2}\,|\boldsymbol{\xi}|
+  \label{eq:bond-fracture-energy-kernel}
+\end{equation}
+（该推导需作者人工复核）。以常数核$\omega(|\boldsymbol{\xi}|)=1$为例，将式\eqref{eq:bond-fracture-energy-kernel}对近场域积分。考虑裂纹面上方高$z$处（$0\le z\le\delta$）的一根键，其长度$|\boldsymbol{\xi}|=r$，键方向与裂纹面法向的夹角为$\varphi$，跨越条件为$\varphi\le\cos^{-1}(z/r)$。球坐标下键体积元为$r^{2}\sin\varphi\,d\psi\,d\varphi\,dr$，方位角积分给出因子$2\pi$。对全部跨越裂纹面的键求和并对$z$积分，得总断裂能
+\begin{equation}
+  G_{c}=\int_{0}^{\delta}\int_{z}^{\delta}\int_{0}^{\cos^{-1}(z/r)}\int_{0}^{2\pi}\frac{1}{2}c_{0}s_{c}^{2}r\cdot r^{2}\sin\varphi\,d\psi\,d\varphi\,dr\,dz=\frac{\pi c_{0}s_{c}^{2}\delta^{5}}{10}
+  \label{eq:fracture-energy-integral}
+\end{equation}
+（该推导需作者人工复核）。由式\eqref{eq:fracture-energy-integral}解出$s_{c}$，得三维情形下临界伸长率
+\begin{equation}
+  s_{c}=\sqrt{\frac{10G_{c}}{\pi c_{0}\delta^{5}}}
+  \label{eq:critical-stretch-3d-kernel}
+\end{equation}
+（该推导需作者人工复核）。式\eqref{eq:critical-stretch-3d-kernel}与第6章式\eqref{eq:critical-stretch-3d}一致，量纲验证：$G_{c}$（N/m）除以$c_{0}$（N/m$^{6}$）$\delta^{5}$（m$^{5}$）后无量纲，故$s_{c}$无量纲，符合物理要求。对于一般衰减核，$s_{c}$的表达式需将$\omega(|\boldsymbol{\xi}|)$纳入积分后重新推导。
+
+Wen等\cite{EWF2023}系统研究了horizon与临界伸长率对断裂预测的影响，发现horizon的选取直接决定了裂纹尖端损伤区的尺度，而临界伸长率则控制裂纹扩展的临界条件。二者的耦合效应使得断裂预测对参数选择高度敏感：较小的horizon配合较大的$s_{c}$可能给出与实验相符的裂纹路径，而较大的horizon配合较小的$s_{c}$则可能导致裂纹过早分叉或沿非物理路径扩展。
+
+在动态裂纹扩展中，Ha与Bobaru\cite{HaBobaru2010}的研究表明，衰减核的选择对裂纹分叉行为有显著影响。光滑衰减的核函数（如指数核）能够更好地抑制数值振荡，而尖锐截断的核函数（如常数核）则可能在裂纹尖端产生非物理的应力集中。此外，能量耗散机制与核函数的选择密切相关：不同核函数对应不同的能量释放速率，进而影响裂纹扩展速度和分叉角度。这些发现提示我们，衰减核的选择不仅是数学上的便利，更应当与材料的物理断裂过程相匹配。
+
+% --- 本节说明：本节讨论了临界伸长率的标定、horizon与$s_{c}$对断裂预测的影响、动态裂纹扩展中核函数的作用。引用了EWF2023、HaBobaru2010。公式涉及积分推导，已标注需人工复核。新符号：无。 ---
+
+\section{微梁模型}\label{sec:micropolar-beam}
+
+键型理论的一个根本局限是泊松比的固定，这源于对力函数仅沿键方向传递、无法刻画剪切变形的事实。为突破这一限制，Gerstle等\cite{Gerstle2007}提出了微极键型近场动力学模型，其核心思想是在键的层次引入附加的弯曲自由度，将键视为具有伸缩和弯曲刚度的微梁。本节介绍微梁模型的基本思想（\ref{sec:micropolar-idea}节）、本构关系与参数标定（\ref{sec:beam-constitutive}节），并评述其优势与局限（\ref{sec:beam-review}节）。本节内容主要基于Gerstle等\cite{Gerstle2007}的原始文献，广义化形式参见Diana与Casolo\cite{DianaCasolo2019}。
+
+\subsection{微极键型的基本思想}\label{sec:micropolar-idea}
+
+键型理论中，材料点的力学响应完全由单根键的轴向变形决定，对力函数的方向恒沿键的方向。这种中心对称的成对势结构意味着材料点层面的相互作用只有一个沿键方向的"轴向"通道，不存在与方向相关的独立剪切通道。Trageser与Seleson\cite{TrageserSeleson2020}明确指出，键型理论中泊松比的固定是这种成对性结构的必然结果：对三维各向同性材料，可标定的弹性常数只有一个，泊松比被迫固定为$1/4$；对二维平面应力问题，泊松比固定为$1/3$。
+
+Gerstle等\cite{Gerstle2007}提出的微极键型模型（micropolar peridynamic model）试图在保持键型理论基本框架的同时，通过引入键层次的附加自由度来缓解这一困难。其核心思想是：将每一根键视为一根微悬臂梁（micro-cantilever beam），键的两端不仅可以传递轴向力，还可以传递成对弯矩（pairwise moment）。这意味着键的变形不再仅仅是轴向伸长，还包括由于相对转动引起的弯曲变形。相应地，材料点的运动方程中除了平动自由度外，还需要引入转动自由度，以描述键的弯曲效应。式\eqref{eq:micromodulus-decay}所示的影响函数框架为微梁模型提供了数学基础。
+
+在微极键型框架下，键的力-位移关系由两个独立的刚度模量描述：伸缩刚度（axial stiffness）和弯曲刚度（bending stiffness）。伸缩刚度对应键的轴向变形，与原始键型理论中的微模量类似；弯曲刚度则对应键的弯曲变形，是微极键型模型引入的新参数。这两个刚度模量的独立存在，使得体积模量与剪切模量可以独立调节，从而突破了泊松比固定的限制，可以模拟任意泊松比的材料。
+
+% --- 本节说明：本节回顾了键型泊松比限制的物理根源，介绍了微极键型的核心思想——在键层次引入成对弯矩和转动自由度。引用了TrageserSeleson2020、Gerstle2007。新符号：$\vartheta$（微极转动角，与notation.tex中$\theta$（膨胀）区分），需在符号表中登记。 ---
+
+\subsection{键的微梁本构与参数标定}\label{sec:beam-constitutive}
+
+微梁模型的本构关系需要在键的层次上同时描述轴向变形和弯曲变形。考虑一根长度为$|\boldsymbol{\xi}|$的键，设其两端点的相对轴向位移为$u_{\parallel}$，相对转角为$\vartheta$。则键的微势（pairwise micro-potential）可以写为轴向伸长项与弯曲项之和：
+\begin{equation}
+  w_{\mathrm{b}}=\frac{1}{2}k_{\mathrm{n}}\frac{u_{\parallel}^{2}}{|\boldsymbol{\xi}|}+\frac{1}{2}k_{\theta}\frac{\vartheta^{2}}{|\boldsymbol{\xi}|}
+  \label{eq:beam-potential}
+\end{equation}
+其中$k_{\mathrm{n}}$为轴向刚度系数，$k_{\theta}$为弯曲刚度系数。式\eqref{eq:beam-potential}中，第一项为轴向伸长的势能，第二项为弯曲变形的势能；分母中的$|\boldsymbol{\xi}|$保证在$|\boldsymbol{\xi}|\to 0$时势能不出现奇异性。
+
+由式\eqref{eq:beam-potential}，键的轴向力$N$与弯矩$M$分别为
+\begin{equation}
+  N=\frac{\partial w_{\mathrm{b}}}{\partial u_{\parallel}}=k_{\mathrm{n}}\frac{u_{\parallel}}{|\boldsymbol{\xi}|},
+  \qquad
+  M=\frac{\partial w_{\mathrm{b}}}{\partial \vartheta}=k_{\theta}\frac{\vartheta}{|\boldsymbol{\xi}|}
+  \label{eq:beam-force-moment}
+\end{equation}
+（该推导需作者人工复核）。式\eqref{eq:beam-force-moment}给出了微梁键的力-位移与弯矩-转角关系，其中轴向力与相对位移成正比，弯矩与相对转角成正比，符合Euler-Bernoulli梁的线性本构假设。
+
+为将微梁模型与经典弹性理论对接，需要通过能量等效原则标定刚度系数$k_{\mathrm{n}}$和$k_{\theta}$。考虑材料点$\mathbf{x}$的近场域内所有键的应变能密度，对微势\eqref{eq:beam-potential}在近场域上积分并取半（避免重复计算），得
+\begin{equation}
+  W=\frac{1}{2}\int_{H_{\mathbf{x}}}w_{\mathrm{b}}\,dV_{\mathbf{x}'}=
+  \frac{1}{4}\int_{H_{\mathbf{x}}}\left(k_{\mathrm{n}}\frac{u_{\parallel}^{2}}{|\boldsymbol{\xi}|}+k_{\theta}\frac{\vartheta^{2}}{|\boldsymbol{\xi}|}\right)dV_{\mathbf{x}'}
+  \label{eq:beam-strain-energy}
+\end{equation}
+（该推导需作者人工复核）。在小变形假设下，将键的轴向变形与经典应变张量关联，并通过能量等效$W=W_{\mathrm{classical}}$，可以建立$k_{\mathrm{n}}$、$k_{\theta}$与经典弹性常数$E$、$\nu$之间的关系。
+
+对于二维平面应力问题（板厚$h$），通过能量等效标定可得
+\begin{equation}
+  k_{\mathrm{n}}=\frac{C_{1}\,E}{h\delta^{3}(1-\nu^{2})},
+  \qquad
+  k_{\theta}=\frac{C_{2}\,E(1-3\nu)}{h\delta^{3}(1-\nu^{2})}
+  \label{eq:beam-calibration-2d}
+\end{equation}
+（该推导需作者人工复核）。式\eqref{eq:beam-calibration-2d}中$C_{1}$、$C_{2}$为待定系数，须与DianaCasolo2019原始文献核对后确定具体数值。该式表明，轴向刚度$k_{\mathrm{n}}$与弯曲刚度$k_{\theta}$的量纲均为$\mathrm{N}/\mathrm{m}^{6}$，符合成对势密度的量纲要求。当$\nu=1/3$（平面应力）时，转动刚度$k_{\theta}=0$，模型退化为原始键型理论；当$\nu<1/3$时，$k_{\theta}>0$，弯曲刚度的贡献使模型得以描述更一般的泊松比。这一标定结果使微梁模型能够突破原始键型理论中泊松比固定的限制。
+
+% --- 本节说明：本节建立了微梁键的微势、力-位移与弯矩-转角关系，给出了二维平面应力情形下的能量等效标定公式。推导涉及能量积分与经典弹性常数的对应关系，已标注需人工复核。新符号：$k_{\mathrm{n}}$（轴向刚度系数）、$k_{\theta}$（弯曲刚度系数）、$\vartheta$（微极转动角），需在符号表中登记。 ---
+
+\subsection{微梁模型的评述}\label{sec:beam-review}
+
+微梁模型通过引入键层次的弯曲自由度，成功突破了原始键型理论中泊松比固定的限制，为键型近场动力学向更一般材料的扩展提供了重要途径。本节评述微梁模型的成功之处与固有限制，并讨论其后续发展方向。
+
+Diana与Casolo\cite{DianaCasolo2019}对微极键型模型进行了广义化，考虑了键的剪切变形效应，提出了包含三个独立刚度参数的微极键型模型。在该模型中，键的变形分解为轴向伸长、横向剪切和弯曲转动三部分，对应的刚度参数分别为$k_{\mathrm{n}}$（轴向刚度）、$k_{\mathrm{t}}$（横向剪切刚度）和$k_{\theta}$（弯曲刚度）。这种广义化形式能够更精细地描述非均质变形场下的材料响应，特别是当泊松比随位置变化时，三个独立刚度参数可以灵活调节，模拟变泊松比材料的行为。
+
+微梁模型的成功之处在于，它在保持键型理论基本框架（成对相互作用）的前提下，通过引入附加自由度扩展了模型的适用范围。然而，这一方案本质上仍在成对相互作用的框架内修补，未能从根本上解除键型理论的限制。具体而言，微梁模型存在以下几方面的局限：
+
+第一，转动自由度的引入显著增加了计算开销。每个材料点除了三个平动自由度外，还需要三个转动自由度（三维情形），使得自由度数目翻倍。此外，转动自由度的引入还带来了额外的边界条件处理复杂性，特别是在裂纹面等不连续处，转动自由度的约束条件需要仔细设计。
+
+第二，客观性问题尚未完全解决。微梁模型中，键的弯曲变形依赖于局部坐标系的选取，当材料发生刚性旋转时，弯曲刚度的定义需要满足客观性（frame indifference）要求。文献中对这一问题存在不同处理方式，但尚未形成统一的标准。
+
+第三，微梁模型仍无法完全独立地调节体积模量与剪切模量。虽然通过引入弯曲刚度可以突破泊松比固定的限制，但体积变形与剪切变形的独立响应仍然受到成对性结构的约束。正如第6章所述，"第5章介绍的微梁模型、共轭键模型等改进方案，正是试图在键的层次引入额外的弯曲、扭转自由度来部分缓解这一困难，但这些方案本质上仍在成对相互作用的框架内修补，未能从根本上解除限制"。
+
+\begin{remark}
+  微梁模型的本质局限在于它仍未脱离成对相互作用的框架。转动自由度的引入虽然扩展了键型理论的适用范围，但材料点层面的受力仍由单根键的变形决定，无法像态型理论那样同时"看见"近场域内的全部键。这一根本区别决定了微梁模型只能作为键型理论向更一般理论过渡的中间方案，而非最终答案。
+\end{remark}
+
+尽管如此，微梁模型为后续共轭键模型和键转动模型的发展奠定了基础。这些模型在微梁模型的启发下，进一步探索了在键层次引入附加自由度的不同途径，试图以更简洁或更一般的方式突破键型理论的固有限制。
+
+% --- 本节说明：本节评述了微梁模型的成功与局限，介绍了DianaCasolo2019的广义化形式，讨论了计算开销、客观性问题及与第6章的衔接。引用了DianaCasolo2019。新符号：$k_{\mathrm{t}}$（横向剪切刚度系数），需在符号表中登记。 ---
+
+\section{共轭键模型}\label{sec:conjugated-bond}
+
+微梁模型通过引入键层次的弯曲自由度突破了泊松比固定的限制，但其转动自由度的计算开销较大。共轭键模型（conjugated bond-based peridynamics）则另辟蹊径：不引入额外的转动自由度，而是通过考虑相邻键之间的相互作用——即共轭键对之间的相对转角——来引入剪切变形通道，从而突破泊松比限制。本节介绍共轭键模型的基本思想（\ref{sec:conjugated-idea}节）、键力密度与参数标定（\ref{sec:conjugated-force}节），并评述其适用性与局限（\ref{sec:conjugated-review}节）。本节内容主要基于Wang等\cite{WangZhouShou2017}的二维模型及其三维推广\cite{WangZhouWang2018}。
+
+\subsection{基本思想与微势构造}\label{sec:conjugated-idea}
+
+键型理论中泊松比固定的根本原因在于单根键的变形无法区分体积变形与剪切变形。Trageser与Seleson\cite{TrageserSeleson2020}指出，键型理论的对力函数仅依赖单根键的伸长，无法刻画键与键之间的相对转动，因此无法引入独立的剪切通道。共轭键模型的核心思想是：将材料点近场域内的键两两配对，形成共轭键对（conjugated bond pair），键的微势不仅依赖单根键的伸长，还依赖共轭键对之间的相对转角。
+
+具体而言，考虑材料点$\mathbf{x}$的近场域内两根相邻的键$\boldsymbol{\xi}_{1}$和$\boldsymbol{\xi}_{2}$，其变形后的伸长率分别为$s_{1}$和$s_{2}$。两根键之间的夹角在参考构型中为$\varphi_{0}$，在变形构型中变为$\varphi$。共轭键模型的微势（pairwise potential）可以写为两体项与三体角项之和：
+\begin{equation}
+  w_{\mathrm{c}}=w_{2}(s_{1})+w_{2}(s_{2})+w_{3}(\varphi-\varphi_{0})
+  \label{eq:conjugated-potential}
+\end{equation}
+其中$w_{2}(s)=\tfrac{1}{2}c_{0}s^{2}|\boldsymbol{\xi}|$为原始键型理论的两体势，$w_{3}(\varphi-\varphi_{0})$为三体角项，描述共轭键对之间相对转角变化对能量的贡献。三体角项的一般形式可取为
+\begin{equation}
+  w_{3}(\varphi-\varphi_{0})=\frac{1}{2}k_{\varphi}(\varphi-\varphi_{0})^{2}|\boldsymbol{\xi}|
+  \label{eq:three-body-angle}
+\end{equation}
+其中$k_{\varphi}$为角刚度系数，量纲为$\mathrm{N}/\mathrm{m}^{6}$，与两体势中$c_{0}$的量纲一致。式\eqref{eq:three-body-angle}中引入$|\boldsymbol{\xi}|$因子，使得$w_{3}$的量纲为$\mathrm{N}/\mathrm{m}^{5}$，与原始键型理论中两体势$w_{2}=\tfrac{1}{2}c_{0}s^{2}|\boldsymbol{\xi}|$的量纲一致。式\eqref{eq:conjugated-potential}中，两体项$w_{2}$对应轴向变形，三体角项$w_{3}$对应剪切变形；二者的独立存在使得体积模量与剪切模量可以分别调节，从而突破了泊松比固定的限制。
+
+% --- 本节说明：本节介绍了共轭键模型的核心思想——通过共轭键对之间的相对转角引入剪切变形通道。给出了微势的两体项+三体角项分解。新符号：$k_{\varphi}$（角刚度系数）、$\varphi$（共轭键夹角，与notation.tex中$\varphi$（损伤变量）冲突，需改用$\varphi_{\mathrm{b}}$并登记），$\varphi_{0}$（参考构型夹角）。 ---
+
+\subsection{键力密度与参数标定}\label{sec:conjugated-force}
+
+由微势\eqref{eq:conjugated-potential}出发，可以通过变分原理导出键力密度。对单根键$s_{1}$求偏导，得该键上的力密度
+\begin{equation}
+  \mathbf{f}_{1}=\frac{\partial w_{\mathrm{c}}}{\partial\boldsymbol{\eta}_{1}}=c_{0}s_{1}\frac{\boldsymbol{\xi}_{1}+\boldsymbol{\eta}_{1}}{|\boldsymbol{\xi}_{1}+\boldsymbol{\eta}_{1}|}+k_{\varphi}(\varphi-\varphi_{0})|\boldsymbol{\xi}_{1}|\frac{\partial\varphi}{\partial\boldsymbol{\eta}_{1}}
+  \label{eq:conjugated-force}
+\end{equation}
+（该推导需作者人工复核）。式\eqref{eq:conjugated-force}中，第一项为轴向力，与原始键型理论一致；第二项为由于共轭键对相对转角变化引起的附加力，方向垂直于键的方向，对应剪切变形。$k_{\varphi}(\varphi-\varphi_{0})|\boldsymbol{\xi}_{1}|$的量纲为$\mathrm{N}/\mathrm{m}^{6}\cdot\mathrm{m}=\mathrm{N}/\mathrm{m}^{5}$，$\partial\varphi/\partial\boldsymbol{\eta}_{1}$的量纲为$1/\mathrm{m}$，故第二项整体量纲为$\mathrm{N}/\mathrm{m}^{6}$，与力密度一致。两个独立参数$c_{0}$和$k_{\varphi}$分别控制轴向和剪切响应，使得泊松比不再固定。
+
+为将共轭键模型与经典弹性理论对接，需要通过能量等效原则标定参数$c_{0}$和$k_{\varphi}$。考虑材料点$\mathbf{x}$的近场域内所有共轭键对的应变能密度，对微势\eqref{eq:conjugated-potential}求和并取适当权重，通过能量等效$W=W_{\mathrm{classical}}$，可以建立$c_{0}$、$k_{\varphi}$与经典弹性常数$E$、$\nu$之间的关系。对于二维平面应力问题，标定结果为
+\begin{equation}
+  c_{0}=\frac{C_{3}\,E}{h\delta^{3}(1-\nu^{2})},
+  \qquad
+  k_{\varphi}=\frac{C_{4}\,E(1-3\nu)}{h\delta^{3}(1-\nu^{2})}
+  \label{eq:conjugated-calibration}
+\end{equation}
+（该推导需作者人工复核）。式\eqref{eq:conjugated-calibration}中$C_{3}$、$C_{4}$为待定系数，须与WangZhouShou2017原始文献核对后确定具体数值。当$\nu=1/3$（平面应力）时，$k_{\varphi}=0$，三体角项消失，模型退化为原始键型理论；当$\nu<1/3$时，$k_{\varphi}>0$，剪切通道激活，模型可以描述更一般的泊松比。
+
+% --- 本节说明：本节导出了共轭键模型的键力密度表达式，给出了二维平面应力情形下的能量等效标定公式。推导涉及变分求导与能量积分，已标注需人工复核。新符号：$C_{3}$、$C_{4}$（待定标定系数）。 ---
+
+\subsection{适用性与局限}\label{sec:conjugated-review}
+
+共轭键模型在岩石类材料的裂纹扩展与汇合模拟中展现了良好的适用性。Wang等\cite{WangZhouShou2017}将共轭键模型应用于单轴压缩下岩石裂纹扩展与汇合的数值模拟，成功再现了实验观测到的翼型裂纹（wing crack）扩展、次生裂纹萌生及裂纹桥接等现象。Wang等\cite{WangZhouWang2018}进一步将模型推广到三维情形，研究了脆性固体中三维裂纹的萌生、扩展与贯通，验证了模型在复杂应力状态下的可靠性。
+
+共轭键模型的成功之处在于，它在不引入额外转动自由度的前提下，通过共轭键对之间的相对转角引入了剪切变形通道，计算开销相对较小。然而，该模型仍存在以下局限：
+
+第一，计算量仍显著高于原始键型理论。每个材料点需要枚举近场域内所有共轭键对，键对数目随近场域内节点数目的平方增长，导致计算复杂度急剧上升。对于三维问题，这一开销尤为突出。
+
+第二，共轭键模型本质上仍在成对相互作用的框架内修补。虽然通过三体角项引入了键与键之间的耦合，但材料点层面的受力仍由局部键对决定，无法像态型理论那样同时"看见"近场域内的全部键。
+
+第三，客观性问题尚未完全解决。共轭键对之间的夹角定义依赖于局部坐标系的选取，当材料发生刚性旋转时，三体角项的客观性需要额外验证。
+
+\begin{remark}
+  共轭键模型与微梁模型的本质区别在于附加自由度的引入方式：微梁模型在键的层次引入转动自由度，将键视为微悬臂梁；共轭键模型则不引入额外自由度，而是通过键与键之间的几何耦合（相对转角）来引入剪切通道。两种方案殊途同归，均试图在成对相互作用的框架内突破泊松比限制，但均未从根本上解除键型理论的固有限制。
+\end{remark}
+
+% --- 本节说明：本节评述了共轭键模型的适用性与局限，介绍了WangZhouShou2017和WangZhouWang2018的应用实例。讨论了计算开销、客观性问题及与微梁模型的区别。引用了WangZhouShou2017、WangZhouWang2018、TrageserSeleson2020。新符号：无新增。 ---
+
+\section{键转动键型近场动力学}\label{sec:bond-rotation}
+
+微梁模型和共轭键模型分别从弯曲自由度和键间几何耦合两个角度突破了泊松比固定的限制。键转动键型近场动力学（bond rotation peridynamics）则提供了第三种途径：在保持键型理论基本框架的前提下，将键的相对位移分解为轴向和切向分量，并引入键转动角度来描述切向变形。本节介绍键转动效应的引入（\ref{sec:rotation-intro}节）、本构关系与转动刚度标定（\ref{sec:rotation-constitutive}节），并评述其与微梁模型、共轭键模型的联系与区别（\ref{sec:rotation-review}节）。本节内容主要基于Zhu与Ni\cite{ZhuNi2017}的原始文献。
+
+\subsection{键转动效应的引入}\label{sec:rotation-intro}
+
+键型理论中，对力函数的方向恒沿键的方向，这意味着键只能传递轴向力，无法传递切向力。为引入切向变形通道，Zhu与Ni\cite{ZhuNi2017}将键两端点的相对位移$\boldsymbol{\eta}$分解为轴向分量$\boldsymbol{\eta}_{\parallel}$和切向分量$\boldsymbol{\eta}_{\perp}$：
+\begin{equation}
+  \boldsymbol{\eta}=\boldsymbol{\eta}_{\parallel}+\boldsymbol{\eta}_{\perp}
+  \label{eq:displacement-decomp}
+\end{equation}
+其中$\boldsymbol{\eta}_{\parallel}$沿键方向，$\boldsymbol{\eta}_{\perp}$垂直于键方向。轴向分量对应键的伸长，切向分量对应键的横向剪切。键的转动角度$\vartheta_{\mathrm{b}}$定义为切向位移与键长之比：
+\begin{equation}
+  \vartheta_{\mathrm{b}}=\frac{|\boldsymbol{\eta}_{\perp}|}{|\boldsymbol{\xi}|}
+  \label{eq:bond-rotation-angle}
+\end{equation}
+（该推导需作者人工复核）。式\eqref{eq:bond-rotation-angle}中，$\vartheta_{\mathrm{b}}$为无量纲量，描述键由于切向位移引起的相对转角。
+
+在此基础上，键的微势可以写为轴向伸长项与键转动项之和：
+\begin{equation}
+  w_{\mathrm{r}}=\frac{1}{2}c_{\mathrm{n}}s^{2}|\boldsymbol{\xi}|+\frac{1}{2}c_{\mathrm{t}}\vartheta_{\mathrm{b}}^{2}|\boldsymbol{\xi}|
+  \label{eq:rotation-potential}
+\end{equation}
+其中$c_{\mathrm{n}}$为轴向微模量，$c_{\mathrm{t}}$为切向微模量（转动刚度）。式\eqref{eq:rotation-potential}中，第一项为轴向伸长的势能，第二项为键转动的势能；两个独立参数$c_{\mathrm{n}}$和$c_{\mathrm{t}}$分别控制轴向和切向响应，使得泊松比不再固定。
+
+% --- 本节说明：本节引入了键转动效应，将相对位移分解为轴向和切向分量，定义了键转动角度。给出了微势的轴向项+转动项分解。新符号：$c_{\mathrm{n}}$（轴向微模量）、$c_{\mathrm{t}}$（切向微模量/转动刚度）、$\vartheta_{\mathrm{b}}$（键转动角，与notation.tex中$\vartheta$（微极转动角）区分）。 ---
+
+\subsection{本构关系与转动刚度标定}\label{sec:rotation-constitutive}
+
+由微势\eqref{eq:rotation-potential}出发，键的轴向力$N$和切向力$T$分别为
+\begin{equation}
+  N=\frac{\partial w_{\mathrm{r}}}{\partial s}=c_{\mathrm{n}}s\,|\boldsymbol{\xi}|,
+  \qquad
+  T=\frac{\partial w_{\mathrm{r}}}{\partial\vartheta_{\mathrm{b}}}=c_{\mathrm{t}}\vartheta_{\mathrm{b}}\,|\boldsymbol{\xi}|
+  \label{eq:rotation-force}
+\end{equation}
+（该推导需作者人工复核）。式\eqref{eq:rotation-force}中，轴向力与伸长率成正比，切向力与键转动角度成正比，符合线性本构假设。
+
+为将键转动模型与经典弹性理论对接，需要通过能量等效原则标定参数$c_{\mathrm{n}}$和$c_{\mathrm{t}}$。考虑材料点$\mathbf{x}$的近场域内所有键的应变能密度，对微势\eqref{eq:rotation-potential}在近场域上积分并取半，通过能量等效$W=W_{\mathrm{classical}}$，可以建立$c_{\mathrm{n}}$、$c_{\mathrm{t}}$与经典弹性常数$E$、$\nu$之间的关系。对于二维平面应力问题，标定结果为
+\begin{equation}
+  c_{\mathrm{n}}=\frac{C_{5}\,E}{h\delta^{3}(1-\nu^{2})},
+  \qquad
+  c_{\mathrm{t}}=\frac{C_{6}\,E(1-3\nu)}{h\delta^{3}(1-\nu^{2})}
+  \label{eq:rotation-calibration}
+\end{equation}
+（该推导需作者人工复核）。式\eqref{eq:rotation-calibration}中$C_{5}$、$C_{6}$为待定系数，须与ZhuNi2017原始文献核对后确定具体数值。当$\nu=1/3$（平面应力）时，$c_{\mathrm{t}}=0$，切向力消失，模型退化为原始键型理论；当$\nu<1/3$时，$c_{\mathrm{t}}>0$，切向通道激活，模型可以描述更一般的泊松比。
+
+% --- 本节说明：本节导出了键转动模型的力-位移关系，给出了二维平面应力情形下的能量等效标定公式。推导涉及变分求导与能量积分，已标注需人工复核。新符号：$C_{5}$、$C_{6}$（待定标定系数）。 ---
+
+\subsection{评述与联系}\label{sec:rotation-review}
+
+键转动模型与微梁模型、共轭键模型相比，具有独特的优势与局限。三者的共同目标是在键型理论的框架内突破泊松比固定的限制，但实现途径各不相同：微梁模型通过引入键层次的弯曲自由度（转动自由度），将键视为微悬臂梁；共轭键模型通过键与键之间的几何耦合（相对转角）引入剪切通道；键转动模型则通过将相对位移分解为轴向和切向分量，直接引入切向刚度。
+
+键转动模型的优势在于其形式简洁，不引入额外的转动自由度，计算开销相对较小。同时，由于切向位移直接由键两端点的相对位移导出，模型的客观性相对容易保证。Diana与Casolo\cite{DianaCasolo2019}在讨论微极键型模型的旋转不变性时指出，键转动模型（Zhu-Ni PDS模型）在刚性旋转下的客观性条件可以通过适当的数学处理得到满足，这为其在复杂变形问题中的应用提供了理论基础。
+
+然而，键转动模型仍存在以下局限：
+
+第一，键转动模型仍无法完全独立地调节体积模量与剪切模量。虽然通过引入切向刚度可以突破泊松比固定的限制，但体积变形与剪切变形的独立响应仍然受到成对性结构的约束。正如第6章所述，这些改进方案本质上仍在成对相互作用的框架内修补，未能从根本上解除键型理论的限制。
+
+第二，键转动模型的切向刚度标定依赖于特定的变形模式假设，对于复杂应力状态下的适用性仍需进一步验证。特别是在裂纹尖端等应力集中区域，键转动角度的定义和切向刚度的取值可能引入额外的数值敏感性。
+
+第三，键转动模型与微梁模型、共轭键模型一样，计算量均高于原始键型理论。虽然键转动模型不引入额外的转动自由度，但切向位移的计算仍需要额外的存储和计算开销。
+
+\begin{remark}
+  键转动模型、微梁模型和共轭键模型代表了键型理论改进的三种不同思路：键转动模型直接分解位移分量，微梁模型引入弯曲自由度，共轭键模型利用键间几何耦合。三种方案殊途同归，均试图在成对相互作用的框架内突破泊松比限制，但均未从根本上解除键型理论的固有限制。第6章将要介绍的态型理论，通过放弃成对性假设，才是解决这一问题的系统性方案。
+\end{remark}
+
+% --- 本节说明：本节评述了键转动模型与微梁模型、共轭键模型的联系与区别，讨论了其优势与局限。引用了ZhuNi2017、DianaCasolo2019。新符号：无新增。 ---
+
+\section{对偶双影响域模型}\label{sec:dual-horizon}
+
+前述各节讨论的键型改进方案均假设全场近场范围$\delta$均匀一致。然而，在实际工程问题中，不同区域往往需要使用不同的离散分辨率：裂纹尖端等关键区域需要细网格和小horizon以捕捉局部损伤细节，而远场区域则可使用粗网格和大horizon以提高计算效率。当近场范围在空间上变化时，经典键型理论的成对性假设——即$\mathbf{x}$对$\mathbf{x}'$的作用与$\mathbf{x}'$对$\mathbf{x}$的作用大小相等、方向相反——可能遭到破坏，导致力不平衡和虚假波反射。本节介绍的对偶双影响域（dual-horizon）模型正是为解决这一问题而提出的。本节内容主要基于Ren等\cite{Ren2017dualhorizon}的原始文献。
+
+\subsection{变近场域离散下的力不平衡问题}\label{sec:dh-issue}
+
+在经典键型理论中，材料点$\mathbf{x}$的近场域$H_{\mathbf{x}}$由以$\mathbf{x}$为中心、半径为$\delta_{\mathbf{x}}$的球（或圆）定义。若全场$\delta$均匀，则$\mathbf{x}'\in H_{\mathbf{x}}$当且仅当$\mathbf{x}\in H_{\mathbf{x}'}$，成对性条件$\mathbf{f}(-\boldsymbol{\eta},-\boldsymbol{\xi})=-\mathbf{f}(\boldsymbol{\eta},\boldsymbol{\xi})$自然满足，线动量守恒自动成立。然而，当$\delta$随空间位置变化时，这一对称性可能不再成立。
+
+具体而言，设$\mathbf{x}$处的近场范围为$\delta_{\mathbf{x}}$，$\mathbf{x}'$处的近场范围为$\delta_{\mathbf{x}'}$。若$\delta_{\mathbf{x}}\neq\delta_{\mathbf{x}'}$，则可能出现$|\mathbf{x}'-\mathbf{x}|\le\delta_{\mathbf{x}}$但$|\mathbf{x}'-\mathbf{x}|>\delta_{\mathbf{x}'}$的情况，即$\mathbf{x}'$在$\mathbf{x}$的近场域内，但$\mathbf{x}$不在$\mathbf{x}'$的近场域内。此时，$\mathbf{x}$感受到$\mathbf{x}'$的作用，但$\mathbf{x}'$感受不到$\mathbf{x}$的反作用，牛顿第三定律在形式上被破坏，线动量守恒不再自动成立。这种力不平衡在变horizon交界处尤为显著，可能导致非物理的应力集中和虚假波反射，严重影响数值结果的可靠性。
+
+Silling\cite{Silling2011coarsening}在变分辨率粗化方法的研究中最早注意到了这一问题，指出变horizon情形下需要特殊的力平衡处理。Ren等\cite{Ren2017dualhorizon}在此基础上系统地提出了对偶双影响域框架，通过引入"对偶近场域"的概念来恢复力平衡。
+
+\subsection{主影响域与对偶影响域}\label{sec:dh-primary-dual}
+
+对偶双影响域模型的核心思想是：为每个材料点同时定义"主影响域"（primary horizon）和"对偶影响域"（dual horizon）。主影响域$H_{\mathbf{x}}$由该点自身的近场范围$\delta_{\mathbf{x}}$决定，即$H_{\mathbf{x}}=\{\mathbf{x}':|\mathbf{x}'-\mathbf{x}|\le\delta_{\mathbf{x}}\}$；对偶影响域$H'_{\mathbf{x}}$则由所有以$\mathbf{x}$为邻居的点的集合构成，即$H'_{\mathbf{x}}=\{\mathbf{x}':|\mathbf{x}-\mathbf{x}'|\le\delta_{\mathbf{x}'}\}$。
+
+当全场$\delta$均匀时，$H_{\mathbf{x}}=H'_{\mathbf{x}}$，对偶双影响域退化为经典键型理论。当$\delta$变化时，$H_{\mathbf{x}}$和$H'_{\mathbf{x}}$不再重合，但二者之间存在包含关系：对任意一对相互作用的点$\mathbf{x}$和$\mathbf{x}'$，若$|\mathbf{x}'-\mathbf{x}|\le\min(\delta_{\mathbf{x}},\delta_{\mathbf{x}'})$，则两点互为邻居，同时属于对方的主影响域和对偶影响域；若$\min(\delta_{\mathbf{x}},\delta_{\mathbf{x}'})<|\mathbf{x}'-\mathbf{x}|\le\max(\delta_{\mathbf{x}},\delta_{\mathbf{x}'})$，则仅近场范围较大的点的主影响域包含另一点，而另一点的对偶影响域包含该点。
+
+在此基础上，材料点$\mathbf{x}$的运动方程修正为
+\begin{equation}
+  \rho(\mathbf{x})\ddot{\mathbf{u}}(\mathbf{x},t)=\int_{H_{\mathbf{x}}\cup H'_{\mathbf{x}}}\mathbf{f}(\boldsymbol{\eta},\boldsymbol{\xi})\,dV_{\mathbf{x}'}+\mathbf{b}(\mathbf{x},t)
+  \label{eq:dual-horizon-motion}
+\end{equation}
+（该推导需作者人工复核）。式\eqref{eq:dual-horizon-motion}中，积分域$H_{\mathbf{x}}\cup H'_{\mathbf{x}}$覆盖了$\mathbf{x}$的主影响域和对偶影响域的并集，确保所有与$\mathbf{x}$有相互作用的点都被计入。当$\delta$均匀时，$H_{\mathbf{x}}\cup H'_{\mathbf{x}}=H_{\mathbf{x}}$，式\eqref{eq:dual-horizon-motion}退化为经典键型运动方程。
+
+% --- 本节说明：本节介绍了对偶双影响域模型的核心思想——通过主影响域和对偶影响域恢复变horizon情形下的力平衡。给出了修正后的运动方程。引用了Ren2017dualhorizon、Silling2011coarsening。新符号：$H'_{\mathbf{x}}$（对偶影响域）。 ---
+
+\subsection{数值实现与优势}\label{sec:dh-implementation}
+
+对偶双影响域模型在数值实现上需要为每个材料点维护两个邻居列表：主影响域邻居列表和对偶影响域邻居列表。主影响域邻居列表的构建与经典键型理论相同，只需遍历以该点为中心、半径为$\delta_{\mathbf{x}}$的球（或圆）内的所有点；对偶影响域邻居列表则需要遍历所有以该点为邻居的点，即满足$|\mathbf{x}-\mathbf{x}'|\le\delta_{\mathbf{x}'}$的点。在并行计算中，对偶影响域邻居列表的构建需要额外的通信开销，但可以通过预处理和优化数据结构来降低影响。
+
+对偶双影响域模型的主要优势在于：
+
+第一，恢复了变horizon情形下的力平衡。通过同时考虑主影响域和对偶影响域，模型确保了每个相互作用都被成对地计入，避免了经典键型理论中因horizon不对称导致的力不平衡问题。Ren等\cite{Ren2017dualhorizon}通过数值实验验证了该模型在变horizon交界处的力平衡恢复效果。
+
+第二，允许跨尺度离散。细网格区可以使用小horizon以捕捉局部损伤细节，粗网格区可以使用大horizon以提高计算效率，二者之间的过渡区域通过对偶双影响域框架自然衔接，避免了经典方法中因horizon突变导致的虚假波反射。
+
+第三，保持了键型理论的基本框架。对偶双影响域模型本质上仍是成对相互作用，当全场$\delta$均匀时完全退化为经典键型理论，因此可以无缝集成到现有的键型近场动力学代码中。
+
+然而，对偶双影响域模型仍存在局限：它仍在成对相互作用的框架内，泊松比固定等根本问题并未解除；对偶影响域邻居列表的构建和维护带来了额外的计算开销；对于高度非均匀的horizon分布，数值稳定性仍需进一步验证。
+
+% --- 本节说明：本节讨论了对偶双影响域模型的数值实现与优势。引用了Ren2017dualhorizon。新符号：无新增。 ---
+
+\section{面向各向异性材料的键型模型}\label{sec:anisotropic-bond}
+
+前述各节讨论的键型改进方案主要针对各向同性材料。然而，工程实践中大量存在各向异性材料，如纤维增强复合材料、层合板等。这些材料的力学性能沿不同方向差异显著，需要专门的本构描述。本节介绍面向各向异性材料的键型模型，包括单向纤维复合材料键型模型（\ref{sec:unidirectional-fiber}节）、正交各向异性键型模型（\ref{sec:orthotropic-bond}节），并评述键型各向异性模型的限制（\ref{sec:anisotropic-limit}节）。本节内容主要基于Hu等\cite{HuHaBobaru2012}、Ghajari等\cite{Ghajari2014}及Oterkus与Madenci\cite{OterkusMadenci2012}的工作。
+
+\subsection{单向纤维复合材料键型模型}\label{sec:unidirectional-fiber}
+
+单向纤维增强复合材料是最常见的各向异性材料之一，其力学性能沿纤维方向与垂直于纤维方向差异显著。Hu等\cite{HuHaBobaru2012}提出了面向单向纤维复合材料的键型近场动力学模型，其核心思想是：根据键的方向与纤维方向的相对关系，赋予键不同的微模量。
+
+设纤维方向为单位矢量$\mathbf{n}_{\mathrm{f}}$，键$\boldsymbol{\xi}$的方向与纤维方向的夹角为$\beta_{\mathrm{b}}$，则键的微模量可以表示为
+\begin{equation}
+  c(\boldsymbol{\xi})=c_{\mathrm{M}}+(c_{\mathrm{F}}-c_{\mathrm{M}})g(\beta_{\mathrm{b}})
+  \label{eq:anisotropic-micromodulus}
+\end{equation}
+其中$c_{\mathrm{F}}$为纤维方向键的微模量，$c_{\mathrm{M}}$为基体方向键的微模量，$g(\beta_{\mathrm{b}})$为方向权重函数，满足$g(0)=1$（纤维方向）、$g(\pi/2)=0$（垂直于纤维方向）。常见的方向权重函数可取为
+\begin{equation}
+  g(\beta_{\mathrm{b}})=\cos^{2}\beta_{\mathrm{b}}
+  \label{eq:direction-weight}
+\end{equation}
+（该推导需作者人工复核）。式\eqref{eq:anisotropic-micromodulus}表明，沿纤维方向的键具有较大的微模量$c_{\mathrm{F}}$，垂直于纤维方向的键具有较小的微模量$c_{\mathrm{M}}$，中间方向的键微模量由方向权重函数插值得到。
+
+在断裂预测方面，单向纤维复合材料需要区分纤维断裂和基体开裂两种失效模式。纤维断裂对应沿纤维方向键的临界伸长率达到极限，基体开裂对应垂直于纤维方向键的临界伸长率达到极限。两种失效模式可以分别定义临界伸长率$s_{\mathrm{c,F}}$和$s_{\mathrm{c,M}}$，并通过能量等效原则与经典断裂力学量关联。
+
+% --- 本节说明：本节介绍了单向纤维复合材料键型模型的核心思想——根据键方向与纤维方向的相对关系赋予不同的微模量。给出了微模量的方向依赖表达式。引用了HuHaBobaru2012。新符号：$c_{\mathrm{F}}$（纤维方向微模量）、$c_{\mathrm{M}}$（基体方向微模量）、$\beta_{\mathrm{b}}$（键方向与纤维方向夹角，与notation.tex中$\beta$（稳定化强度参数）区分）、$g(\beta_{\mathrm{b}})$（方向权重函数）。 ---
+
+\subsection{正交各向异性键型模型}\label{sec:orthotropic-bond}
+
+正交各向异性材料（如层合板）具有三个相互垂直的材料主方向，沿各主方向的弹性性质不同。Ghajari等\cite{Ghajari2014}将键型理论推广到正交各向异性材料，建立了正交各向异性键型近场动力学模型。
+
+在正交各向异性键型模型中，键的微模量不仅依赖于键的方向，还依赖于材料主方向的选取。设材料主方向为$\mathbf{e}_{1}$、$\mathbf{e}_{2}$、$\mathbf{e}_{3}$，键$\boldsymbol{\xi}$的方向与各主方向的夹角分别为$\beta_{1}$、$\beta_{2}$、$\beta_{3}$，则键的微模量可以表示为
+\begin{equation}
+  c(\boldsymbol{\xi})=\sum_{i=1}^{3}c_{i}\,g_{i}(\beta_{i})
+  \label{eq:orthotropic-micromodulus}
+\end{equation}
+其中$c_{i}$为沿第$i$个材料主方向的微模量，$g_{i}(\beta_{i})$为相应的方向权重函数。式\eqref{eq:orthotropic-micromodulus}通过方向权重函数的叠加，实现了正交各向异性材料在不同方向上弹性性质的独立描述。
+
+正交各向异性键型模型的本构关系需要满足正交各向异性对称性约束。经典正交各向异性弹性理论中，独立的弹性常数有9个（三维）或4个（二维），包括弹性模量$E_{11}$、$E_{22}$、$E_{33}$，剪切模量$G_{12}$、$G_{23}$、$G_{31}$，以及泊松比$\nu_{12}$、$\nu_{23}$、$\nu_{31}$。键型理论中，这些经典弹性常数与键型微模量之间的关系需要通过能量等效原则建立。对于二维正交各向异性材料，标定结果为
+\begin{equation}
+  c_{1}=\frac{C_{7}\,E_{11}}{h\delta^{3}},\qquad c_{2}=\frac{C_{8}\,E_{22}}{h\delta^{3}},\qquad c_{12}=\frac{C_{9}\,G_{12}}{h\delta^{3}}
+  \label{eq:orthotropic-calibration}
+\end{equation}
+（该推导需作者人工复核）。式\eqref{eq:orthotropic-calibration}中$C_{7}$、$C_{8}$、$C_{9}$为待定系数，须与Ghajari2014原始文献核对后确定具体数值。$c_{1}$、$c_{2}$分别为沿两个材料主方向的微模量，$c_{12}$为面内剪切微模量。
+
+% --- 本节说明：本节介绍了正交各向异性键型模型的核心思想——通过方向权重函数的叠加实现正交各向异性材料在不同方向上弹性性质的独立描述。给出了二维正交各向异性材料的标定公式。引用了Ghajari2014。新符号：$c_{1}$、$c_{2}$、$c_{12}$（正交各向异性微模量）、$\beta_{i}$（键方向与材料主方向夹角）。 ---
+
+\subsection{键型各向异性模型的限制}\label{sec:anisotropic-limit}
+
+键型各向异性模型虽然在描述复合材料等方向性材料方面取得了进展，但仍存在根本性的限制。Oterkus与Madenci\cite{OterkusMadenci2012}指出，键型各向异性模型受泊松比固定的约束：对于二维平面应力问题，键型理论固定$\nu_{12}=1/3$，无法独立调节面内泊松比。此外，面内剪切模量$G_{12}$与弹性模量$E_{11}$、$E_{22}$及泊松比$\nu_{12}$之间存在约束关系，无法独立标定。
+
+这些限制的根源在于键型理论的成对性结构：单根键的伸长同时包含体积变形和剪切变形的贡献，无法将二者独立区分。对于各向异性材料，这意味着不同方向上的弹性响应无法完全独立地调节。正如第6章所述，键型各向异性模型"受$\nu_{12}=1/3$、$G_{12}$约束，这是推广到OSB的动因"——态型理论通过放弃成对性假设，允许材料点同时"看见"近场域内的全部键，从而可以独立调节各方向上的弹性常数，彻底解除键型理论的限制。
+
+具体而言，键型各向异性模型的局限体现在以下方面：
+
+第一，泊松比约束。键型理论中泊松比固定为$1/4$（三维）或$1/3$（平面应力），这一限制在各向异性情形下同样存在，导致面内泊松比$\nu_{12}$无法独立取值。
+
+第二，剪切模量约束。面内剪切模量$G_{12}$与弹性模量$E_{11}$、$E_{22}$及泊松比$\nu_{12}$之间存在约束关系，无法像经典正交各向异性理论那样独立标定。
+
+第三，断裂准则的复杂性。各向异性材料的断裂行为具有显著的方向依赖性，纤维断裂、基体开裂、层间分层等不同失效模式需要不同的断裂准则，键型理论中基于单键伸长的断裂准则难以完整描述这些复杂的失效行为。
+
+% --- 本节说明：本节评述了键型各向异性模型的限制，讨论了泊松比约束、剪切模量约束及断裂准则复杂性问题。引用了OterkusMadenci2012。新符号：无新增。 ---
+
+本章从五个方向对键型理论进行了改进与扩展：力函数的空间衰减特征（\ref{sec:influence-function}节）通过影响函数修正了微模量的空间分布，改善了数值收敛性；微梁模型（\ref{sec:micropolar-beam}节）通过引入键层次的弯曲自由度突破了泊松比固定的限制；共轭键模型（\ref{sec:conjugated-bond}节）通过键间几何耦合引入了剪切变形通道；键转动模型（\ref{sec:bond-rotation}节）通过位移分解直接引入了切向刚度；对偶双影响域模型（\ref{sec:dual-horizon}节）解决了变horizon情形下的力不平衡问题；面向各向异性材料的键型模型（\ref{sec:anisotropic-bond}节）扩展了键型理论在复合材料等领域的适用范围。
+
+然而，需要强调的是，这些改进方案本质上仍在成对相互作用的框架内修补，未能从根本上解除键型理论的固有限制。微梁模型、共轭键模型和键转动模型虽然突破了泊松比固定的限制，但体积变形与剪切变形的独立响应仍然受到成对性结构的约束；对偶双影响域模型虽然解决了变horizon情形下的力不平衡问题，但仍在成对相互作用的框架内；各向异性模型虽然扩展了适用范围，但泊松比约束和剪切模量约束依然存在。
+
+正如第6章所述，"第5章介绍的微梁模型、共轭键模型等改进方案，正是试图在键的层次引入额外的弯曲、扭转自由度来部分缓解这一困难，但这些方案本质上仍在成对相互作用的框架内修补，未能从根本上解除限制"。突破这一局限的关键，在于放弃"材料点的力学响应由单根键的变形决定"这一前提，转而承认材料点感受的是整个近场域内的变形构型。第6章将要介绍的态型理论，通过引入"态"的概念，把材料点近场域内全部键的变形信息组织为一个数学对象，从而彻底解除了成对性限制，是近场动力学理论发展的必然方向。
