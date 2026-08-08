@@ -10,7 +10,7 @@
 ## 项目概览
 
 专著《近场动力学理论与数值方法》的 LaTeX 书籍项目（ctexbook，A4，11pt）。
-章节完成度参差：ch01、ch02、ch03、ch06、ch07 为完整章节（数百行），是写作新章节时的范例；ch04、ch05、ch08–ch19 目前仅为十余行占位骨架；附录 appA–appE 为占位空文件（动手前先 Read 确认行数）。
+章节完成度参差：ch01、ch02、ch03、ch05、ch06、ch07 为完整章节（数百行），是写作新章节时的范例；ch04、ch08–ch19 目前为十余行占位骨架；附录 appA–appE 为1–2行占位空文件（动手前先 Read 确认行数）。
 
 ## 编译
 
@@ -115,6 +115,7 @@ xelatex main.tex
 ### 术语与符号
 
 - **符号表**：新符号在 `frontmatter/notation.tex` 登记，首次出现时定义
+- **符号冲突预警**：notation.tex 已登记以下易混淆符号——`$\theta$`（膨胀，第6章）、`$\varphi$`（损伤变量，第2章）、`$\alpha(\mathbf{x})$`（morphing函数，第3章）、`$\mathbf{R}$`（刚性旋转/极分解旋转张量，第2、6章）。新章节须避让，已有先例：第5章用`\vartheta`（微极转动角）避让`\theta`、用`\varphi_b`（共轭键夹角）避让`\varphi`、用`\beta_b`（键方向角）避让`\alpha`。新增符号前须先 grep notation.tex 确认无冲突
 - **表格列宽**：短表 `p{0.22\textwidth}p{0.65\textwidth}`，长表用 `p{4.8cm}>{\raggedright\arraybackslash}p{10.2cm}` 的 longtable
 - **标点与数字**：GB/T 15834、GB/T 15835
 - **量与单位**：GB 3100、GB/T 3101；量符号斜体，单位符号正体，矢量粗体或箭头
@@ -130,11 +131,14 @@ xelatex main.tex
 
 先例（2026-08）：第 6 章细化审查中确认三处推导错误——G₀ 三维积分缺方位角 `2π` 因子、经典塑性乘子分子 `3μ` 应为 `2μ`、`ν=1/4` 时 `E=3k/2` 误写为 `9k/2`——均在编译前核查中验证并修正。
 
+- **子代理委托注意**：①子代理返回"no file changes"时须用 git diff 或 Read 文件核实，git 工作副本检测可能误报；②子代理常见错误包括孤立`}`（如章末多余花括号）、下标花括号未闭合（如`\delta_{\mathbf{x}'`缺`}`）、量纲推导循环卡死——编译前须人工核查花括号平衡（PowerShell 下用 UTF8 读取+去注释后计`{`/`}`数）；③LaTeX 写作若需多轮分节撰写，必须复用原 session（task_id），新建 session 易丢失上下文导致循环或零写入
+
 ## 文献与可复现性
 
-- **参考文献**：统一由 `bibliography.bib` 管理（121 条）；当前 `main.tex` 用 `\bibliographystyle{plain}`（非 GB/T 7714），若切换 GB/T 7714 须更换 bibstyle 并引入 `gbt7714` 宏包
+- **参考文献**：统一由 `bibliography.bib` 管理（124 条）；新增文献条目须先与作者确认书目信息，禁止编造 cite key；当前 `main.tex` 用 `\bibliographystyle{plain}`（非 GB/T 7714），若切换 GB/T 7714 须更换 bibstyle 并引入 `gbt7714` 宏包
 - **编译质量门禁**：xelatex + bibtex 无 error；无 undefined reference/citation 警告
 - **编译验证执行方式**：涉及 xelatex 编译验证的 QA 任务（如最终编译检查、F-wave 验证），**由当前会话直接本地执行**，不委托子代理。原因：章节文件（`chNN_*.tex`）不能单独编译，必须由 `main.tex` 入口编译；子代理可能编译错误文件、PowerShell 环境差异导致阻塞、或未按格式输出 `VERDICT` 导致 boulder 暂停。
+- **编译执行细节**：整书编译耗时长，须先清理辅助文件（`Remove-Item main.aux,.toc,.out,.log,.bbl,.blg`）再按顺序执行，每次 `xelatex main.tex` 用重定向 `> compileN.log 2>&1` 并设长超时（≥900s）；检查点：`^!` 开头行为 error、`undefined` 为未解析引用、`Overfull \hbox` 为版式溢出。PowerShell 管道（`Select-String` 过滤）会干扰子进程，勿用。
 
 ## Git 约定
 
