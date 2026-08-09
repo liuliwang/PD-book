@@ -1,14 +1,316 @@
 % 第10章 边界条件与表面效应处理
 \chapter{边界条件与表面效应处理}
 
+近场动力学运动方程不含空间导数，这一特征使经典连续介质力学中基于面力 $\mathbf{t}=\boldsymbol{\sigma}\hat{\mathbf{n}}$ 的边界条件无法直接套用：面力必须转化为分布在边界薄层内的等效体力，位移约束也必须通过薄层反馈或虚拟节点实现。边界处理在 PD 中的本质是非局部的——载荷与约束均分布在近场尺度 $\delta$ 的有限厚度层内，而非施加在零测度的几何表面上。本章系统讨论边界条件的数值实现方法：10.1 节与 10.2 节分别给出位移边界与力边界的施加技术；10.3 节深入表面效应的四类修正方法的数值实现细节与收敛性分析；10.4 节介绍无需虚拟层的直接施加方法；10.5 节起讨论接触算法。这些内容将第 2 章的概念性介绍与第 4 章的定性分析深化为可直接用于工程计算的系统性方法论。
+
 \section{位移边界条件的施加}
+
+位移边界条件要求物体表面上的位移等于给定值 $\bar{\mathbf{u}}$。在 PD 中，由于不存在经典意义上的位移场边界 $\partial\mathcal{B}$，位移约束必须通过体力反馈、虚拟节点扩展或方程组重排等方式间接实现。本节依次讨论 penalty 薄层法、虚拟节点\slash 扩展区域法与强加约束法三种主流实现，并比较它们与经典有限元位移边界条件的异同。
+
+\subsection{Penalty 薄层法}
+
+Penalty 薄层法在第 2 章 2.8.1 节已作概念性介绍，其核心思想是在边界附近厚度为 $\delta$ 的薄层内施加与位移偏差成正比的反馈体力：
+\begin{equation}
+\mathbf{b}_{\text{eff}}(\mathbf{x}) = -k\,\bigl[\mathbf{u}(\mathbf{x})-\bar{\mathbf{u}}(\mathbf{x})\bigr], \qquad \mathbf{x}\in\mathcal{B}_{\delta}^{\text{bdy}}
+\label{eq:penalty-body-force}
+\end{equation}
+其中 $k>0$ 为 penalty 系数，$\mathcal{B}_{\delta}^{\text{bdy}}$ 为边界薄层（厚度一般取 $\delta$）。式\eqref{eq:penalty-body-force}将位移约束转化为体力源项，直接加入运动方程 \eqref{eq:motion} 的右端，无需修改离散方程的结构。
+
+Penalty 系数 $k$ 的选择需权衡约束精度与数值稳定性。从物理上看，$k\to\infty$ 时薄层内位移严格等于 $\bar{\mathbf{u}}$，但过大的 $k$ 会引入高频虚假振动：薄层刚度与 $k$ 成正比，导致显式时间积分的时间步长受 CFL 条件限制而急剧缩小。Silling 与 Lehoucq \cite{SillingLehoucq2010} 建议取 $k\sim E/\delta^{2}$（$E$ 为弹性模量），此时薄层位移与给定值的相对误差约为 $O(10^{-2})$，同时时间步长限制在可接受范围内。Kilic 与 Madenci \cite{KilicMadenci2010} 的数值实验表明，$k$ 过小（$k\ll E/\delta^{2}$）会导致约束不足，边界位移显著偏离给定值；$k$ 过大（$k\gg E/\delta^{2}$）则引起虚假波反射，在动态问题中尤为明显。薄层厚度取 $\delta$ 的合理性在于：PD 的近场相互作用尺度为 $\delta$，将约束分布在 $\delta$ 厚度层内可保证约束体力与近场力的空间尺度匹配，避免引入更短波长的虚假模式。
+
+\subsection{虚拟节点与扩展区域法}
+
+虚拟节点法（亦称扩展区域法）在真实物体边界外增设一层虚拟节点（ghost nodes），直接在这些虚拟节点上指定位移。设真实边界上的位移为 $\bar{\mathbf{u}}$，虚拟节点 $\tilde{\mathbf{x}}$ 的位移通过边界上的位移外推得到。对平直边界，最简单的线性外推为
+\begin{equation}
+\mathbf{u}(\tilde{\mathbf{x}}) = 2\bar{\mathbf{u}}(\mathbf{x}_{\text{proj}}) - \mathbf{u}(\mathbf{x}_{\text{int}})
+\label{eq:virtual-layer-extrap}
+\end{equation}
+其中 $\mathbf{x}_{\text{proj}}$ 为虚拟节点在边界上的投影点，$\mathbf{x}_{\text{int}}$ 为边界内侧最近的真实节点。式\eqref{eq:virtual-layer-extrap}的推导基于线性假设：边界位移为真实节点与虚拟节点位移的线性插值中点（该推导需作者人工复核）。
+
+虚拟层的厚度通常取 $\delta$ 或 $2\delta$。取 $\delta$ 时，边界附近真实节点的近场域刚好通过虚拟层补全；取 $2\delta$ 时，可进一步减小外推误差，但增加计算量。Breitenfeld 等 \cite{Breitenfeld2014,BreitenfeldThesis2014} 在隐式 NOSB 框架中采用虚拟节点法施加位移边界，将虚拟节点位移作为已知量移项到方程右端（见第 7 章式\eqref{eq:bc-eliminated}），其处理方式与有限元中的多点约束（MPC）等价。
+
+虚拟节点是否参与损伤演化是工程实现中的关键问题。一般约定：虚拟层内的键不参与损伤计算（即虚拟节点间的键永远完好），因为虚拟材料并非真实物理材料，其断裂行为不应影响真实物体的损伤演化。Oterkus 等 \cite{Oterkus2012Combined} 在组合载荷下的裂纹扩展分析中采用了这一约定，获得了与实验吻合的结果。
+
+\subsection{强加约束法}
+
+强加约束法将位移约束直接并入离散方程组，通过分块消元消除约束自由度。设整体位移向量按未知自由度与约束自由度重排为 $\mathbf{U}_{\text{glob}}=[\mathbf{U}_{u};\,\mathbf{U}_{c}]$，其中 $\mathbf{U}_{c}$ 为指定位移，则离散平衡方程分块为
+\begin{equation}
+\begin{bmatrix}
+\mathbf{K}_{uu} & \mathbf{K}_{uc}\\
+\mathbf{K}_{cu} & \mathbf{K}_{cc}
+\end{bmatrix}
+\begin{bmatrix}
+\mathbf{U}_{u}\\
+\mathbf{U}_{c}
+\end{bmatrix}
+=
+\begin{bmatrix}
+\mathbf{F}_{u}\\
+\mathbf{F}_{c}
+\end{bmatrix}
+\label{eq:ch10-partition}
+\end{equation}
+（该推导需作者人工复核）。由式\eqref{eq:ch10-partition}的第一行，未知自由度满足缩减方程
+\begin{equation}
+\mathbf{K}_{uu}\,\mathbf{U}_{u} = \mathbf{F}_{u} - \mathbf{K}_{uc}\,\mathbf{U}_{c}
+\label{eq:ch10-eliminated}
+\end{equation}
+式\eqref{eq:ch10-eliminated}与第 7 章式\eqref{eq:bc-eliminated}形式一致，但此处强调其在显式与隐式格式中的普适性：显式格式中 $\mathbf{K}$ 为等效刚度矩阵（由近场力对位移的敏感度构成），隐式格式中则为切线刚度矩阵。Breitenfeld 等 \cite{Breitenfeld2014} 指出，强加约束法的精度高于 penalty 法，且不受 penalty 系数选择的困扰，但实现上需要识别约束自由度并重新排列方程组，增加了前处理的复杂度。
+
+\subsection{与经典有限元位移边界条件的对比}
+
+上述三种方法在 PD 中的共同特征是：位移约束均为分布式的，而非经典有限元中节点级的单点约束。在 FEM 中，指定位移边界直接作用于边界节点，约束是严格局部的；而在 PD 中，无论 penalty 薄层、虚拟节点还是强加约束，约束的影响都通过近场相互作用扩散到边界附近厚度 $O(\delta)$ 的区域内。这一差异源于 PD 的非局部性：位移场在一点的值通过键力影响邻近点的运动，因此边界约束必然以"层"的形式存在。Macek 与 Silling \cite{Macek2007} 在将 PD 解释为杆单元网络时指出，这种分布式约束与 FEM 节点约束的等价性仅在 $\delta\to 0$ 的局部极限下成立。
+
+\emph{AI 辅助生成，需经专业审阅。}
+
+% --- 本节说明：系统阐述位移边界的三种数值实现（penalty薄层、虚拟节点、强加约束），讨论参数选择与FEM的差异，为10.2节力边界做铺垫。---
 
 \section{力边界条件的施加}
 
+力边界条件要求物体表面承受给定面力 $\mathbf{t}(\mathbf{x})$。PD 运动方程仅含体力项，因此面力必须转化为等效体力层施加于边界附近。本节从静力等效原理出发，给出均匀面力、非均匀面力、压力载荷及集中力的数值实现方法，并讨论误差来源与收敛性。
+
+\subsection{面力到体力的转换原理}
+
+经典面力到 PD 等效体力的转换基于静力等效原理：等效体力在边界薄层内的体积积分应等于面力在表面上的面积分。设边界薄层为 $\mathcal{B}_{\delta}^{\text{bdy}}$（厚度 $h$，一般取 $h=\delta$），则
+\begin{equation}
+\int_{\mathcal{B}_{\delta}^{\text{bdy}}} \mathbf{b}_{\text{eff}}(\mathbf{x})\, \mathrm{d}V = \int_{\partial\mathcal{B}} \mathbf{t}(\mathbf{x})\, \mathrm{d}A
+\label{eq:ch10-force-conversion}
+\end{equation}
+式\eqref{eq:ch10-force-conversion}即第 2 章式\eqref{eq:force-conversion}。当薄层内体力均匀分布时，有
+\begin{equation}
+\mathbf{b}_{\text{eff}}(\mathbf{x}) = \frac{1}{h}\,\mathbf{t}\bigl(\mathbf{x}_{\text{proj}}(\mathbf{x})\bigr), \qquad \mathbf{x}\in\mathcal{B}_{\delta}^{\text{bdy}}
+\label{eq:ch10-uniform-body-force}
+\end{equation}
+式\eqref{eq:ch10-uniform-body-force}与第 2 章式\eqref{eq:uniform-body-force}一致。该转换的适用条件是面力沿表面的变化特征尺度远大于 $\delta$；若面力在表面上快速变化（如集中力、裂纹尖端奇异性），则均匀分布假设失效，需采用更精细的体力分布。
+
+\subsection{节点等效体力}
+
+在离散实现中，面力按节点分担面积转化为节点等效体力。设边界面上节点 $i$ 分担的面积为 $A_{i}$，节点参考体积为 $V_{i}$，则节点 $i$ 上的等效体力密度为
+\begin{equation}
+\mathbf{b}_{i} = \frac{\mathbf{t}\,A_{i}}{V_{i}}
+\label{eq:ch10-bc-traction-force}
+\end{equation}
+式\eqref{eq:ch10-bc-traction-force}与第 7 章式\eqref{eq:bc-traction-force}一致。对内部节点，$V_{i}$ 为完整节点体积；对表面节点，由于近场域被边界截断，实际参与积分的体积小于名义体积，需进行体积修正。设表面节点 $i$ 的实际近场域体积为 $V_{i}^{\text{eff}}$（由数值积分计算，见 10.3 节），则修正后的等效体力由式\eqref{eq:ch10-corrected-body-force}给出：
+\begin{equation}
+\mathbf{b}_{i}^{\text{corr}} = \frac{\mathbf{t}\,A_{i}}{V_{i}^{\text{eff}}}
+\label{eq:ch10-corrected-body-force}
+\end{equation}
+（该推导需作者人工复核）。式\eqref{eq:ch10-corrected-body-force}表明，若不进行体积修正，表面节点的等效体力将被低估，导致边界位移偏大。Madenci 与 Oterkus \cite{MadenciOterkus2014} 建议在边界层内统一采用修正体积 $V_{i}^{\text{eff}}$ 计算体力，以消除表面效应在力边界处的耦合误差。
+
+\subsection{压力载荷与集中力的处理}
+
+压力载荷 $\mathbf{t}=-p\,\hat{\mathbf{n}}$（$p$ 为压强，$\hat{\mathbf{n}}$ 为外法向）的处理与均匀面力相同：将压力转化为边界薄层内的等效体力，按式\eqref{eq:ch10-uniform-body-force}均匀分布。对法向压力，$\mathbf{b}_{\text{eff}}=-(p/h)\,\hat{\mathbf{n}}$。Oterkus \cite{Oterkus2014} 在平板弯曲问题的 PD 分析中采用这一处理，获得了与经典解吻合的挠度分布。
+
+集中力在 PD 中不存在经典意义上的"点力"——因为 PD 运动方程是积分形式，力必须分布在有限体积内。Silling 与 Lehoucq \cite{SillingLehoucq2010} 提出用正则化核函数将集中力 $\mathbf{F}\,\delta(\mathbf{x}-\mathbf{x}_{0})$ 展布为体力层：
+\begin{equation}
+\mathbf{b}_{\text{eff}}(\mathbf{x}) = \mathbf{F}\,\phi_{\delta}(|\mathbf{x}-\mathbf{x}_{0}|)
+\label{eq:ch10-regularized-force}
+\end{equation}
+其中 $\phi_{\delta}(r)$ 为以 $\delta$ 为特征尺度的正则化核函数，满足 $\int_{\mathcal{B}}\phi_{\delta}(r)\,\mathrm{d}V=1$。常用的均匀核取 $\phi_{\delta}(r)=1/V_{\delta}$（$r\le\delta$），高斯核取 $\phi_{\delta}(r)\propto\exp(-r^{2}/\delta^{2})$。式\eqref{eq:ch10-regularized-force}将点力正则化为近场尺度内的分布体力，避免了经典力学中点力引起的奇异性，体现了 PD 非局部理论对奇异载荷的自然正则化能力。
+
+\subsection{非均匀面力与收敛性}
+
+当面力沿表面变化时，需逐点投影并分配体力。设面力分布为 $\mathbf{t}(\mathbf{x})$，$\mathbf{x}\in\partial\mathcal{B}$，对边界薄层内每一点 $\mathbf{x}'$，找到其在表面上的投影点 $\mathbf{x}_{\text{proj}}(\mathbf{x}')$，令
+\begin{equation}
+\mathbf{b}_{\text{eff}}(\mathbf{x}') = \frac{1}{h}\,\mathbf{t}\bigl(\mathbf{x}_{\text{proj}}(\mathbf{x}')\bigr)
+\label{eq:ch10-nonuniform-body-force}
+\end{equation}
+式\eqref{eq:ch10-nonuniform-body-force}的精度取决于面力变化尺度与 $\delta$ 的比值。Queiruga 与 Moridis \cite{QueirugaMoridis2017} 通过数值实验系统研究了非均匀面力转换的误差：当面力变化特征尺度 $L_{t}\gg\delta$ 时，式\eqref{eq:ch10-nonuniform-body-force}的误差为 $O(\delta/L_{t})$；当 $L_{t}\sim\delta$ 时，误差显著增大，需在厚度方向采用更高阶的分布（如线性或二次分布）以改善精度。Silling 与 Lehoucq \cite{SillingLehoucq2008} 指出，对快速变化的面力，可在边界层内引入权函数修正，使体力分布匹配面力的局部梯度。
+
+\emph{AI 辅助生成，需经专业审阅。}
+
+% --- 本节说明：从静力等效原理出发，给出均匀/非均匀面力、压力、集中力的数值实现，强调体积修正与正则化的必要性，与10.1节位移边界形成完整边界条件处理框架。---
+
 \section{非局部边界层与表面效应的数值修正}
+
+第 2 章 2.8.2 节与第 4 章 4.5 节已从概念和定性角度介绍了表面效应及其四类修正方法。本节转向数值实现层面：给出微模量修正、体积修正、虚拟材料层法与短程力修正的离散实现细节，用一张对比表总结各方法的适用场景，并讨论修正方法的收敛性与尺度依赖性。
+
+\subsection{表面效应的数值表现回顾}
+
+表面效应源于边界附近物质点近场域的不完整。以线性化键基理论为例，物质点 $\mathbf{x}$ 处的有效刚度由式\eqref{eq:effective-stiffness-recall}给出。对三维平直表面，近场域退化为半球，有效刚度约为内部值的一半（式\eqref{eq:surface-stiffness-recall}）；在角点和边缘处，截断更严重，$k_{\text{eff}}^{\text{bdy}}$ 可降至 $k_{\text{eff}}^{\infty}$ 的 $1/4$ 甚至更低。Le 与 Bobaru \cite{LeBobaru2018} 的数值分析表明，对均匀拉伸载荷，边界点位移可达内部点的近两倍，应力场显著偏离经典弹性解。表面效应的严重程度与物体特征尺寸 $L$ 和近场范围 $\delta$ 之比密切相关：当 $L\gg\delta$ 时，受影响边界层体积占比 $\sim\delta/L$ 很小；当 $L\sim\delta$ 时（薄膜、纤维、微结构），表面效应主导整体响应，必须修正。
+
+\subsection{微模量修正的数值实现}
+
+微模量修正法的核心是按近场域截断比例放大微模量（第 4 章式\eqref{eq:surface-correction-c}）。在离散实现中，体积比例因子由式\eqref{eq:ch10-alpha-discrete}定义：
+\begin{equation}
+\alpha(\mathbf{x}_{i}) = \frac{V_{H_{\mathbf{x}_{i}}}}{V_{H_{\mathbf{x}_{i}}^{\infty}}}
+\label{eq:ch10-alpha-discrete}
+\end{equation}
+该因子需对每个物质点数值计算。对规则网格（如立方体网格），$V_{H_{\mathbf{x}_{i}}^{\infty}}=\frac{4}{3}\pi\delta^{3}$（三维）或 $\pi\delta^{2}$（二维）为常数；$V_{H_{\mathbf{x}_{i}}}$ 则通过判断邻居节点是否位于物体内部并累加其体积微元得到，近场域内体积由式\eqref{eq:ch10-alpha-volume-sum}累加得到：
+\begin{equation}
+V_{H_{\mathbf{x}_{i}}} = \sum_{\mathbf{x}_{j}\in H_{\mathbf{x}_{i}}\cap\mathcal{B}} V_{j}
+\label{eq:ch10-alpha-volume-sum}
+\end{equation}
+（该推导需作者人工复核）。对复杂几何（多孔介质、裂纹体），精确计算 $V_{H_{\mathbf{x}_{i}}}$ 需要判断每个邻居节点与物体边界的相对位置，计算量较大。工程上常采用近似：对平直表面，直接取解析值 $\alpha\approx 1/2$（三维）或 $\alpha\approx 1/2$（二维）；对曲率半径 $\gg\delta$ 的曲面，用局部平面近似估算截断比例。
+
+修正后的微模量 $c'(\boldsymbol{\xi},\mathbf{x}_{i})=c/\alpha(\mathbf{x}_{i})$ 在空间上变化，可能引入虚假波反射。Le 与 Bobaru \cite{LeBobaru2018} 指出，动态问题中微模量修正会导致边界附近产生非物理的应力波反射，其幅度与 $\alpha$ 的空间梯度成正比。因此，微模量修正更适用于静态或准静态问题，在动态冲击问题中需谨慎使用。
+
+\subsection{体积修正的数值实现}
+
+体积修正法通过修正积分权重来处理表面效应（第 4 章式\eqref{eq:volume-beta}）。在离散实现中，对每条键 $(i,j)$ 赋予修正因子
+\begin{equation}
+\beta_{ij} =
+\begin{cases}
+1, & \mathbf{x}_{j}\in H_{\mathbf{x}_{i}}\cap\mathcal{B}\\
+0, & \text{否则}
+\end{cases}
+\label{eq:ch10-beta-discrete}
+\end{equation}
+式\eqref{eq:ch10-beta-discrete}等价于在数值积分时仅累加位于物体内部的邻居节点。与微模量修正不同，体积修正不改变本构参数，仅调整积分范围，因此不会引入额外的刚度不均匀性。
+
+体积修正法与主流 PD 软件（Peridigm、LAMMPS 的 PD 模块）的默认实现天然兼容：这些软件在搜索邻居时自动排除物体外的节点，本质上就是体积修正的等价实现。Bobaru 等 \cite{Bobaru2016} 指出，体积修正法的精度受网格分辨率影响：当网格较粗时，边界附近节点数少，截断比例的离散误差大；随着网格加密，体积修正的结果收敛于精确解。Seleson 与 Parks \cite{SelesonParks2011} 以及 Seleson 与 Littlewood \cite{SelesonLittlewood2016} 在耦合方法的研究中验证了体积修正的收敛性，建议边界层内至少保持 $3\sim 5$ 层节点以保证精度。
+
+\subsection{虚拟材料层法}
+
+虚拟材料层法在真实物体外边界之外延拓一层厚度为 $\delta$ 的虚拟材料，使原边界附近物质点的近场域通过虚拟层补全。虚拟层内物质点的位移由真实边界位移外推得到（式\eqref{eq:virtual-layer-extrap}），其键不参与损伤计算（即虚拟层内无裂纹）。
+
+该方法的数值实现步骤为：第一步，识别真实边界节点并构造虚拟层网格；第二步，对每个时间步，由真实边界位移通过外推公式计算虚拟节点位移；第三步，在计算真实节点近场力时，将虚拟节点纳入邻居搜索范围。Madenci 与 Oterkus \cite{MadenciOterkus2014} 对二维与三维问题中的虚拟层构造有详细讨论，建议对平直边界采用线性外推，对曲率边界采用二次外推以提高精度。
+
+虚拟材料层法的优点是不修改本构参数，概念直观；缺点是需要扩大计算域，增加节点数约 $O(\delta/L)$ 比例。在复杂几何（如含内孔、多裂纹）边界处，虚拟层的构造与外推逻辑较为复杂，需要专门的网格生成算法。Oterkus 等 \cite{Oterkus2012Combined} 在组合载荷裂纹扩展分析中采用虚拟层法，通过限制虚拟层键不参与损伤演化，避免了虚拟裂纹对真实裂纹路径的干扰。
+
+\subsection{短程力修正}
+
+短程力修正法由 Mitchell 等 \cite{Mitchell2015} 提出，其核心是在运动方程中附加一项仅作用于边界附近物质点对的短程中心力，以补偿表面效应导致的刚度损失。修正力沿键方向，大小与两物质点到边界的距离成反比：
+\begin{equation}
+\mathbf{f}_{\text{corr}}(\boldsymbol{\xi},\mathbf{x}) = -\frac{\gamma}{d_{\text{bdy}}(\mathbf{x})\,d_{\text{bdy}}(\mathbf{x}')}\,\frac{\boldsymbol{\xi}+\boldsymbol{\eta}}{|\boldsymbol{\xi}+\boldsymbol{\eta}|}
+\label{eq:ch10-short-range-force}
+\end{equation}
+其中 $d_{\text{bdy}}(\mathbf{x})$ 为物质点 $\mathbf{x}$ 到边界的距离，$\gamma$ 为待标定参数。式\eqref{eq:ch10-short-range-force}的参数 $\gamma$ 通过强制边界位移场匹配经典弹性解的边界条件来反演确定：对给定材料与几何，求解经典弹性问题得到表面位移，然后调整 $\gamma$ 使 PD 解在边界处的位移与之一致。
+
+短程力修正法的优点是不扩大计算域、不修改微模量；缺点是参数 $\gamma$ 需针对具体材料与几何单独标定，缺乏通用性。此外，式\eqref{eq:ch10-short-range-force}中的 $d_{\text{bdy}}(\mathbf{x})$ 在复杂几何中难以精确定义，限制了该方法在工程问题中的广泛应用。
+
+\subsection{四类修正方法对比}
+
+表\ref{tab:surface-numerical-compare}从适用本构类型、实现复杂度、对波传播的影响以及裂纹场景兼容性四个维度对四类修正方法作了系统对比。
+
+\begin{table}[htbp]
+\centering
+\caption{表面效应四类修正方法的数值实现对比}
+\label{tab:surface-numerical-compare}
+\begin{tabular}{p{0.18\textwidth}p{0.18\textwidth}p{0.18\textwidth}p{0.20\textwidth}p{0.18\textwidth}}
+\toprule
+方法 & 适用本构类型 & 实现复杂度 & 对波传播的影响 & 裂纹场景兼容性 \\
+\midrule
+微模量修正 & 键基、态型 & 低（规则几何）/ 高（复杂几何） & 可能引入虚假波反射 & 兼容，但需处理裂纹面截断 \\
+体积修正 & 键基、态型 & 低 & 无额外波反射 & 天然兼容，自动排除裂纹面外节点 \\
+虚拟材料层 & 键基、态型 & 中（平直边界）/ 高（曲率边界） & 外推位移可能改变波速 & 需限制虚拟层键不参与损伤 \\
+短程力修正 & 键基为主 & 高（参数需反演标定） & 取决于标定质量 & 受限于边界距离定义 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\subsection{收敛性与尺度依赖性}
+
+表面效应的修正精度与 $L/\delta$ 密切相关。Le 与 Bobaru \cite{LeBobaru2018} 通过系统的数值实验表明：对微模量修正和体积修正，当 $L/\delta\ge 20$ 时，边界位移误差可控制在 $5\%$ 以内；当 $L/\delta\le 10$ 时，即使采用修正，边界应力仍显著偏离经典解。Silling \cite{Silling2010,Silling2017} 从非局部算子理论出发，证明了对充分光滑的解，修正后的 PD 解在 $\delta\to 0$ 时收敛于经典弹性解，收敛阶为 $O(\delta)$。Trageser 与 Seleson \cite{TrageserSeleson2020} 进一步分析了不同修正方法在耦合问题中的收敛行为，建议根据问题特征尺寸与 $\delta$ 的比值选择修正策略。
+
+\emph{AI 辅助生成，需经专业审阅。}
+
+% --- 本节说明：将第4章定性介绍的表面效应修正方法深化为数值实现细节，通过对比表明确各方法的工程适用场景，为10.4节无虚拟层方法提供参照基准。---
 
 \section{无虚拟层边界条件直接施加方法}
 
+前述 penalty 薄层法、虚拟节点法和体积修正法均需在边界附近引入额外的物理假设（反馈系数、虚拟层、修正因子）。在复杂几何、裂纹表面或多体接触等场景中，这些假设的实施往往困难。本节介绍两类无需虚拟层的直接施加方法：近场动力学微分算子（PDDO）方法与直接约束\slash 直接体力法，它们将边界条件直接施加在真实边界点上，不扩展近场域。
+
+\subsection{PDDO 方法}
+
+近场动力学微分算子（Peridynamic Differential Operator，PDDO）由 Madenci 等 \cite{Madenci2016} 提出，其核心思想是用非局部积分构造微分算子，将经典微分方程中的空间导数替换为近场积分形式。对函数 $f(\mathbf{x})$，PDDO 定义其 $n$ 阶导数的非局部近似为
+\begin{equation}
+\mathcal{D}^{\boldsymbol{\alpha}}f(\mathbf{x}) = \int_{H_{\mathbf{x}}} \bigl[f(\mathbf{x}')-f(\mathbf{x})\bigr]\,g^{(\boldsymbol{\alpha})}(|\mathbf{x}'-\mathbf{x}|)\,\mathrm{d}V_{\mathbf{x}'}
+\label{eq:pdo-operator}
+\end{equation}
+其中 $\boldsymbol{\alpha}$ 为多指标，$g^{(\boldsymbol{\alpha})}$ 为与导数阶数对应的权函数。式\eqref{eq:pdo-operator}的构造使得当 $\delta\to 0$ 时，$\mathcal{D}^{\boldsymbol{\alpha}}f$ 收敛于经典导数 $\partial^{\boldsymbol{\alpha}}f$（该推导需作者人工复核）。
+
+在边界条件处理中，PDDO 的关键优势在于：它允许在边界点上直接定义面力或位移，而无需通过虚拟层过渡。对位移边界，直接在边界点上令 $\mathbf{u}(\mathbf{x})=\bar{\mathbf{u}}(\mathbf{x})$；对面力边界，利用 PDDO 将面力 $\mathbf{t}=\boldsymbol{\sigma}\hat{\mathbf{n}}$ 表示为近场积分形式，再代入运动方程。Madenci 等 \cite{Madenci2016} 证明，PDDO 方法在规则网格上的精度与有限元相当，且天然适用于非局部本构。
+
+\subsection{直接约束与直接体力法}
+
+直接约束法（direct constraint method）与直接体力法（direct body force method）是近年来发展的另一类无虚拟层方法。Gu 与 Zhang 等 \cite{GuZhang2019,GuMadenciZhang2018,GuZhangMadenciXia2019} 提出在边界点上直接施加约束或等效体力，而不扩展近场域。
+
+直接约束法的基本思想是：对边界上的物质点，将其位移自由度直接指定位移值，同时修改其近场力的计算方式——仅使用位于物体内部的邻居节点计算键力，边界点本身不引入虚拟节点。形式上，对边界点 $\mathbf{x}_{i}$，其运动方程取式\eqref{eq:ch10-direct-constraint}的形式：
+\begin{equation}
+\rho\ddot{\mathbf{u}}(\mathbf{x}_{i}) = \int_{H_{\mathbf{x}_{i}}\cap\mathcal{B}} \mathbf{f}\bigl(\boldsymbol{\eta},\boldsymbol{\xi}\bigr)\,\mathrm{d}V_{\mathbf{x}'} + \mathbf{b}_{\text{eff}}(\mathbf{x}_{i})
+\label{eq:ch10-direct-constraint}
+\end{equation}
+其中积分域限制在 $H_{\mathbf{x}_{i}}\cap\mathcal{B}$（即仅包含物体内部的邻居），$\mathbf{b}_{\text{eff}}$ 为根据边界条件确定的等效体力。对位移边界，$\mathbf{b}_{\text{eff}}$ 通过反馈机制保证 $\mathbf{u}(\mathbf{x}_{i})\approx\bar{\mathbf{u}}$；对面力边界，$\mathbf{b}_{\text{eff}}$ 由静力等效确定。
+
+直接体力法则更进一步：不修改运动方程的结构，而是在边界点上直接施加经标定的等效体力，使边界响应匹配经典解。Zhu 与 Ni \cite{ZhuNi2017} 在二维弹性问题的分析中采用直接体力法，通过优化体力分布使边界位移误差最小化，获得了优于虚拟层法的精度。
+
+\subsection{收敛性分析}
+
+无虚拟层方法的收敛性已在近年文献中得到系统研究。Zaccariotto 等 \cite{Zaccariotto2018} 分析了直接约束法在有限尺寸效应下的收敛行为，指出当网格加密且 $\delta$ 固定时，边界位移误差以 $O(\Delta x)$ 速率收敛（$\Delta x$ 为网格尺寸）。对直接体力法，Silling 与 Lehoucq \cite{SillingLehoucq2008} 从非局部算子收敛理论的角度指出，当 $\delta\to 0$ 时 PD 解在能量意义下收敛于经典弹性解，收敛的快慢与近场范围的选择密切相关：$\delta$ 过大时，边界条件的非局部性增强，收敛变慢；$\delta$ 过小时，近场相互作用不足，内部解的精度下降。Scabbia 等 \cite{Scabbia2024} 在各向异性 OSB 模型的研究中采用直接约束法处理边界条件，验证了该方法在复杂本构下的适用性。
+
+\subsection{方法对比}
+
+表\ref{tab:bc-methods-compare}从实施难度、精度、通用性和裂纹兼容性四个维度对比了虚拟层法、PDDO 直接法和直接约束法。
+
+\begin{table}[htbp]
+\centering
+\caption{边界条件施加方法对比：虚拟层法、PDDO 直接法与直接约束法}
+\label{tab:bc-methods-compare}
+\begin{tabular}{p{0.18\textwidth}p{0.18\textwidth}p{0.18\textwidth}p{0.18\textwidth}p{0.18\textwidth}}
+\toprule
+方法 & 实施难度 & 精度 & 通用性 & 裂纹兼容性 \\
+\midrule
+虚拟层法 & 中（需生成虚拟层网格） & 中（受外推精度限制） & 高（适用于各类本构） & 需限制虚拟层键不参与损伤 \\
+PDDO 直接法 & 高（需构造微分算子） & 高（与 FEM 相当） & 中（主要适用于规则网格） & 天然兼容 \\
+直接约束法 & 低（仅修改边界点方程） & 中高（取决于约束实现） & 高（适用于显式/隐式） & 天然兼容 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+表\ref{tab:bc-methods-compare}表明，直接约束法在保持较低实施难度的同时获得了较高的精度和通用性，是工程应用中的首选；PDDO 直接法精度最高，但实现复杂，更适合需要高精度边界处理的学术研究；虚拟层法概念直观，但在复杂几何和裂纹问题中需额外处理虚拟层与真实裂纹的交互。
+
+\emph{AI 辅助生成，需经专业审阅。}
+
+% --- 本节说明：介绍无虚拟层直接施加方法（PDDO、直接约束、直接体力），通过对比表明确其与虚拟层法的差异，为10.5节接触算法提供边界处理的技术基础。---
+
 \section{接触算法}
+
+经典接触力学需要定义接触界面、主从面、穿透检测以及惩罚函数或拉格朗日乘子来约束接触条件。近场动力学由于运动方程本身是非局部的，接触的处理方式与经典力学有本质不同：不同物体的物质点之间通过短程排斥力自然表征接触，无需显式定义接触面或进行穿透检测。Silling 与 Askari \cite{SillingAskari2005} 在早期的动态断裂模拟中即采用了这一思想，将不同物体物质点对之间的短程排斥力作为接触的自然描述。本节讨论刚体-可变形体接触（10.5.1）与多体接触（10.5.2）的数值实现，并说明接触算法与 10.4 节无虚拟层边界条件处理方法的衔接。
+
 \subsection{刚体-可变形体接触}
+
+刚体-可变形体接触是工程中最常见的接触场景之一：刚体（如冲头、压板、模具）以给定运动或固定状态与可变形体相互作用。在 PD 中，刚体表面被离散为一组固定（或按给定运动规律更新位置）的物质点集合，可变形体表面的物质点与刚体物质点之间通过短程排斥力实现接触。
+
+设刚体上物质点为 $\mathbf{x}_{r}$，可变形体上物质点为 $\mathbf{x}_{d}$，其当前位置分别为 $\mathbf{y}_{r}=\mathbf{x}_{r}+\mathbf{u}(\mathbf{x}_{r})$ 和 $\mathbf{y}_{d}=\mathbf{x}_{d}+\mathbf{u}(\mathbf{x}_{d})$。当两物质点当前距离小于接触截止距离 $r_{c}$（通常取 $r_{c}\sim\Delta x$，$\Delta x$ 为网格尺寸）时，激活短程排斥接触力：
+\begin{equation}
+\mathbf{f}_{c}(\mathbf{x}_{d},\mathbf{x}_{r}) =
+\begin{cases}
+c_{c}\,\bigl(r_{c} - |\mathbf{y}_{d}-\mathbf{y}_{r}|\bigr)\,\dfrac{\mathbf{y}_{d}-\mathbf{y}_{r}}{|\mathbf{y}_{d}-\mathbf{y}_{r}|}, & |\mathbf{y}_{d}-\mathbf{y}_{r}| < r_{c}\\
+\mathbf{0}, & \text{否则}
+\end{cases}
+\label{eq:ch10-contact-force}
+\end{equation}
+其中 $c_{c}>0$ 为接触刚度系数，量纲为 $\mathrm{N}/\mathrm{m}^{7}$（三维）或 $\mathrm{N}/\mathrm{m}^{4}$（二维，单位厚度），由 $(r_{c}-|\mathbf{y}_{d}-\mathbf{y}_{r}|)$ 的长度量纲与对力密度量纲反推（该推导需作者人工复核）。式\eqref{eq:ch10-contact-force}表明，接触力沿两物质点当前相对位置方向，大小随接近距离线性增大，在 $|\mathbf{y}_{d}-\mathbf{y}_{r}|=r_{c}$ 处连续归零。
+
+刚体-可变形体接触的算法流程如下：第一步，在邻居搜索阶段，将刚体物质点纳入可变形体表面物质点的邻居列表（跨物体邻居对）；第二步，对每个时间步，计算所有跨物体邻居对的当前距离；第三步，对距离小于 $r_{c}$ 的邻居对，按式\eqref{eq:ch10-contact-force}计算接触力；第四步，将接触力作为成对力密度与键力一同叠加计入运动方程。需要特别指出的是，接触键（即跨物体邻居对）不参与损伤计算——接触力是纯粹的几何约束，不应影响可变形体内部的断裂演化。Agwai 等 \cite{Agwai2011} 在动态断裂的对比研究中将短程排斥接触模型与有限元接触算法作了比较，表明 PD 接触模型无需定义接触界面即可表征碰撞作用；接触刚度 $c_{c}$ 的取值需在约束精度与显式积分稳定性之间权衡。
+
+接触截止距离 $r_{c}$ 和接触刚度 $c_{c}$ 是两个关键参数。$r_{c}$ 过小会导致接触检测遗漏（尤其当时间步较大时物质点可能"穿透"），$r_{c}$ 过大则会引入非物理的远距离排斥；工程上通常取 $r_{c}\approx\Delta x$。$c_{c}$ 的选择需权衡接触约束精度与数值稳定性：$c_{c}$ 过小约束不足，可变形体与刚体发生穿透；$c_{c}$ 过大则时间步长受 CFL 条件限制。Diehl 等 \cite{Diehl2019} 在近场动力学 benchmark 实验综述中指出，接触算例的参数（刚度、截止距离）选取需经基准实验标定，以保证数值结果的可比性与可复现性。
+
 \subsection{多体接触}
+
+多体接触指两个或多个可变形体之间的相互接触。与刚体-可变形体接触不同，多体接触中所有物体均为可变形体，接触力按牛顿第三定律成对作用于两物体表面物质点之间。设物体 A 上物质点为 $\mathbf{x}_{A}$，物体 B 上物质点为 $\mathbf{x}_{B}$，则物体 A 受到物体 B 的接触力为式\eqref{eq:ch10-contact-force}，物体 B 受到物体 A 的接触力为 $-\mathbf{f}_{c}$，保证动量守恒。
+
+多体接触的搜索策略与单物体近场邻居搜索共享数据结构：在构建邻居列表时，对每个物质点搜索其近场域 $H_{\mathbf{x}}$ 内的所有邻居，包括同物体邻居（用于计算内部键力）和跨物体邻居（用于计算接触力）。这种统一的搜索策略避免了经典接触力学中独立的主从面搜索算法，简化了实现。具体而言，对物质点 $\mathbf{x}$，其邻居列表分为两部分：$\mathcal{N}_{\text{int}}(\mathbf{x})$（同物体邻居）和 $\mathcal{N}_{\text{ext}}(\mathbf{x})$（跨物体邻居）。内部键力仅对 $\mathcal{N}_{\text{int}}(\mathbf{x})$ 中的邻居计算，接触力仅对 $\mathcal{N}_{\text{ext}}(\mathbf{x})$ 中的邻居计算，二者互不干扰。
+
+多体接触与断裂模拟的耦合是 PD 的重要优势之一。在动态断裂过程中，裂纹扩展导致物体分裂为多个碎片，碎片之间可能发生二次接触（如碎片飞溅后的碰撞）。经典有限元处理这种碎片间的接触需要复杂的接触面重构算法，而 PD 由于物质点始终携带完整的近场邻居信息，碎片间的接触自动通过跨物体邻居搜索实现——碎片分离后，原属于同一物体的物质点变为不同碎片，其近场域内的邻居关系自然转化为跨物体接触对。Agwai 等 \cite{Agwai2011} 的动态断裂算例表明，碎片分离后其近场邻居关系自然转化为跨物体接触对，接触作用无需人工干预即可自动激活。Diehl 等 \cite{Diehl2019} 进一步指出，多体接触与断裂的耦合对接触模型参数敏感：过小的 $r_{c}$ 可能导致碎片在碰撞前已发生非物理穿透，过大的 $c_{c}$ 则可能在碰撞瞬间引入过高的接触应力，诱发虚假的局部断裂。
+
+接触算法与 10.4 节无虚拟层边界条件处理方法存在自然的衔接：接触表面不需要虚拟层——接触力直接施加在真实边界点上，通过短程排斥力自然阻止穿透。这与 PDDO 直接法和直接约束法的思想一致：边界条件（此处为接触约束）直接施加在真实物质点上，不扩展近场域。因此，在同时涉及复杂边界条件和多体接触的问题中，无虚拟层方法与接触算法可无缝集成，避免了虚拟层在接触面处的构造困难。
+
+\emph{AI 辅助生成，需经专业审阅。}
+
+% --- 本节说明：介绍PD接触算法的物理思想与数值实现，涵盖刚体-可变形体接触与多体接触，强调接触与断裂模拟的耦合优势，与10.4节无虚拟层方法形成衔接。---
+
+\section{本章小结}
+
+本章系统讨论了近场动力学边界条件与表面效应处理的数值方法，核心结论是：PD 的边界处理本质是非局部的——面力转化为分布在近场尺度 $\delta$ 内的等效体力层，位移约束通过薄层反馈、虚拟节点或方程重排实现分布式约束，载荷与约束均不施加在零测度的几何表面上。
+
+本章的技术内容可归纳为三类。第一类是边界条件的数值实现（10.1--10.2 节）：位移边界通过 penalty 薄层法、虚拟节点法和强加约束法实现，力边界通过面力-体力转换、节点等效体力和正则化核函数实现。这些方法将第 2 章的概念性介绍深化为可直接用于工程计算的系统性方法论。第二类是表面效应的数值修正（10.3 节）：微模量修正、体积修正、虚拟材料层法和短程力修正的离散实现细节、适用场景与收敛性分析，为工程实践中修正方法的选择提供了定量依据。第三类是无虚拟层直接施加方法与接触算法（10.4--10.5 节）：PDDO 直接法、直接约束法和直接体力法将边界条件直接施加在真实边界点上，短程排斥接触力将多体接触自然融入非局部框架，二者共同拓展了 PD 在复杂几何和断裂碎片碰撞等场景中的应用能力。
+
+从工程应用角度，边界处理方法的选择应依据问题特征。对静态或准静态问题、简单几何（矩形板、圆柱），虚拟材料层法或微模量修正法即可获得满意精度；对动态冲击问题，体积修正法因不引入额外刚度不均匀性而更为合适；对复杂几何（含孔洞、多裂纹）或需要同时处理边界条件和接触的问题，直接约束法与短程排斥接触力的组合是首选。物体特征尺寸与近场范围之比 $L/\delta$ 是关键判据：$L/\delta\ge 20$ 时表面效应影响有限，$L/\delta\le 10$ 时必须采用修正方法。对断裂模拟，需确保边界修正方法（如虚拟层）与损伤模型的兼容性——虚拟层键不参与损伤、接触键不参与断裂是通用约定。
+
+本章内容直接服务于第 11 章裂纹与损伤的数值模拟。裂纹面在 PD 中本质上是新生成的边界：裂纹扩展使原内部物质点变为表面物质点，其近场域被裂纹面截断，表面效应在裂纹尖端尤为严重。第 11 章将大量依赖本章的边界处理技术——裂纹面的位移约束、裂纹尖端的面力转换、断裂碎片的接触碰撞——这些场景中的边界条件处理均可在本章找到对应的方法论基础。全书第三部分（第 9--11 章）从离散化到边界条件再到裂纹模拟，构成了近场动力学数值方法从理论到应用的完整链条。
+
+\emph{AI 辅助生成，需经专业审阅。}
+
+% --- 本节说明：总结本章技术内容，按问题类型给出工程建议，衔接第11章裂纹模拟，回扣全书第9-11章数值方法路线图。---
