@@ -1,17 +1,601 @@
 % 第4章 键型近场动力学模型
 \chapter{键型近场动力学模型}
 
+\leavevmode\usetikzlibrary{arrows.meta, positioning, calc}
+
+第 2 章建立了近场动力学的完整理论框架：物质点通过键与近场域内的邻居相互作用，对力函数满足反作用条件与中心力条件 \eqref{eq:central-force}，微弹性材料的成对势 $w$ 与对力由梯度关系 $\mathbf{f}=\nabla_{\boldsymbol{\eta}}w$ 联系（\eqref{eq:pairwise-force-potential}），损伤通过历史变量 $\mu$ 与临界伸长率 $s_c$ 描述。第 3 章在此基础上建立了近场动力学与经典连续介质力学的对应关系：各向同性键基模型的近场动力学 Lam\'e 常数 $\lambda_{\mathrm{PD}}=\mu_{\mathrm{PD}}=4\pi R/15$（式\eqref{eq:pd-lame}），泊松比被锁定为 $1/4$。然而，第 2 章与第 3 章的讨论是在一般框架下进行的，并未给出可供工程计算的显式本构方程。本章的任务是将一般理论具体化为键型（bond-based）模型族：从三个基本假设出发将一般本构框架约化为键基形式（4.1 节），分析微势与键力密度函数的结构与约束（4.2 节），进而重点展开最广泛使用的经典微弹脆性（PMB）模型（4.3 节），随后给出材料参数的率定方法（4.4 节），讨论表面效应及其修正（4.5 节），最后分析键型模型的固有局限（4.6 节）。本章的结果将直接服务于本书后续各章的数值方法、改进模型与工程算例，同时为第 6 章态基理论的展开提供对照基础。
+
 \section{键型理论的基本假设}
+
+近场动力学的完整理论框架——运动方程 \eqref{eq:motion}、对力函数 $\mathbf{f}(\boldsymbol{\eta},\boldsymbol{\xi})$、成对势 $w(\boldsymbol{\eta},\boldsymbol{\xi})$——在第 2 章已经建立。将这一框架具体化为可计算的键型模型，需对 $\mathbf{f}$ 和 $w$ 的函数形式施加三条基本假设。本节依次讨论这三条假设及其物理意义（4.1.1），在此基础上导出键型对力的一般函数形式（4.1.2），最后综述键型模型族的结构与分类（4.1.3）。
+
+\subsection{三条基本假设}
+
+键型近场动力学区别于态型理论的核心在于对力函数 $\mathbf{f}(\boldsymbol{\eta},\boldsymbol{\xi})$ 仅依赖单一键 $(\mathbf{x},\mathbf{x}')$ 两端点的相对变形，而不像态型理论中力态 $\underline{\mathbf{T}}\langle\boldsymbol{\xi}\rangle$ 那样依赖物质点 $\mathbf{x}$ 的整个变形状态。这一"键独立"的特征由以下三条基本假设联合刻画。
+
+\textbf{第一条：成对性（pairwise nature）。}键型理论假设物质点对 $(\mathbf{x},\mathbf{x}')$ 之间的相互作用完全由该键自身的几何量——参考相对位置矢量 $\boldsymbol{\xi}=\mathbf{x}'-\mathbf{x}$ 与相对位移矢量 $\boldsymbol{\eta}=\mathbf{u}(\mathbf{x}')-\mathbf{u}(\mathbf{x})$——决定，与物质点 $\mathbf{x}$ 或 $\mathbf{x}'$ 与其他邻居的相互作用无关。换言之，对力函数 $\mathbf{f}(\boldsymbol{\eta},\boldsymbol{\xi})$ 的自变量仅为该键自身的 $\boldsymbol{\eta}$ 与 $\boldsymbol{\xi}$，不出现其他键的长度、方向或变形状态。这一假设是 Silling \cite{Silling2000} 建立键基理论时的出发点，它把非局部相互作用简化为大量独立二体力（pairwise force）的叠加，既保持了非局部性，又将计算复杂度控制在与物质点数目和每条键的邻居数目乘积的量级。
+
+\textbf{第二条：中心力（central force）。}键型理论要求对力沿变形后键的方向作用，即满足中心力条件
+\begin{equation}
+(\boldsymbol{\xi}+\boldsymbol{\eta})\times\mathbf{f}(\boldsymbol{\eta},\boldsymbol{\xi})=\mathbf{0}
+\label{eq:central-force-recall}
+\end{equation}
+该条件在第 2 章式\eqref{eq:central-force}中已作为角动量守恒的充要条件引入。此处再次强调其物理意义：中心力条件排除了垂直于键方向的力偶分量，保证每对物质点之间的相互作用不产生净力矩。在这一条件下，对力可写成沿变形后键方向的形式
+\begin{equation}
+\mathbf{f}(\boldsymbol{\eta},\boldsymbol{\xi}) = \frac{\boldsymbol{\xi}+\boldsymbol{\eta}}{|\boldsymbol{\xi}+\boldsymbol{\eta}|}\,F(|\boldsymbol{\xi}+\boldsymbol{\eta}|,|\boldsymbol{\xi}|)
+\label{eq:central-force-scalar}
+\end{equation}
+其中标量函数 $F$ 由键的当前长度 $|\boldsymbol{\xi}+\boldsymbol{\eta}|$ 和参考长度 $|\boldsymbol{\xi}|$ 决定。式\eqref{eq:central-force-scalar}将矢量函数 $\mathbf{f}$ 约化为标量函数 $F$，是键型模型构造的关键一步：本构建模的任务从确定 $\mathbf{f}$ 的矢量方向（已被中心力条件预设为沿键方向）简化为确定标量函数 $F$ 的大小。
+
+\textbf{第三条：微弹性（microelastic）。}键型理论进一步假设材料是微弹性的，即存在成对势函数 $w(\boldsymbol{\eta},\boldsymbol{\xi})$ 使得对力可由势的梯度导出：
+\begin{equation}
+\mathbf{f}(\boldsymbol{\eta},\boldsymbol{\xi}) = \nabla_{\boldsymbol{\eta}} w(\boldsymbol{\eta},\boldsymbol{\xi})
+\label{eq:pairwise-force-potential-recall}
+\end{equation}
+此即第 2 章式\eqref{eq:pairwise-force-potential}。微弹性假设的物理含义是：键的变形过程是可逆的、保守的，变形能与变形路径无关。结合中心力条件与微弹性假设，成对势 $w$ 可经客观性条件 \eqref{eq:potential-objectivity} 与交换对称性 \eqref{eq:potential-symmetry} 进一步约化，这是下一小节的任务。
+
+三条假设之间存在清晰的逻辑关系：成对性定义了 $\mathbf{f}$ 的自变量空间，中心力条件限制了 $\mathbf{f}$ 的方向，微弹性假设给出了 $\mathbf{f}$ 的势结构。它们层层嵌套，共同构成键型理论区别于态型理论的标志性特征。
+
+\begin{remark}
+成对性假设虽然极大地简化了理论结构与计算实现，却也是键型理论局限性的根源。中心力条件要求力沿键方向，使键型模型只能描述与键方向共线的相互作用，无法独立调控体积变形与剪切变形——这正是键基泊松比 $\nu=1/4$（三维）的物理起源。态型理论通过放弃成对性（使力态 $\underline{\mathbf{T}}\langle\boldsymbol{\xi}\rangle$ 依赖全部键的变形状态）突破了这一限制，但其代价是本构函数从标量函数 $F$ 升级为态的泛函，具体分析见第 6 章。
+\end{remark}
+
+\subsection{键型对力的一般形式}
+
+在三条基本假设下，键型对力函数 $\mathbf{f}(\boldsymbol{\eta},\boldsymbol{\xi})$ 的函数形式可进一步约化。本小节利用成对势的客观性与交换对称性，将 $\mathbf{f}$ 表达为仅依赖两个标量自变量——键的伸长率 $s$ 与参考长度 $|\boldsymbol{\xi}|$——的函数。
+
+由中心力条件，键型对力必取式\eqref{eq:central-force-scalar}的形式。由微弹性假设，$F$ 可由成对势 $w$ 导出。具体地，将式\eqref{eq:central-force-scalar}代入梯度关系 \eqref{eq:pairwise-force-potential}，注意到变形后键方向的单位矢量为 $\hat{\mathbf{m}}=(\boldsymbol{\xi}+\boldsymbol{\eta})/|\boldsymbol{\xi}+\boldsymbol{\eta}|$，由链式法则
+\begin{equation}
+\mathbf{f} = \nabla_{\boldsymbol{\eta}} w = \frac{\partial w}{\partial |\boldsymbol{\xi}+\boldsymbol{\eta}|}\,\frac{\partial |\boldsymbol{\xi}+\boldsymbol{\eta}|}{\partial \boldsymbol{\eta}}
+= \frac{\partial w}{\partial |\boldsymbol{\xi}+\boldsymbol{\eta}|}\,\frac{\boldsymbol{\xi}+\boldsymbol{\eta}}{|\boldsymbol{\xi}+\boldsymbol{\eta}|}
+\label{eq:force-from-w}
+\end{equation}
+对比式\eqref{eq:central-force-scalar}，标量函数 $F$ 即为 $\partial w/\partial |\boldsymbol{\xi}+\boldsymbol{\eta}|$。
+
+成对势 $w$ 的函数形式受两个对称性约束。首先，客观性条件 \eqref{eq:potential-objectivity} 要求 $w$ 在刚性旋转下不变，即 $w(\mathbf{R}\boldsymbol{\eta},\mathbf{R}\boldsymbol{\xi})=w(\boldsymbol{\eta},\boldsymbol{\xi})$ 对任意旋转张量 $\mathbf{R}$ 成立。其直接推论是 $w$ 只能依赖旋转不变量——$\boldsymbol{\eta}$ 与 $\boldsymbol{\xi}$ 的模长以及它们之间的夹角。其次，交换对称性 \eqref{eq:potential-symmetry} 要求 $w(-\boldsymbol{\eta},-\boldsymbol{\xi})=w(\boldsymbol{\eta},\boldsymbol{\xi})$，即 $w$ 在交换两个物质点的角色时不变。
+
+这两个对称性共同将键型成对势约化为如下函数形式
+\begin{equation}
+w(\boldsymbol{\eta},\boldsymbol{\xi}) = w(s,|\boldsymbol{\xi}|)
+\label{eq:pairwise-potential-simplified}
+\end{equation}
+或等价的
+\begin{equation}
+w(\boldsymbol{\eta},\boldsymbol{\xi}) = \tilde{w}\bigl(|\boldsymbol{\xi}+\boldsymbol{\eta}|,|\boldsymbol{\xi}|\bigr)
+\label{eq:pairwise-potential-alt}
+\end{equation}
+其中 $s=(|\boldsymbol{\xi}+\boldsymbol{\eta}|-|\boldsymbol{\xi}|)/|\boldsymbol{\xi}|$ 为键伸长率（式\eqref{eq:bond-stretch}）。式\eqref{eq:pairwise-potential-simplified} 表明，键型成对势仅取决于两个标量：键的伸长率 $s$（描述变形程度）与键的参考长度 $|\boldsymbol{\xi}|$（描述键的空间位置）。这一结果的意义在于：本构建模的任务从确定 $\mathbb{R}^3\times\mathbb{R}^3\to\mathbb{R}$ 的势函数 $w$，简化为确定 $\mathbb{R}\times\mathbb{R}^+\to\mathbb{R}$ 的标量函数 $w(s,|\boldsymbol{\xi}|)$。
+
+从 $\mathbf{f}$ 的角度，由链式法则
+\begin{equation}
+\mathbf{f}(\boldsymbol{\eta},\boldsymbol{\xi}) = \frac{\partial w}{\partial s}\,\nabla_{\boldsymbol{\eta}} s
+= \frac{1}{|\boldsymbol{\xi}|}\,\frac{\partial w}{\partial s}\,
+\frac{\boldsymbol{\xi}+\boldsymbol{\eta}}{|\boldsymbol{\xi}+\boldsymbol{\eta}|}
+\label{eq:key-force-dir}
+\end{equation}
+其中利用了 $\nabla_{\boldsymbol{\eta}} s = (\boldsymbol{\xi}+\boldsymbol{\eta})/(|\boldsymbol{\xi}||\boldsymbol{\xi}+\boldsymbol{\eta}|)$（伸长率对相对位移的梯度）。式\eqref{eq:key-force-dir}是键型对力在中心力与微弹性假设下的最一般形式：对力沿变形后键方向，其大小由成对势 $w(s,|\boldsymbol{\xi}|)$ 对伸长率的导数决定，乘以键参考长度的倒数（量纲因素）。当微势 $w$ 形式选定后，$\mathbf{f}$ 的显式表达直接由式\eqref{eq:key-force-dir}给出。
+
+在小变形条件下（$|\boldsymbol{\eta}|\ll|\boldsymbol{\xi}|$），利用线性化伸长率 \eqref{eq:stretch-linear} $s\approx\boldsymbol{\xi}\cdot\boldsymbol{\eta}/|\boldsymbol{\xi}|^{2}$，对力的线性化形式为
+\begin{equation}
+\mathbf{f}(\boldsymbol{\eta},\boldsymbol{\xi}) \approx c(|\boldsymbol{\xi}|)\,s\,\frac{\boldsymbol{\xi}}{|\boldsymbol{\xi}|}
+\label{eq:linear-bond-force}
+\end{equation}
+其中 $c(|\boldsymbol{\xi}|)=(\partial^{2}w/\partial s^{2})|_{s=0}/|\boldsymbol{\xi}|$ 为微模量函数（详见 4.2.3 节）。式\eqref{eq:linear-bond-force} 表明，线性化键型对力的大小正比于伸长率 $s$，方向沿参考键方向 $\hat{\boldsymbol{\xi}}=\boldsymbol{\xi}/|\boldsymbol{\xi}|$（小变形下变形后键方向与参考键方向之差为高阶小量）。
+
+\subsection{键型模型族的结构}
+
+在基本假设与一般形式的框架下，不同的成对势 $w(s,|\boldsymbol{\xi}|)$ 选择对应不同的键型模型，构成键型模型族。按微势对伸长率 $s$ 的依赖方式，可将键型模型分为三大类。
+
+\textbf{第一类：线性微弹性模型。}此类模型取微势为伸长率的二次型。最一般的形式为
+\begin{equation}
+w(s,|\boldsymbol{\xi}|) = \tfrac{1}{2}\,c(|\boldsymbol{\xi}|)\,s^{2}\,|\boldsymbol{\xi}|
+\label{eq:linear-micro-potential}
+\end{equation}
+其中 $c(|\boldsymbol{\xi}|)$ 为仅依赖参考键长的微模量函数。由式\eqref{eq:key-force-dir}，对力为 $\mathbf{f}=c(|\boldsymbol{\xi}|)\,s\,(\boldsymbol{\xi}+\boldsymbol{\eta})/|\boldsymbol{\xi}+\boldsymbol{\eta}|$。当取 $c(|\boldsymbol{\xi}|)=c$（常数，与键长无关）时退化为最简形式——即 4.3 节的 PMB 模型；当 $c(|\boldsymbol{\xi}|)$ 随 $|\boldsymbol{\xi}|$ 衰减（如线性衰减 $\propto 1-|\boldsymbol{\xi}|/\delta$）时，即为第 5 章讨论的改进键型模型。线性微弹性模型的优点是本构形式简单、参数少、易于解析分析与参数率定；缺点是力-伸长率关系线性，无法描述材料的非线性响应。
+
+\textbf{第二类：微弹脆性模型（PMB 与变体）。}此类模型仍取微势为二次型，但在力-伸长率关系中引入临界伸长率 $s_c$ 的断键准则，键一旦断裂不可恢复。PMB 模型（prototype microelastic brittle）\cite{SillingAskari2005} 是最基本的微弹脆性模型，其参数仅为微模量常数 $c$ 与临界伸长率 $s_c$，详见 4.3 节。此类模型的"脆性"来自断键的不可逆性与瞬时性——不引入渐进损伤、软化或塑性行为。
+
+\textbf{第三类：非线性微势模型。}此类模型取微势为伸长率的非二次函数，以描述物质的非线性响应。典型例子包括：Lennard-Jones 型微势 \cite{SillingZimmermannAbeyaratne2003}，其 $w(s,|\boldsymbol{\xi}|)$ 包含排斥项（短程）与吸引项（长程）两部分的平衡；双线性或分段线性微势，在压缩区与拉伸区取不同的微模量以描述拉压不对称性，如 Ha 与 Bobaru \cite{HaBobaru2010} 的复合材料模型；以及基于 Morse 势或多项式展开的更一般非线性势。非线性微势的引入使键型模型可以描述材料非线性行为，但其参数率定比线性模型复杂得多，且微弹性条件要求 $w$ 是凸的、$s=0$ 处无残余力（即 $\partial w/\partial s|_{s=0}=0$，详见 4.2.1 节）。
+
+三类模型构成一个阶梯：线性微弹性是最基础的层次，PMB 在线性微弹性之上叠加断键准则，非线性微势则进一步放宽了力-伸长率关系的线性限制。本书第 4 章的重点是前两类（4.3 节 PMB），第 5 章将展开改进模型（长程力衰减、微梁模型、共轭键等）与非线性微势的讨论。值得指出的是，态型理论（第 6 章）可以将上述所有键型模型作为特例纳入：在态型框架中，键型的成对力 $\mathbf{f}/2$ 被重新解释为力态的特化形式 $\underline{\mathbf{T}}\langle\boldsymbol{\xi}\rangle=\tfrac{1}{2}\mathbf{f}$（见第 2 章 2.4 节），从而将"键独立"的本构模型嵌入"点到场"的更一般框架。这一联系是本书第 4--6 章贯穿的主线之一。
+
+\emph{AI 辅助生成，需经专业审阅。}
 
 \section{微势与键力密度函数}
 
+4.1 节从一般理论框架出发，将键型对力约化为 $\mathbf{f}=(1/|\boldsymbol{\xi}|)(\partial w/\partial s)\,\hat{\mathbf{m}}$（式\eqref{eq:key-force-dir}）的形式，其中微势 $w(s,|\boldsymbol{\xi}|)$ 是仅依赖伸长率与参考键长的标量函数。本节从构造性角度出发，讨论 $w$ 应满足的物理约束（4.2.1），由此导出键力密度函数的显式表达与线性化形式（4.2.2），建立微模量 $c(|\boldsymbol{\xi}|)$ 与第 3 章微模量张量 $\mathbf{C}(\boldsymbol{\xi})$ 的对应关系（4.2.3），最后给出键型应变能密度的具体表达式（4.2.4）。本节的内容对 4.3 节 PMB 模型（$c(|\boldsymbol{\xi}|)=c$ 常数）的构造具有直接指导意义，也为 4.4 节的率定提供了能量基础。
+
+\subsection{微势构造的物理要求}
+
+成对势 $w(s,|\boldsymbol{\xi}|)$ 并非任意函数——它须满足若干物理约束以保证本构行为的合理性。以下给出三条基本要求，它们在后续内容中将被反复使用。
+
+\textbf{（1）零变形零能量：}
+\begin{equation}
+w(0,|\boldsymbol{\xi}|) = 0
+\label{eq:w-zero-condition}
+\end{equation}
+无变形时两物质点处于无应力参考状态，相互作用能量应为零。此条件在形式上类似于经典弹性应变能密度在零应变处为零的要求。
+
+\textbf{（2）无残余力：}在无变形状态 $s=0$ 处，力应消失：
+\begin{equation}
+\frac{\partial w}{\partial s}\bigg|_{s=0} = 0
+\label{eq:w-derivative-zero}
+\end{equation}
+否则在参考构型中各点间将存在非零残余力，即使不存在宏观载荷，物质点也会被键力驱动而产生运动——这在物理上不合理。
+
+\textbf{（3）凸性与正定性：}$w$ 关于 $s$ 应为凸函数（至少在 $s=0$ 附近）：
+\begin{equation}
+\frac{\partial^{2} w}{\partial s^{2}} > 0 \quad(s=0\; \text{附近})
+\label{eq:w-convexity}
+\end{equation}
+凸性保证了伸长率增大时回复力单调增大，避免本构响应中出现不稳定（如负刚度）区段。结合条件（1）（2），凸性也保证了 $w(s,|\boldsymbol{\xi}|)\geq 0$（在 $s=0$ 附近），即微势为伸长率平方的函数——这正是线性微弹性模型 $\propto s^{2}$ 成立的物理基础。
+
+除了上述三条基本要求外，微势还应满足两个更细致的要求：一是 $w$ 应允许键断裂后的能态——在 PMB 等微弹脆性模型中，$s\geq s_c$ 后键断裂、力突降为零，这并不意味着 $w$ 在此区间为常数，而是意味着键不再返回原状态，能量的释放对应新生裂纹面（见第 2 章 2.7.3 节与本章 4.3.3 节）；二是 $w$ 在压缩区 $s<0$ 也应满足条件（2）（3），以保证压缩响应的合理性。不过，键型模型对压缩响应的处理并不统一——PMB 本构允许键承受压缩力（$s<0$ 时 $\mathbf{f}$ 指向与 $\boldsymbol{\xi}+\boldsymbol{\eta}$ 相反，对应压缩），但实际材料中键的"压缩失效"与"拉伸失效"的微观机制不同，这一点是键型模型的一个局限，详见 4.6.3 节。
+
+微势 $w$ 的量纲可通过式\eqref{eq:pairwise-force-potential}和 $\mathbf{f}$ 的量纲（$\mathrm{N}/\mathrm{m}^{6}$）反推。由 $\mathbf{f}=\nabla_{\boldsymbol{\eta}}w$，梯度算子 $\nabla_{\boldsymbol{\eta}}$ 的量纲为 $1/\mathrm{m}$（相对位移 $\boldsymbol{\eta}$ 的量纲为 $\mathrm{m}$），故 $[w]=[\mathbf{f}]\cdot[\boldsymbol{\eta}]=\mathrm{N}/\mathrm{m}^{6}\cdot\mathrm{m}=\mathrm{J}/\mathrm{m}^{6}$。在三维情形下，微势的量纲为焦耳每六次方米（J/m$^{6}$），这是因为 $w$ 是应变能密度 $W$（J/m$^{3}$）对单根键体积（m$^{3}$）积分的被积函数——这是键型理论的一个基本量纲特征。
+
+\subsection{键力密度函数的显式表达}
+
+由上节式\eqref{eq:key-force-dir}，键型对力的方向为变形后键方向的单位矢量 $\hat{\mathbf{m}}=(\boldsymbol{\xi}+\boldsymbol{\eta})/|\boldsymbol{\xi}+\boldsymbol{\eta}|$，其大小由成对势对伸长率的导数经参考键长归一化给出。为使用方便，此处给出以伸长率 $s$ 和参考键长 $|\boldsymbol{\xi}|$ 表达的键力密度函数的几种等价形式。
+
+记 $g(s,|\boldsymbol{\xi}|)=\partial w/\partial s$ 为伸长率导出的标量力函数，则对力可写为
+\begin{equation}
+\mathbf{f}(\boldsymbol{\eta},\boldsymbol{\xi}) = \frac{g(s,|\boldsymbol{\xi}|)}{|\boldsymbol{\xi}|}\,
+\frac{\boldsymbol{\xi}+\boldsymbol{\eta}}{|\boldsymbol{\xi}+\boldsymbol{\eta}|}
+\label{eq:f-general-form}
+\end{equation}
+其中 $|\boldsymbol{\xi}+\boldsymbol{\eta}|=(1+s)|\boldsymbol{\xi}|$。式\eqref{eq:f-general-form}是键型对力在使用伸长率 $s$ 作为自变量时的最一般形式。当 $w$ 取线性微弹性形式 \eqref{eq:linear-micro-potential} 即 $w=\tfrac{1}{2}c(|\boldsymbol{\xi}|)s^{2}|\boldsymbol{\xi}|$ 时，$g=c(|\boldsymbol{\xi}|)s|\boldsymbol{\xi}|$，代入得
+\begin{equation}
+\mathbf{f}(\boldsymbol{\eta},\boldsymbol{\xi}) = c(|\boldsymbol{\xi}|)\,s\,\frac{\boldsymbol{\xi}+\boldsymbol{\eta}}{|\boldsymbol{\xi}+\boldsymbol{\eta}|}
+\label{eq:f-linear-full}
+\end{equation}
+这是线性微弹性对力的大变形形式——方向沿变形后键方向，大小正比于伸长率 $s$。注意 $s$ 本身是 $|\boldsymbol{\xi}+\boldsymbol{\eta}|$ 的非线性函数，因此式\eqref{eq:f-linear-full}中的 $\mathbf{f}$ 并非 $\boldsymbol{\eta}$ 的线性函数。
+
+在小变形极限下（$|\boldsymbol{\eta}|\ll|\boldsymbol{\xi}|$），将 $s\approx\boldsymbol{\xi}\cdot\boldsymbol{\eta}/|\boldsymbol{\xi}|^{2}$（式\eqref{eq:stretch-linear}）与 $(\boldsymbol{\xi}+\boldsymbol{\eta})/|\boldsymbol{\xi}+\boldsymbol{\eta}|\approx\hat{\boldsymbol{\xi}}$ 代入式\eqref{eq:f-linear-full}，得线性化对力
+\begin{equation}
+\mathbf{f}(\boldsymbol{\eta},\boldsymbol{\xi}) \approx c(|\boldsymbol{\xi}|)\,\frac{\boldsymbol{\xi}\cdot\boldsymbol{\eta}}{|\boldsymbol{\xi}|^{2}}\,
+\frac{\boldsymbol{\xi}}{|\boldsymbol{\xi}|}
+\label{eq:f-linear-small}
+\end{equation}
+对照第 2 章线性化对力的一般形式 $\mathbf{f}\approx\mathbf{C}(\boldsymbol{\xi})\,\boldsymbol{\eta}$（式\eqref{eq:linear-force}），可得键型模型对应的微模量张量为
+\begin{equation}
+\mathbf{C}(\boldsymbol{\xi}) = c(|\boldsymbol{\xi}|)\,\frac{\boldsymbol{\xi}\otimes\boldsymbol{\xi}}{|\boldsymbol{\xi}|^{3}}
+\label{eq:C-tensor-bond}
+\end{equation}
+或写成分量形式 $C_{ij}(\boldsymbol{\xi}) = c(|\boldsymbol{\xi}|)\,\xi_i\xi_j/|\boldsymbol{\xi}|^{3}$。其中 $c(|\boldsymbol{\xi}|)$ 即微模量函数，其物理意义是键的单位伸长率变化引起的对力大小的变化率。$c(|\boldsymbol{\xi}|)$ 的量纲可由 $[\mathbf{C}] = [\mathbf{f}]/[\boldsymbol{\eta}] = \mathrm{N}/\mathrm{m}^{7}$ 反推，结合 $\xi_i\xi_j/|\boldsymbol{\xi}|^{3}$ 的量纲为 $1/\mathrm{m}$，得 $[c] = \mathrm{N}/\mathrm{m}^{6}$，即对力量纲——这与对力为键力密度（整条键的力密度）一致，也与第 2 章式\eqref{eq:dim-force}一致。
+
+式\eqref{eq:C-tensor-bond}与式\eqref{eq:f-linear-small}是键型线性近场动力学的核心结果，它们把本构描述的全部复杂性归结为标量函数 $c(|\boldsymbol{\xi}|)$ 的选择。不同的 $c(|\boldsymbol{\xi}|)$ 函数形式——常数型（PMB）、线性衰减型、锥型（cone-shaped）、高斯型——对应不同的键型模型，而力-伸长率关系始终是线性的（$s$ 小变形线性化有效）。非线性行为仅当 $w$ 不是 $s$ 的二次型时才出现（见 4.1.3 节第三类模型）。
+
+\subsection{微模量与微模量张量}
+
+第 3 章对各向同性键基模型给出了微模量张量的形式为 $\mathbf{C}(\boldsymbol{\xi})=c(r)\,\hat{\boldsymbol{\xi}}\otimes\hat{\boldsymbol{\xi}}$，即 $C_{ij}(\boldsymbol{\xi})=c(r)\,\xi_i\xi_j/r^{2}$（式\eqref{eq:iso-micro-modulus}），其中 $r=|\boldsymbol{\xi}|$。将式\eqref{eq:C-tensor-bond}改写为
+\begin{equation}
+C_{ij}(\boldsymbol{\xi}) = \frac{c(|\boldsymbol{\xi}|)}{|\boldsymbol{\xi}|}\,\frac{\xi_i\xi_j}{|\boldsymbol{\xi}|^{2}}
+\label{eq:C-comparison}
+\end{equation}
+可见两式的对应关系为 $c(r)\;(\text{第3章记法}) \leftrightarrow c(|\boldsymbol{\xi}|)/|\boldsymbol{\xi}|\;(\text{本章记法})$。不过，为了避免符号混淆，本书约定：\textbf{微模量函数 $c(|\boldsymbol{\xi}|)$}（本章用法，量纲 $\mathrm{N}/\mathrm{m}^{6}$）出现在对力的表达式 $\mathbf{f}=c(|\boldsymbol{\xi}|)\,s\,\hat{\mathbf{m}}$ 中；而第 3 章的 $c(r)$ 是线性化微模量张量中的系数。两者的换算关系为 $c_{\text{ch3}}(r)=c_{\text{ch4}}(r)/r$。
+
+微模量函数 $c(|\boldsymbol{\xi}|)$ 的选择是本构建模的核心。最简单的选择是取 $c(|\boldsymbol{\xi}|)=c$（常数，与键长无关），即 PMB 模型。然而，常微模量会带来两个问题：其一，所有键——无论长短——采用同一刚度，在物理上意味着极短线（其伸长率对局部变形的敏感度与长键相同）被过度强化；其二，近场域边界处键的突然截断（$|\boldsymbol{\xi}|>\delta$ 的键不存在）造成有效刚度积分 $k_{\mathrm{eff}}=\int_{H_{\mathbf{x}}}c\,\mathrm{d}V$（第 2 章 2.8.2 节）在近场域边界处的非连续变化，是表面效应的成因之一。
+
+为缓解这些问题，文献中提出了微模量随键长的衰减形式 $c(|\boldsymbol{\xi}|)=c_0\,f(|\boldsymbol{\xi}|/\delta)$，其中 $f(\cdot)$ 为衰减函数，满足 $f(1)=0$（近场域边界处刚度平滑归零）。常用的衰减形式包括线性衰减 $f(\zeta)=1-\zeta$、锥型衰减 $f(\zeta)=(1-\zeta^{2})$ 与 指数衰减 $f(\zeta)=\exp(-\zeta^{2}/2\sigma^{2})$ 等 \cite{Bobaru2016,KilicMadenci2010}。衰减微模量对收敛性、表面效应与泊松比调整的影响，以及具体的函数形式与参数选择，将在第 5 章系统讨论。此处仅指出其存在与意义。
+
+\subsection{应变能密度的键型形式}
+
+第 2 章式\eqref{eq:strain-energy}将应变能密度定义为其族内所有键的成对势的半和：$W(\mathbf{x})=\tfrac{1}{2}\int_{\mathcal{F}_{\mathbf{x}}}w(\boldsymbol{\eta},\boldsymbol{\xi})\,\mathrm{d}V'$。在键型模型下，$w$ 的具体形式已知（式\eqref{eq:pairwise-potential-simplified}），应变能密度可写为仅依赖键伸长率与键长的积分形式。
+
+对一般键型模型，将 $w=w(s,|\boldsymbol{\xi}|)$ 代入得
+\begin{equation}
+W(\mathbf{x}) = \frac{1}{2}\int_{\mathcal{F}_{\mathbf{x}}} w\bigl(s(\boldsymbol{\eta},\boldsymbol{\xi}),|\boldsymbol{\xi}|\bigr)\,\mathrm{d}V'
+\label{eq:ch4-strain-energy}
+\end{equation}
+其中 $s$ 由 $\boldsymbol{\eta}$ 与 $\boldsymbol{\xi}$ 经式\eqref{eq:bond-stretch}确定。式\eqref{eq:ch4-strain-energy}是键型应变能密度的基本表达式。
+
+对于线性微弹性模型 $w=\tfrac{1}{2}c(|\boldsymbol{\xi}|)s^{2}|\boldsymbol{\xi}|$，代入得
+\begin{equation}
+W(\mathbf{x}) = \frac{1}{4}\int_{\mathcal{F}_{\mathbf{x}}} c(|\boldsymbol{\xi}|)\,s^{2}\,|\boldsymbol{\xi}|\,\mathrm{d}V'
+\label{eq:ch4-strain-energy-linear}
+\end{equation}
+注意式中系数由 $\tfrac{1}{2}\times\tfrac{1}{2}c=\tfrac{1}{4}c$ 而来——前一个 $\tfrac{1}{2}$ 来自应变能密度定义的半和，后一个 $\tfrac{1}{2}$ 来自微势的二次型形式。对于常微模量 $c(|\boldsymbol{\xi}|)=c$ 情形（PMB），有
+\begin{equation}
+W(\mathbf{x}) = \frac{c}{4}\int_{\mathcal{F}_{\mathbf{x}}} s^{2}\,|\boldsymbol{\xi}|\,\mathrm{d}V'
+\label{eq:ch4-strain-energy-pmb}
+\end{equation}
+当变形为均匀各向同性时 $s=\varepsilon$（依据式\eqref{eq:stretch-uniform}），积分后与第 3 章式\eqref{eq:pd-lame}一致：经典应变能 $W=(9K/2)\varepsilon^{2}=3E\varepsilon^{2}$（$\nu=1/4$ 时体积模量 $K=2E/3$）；键型侧将 $s=\varepsilon$ 代入式\eqref{eq:ch4-strain-energy-pmb}得 $W=c\cdot4\pi\delta^{4}\varepsilon^{2}/(4\cdot4)=\pi c\delta^{4}\varepsilon^{2}/4$，代入 $c=12E/(\pi\delta^{4})$（见 4.4 节）即得 $W=3E\varepsilon^{2}$，两式自洽。这一对应将在 4.4 节参数率定的推导中详细展开。
+
+需要强调的是，式\eqref{eq:ch4-strain-energy-linear}中的 $s$ 取非线性的精确定义（式\eqref{eq:bond-stretch}），而非小变形近似。因此，即使微势是伸长率的二次型，由应变能密度导出的对力（通过变分 $\mathbf{f}=\nabla_{\boldsymbol{\eta}}w$）也天然包含几何非线性——因为 $s$ 本身是 $\boldsymbol{\eta}$ 的非线性函数。这一几何非线性使键型近场动力学能够描述有限变形问题，尽管本构关系的材料部分（$w$ 关于 $s$ 的依赖）是线性的。这也是近场动力学与经典连续介质力学的一个重要区别：经典理论需要区分小变形线性化与有限变形格林应变，而近场动力学中"本构线性+运动学非线性"的组合天然适合处理大变形与大转动。
+
+\emph{AI 辅助生成，需经专业审阅。}
+
 \section{经典微弹脆性模型}
 
+前两节建立了键型近场动力学的一般理论框架：成对势 $w(s,|\boldsymbol{\xi}|)$ 是仅依赖伸长率与键长的标量函数，对力沿变形后键方向、大小由 $(\partial w/\partial s)/|\boldsymbol{\xi}|$ 决定。本节选取其中最简形式——常微模量 $c(|\boldsymbol{\xi}|)=c$ 与二次微势 $w=\tfrac{1}{2}c s^{2}|\boldsymbol{\xi}|$——加上断键准则，构成经典微弹脆性模型（prototype microelastic brittle，简称 PMB）。PMB 模型由 Silling 与 Askari 在 2005 年正式提出 \cite{SillingAskari2005}，是迄今文献中使用最广泛、理论分析最完备的键型模型：它仅含两个材料参数（微模量 $c$ 与临界伸长率 $s_c$），物理直观、易于实现、数值效率高。本节依次给出 PMB 的完整定义（4.3.1），分析力-伸长率关系的脆性特征（4.3.2），重述断裂能与临界伸长率的标定关系（4.3.3），最后讨论 PMB 的适用范围与典型参数（4.3.4）。
+
+\subsection{PMB 的完整定义}
+
+PMB 模型由三个要素联合定义：微势（成对势）$w$、对力 $\mathbf{f}$ 以及断键准则。
+
+\textbf{成对势.}PMB 取线性微弹性微势 \eqref{eq:linear-micro-potential} 的常微模量特例：
+\begin{equation}
+w(\boldsymbol{\eta},\boldsymbol{\xi}) = \tfrac{1}{2}\,c\,s^{2}\,|\boldsymbol{\xi}|
+\label{eq:pmb-potential}
+\end{equation}
+其中 $c$ 为近场域内不随键长变化的常微模量（量纲 $\mathrm{N}/\mathrm{m}^{6}$），由材料宏观弹性模量率定；$s$ 为键伸长率（式\eqref{eq:bond-stretch}）；$|\boldsymbol{\xi}|$ 为键的参考长度，$s^{2}|\boldsymbol{\xi}|$ 的整体量纲为 $\mathrm{m}$，保证 $w$ 的量纲为 $\mathrm{J}/\mathrm{m}^{6}$。式\eqref{eq:pmb-potential}表明，键的应变能与其参考长度 $|\boldsymbol{\xi}|$ 成正比——长键储存的弹性能大于短键（在相同伸长率下），这反映了长键跨越更大物质范围、其变形蕴含更多的弹性功。
+
+\textbf{对力.}由式\eqref{eq:f-linear-full}代入常微模量 $c$，得 PMB 的对力函数
+\begin{equation}
+\mathbf{f}(\boldsymbol{\eta},\boldsymbol{\xi}) = c\,s\,\frac{\boldsymbol{\xi}+\boldsymbol{\eta}}{|\boldsymbol{\xi}+\boldsymbol{\eta}|},\qquad
+|\boldsymbol{\xi}+\boldsymbol{\eta}| > 0
+\label{eq:pmb-force}
+\end{equation}
+其中方向因子 $\hat{\mathbf{m}}=(\boldsymbol{\xi}+\boldsymbol{\eta})/|\boldsymbol{\xi}+\boldsymbol{\eta}|$ 为变形后键方向的单位矢量。式\eqref{eq:pmb-force}有两个关键性质：其一，$\mathbf{f}$ 的大小为 $c|s|$，与伸长率的绝对值成正比——$s>0$（拉伸）时力指向背离 $\mathbf{x}$ 的方向（即 $\mathbf{f}$ 与 $\boldsymbol{\xi}+\boldsymbol{\eta}$ 同向，键试图缩短），$s<0$（压缩）时力指向靠近 $\mathbf{x}$ 的方向（键试图伸长）；其二，$\mathbf{f}$ 的方向严格沿变形后键方向，满足中心力条件 \eqref{eq:central-force}，且反作用条件 \eqref{eq:reaction} 自动成立（因为 $s$ 在交换 $\mathbf{x}\leftrightarrow\mathbf{x}'$ 时不变，而 $\hat{\mathbf{m}}$ 反号，故 $\mathbf{f}(-\boldsymbol{\eta},-\boldsymbol{\xi})=c s(-\hat{\mathbf{m}})=-\mathbf{f}$）。
+
+在小变形极限下，PMB 对力简化为 $\mathbf{f}\approx c s \hat{\boldsymbol{\xi}}$，对应的微模量张量为 $C_{ij}(\boldsymbol{\xi})=c\xi_i\xi_j/|\boldsymbol{\xi}|^{3}$（式\eqref{eq:C-tensor-bond}）。
+
+\textbf{断键准则.}PMB 采用第 2 章 2.7.1 节建立的断键准则：引入历史变量 $\mu(\boldsymbol{\xi},t)$（式\eqref{eq:history-variable}），初始值为 $1$，当键伸长率在历史上的最大值达到临界值 $s_c$ 时，$\mu$ 永久置为 $0$。修正后的对力为
+\begin{equation}
+\tilde{\mathbf{f}}(\boldsymbol{\eta},\boldsymbol{\xi},t) = \mu(\boldsymbol{\xi},t)\,\mathbf{f}(\boldsymbol{\eta},\boldsymbol{\xi})
+\label{eq:pmb-damaged-force}
+\end{equation}
+即断键后该键不再对运动方程 \eqref{eq:motion} 有贡献。PMB 的"微弹脆性"源于 $\mu$ 的瞬时、不可逆特性：键在达到 $s_c$ 前保持线性弹性响应（微弹性），达到 $s_c$ 时力瞬时降为零（脆性），且不可恢复。这一行为是键型模型描述脆性断裂的核心机制。
+
+\begin{remark}
+PMB 模型的三个要素——二次微势、中心力准则、临界伸长率准则——之间存在自然的逻辑配合。二次微势导出的对力与 $s$ 成正比（式\eqref{eq:pmb-force}），使力-伸长率关系为线性，便于参数率定；中心力准则（对力沿键方向）与二次微势相容，保证角动量守恒；临界伸长率准则 $s_c$ 用标量规则触发了接近真实原子键断裂的行为模式——当键被拉到一定程度后突然断裂。这三个要素共同使 PMB 成为键型模型族中最经典的代表。
+\end{remark}
+
+\subsection{力-伸长率关系与脆性断裂特征}
+
+PMB 的力-伸长率关系的特征由式\eqref{eq:pmb-force}加上断键准则 \eqref{eq:pmb-damaged-force}联合决定。图\ref{fig:pmb-force-stretch}给出了 PMB 模型完整的力-伸长率关系，其行为特征如下：
+
+\begin{itemize}
+\item \textbf{线弹性加载段（$0\leq s < s_c$）：}键完好（$\mu=1$），对力的大小 $|\mathbf{f}|=c s$ 与伸长率成正比。此为微弹性行为，变形可逆，若在 $s<s_c$ 处卸载，力沿相同线性路径返回原点。
+
+\item \textbf{断键点（$s=s_c$）：}键伸长率达到临界值，键断裂，$\mu$ 由 $1$ 突变为 $0$，力从 $c s_c$ 瞬时降为零。这一突变是不可逆的——无论后续伸长率如何变化，力保持为零。
+
+\item \textbf{永久失效段（$s>s_c$）：}断键后 $\mu=0$，键永久失去承载能力。即使伸长率继续增大，力也不再产生。从力学上看，该键对运动方程的贡献为零，等价于键的完全删除。
+
+\item \textbf{卸载-重载路径：}若在 $s<s_c$ 处卸载，力沿原路返回（键仍完好）；若在断键后（$s\geq s_c$）再试图加载，因 $\mu$ 已置零，力始终为零。这体现了脆性断裂不可恢复的本质特征，与金属塑性变形的可恢复行为形成鲜明对比。
+
+\end{itemize}
+
+\begin{figure}[htbp]
+  \centering
+  \begin{tikzpicture}[>={Stealth}, scale=1.0]
+    % 坐标轴
+    \draw[->, thick] (0,0) -- (8,0) node[right] {$s$（伸长率）};
+    \draw[->, thick] (0,0) -- (0,5) node[above] {$|\tilde{\mathbf{f}}|$（N/m$^{6}$）};
+    % s_c 位置
+    \draw[dashed, thick] (4.5,0) -- (4.5,4.2);
+    \node[below] at (4.5,0) {$s_c$};
+    \node[left] at (0.1,3.8) {$f_{\max}=c\,s_c$};
+    % 线弹性加载段（0 到 s_c）
+    \draw[very thick, blue!60!black] (0,0) -- (4.5,3.8);
+    \node[blue!60!black, above] at (2.2,2.0) {$\mu=1$，线弹性};
+    \node[blue!60!black, below] at (2.2,1.5) {$|\tilde{\mathbf{f}}|=c s$};
+    % 断键瞬间（垂直骤降）
+    \draw[very thick, red!70!black, ->] (4.5,3.8) -- (4.5,0.05);
+    \node[right, red!70!black] at (4.55,2.0) {断键，$\mu\to0$};
+    % 永久失效段
+    \draw[very thick, red!70!black] (4.5,0) -- (7.5,0);
+    \node[red!70!black, below] at (6,0.05) {键永久失效，$\mu=0$};
+    \node[red!70!black, below] at (6,-0.35) {$|\tilde{\mathbf{f}}|\equiv0$};
+    % 卸载-重载路径（实线箭头，键完好时的卸载）
+    \draw[->, dashed, thick, gray!50!black] (3.5,2.95) -- (0.2,0.17);
+    \node[below left, gray!50!black] at (1.8,1.3) {卸载（$\mu=1$）};
+    % 重载（虚线箭头，重载沿原路径）
+    \draw[->, dashed, thick, gray!50!black] (0.5,0.42) -- (3.8,3.2);
+    \node[right, gray!50!black] at (2.5,2.2) {重载（$\mu=1$）};
+    % 断键后的零力段标注
+    \draw[<->, thin, gray!40!black] (5.5,0.15) -- (5.5,-0.35);
+    \node[gray!40!black, right] at (5.6,-0.1) {$\mu=0$，再加载力始终为零};
+    % PMB 标注
+    \node[above] at (7.5,4.5) {PMB 模型};
+  \end{tikzpicture}
+  \caption{PMB 模型的力-伸长率关系：线弹性加载至 $s_c$ 时键断裂（$\mu$ 由 $1\to0$），力瞬时降为零，此后粘结永久失效。与第 2 章图\ref{fig:force-stretch}（一般示意）不同，本图强调了 PMB 的脆性断裂特性：上方的卸载路径仅在 $\mu=1$ 时存在，断键后即使重新加载力也为零。}
+  \label{fig:pmb-force-stretch}
+\end{figure}
+
+图\ref{fig:pmb-force-stretch}与第 2 章图\ref{fig:force-stretch}的区别在于：后者是一般性的键力-伸长率关系示意，未指定具体的本构形式；而本图专指 PMB 模型，明确给出了力的大小 $c s$、断键突降、以及卸载-重载路径的完整描述。PMB 的脆性断裂特征（瞬时失效、永久不可恢复）在图\ref{fig:pmb-force-stretch}中以断键点处的垂直骤降与 $s>s_c$ 段的零力线明确表达。
+
+\subsection{断裂能与临界伸长率}
+
+PMB 模型的临界伸长率 $s_c$ 不是独立参数——它通过单键断裂能与宏观断裂韧度 $G_c$ 的标定关系确定。第 2 章 2.7.3 节对这一标定关系给出了完整的推导，此处仅重述结果以保持 PMB 模型的参数完备性。推导的出发点是：单键断裂所释放的应变能（键能的势阱深度）为 $g_0(\boldsymbol{\xi})=\tfrac{1}{2}c s_c^{2}|\boldsymbol{\xi}|$（由 $w$ 的二次型直接给出）；将所有跨单位裂纹面的键的断裂能之和等值于宏观 $G_c$，进行球面积分得到 $s_c$ 的显式表达式。对三维各向同性情形
+\begin{equation}
+s_c = \sqrt{\frac{5\pi G_c}{9\,c\,\delta^{5}}} \qquad \text{(三维, PMB)}
+\label{eq:sc-gc-pmb-3d-recall}
+\end{equation}
+该式即第 2 章式\eqref{eq:sc-gc-pmb-3d}，式中 $\delta$ 为近场范围，$c$ 为 PMB 常微模量，$G_c$ 为宏观断裂韧度（单位 $\mathrm{J}/\mathrm{m}^{2}$）。对二维平面应力情形
+\begin{equation}
+s_c = \sqrt{\frac{2\pi G_c}{c\,\delta^{4}}} \qquad \text{(二维平面应力, PMB)}
+\label{eq:sc-gc-pmb-2d-recall}
+\end{equation}
+此即第 2 章式\eqref{eq:sc-gc-pmb-2d}。两式分母中 $\delta$ 的幂次差异源于二维与三维近场域体积不同所致：三维近场域体积 $\propto\delta^{3}$，跨裂纹面的键数 $\propto\delta^{2}$（截面面积），故 $G_c\sim s_c^{2}\,c\,\delta^{5}$；二维情形近场域面积 $\propto\delta^{2}$，跨裂纹线的键数 $\propto\delta$，故 $G_c\sim s_c^{2}\,c\,\delta^{4}$。
+
+式\eqref{eq:sc-gc-pmb-3d-recall}与\eqref{eq:sc-gc-pmb-2d-recall}的逻辑结构揭示了参数标定的基本顺序：首先从宏观弹性模量率定微模量 $c$（详见 4.4 节），然后由 $G_c$ 和已率定的 $c$ 给出 $s_c$。以典型脆性材料 PMMA 为例：$E\approx 3\;\mathrm{GPa}$，$\nu=1/4$，$G_c\approx 300\;\mathrm{J}/\mathrm{m}^{2}$，$\delta\approx 3\;\mathrm{mm}$，代入三维率定公式 $c=12E/(\pi\delta^{4})$ 得 $c\approx 1.4\times 10^{20}\;\mathrm{N}/\mathrm{m}^{6}$，进而由式\eqref{eq:sc-gc-pmb-3d-recall}得 $s_c\approx 3.9\times 10^{-3}$。不同材料的参数取值与具体的数值算例见后续工程算例章节。
+
+\subsection{适用范围与典型参数}
+
+PMB 模型的简洁性——仅两个参数 $c$ 与 $s_c$、线性力-伸长率关系——赋予了它广泛的适用性与明确的应用边界。
+
+\textbf{适用材料.}PMB 最自然地适用于脆性材料的断裂模拟：玻璃与陶瓷（原子键断裂主导的脆性裂纹扩展）、混凝土（骨料-砂浆界面的脆性脱粘与宏观裂缝）、复合材料基体开裂与纤维-基体脱粘 \cite{HaBobaru2010}、以及脆性聚合物的冲击碎裂 \cite{Bobaru2016}。对于准脆性材料（如岩石在一定围压下），PMB 的"瞬时脆断"假设可能过于简化，宜改用第 5 章讨论的渐进损伤模型。对于韧性金属（裂纹扩展前发生显著塑性变形），PMB 完全不适用——键型理论无法描述塑性不可逆变形（缺乏屈服与流动规则），需采用第 7 章的非常规态型弹塑性模型。
+
+\textbf{近场范围选择.}$\delta$ 的数值选择对计算精度与效率有决定性影响。Bobaru 等人 \cite{Bobaru2009} 通过系统的收敛性研究表明，为保证数值解的精度与收敛性，近场域内应包含足够多的物质点。通常取 $m=\delta/\Delta x\geq 3$，其中 $\Delta x$ 为离散网格尺寸。$m$ 过小（$<2$）时，近场域内物质点数不足，积分离散化误差增大，导致裂纹路径的网格局域依赖（网格偏向性）；$m$ 过大时，计算成本急剧上升，但进一步增大 $m$ 对精度的改善递减。工程实践中常取 $m=3\sim5$，在精度与成本之间取得折中。
+
+\textbf{微模量 $c$ 的率定.}PMB 的微模量 $c$ 由宏观弹性模量经能量等效原则率定。具体公式见 4.4 节：三维 $c=12E/(\pi\delta^{4})$、二维平面应力 $c=9E/(\pi t\delta^{3})$ 等。这些率定公式天然导出泊松比 $\nu=1/4$（三维）和 $\nu=1/3$（二维平面应力），即键型理论不可回避的固定值。对于泊松比显著偏离此值的材料（如 $\nu\approx 0.49$ 的橡胶、$\nu\approx 0.3$ 的大多数金属），PMB 在泊松效应上存在系统误差，这是 4.6 节将要讨论的键型模型固有局限之一。态型理论 \cite{Silling2007} 与改进的键型模型 \cite{TrageserSeleson2020} 均试图在不同程度上解决这一问题。
+
+\textbf{与其他模型的衔接.}PMB 是键型模型族的基础模型，后续各章将以此为基础展开：第 5 章通过引入 $c(|\boldsymbol{\xi}|)$ 随键长衰减的形式（如锥型微模量），改善收敛性与降低表面效应；第 6 章节将展示 PMB 作为态型理论特例如何纳入更一般的非局部本构框架——在态型框架中，键基模型的"成对力"重新解释为"力态的退化解"。第 7 章将介绍的非常规态型模型通过本构对应把经典塑性本构引入近场动力学框架，从而突破 PMB 仅适用于脆性材料的限制。因此，透彻理解 PMB 的构造逻辑与参数标定，是进一步深入近场动力学本构建模的基础。
+
+\emph{AI 辅助生成，需经专业审阅。}
+
+以上三节构成了键型近场动力学的核心理论部分：4.1 节将一般理论框架约化为键型的三个基本假设与对力的一般形式，4.2 节建立了微势的物理要求与键力密度函数的显式表达，4.3 节以 PMB 为典范给出了可计算的完整本构模型。这三节的结果为后续的参数率定、误差分析与工程应用提供了理论基础。以下三节——4.4 节（参数率定）、4.5 节（表面效应修正）、4.6 节（键型模型局限）——将从工程应用的角度，把 PMB 的理论公式转化为可直接用于数值计算的参数化方案，分析其误差来源与适用范围，为第 5 章改进模型与第 10 章边界条件处理的展开做准备。
+
 \section{材料参数的率定}
-\subsection{一维参数}
-\subsection{二维参数：平面应力与平面应变}
-\subsection{三维参数}
+
+4.1--4.3 节建立了键型近场动力学的完整理论框架：成对势 $w=\tfrac{1}{2}c s^{2}|\boldsymbol{\xi}|$、对力 $\mathbf{f}=c s(\boldsymbol{\xi}+\boldsymbol{\eta})/|\boldsymbol{\xi}+\boldsymbol{\eta}|$、以及断键准则 $s_c$。然而，这一框架中的核心参数——微模量 $c$——尚未与材料的宏观力学性能建立定量联系。本节的任务是：通过能量等效原理（令均匀变形下键型应变能密度与经典弹性应变能密度相等），从宏观弹性模量 $E$ 反解微模量 $c$。率定按空间维度分一维（杆件）、二维（平面应力与平面应变）和三维（体单元）三种情形展开，最后以参数对照表总结。与第 3 章通过近场动力学应力张量 $\sigma^{\mathrm{PD}}$ 与 Lam\'e 常数对应（式\eqref{eq:pd-lame}）的路径不同，本章采用直接能量法，避免 $\sigma^{\mathrm{PD}}$ 定义中对称化因子引入的因子 $2$ 歧义。
+
+\subsection{率定原理}
+
+率定的基本思想是：选取一种均匀变形模式，分别在键型近场动力学与经典线弹性理论中写出应变能密度 $W$，令二者相等，解出 $c$ 作为 $E$ 与近场范围 $\delta$ 的函数。选取的均匀变形模式可以是单轴拉伸、纯剪切或各向同性膨胀，不同模式在经典理论中给出不同的 $W$--$E$ 关系，但在键型理论的 $\nu$ 锁定约束下，同一空间维度内不同模式应给出相同的 $c$——这一自洽性是率定公式正确性的验证标准。
+
+具体步骤为：第一步，设均匀应变场 $\boldsymbol{\varepsilon}$，由式\eqref{eq:stretch-uniform}得键伸长率 $s=(\boldsymbol{\xi}\cdot\boldsymbol{\varepsilon}\cdot\boldsymbol{\xi})/|\boldsymbol{\xi}|^{2}$；第二步，代入 PMB 应变能密度式\eqref{eq:ch4-strain-energy-pmb}：
+\begin{equation}
+W_{\mathrm{PD}} = \frac{c}{4}\int_{\mathcal{F}_{\mathbf{x}}} s^{2}\,|\boldsymbol{\xi}|\,\mathrm{d}V'
+\label{eq:rate-W-general}
+\end{equation}
+并在对应维度的近场域上完成积分；第三步，由经典弹性理论写出相同变形模式下的应变能密度 $W_{\mathrm{CCM}}$；第四步，令 $W_{\mathrm{PD}}=W_{\mathrm{CCM}}$，解出 $c$。
+
+\subsection{一维参数率定}
+
+一维情形对应细长杆件的轴向拉压，近场域为以物质点 $\mathbf{x}$ 为中心、长度 $2\delta$ 的线段。设杆件截面面积为 $A$，体积微元 $\mathrm{d}V'=A\,\mathrm{d}\xi$（$\xi=x'-x$ 为沿杆轴方向的坐标差）。均匀单轴应变 $\varepsilon$ 下，$s=\varepsilon$（所有键的伸长率相同），代入式\eqref{eq:rate-W-general}：
+\begin{equation}
+W_{\mathrm{PD}} = \frac{c}{4}\,\varepsilon^{2}\,A\int_{-\delta}^{\delta} |\xi|\,\mathrm{d}\xi
+= \frac{c}{4}\,\varepsilon^{2}\,A\cdot\delta^{2}
+\label{eq:rate-1d-W}
+\end{equation}
+其中 $\int_{-\delta}^{\delta}|\xi|\,\mathrm{d}\xi=2\int_{0}^{\delta}\xi\,\mathrm{d}\xi=\delta^{2}$。
+
+经典一维线弹性杆的应变能密度为 $W_{\mathrm{CCM}}=\tfrac{1}{2}E\varepsilon^{2}$。令 $W_{\mathrm{PD}}=W_{\mathrm{CCM}}$：
+\begin{equation}
+\frac{c A\delta^{2}}{4}\,\varepsilon^{2} = \frac{1}{2}E\varepsilon^{2}
+\quad\Longrightarrow\quad
+c = \frac{2E}{A\,\delta^{2}}
+\label{eq:rate-1d}
+\end{equation}
+量纲验证：$[c]=[E]/([A][\delta]^{2})=\mathrm{N}/\mathrm{m}^{2}/(\mathrm{m}^{2}\cdot\mathrm{m}^{2})=\mathrm{N}/\mathrm{m}^{6}$，与对力函数的量纲一致。
+
+\subsection{二维参数率定——平面应力与平面应变}
+
+二维情形中，设物体为厚度 $t$（均匀）的薄板或平面应变截面，体积微元 $\mathrm{d}V'=t\,\mathrm{d}A'$，$\mathrm{d}A'$ 为面元。对于均匀变形 $s=\varepsilon$（等向膨胀），近场域积分为
+\begin{equation}
+\int_{\mathcal{F}_{\mathbf{x}}} |\boldsymbol{\xi}|\,\mathrm{d}V' = t\int_{0}^{2\pi}\!\int_{0}^{\delta} r\cdot r\,\mathrm{d}r\,\mathrm{d}\theta
+= t\cdot 2\pi\cdot\frac{\delta^{3}}{3} = \frac{2\pi t\delta^{3}}{3}
+\label{eq:rate-integral-2d}
+\end{equation}
+代入式\eqref{eq:rate-W-general}得二维 PMB 应变能密度的通用表达式
+\begin{equation}
+W_{\mathrm{PD}} = \frac{\pi c t\delta^{3}}{6}\,\varepsilon^{2}
+\label{eq:rate-W-2d}
+\end{equation}
+
+\textbf{平面应力情形。}平面应力假设面外应力为零（$\sigma_{zz}=0$），允许横向自由收缩。二维键基近场动力学的有效泊松比为 $\nu=1/3$（见第 2 章式\eqref{eq:poisson-limit}）。在面内等双轴拉伸 $\varepsilon_{xx}=\varepsilon_{yy}=\varepsilon$ 下，经典平面应力本构给出 $\sigma_{xx}=\sigma_{yy}=E\varepsilon/(1-\nu)$，应变能密度为
+\begin{equation}
+W_{\mathrm{CCM}} = \frac{1}{2}(\sigma_{xx}\varepsilon_{xx}+\sigma_{yy}\varepsilon_{yy})
+= \sigma_{xx}\varepsilon = \frac{E\varepsilon^{2}}{1-\nu}
+= \frac{3E\varepsilon^{2}}{2}\quad(\nu=1/3)
+\label{eq:rate-W-ps}
+\end{equation}
+令 $W_{\mathrm{PD}}=W_{\mathrm{CCM}}$，由式\eqref{eq:rate-W-2d}与\eqref{eq:rate-W-ps}得
+\begin{equation}
+c = \frac{9E}{\pi t\delta^{3}} \qquad \text{(二维平面应力)}
+\label{eq:rate-2d-ps}
+\end{equation}
+此式是二维平面应力 PMB 模型的率定结果，与 Silling 与 Askari \cite{SillingAskari2005} 及 Madenci 与 Oterkus \cite{MadenciOterkus2014} 给出的结果一致。
+
+\textbf{平面应变情形。}平面应变假设面外应变为零（$\varepsilon_{zz}=0$），对应厚截面物体的内部平面。此时键基材料的有效泊松比取三维锁定值 $\nu=1/4$（平面应变的约束来自三维本构）。对面内等双轴拉伸 $\varepsilon_{xx}=\varepsilon_{yy}=\varepsilon$、$\varepsilon_{zz}=0$，由三维各向同性 Hooke 定律：
+\begin{align}
+\sigma_{ij} &= \lambda\,\delta_{ij}\,\varepsilon_{kk} + 2\mu\,\varepsilon_{ij},\qquad
+\varepsilon_{kk}=2\varepsilon \notag\\
+\sigma_{xx} &= \lambda\cdot 2\varepsilon + 2\mu\cdot\varepsilon = 2(\lambda+\mu)\varepsilon
+\label{eq:rate-pe-stress}
+\end{align}
+键基理论 $\lambda=\mu$，故 $\sigma_{xx}=4\mu\varepsilon$。由 $E=2\mu(1+\nu)=2.5\mu$（$\nu=1/4$），得 $\mu=2E/5$，$\sigma_{xx}=8E\varepsilon/5$。应变能密度为
+\begin{equation}
+W_{\mathrm{CCM}} = \frac{1}{2}(\sigma_{xx}\varepsilon+\sigma_{yy}\varepsilon)
+= \sigma_{xx}\varepsilon = \frac{8E\varepsilon^{2}}{5}
+\label{eq:rate-W-pe}
+\end{equation}
+令 $W_{\mathrm{PD}}=W_{\mathrm{CCM}}$，由式\eqref{eq:rate-W-2d}与\eqref{eq:rate-W-pe}得
+\begin{equation}
+c = \frac{48E}{5\pi t\delta^{3}} \qquad \text{(二维平面应变)}
+\label{eq:rate-2d-pe}
+\end{equation}
+系数 $48/5$ 的分子 $48$ 来自 $8E/5\cdot 6/\pi t\delta^{3}=48E/(5\pi t\delta^{3})$，其中因子 $6$ 来自式\eqref{eq:rate-W-2d}中 $\pi c t\delta^{3}/6$ 的反演。需注意，若误用平面应力公式 $W=E\varepsilon^{2}/(1-\nu)$ 代入 $\nu=1/4$ 将得 $c=8E/(\pi t\delta^{3})$，这与正确的平面应变结果相差因子 $6/5$，根本原因在于平面应变通过 $\varepsilon_{zz}=0$ 约束激活了厚度方向的 $\sigma_{zz}$ 约束应力，使面内刚度高于平面应力情形。此处给出的式\eqref{eq:rate-2d-pe}与 Madenci 与 Oterkus \cite{MadenciOterkus2014} 及 Bobaru 等 \cite{Bobaru2016} 的率定一致。
+
+\subsection{三维参数率定}
+
+三维情形中，近场域为半径 $\delta$ 的球体，体积微元 $\mathrm{d}V'=4\pi r^{2}\mathrm{d}r$。球对称积分为
+\begin{equation}
+\int_{\mathcal{F}_{\mathbf{x}}} |\boldsymbol{\xi}|\,\mathrm{d}V' = \int_{0}^{\delta} r\cdot 4\pi r^{2}\,\mathrm{d}r
+= 4\pi\cdot\frac{\delta^{4}}{4} = \pi\delta^{4}
+\label{eq:rate-integral-3d}
+\end{equation}
+代入式\eqref{eq:rate-W-general}，均匀各向同性膨胀 $\varepsilon_{ij}=\varepsilon\,\delta_{ij}$ 下 $s=\varepsilon$：
+\begin{equation}
+W_{\mathrm{PD}} = \frac{\pi c\delta^{4}}{4}\,\varepsilon^{2}
+\label{eq:rate-W-3d}
+\end{equation}
+此式与 4.2.4 节式\eqref{eq:ch4-strain-energy-pmb}在 $s=\varepsilon$ 下的直接积分结果一致。
+
+经典各向同性线弹性材料在均匀膨胀下的应变能密度为 $W_{\mathrm{CCM}}=\tfrac{9}{2}K\varepsilon^{2}$，其中 $K$ 为体积模量。$\nu=1/4$ 时 $K=E/[3(1-2\nu)]=2E/3$，故
+\begin{equation}
+W_{\mathrm{CCM}} = \frac{9}{2}\cdot\frac{2E}{3}\,\varepsilon^{2} = 3E\varepsilon^{2}
+\label{eq:rate-W-3d-ccm}
+\end{equation}
+令 $W_{\mathrm{PD}}=W_{\mathrm{CCM}}$，由式\eqref{eq:rate-W-3d}与\eqref{eq:rate-W-3d-ccm}得
+\begin{equation}
+c = \frac{12E}{\pi\delta^{4}} \qquad \text{(三维)}
+\label{eq:rate-3d}
+\end{equation}
+此即 PMB 模型三维微模量的率定公式，与 Silling 与 Askari \cite{SillingAskari2005} 的原始推导一致。以 4.3.3 节的 PMMA 为例——$E\approx 3\;\mathrm{GPa}=3\times 10^{9}\;\mathrm{Pa}$、$\delta\approx 3\;\mathrm{mm}=3\times 10^{-3}\;\mathrm{m}$——代入式\eqref{eq:rate-3d}得 $c\approx 1.4\times 10^{20}\;\mathrm{N}/\mathrm{m}^{6}$，与 4.3.3 节由 $s_c$--$G_c$ 标定反推的数值自洽。
+
+由 $c=12E/(\pi\delta^{4})$ 可进一步导出键基材料在 $\nu=1/4$ 锁定下的其他模量：剪切模量 $\mu=2E/5$，体积模量 $K=2E/3$，Lam\'e 常数 $\lambda=\mu=2E/5$。这些关系体现了键基模型的单参数特征——所有弹性常数均由 $c$（或等价的 $E$）唯一确定。
+
+\subsection{参数对应关系表}
+
+表\ref{tab:rate-summary}汇总了 PMB 模型在不同空间维度与变形模式下的微模量率定公式。表中 $\int|\boldsymbol{\xi}|\mathrm{d}V'$ 为近场域积分，$c$ 为对应的微模量率定结果，$\nu_{\mathrm{eff}}$ 为键基模型在该情形下的有效泊松比。
+
+\begin{table}[htbp]
+\centering
+\caption{PMB 模型微模量率定公式汇总}
+\label{tab:rate-summary}
+\begin{tabular}{p{0.12\textwidth}p{0.22\textwidth}p{0.18\textwidth}p{0.22\textwidth}p{0.13\textwidth}}
+\toprule
+维度 & 变形模式 & $\int_{\mathcal{F}_{\mathbf{x}}}|\boldsymbol{\xi}|\mathrm{d}V'$ & 微模量 $c$ & $\nu_{\mathrm{eff}}$ \\
+\midrule
+一维 & 单轴拉压 & $A\delta^{2}$ & $2E/(A\delta^{2})$ & --- \\
+二维 & 平面应力等双轴 & $2\pi t\delta^{3}/3$ & $9E/(\pi t\delta^{3})$ & $1/3$ \\
+二维 & 平面应变等双轴 & $2\pi t\delta^{3}/3$ & $48E/(5\pi t\delta^{3})$ & $1/4$ \\
+三维 & 各向同性膨胀 & $\pi\delta^{4}$ & $12E/(\pi\delta^{4})$ & $1/4$ \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+表\ref{tab:rate-summary}揭示了率定公式的两个规律。其一，$c$ 随 $\delta$ 增大而减小——近场域越大，每条键分摊的刚度越小，因为同样的宏观模量 $E$ 要由更多的键来承担。其二，平面应力与平面应变的率定系数差异（$9$ vs $48/5$）源自面外约束的不同：平面应力允许横向自由收缩（$\sigma_{zz}=0$），面内刚度较低，故 $c$ 较小；平面应变通过 $\varepsilon_{zz}=0$ 约束激活了厚度方向的刚度贡献，面内有效刚度较高，故 $c$ 较大。这一差异在数值模拟中直接体现为对相同材料的平面应力与平面应变模拟需采用不同的 $c$ 值。
+
+\emph{AI 辅助生成，需经专业审阅。}
 
 \section{表面效应及其修正}
 
+4.4 节的率定公式——如三维 $c=12E/(\pi\delta^{4})$——均在假设物质点 $\mathbf{x}$ 的近场域完整（即 $H_{\mathbf{x}}$ 为完整的球体）的前提下导出。然而，位于物体边界附近的物质点，其近场域被物体表面截断，族内物质点数少于内部物质点，导致有效刚度偏低——这一现象即表面效应（surface effect），有时亦称为近场表面软化（peridynamic surface softening）。表面效应是键型近场动力学的系统性误差来源：它使边界附近位移偏大、应力偏低，并可能影响裂纹萌生位置与扩展路径。本节先对表面效应作定量回顾（4.5.1），然后依次讨论微模量修正法（4.5.2）、体积修正法（4.5.3），以及虚拟材料层法与短程力修正（4.5.4）。
+
+\subsection{表面效应的回顾与定量描述}
+
+表面效应的根本原因在第 2 章 2.8.2 节已作了数学表述，此处仅定量回顾其核心结果以保持本章内容的完整。以线性化键基理论 $\mathbf{f}\approx\mathbf{C}(\boldsymbol{\xi})\,\boldsymbol{\eta}$ 为例，物质点 $\mathbf{x}$ 处的有效刚度由近场积分
+\begin{equation}
+k_{\mathrm{eff}}(\mathbf{x}) = \int_{H_{\mathbf{x}}} C(\boldsymbol{\xi})\,\mathrm{d}V_{\boldsymbol{\xi}}
+\label{eq:effective-stiffness-recall}
+\end{equation}
+给出（即第 2 章式\eqref{eq:effective-stiffness}）。对于 PMB 模型，$C(\boldsymbol{\xi})=c/|\boldsymbol{\xi}|$（由式\eqref{eq:C-tensor-bond}沿键方向投影），故
+\begin{equation}
+k_{\mathrm{eff}}(\mathbf{x}) = c\int_{H_{\mathbf{x}}} \frac{1}{|\boldsymbol{\xi}|}\,\mathrm{d}V_{\boldsymbol{\xi}}
+\label{eq:keff-pmb}
+\end{equation}
+
+对内部物质点 $\mathbf{x}_{\mathrm{int}}$，$H_{\mathbf{x}}$ 为完整的球体（三维）或圆盘（二维），积分值 $k_{\mathrm{eff}}^{\infty}$ 为常数。对表面附近物质点 $\mathbf{x}_{\mathrm{bdy}}$（距边界的距离小于 $\delta$），近场域被边界截断，三维平直表面处 $H_{\mathbf{x}}$ 退化为半球、积分区域减半，故
+\begin{equation}
+k_{\mathrm{eff}}^{\mathrm{bdy}} \approx \frac{1}{2}\,k_{\mathrm{eff}}^{\infty} \qquad \text{(三维平直表面)}
+\label{eq:surface-stiffness-recall}
+\end{equation}
+此即第 2 章式\eqref{eq:surface-stiffness}的结论。在角点、边缘等几何特征处，截断更严重，$k_{\mathrm{eff}}^{\mathrm{bdy}}$ 可降至 $k_{\mathrm{eff}}^{\infty}$ 的 $1/4$ 甚至更低。
+
+表面效应对数值结果的影响取决于物体尺寸 $L$ 与近场范围 $\delta$ 之比。当 $L\gg\delta$ 时，受影响边界层厚度 $O(\delta)$ 的体积占比 $\sim\delta/L$ 很小，整体响应受影响有限；当 $L\sim\delta$ 时（如薄膜、纤维、微结构），表面效应主导整体响应，必须修正 \cite{LeBobaru2018}。Le 与 Bobaru \cite{LeBobaru2018} 系统分析了表面效应的尺度依赖性，指出对均匀拉伸载荷，边界点位移可达内部点的近两倍，相应的应力场显著偏离经典弹性解。Bobaru 与 Hu \cite{BobaruHu2012} 对二维数值离散中的表面效应做了系统的参数化研究，Madenci 与 Oterkus \cite{MadenciOterkus2014} 在其专著中给出了基于能量修正的系统方法论。
+
+\subsection{微模量修正法}
+
+微模量修正法（micro-modulus correction method）的思想是：对边界附近物质点的键，按近场域截断比例放大微模量，使有效刚度恢复至内部值。定义体积比例因子
+\begin{equation}
+\alpha(\mathbf{x}) = \frac{\displaystyle\int_{H_{\mathbf{x}}} \mathrm{d}V_{\boldsymbol{\xi}}}
+{\displaystyle\int_{H_{\mathbf{x}}^{\infty}} \mathrm{d}V_{\boldsymbol{\xi}}}
+= \frac{V_{H_{\mathbf{x}}}}{V_{H_{\mathbf{x}}^{\infty}}}
+\label{eq:surface-alpha}
+\end{equation}
+其中 $H_{\mathbf{x}}^{\infty}$ 为无截断的理想完整近场域，$V_{H_{\mathbf{x}}}$ 为实际近场域的体积。对内部物质点 $\alpha=1$（近场域完整），对平直表面处 $\alpha\approx 1/2$（三维）或 $\alpha\approx 1/2$（二维，距边界 $\delta$ 范围内的均值）。修正后的微模量函数为
+\begin{equation}
+c'(\boldsymbol{\xi},\mathbf{x}) = \frac{c}{\alpha(\mathbf{x})}
+\label{eq:surface-correction-c}
+\end{equation}
+式\eqref{eq:surface-correction-c}表明，$\alpha$ 越小的边界点，微模量放大倍数越大——近场域截断越严重，就需要越大的微模量来补偿有效刚度的损失。
+
+微模量修正法的实施步骤为：第一步，对每个物质点 $\mathbf{x}$，数值计算（或解析估算）其实际近场域体积 $V_{H_{\mathbf{x}}}$ 与完整近场域体积 $V_{H_{\mathbf{x}}^{\infty}}$，得 $\alpha(\mathbf{x})$；第二步，将运动方程 \eqref{eq:motion} 中的对力 $\mathbf{f}$ 所用微模量 $c$ 替换为 $c/\alpha(\mathbf{x})$。由于 $\alpha$ 只依赖 $\mathbf{x}$ 的位置（不依赖键方向），该修正不破坏反作用条件 \eqref{eq:reaction}——在交换 $\mathbf{x}\leftrightarrow\mathbf{x}'$ 时，两点的 $\alpha$ 可能不同，但作用在键上的力是对称的（键为 $\mathbf{x}$ 贡献 $\mathbf{f}/2$，为 $\mathbf{x}'$ 贡献 $-\mathbf{f}/2$），这保证了力和的守恒。
+
+此法的优点是实施简单、不改变计算域、计算成本几乎不增加；缺点有两个。其一，$\alpha(\mathbf{x})$ 需要在每个物质点处计算近场域体积的截断比例，对于复杂几何（如多孔介质、裂纹体），精确计算 $\alpha$ 可能较为困难。其二，放大微模量 $c/\alpha(\mathbf{x})$ 在边界附近空间变化，可能引入局部的刚度不均匀，在动态问题中引起虚假的波反射。Le 与 Bobaru \cite{LeBobaru2018} 对微模量修正法在二维与三维静动态问题中的精度做了系统的数值评估。
+
+\subsection{体积修正法}
+
+体积修正法（volume correction method）从另一个角度处理表面效应：不放大微模量，而是修正运动方程中积分权重的计算方式——对近场域内每条键的体积贡献按该键实际被包含在 $H_{\mathbf{x}}$ 内的比例加权。
+
+具体而言，在运动方程 \eqref{eq:motion} 的数值离散中，对每个邻居物质点 $\mathbf{x}'$ 赋予一个体积修正因子 $\beta(\mathbf{x},\mathbf{x}')$，使得对于边界附近物质点，位于截断区域（即完整近场域内但在实际 $H_{\mathbf{x}}$ 外）的键不贡献力密度，而位于实际 $H_{\mathbf{x}}$ 内的键按其实际体积微元 $\mathrm{d}V'$ 贡献力密度。形式上将积分测度由 $\mathrm{d}V'$ 替换为 $\beta(\mathbf{x},\mathbf{x}')\,\mathrm{d}V'$，其中
+\begin{equation}
+\beta(\mathbf{x},\mathbf{x}') = 
+\begin{cases}
+1, & \mathbf{x}'\in H_{\mathbf{x}}\\
+0, & \mathbf{x}'\notin H_{\mathbf{x}}
+\end{cases}
+\label{eq:volume-beta}
+\end{equation}
+在物质点离散实现中（如网格背景法），$\beta$ 等价于判断邻居物质点是否在 $\mathbf{x}$ 的当前近场域内——对于边界附近物质点，位于物体外的网格点自动被排除，$\beta=0$。这与微模量修正法的区别在于：微模量修正放大 $c$ 以补偿键数的减少（使剩余键的刚度增大），而体积修正法保持 $c$ 不变、仅调整积分范围（使参与积分的键为实际存在的键）。
+
+两种方法在连续极限下等价——因为从能量角度，有效刚度的下降源于参与积分的键的总数变少，放大每条键的刚度（微模量修正）与保持每条键的刚度不变但减少键数（体积修正）在能量平均意义下应给出相同的结果。但在有限离散（有限数量的物质点）下，两种方法的数值表现可能不同。Bobaru 等 \cite{Bobaru2016} 指出，体积修正法更自然地与物质点离散算法兼容——直接根据物质点的实际位置判断是否位于近场域内即可，无需额外计算 $\alpha(\mathbf{x})$。因此，许多近场动力学数值代码（如 Peridigm、LAMMPS 的 PD 模块）默认采用体积修正法的等价实现。
+
+\subsection{虚拟材料层法与短程力修正}
+
+除上述两种直接修正微模量或积分权重的方法外，文献中还发展了两类基于计算域扩展的修正方法。
+
+\textbf{虚拟材料层法（fictitious material layer method）。}在真实物体的外边界之外延拓一层厚度为 $\delta$ 的虚拟材料（亦称"幽灵层"），使原边界附近物质点的近场域通过虚拟层中的假想物质点得到补全。虚拟层中物质点的位移由原边界上的位移外推得到（通常取线性外推或零阶保持），其键不参与损伤计算（即虚拟层内无裂纹），仅用于补全近场域以恢复有效刚度。该方法的优点是概念简单、不修改本构参数；缺点是需要扩大计算域（增加虚拟层的物质点），且在复杂几何（如含内孔、裂纹）边界处，虚拟层的构造与外推逻辑较为复杂。Madenci 与 Oterkus \cite{MadenciOterkus2014} 对虚拟材料层法在二维与三维问题中的实现细节有详细讨论。
+
+\textbf{短程力修正法（short-range force correction）。}Mitchell 等 \cite{Mitchell2015} 提出了一种不同的思路：在运动方程中附加一项短程中心力，该力仅作用于边界附近的物质点对，其大小与两物质点到边界的距离成反比，方向沿键方向。修正力 $\mathbf{f}_{\mathrm{corr}}$ 的参数通过强制边界位移场匹配经典弹性解的边界条件来反演确定。短程力修正法的优点是不扩大计算域、不修改微模量，且修正项具有清晰的物理图像（补偿表面原子缺失的相互作用）；缺点是修正参数需针对具体材料与几何进行标定，缺乏通用性。
+
+表\ref{tab:surface-methods}从思想、实施方式、优点与缺点四个维度对上述四类修正方法作了对比。
+
+\begin{table}[htbp]
+\centering
+\caption{表面效应四类修正方法对比}
+\label{tab:surface-methods}
+\begin{tabular}{p{0.18\textwidth}p{0.22\textwidth}p{0.22\textwidth}p{0.25\textwidth}}
+\toprule
+方法 & 基本思想 & 优点 & 缺点 \\
+\midrule
+微模量修正 & 按截断比例放大 $c\to c/\alpha(\mathbf{x})$ & 实施简单，不增大计算域 & $\alpha(\mathbf{x})$ 在复杂几何中难精确计算 \\
+体积修正 & 修正积分权重 $\beta(\mathbf{x},\mathbf{x}')$ & 与离散算法天然兼容 & 离散尺度依赖性，网格敏感性 \\
+虚拟材料层 & 外延 $\delta$ 虚拟层补全近场域 & 不修改本构，概念简单 & 增大计算域，复杂几何外推困难 \\
+短程力修正 & 附加短程力补偿表面收缩 & 不修改微模量，物理清晰 & 参数需单独标定，通用性受限 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+表面效应是键型近场动力学系统性误差的重要来源，上述四类方法各有适用场景。工程实践中，对于简单几何（如矩形板、圆柱），微模量修正法与虚拟材料层法均可获得满意的精度；对于复杂几何（如含孔洞、多裂纹），体积修正法因其与离散算法的天然兼容性而更为常用。值得注意的是，表面效应的根本成因——近场域的硬截断——在引入微模量衰减（第 5 章改进模型）后可得到一定程度的缓解：衰减微模量 $c(|\boldsymbol{\xi}|)$ 在 $|\boldsymbol{\xi}|\to\delta$ 时平滑归零，减小了近场域边界处的刚度突变，从而降低了表面效应的严重程度。表面效应及其修正方法的严格理论分析与系统数值验证留待第 10 章展开。
+
+\emph{AI 辅助生成，需经专业审阅。}
+
 \section{键型模型的固有局限}
+
+4.1--4.5 节从三条基本假设出发，依次建立了键型对力的一般形式、微势与键力密度函数、PMB 模型的完整定义、材料参数的能量法率定以及表面效应的四类修正方法，构成了键型理论从一般框架到可计算模型的完整闭环。然而，这一闭环的每一环——基本假设、率定公式、修正方法——都隐含着键型理论所固有的局限。这些局限不是实现层面的误差，而是键型理论公理基础的内在约束，认识它们是理解后续章节（第 5 章改进键型模型、第 6 章态型理论）的必要前提。本节分三个方面系统剖析这些局限：4.6.1 节讨论泊松比锁定及其物理根源，4.6.2 节分析单键依赖假设所导致的弯曲刚度缺失与本构表达能力限制，4.6.3 节概括各向异性建模困难及计算层面的固有挑战。
+
+\subsection{泊松比锁定与弹性常数的单一参数约束}
+
+各向同性键型近场动力学最广为人知的局限是泊松比被锁定为固定值。第 2 章式\eqref{eq:poisson-limit}已给出这一结论：
+\begin{equation}
+\nu_{\mathrm{PD}} = \frac{1}{4}\;\;(\text{三维、平面应变}),\qquad
+\nu_{\mathrm{PD}} = \frac{1}{3}\;\;(\text{二维平面应力})
+\label{eq:limit-poisson}
+\end{equation}
+式\eqref{eq:limit-poisson}不是数值近似，而是键型理论严格的理论约束：无论选取何种微模量函数 $c(|\boldsymbol{\xi}|)$——常数型、线性衰减型或锥型——只要对力取中心力形式 $\mathbf{f}\propto(\boldsymbol{\xi}+\boldsymbol{\eta})/|\boldsymbol{\xi}+\boldsymbol{\eta}|$，泊松比就被锁定。
+
+这一锁定的物理根源在第 3 章 3.3.3 节已经阐明：键型模型仅含一个独立的弹性参数 $R=\int_{0}^{\delta}c(r)r^{4}\mathrm{d}r$（或等价的微模量 $c$），而经典各向同性弹性需要两个独立参数（$\lambda$ 与 $\mu$，或 $K$ 与 $\mu$）。键型对力沿键方向作用，体积变形（对应 $\varepsilon_{kk}$ 的球张量部分）与剪切变形（对应 $\varepsilon_{ij}$ 的偏斜部分）均由同一机制——键的轴向伸缩——传递，二者耦合在单一参数上，导致第 3 章式\eqref{eq:pd-lame}中的 $\lambda_{\mathrm{PD}}=\mu_{\mathrm{PD}}$。Trageser 与 Seleson \cite{TrageserSeleson2020} 进一步指出，这一约束本质上是经典弹性理论中 Cauchy 关系 $C_{1122}=C_{1212}$ 在近场动力学中的体现——一个具有中心力相互作用的连续体必然满足 Cauchy 关系，从而泊松比为 $1/4$。
+
+泊松比锁定的实际后果是多方面的。首先，对 $\nu\neq 1/4$ 的工程材料——金属 $\nu\approx 0.3$、橡胶 $\nu\approx 0.5$、混凝土 $\nu\approx 0.2$——键型模型无法精确再现其弹性响应。在单轴拉伸问题中，横向收缩比被强制为 $1/4$，与真实材料的横向变形存在系统性偏差。其次，在断裂模拟中，这一偏差直接影响裂尖附近的三维应力状态，进而影响临界伸长率 $s_c$ 标定（式\eqref{eq:sc-gc-pmb-3d-recall}与\eqref{eq:sc-gc-pmb-2d-recall}）的有效性——$s_c$ 虽然可以通过调整 $c$ 使断裂韧度 $G_c$ 匹配实验值，但裂尖应力场的泊松比偏差无法通过 $c$ 的标量缩放来消除。
+
+\subsection{单键依赖假设与次生后果}
+
+键型模型的第二条根本局限来源于对力函数的自变量空间限制：$\mathbf{f}(\boldsymbol{\eta},\boldsymbol{\xi})$ 仅依赖单根键自身的相对位移 $\boldsymbol{\eta}$ 与参考方向 $\boldsymbol{\xi}$，键与键之间无横向耦合。这一"键独立"假设是 4.1.1 节成对性的直接后果，其影响远不止泊松比锁定——它导致键型理论在三个方面存在结构性缺陷。
+
+\textbf{弯曲刚度缺失。}键型对力沿变形后键方向作用，对相邻键之间的相对转动不产生任何阻力。考虑三根共线键 $\boldsymbol{\xi}_{1}$、$\boldsymbol{\xi}_{2}$、$\boldsymbol{\xi}_{3}$ 构成一条微梁：当 $\boldsymbol{\xi}_{1}$ 与 $\boldsymbol{\xi}_{3}$ 绕中间点 $\mathbf{x}$ 发生相对转动时（纯弯曲），各键的伸长率 $s$ 均为零（或至多为高阶小量），因而对力为零——键型模型不产生抵抗弯曲的恢复力矩。这意味着键型模型无法天然描述梁、板、壳等结构的弯曲行为，需借助第 5 章的微梁模型（引入转角自由度与微力矩）或态型理论（引入键间耦合的非局部曲率测度）。
+
+\textbf{体积--剪切不可分离。}单键伸长率 $s$ 同时包含体积变形（键所在方向的法向应变）和剪切变形（键的偏斜导致的伸长变化）的贡献，但二者在 $s$ 中混为一体，无法被单独分辨。这导致键型模型在理论上不能区分球张量响应与偏张量响应，从而无法将经典本构中体积模量 $K$ 与剪切模量 $\mu$ 分离——这正是 4.6.1 节泊松比锁定的更深层表述。从信息论的角度，单键只提供一个标量信号 $s$，而描述一点的变形状态需要至少 6 个独立分量（三维应变张量），信息维度的根本不足使键型模型无法达到经典弹性理论的一般性。
+
+\textbf{复杂本构的表达力受限。}经典连续介质力学中的塑性流动（屈服面方向、非关联流动法则）、粘弹性（率相关松弛谱）、损伤软化（损伤变量与应力的耦合）等复杂本构行为，本质上依赖一点处应变张量的完整信息（或应力张量的完整信息）来确定响应方向。单键层次仅提供 $s$ 一个标量，塑性流动方向的判定（如 $\partial f/\partial\boldsymbol{\sigma}$）无法在键的层面表达。因此，键型模型的"键独立"假设已将本构复杂性限制在脆性断裂的范围内（第 4 章），塑性、粘弹性、相变等更复杂的物理行为必须诉诸态型框架（第 6 章常规态型、第 7 章非常规态型），在态的层次上获得完整的变形状态信息。
+
+\textbf{后果的根本统一。}上述三项缺陷——弯曲缺失、体积--剪切耦合、本构表达力有限——看似独立，实则同源于一个根本设定：每条键对它所属的物质点的合力贡献由该键自身的变形单独决定，与其他键的变形状态无关。这一设定简化了理论、降低了计算成本，但付出了上述结构性代价。认识这一点，是理解第 5 章改进方案（微梁、共轭键、键转动等打破"键独立"的尝试）与第 6 章态基理论（从"键独立"升级为"态依赖"）的逻辑起点。
+
+\subsection{各向异性建模与计算层面的挑战}
+
+上述两节讨论的局限是所有键型模型（无论各向同性还是各向异性）的共性。本节进一步讨论键型模型在面向各向异性材料与数值实现时所面临的特殊困难。
+
+\textbf{各向异性材料的建模。}PMB 模型取常微模量 $c$，对键的方向无差别，天然是各向同性的。各向异性材料——纤维增强复合材料、木材、单晶金属——需要键的方向依赖微模量 $c(\boldsymbol{\xi})$（而非仅依赖 $|\boldsymbol{\xi}|$）。虽然可以构造方向依赖的 $c(\hat{\boldsymbol{\xi}})$ 来表达键沿不同方向的刚度差异（如纤维方向的 $c$ 大于横向），但泊松比锁定问题依然存在：因为各向异性键型模型的每条键仍然是独立的中心力，其 Cauchy 关系的约束并未因 $c$ 的方向依赖而解除——仅将各向同性 Cauchy 关系推广为各向异性的 Cauchy 型关系，参数数量仍不足以覆盖一般各向异性弹性。第 5 章将介绍的面内各向异性键型模型（通过微模量方向函数、成对势中耦合键对的附加项等）在一定程度上扩展了适用范围，但本质限制直到态型框架才被完全解除。
+
+\textbf{离散敏感性与网格依赖。}从数值计算的角度，键型模型的离散实现存在两个实践层面的挑战。其一，近场范围 $\delta$ 与网格尺寸 $\Delta x$ 的比值 $m=\delta/\Delta x$ 是影响收敛性与精度的重要参数。第 2 章 2.1 节已指出，为保证积分离散化的精度，通常要求 $m\geq 3$；但 $m$ 的选择对裂纹路径有一定影响——$m$ 过小时，裂纹倾向于沿网格方向扩展（网格偏向性，mesh bias），Bobaru 与 Hu \cite{BobaruHu2012} 的系统数值研究表明 $m$ 取 $3\sim5$ 可在精度与网格独立性之间取得较好的平衡。其二，表面效应（4.5 节已详细讨论）虽然可通过微模量修正或虚拟材料层等方法缓解，但在复杂三维几何中的精确修正仍具挑战性——尤其是当裂纹扩展至边界附近时，表面效应与裂纹尖端场的相互作用使修正参数的选择成为经验性而非系统性的。
+
+\textbf{计算成本与态型的对比。}键型模型的最大优势——仅需计算各键独立的对力——同时也是它的核心局限。态型理论（第 6 章）虽然突破了上述所有约束（任意泊松比、弯曲刚度、各向异性、复杂本构），但代价是每条键的力态计算需要访问物质点 $\mathbf{x}$ 的全部族信息（如膨胀 $\theta$、偏斜伸长 $\underline{e}^{\mathrm{d}}$ 等态量），计算成本显著高于键型模型。因此，键型模型与态型模型在实际应用中并非"新旧替代"关系，而是构成一个成本--精度谱系：对以脆性断裂为主、泊松比约束可接受的问题（如玻璃、陶瓷、混凝土的动态碎裂），PMB 键型模型以其计算经济性仍然是最优选择；对需要精确三维弹性响应或包含塑性等复杂本构的问题，态型模型是不可替代的工具。这一谱系正是第 4--7 章按"PMB→改进键型→常规态型→非常规态型"组织的内在逻辑。
+
+\emph{AI 辅助生成，需经专业审阅。}
+
+本章从第 2 章一般理论框架与第 3 章经典对应出发，完成了键型近场动力学从公理基础到可计算模型的完整闭环。4.1 节将一般对力函数约化为三条基本假设下的键基形式，4.2 节建立了微势的物理约束与键力密度函数的显式表达，4.3 节以 PMB 模型为典范给出了含断键准则的完整本构，4.4 节通过能量法率定了一维、二维（平面应力与平面应变）及三维情形下的微模量公式，4.5 节讨论了表面效应的四类修正方法，4.6 节系统剖析了键型模型的三类固有局限——泊松比锁定、单键依赖假设、各向异性建模与计算挑战。这一结构围绕一条中心线索展开：键型理论以"键独立"为基本设定，获得了简洁性与计算经济性，付出了泊松比锁定、无弯曲刚度、本构表达力受限等结构性代价。PMB 模型作为键型家族中最具代表性的成员，仅含两个材料参数（$c$ 与 $s_c$），是脆性断裂模拟中计算效率最高的近场动力学本构。在此基础上，第 5 章将通过引入微模量衰减、微梁模型、共轭键、键转动与对偶双影响域等改进方案，逐一缓解本章所指出的局限；第 6 章态型理论则从更一般的非局部本构框架出发，将键型模型作为特例（$\underline{\mathbf{T}}=\tfrac{1}{2}\mathbf{f}$）纳入态的数学结构之中，彻底解除泊松比锁定与本构复杂性限制，为近场动力学向一般工程材料本构建模的拓展奠定基础。
