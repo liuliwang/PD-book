@@ -1,18 +1,692 @@
 % 第9章 空间离散与时间积分
 \chapter{空间离散与时间积分}
 
-\section{无网格离散格式}
-\subsection{均匀离散与非均匀离散}
-\subsection{Voronoi 图自适应离散}
+第 2 章至第 8 章建立了近场动力学的完整理论框架：从运动方程 \eqref{eq:motion}、键型本构（第 4--5 章）、态型本构（第 6--7 章）到有限变形本构（第 8 章）。然而，这些理论均以积分—微分方程的连续形式给出，除极少数简化算例外无法解析求解。本章的任务是将连续理论转化为可计算的数值格式，涵盖空间离散（9.1--9.2 节）与时间积分（9.3--9.6 节）两个核心环节。9.1 节讨论无网格离散格式，从均匀离散出发，进而讨论非均匀离散、自适应细化与变 horizon 的数值实现，其中对偶影响域部分衔接第 5 章 5.5 节的理论基础。9.2 节处理离散化引入的误差：键积分离散误差与体积修正、表面修正的数值实现、求积方案与误差估计。9.3 节介绍显式时间积分方法——中心差分法、速度 Verlet 与蛙跳格式，重点推导显式格式的稳定性条件（CFL），并讨论数值耗散与时间步选取策略。9.4 节转入准静态问题，介绍自适应动力松弛法（Kilic 与 Madenci 格式）；9.5 节对隐式求解策略做策略总览，衔接第 7 章 7.3--7.4 节的详细推导；9.6 节比较三类准静态求解方案并给出准静态断裂模拟流程。本章所建立的离散化框架将直接支撑第 10 章边界条件的数值实现与第 11 章裂纹与损伤的数值模拟。
 
-\section{体积修正与表面积分方案}
+\section{无网格离散格式}\label{sec:disc-meshfree}
 
-\section{时域积分的显式方法}
-\subsection{中心差分法}
-\subsection{显式方法的稳定性条件}
+经典有限元法依赖网格实现空间离散，单元拓扑固定，处理裂纹扩展等不连续问题时需要复杂的网格重构或扩展有限元（XFEM）技术。近场动力学的运动方程 \eqref{eq:motion} 以积分形式表述，不含空间导数，天然适合无网格离散——将物体 $\mathcal{B}$ 离散为一组物质点 $\{\mathbf{x}_i\}_{i=1}^{N}$，每点携带体积 $\Delta V_i$、质量 $\rho_i\Delta V_i$ 与近场域 $H_i=\{\mathbf{x}_j:|\mathbf{x}_j-\mathbf{x}_i|\le\delta_i\}$。积分形式的运动方程在离散后转化为物质点层次的求和运算，裂纹的萌生与扩展通过键的断开自然捕捉，无需额外的裂纹面追踪或单元分割 \cite{Silling2000,SillingAskari2005}。本节从均匀离散出发（9.1.1 节），继而讨论非均匀离散与自适应细化策略（9.1.2 节），最后处理变 horizon 下对偶影响域的数值实现（9.1.3 节）。
 
-\section{自适应动力松弛法}
+\subsection{均匀离散与物质点}\label{sec:disc-uniform}
 
-\section{隐式求解策略}
+最简单的离散策略是将物体 $\mathcal{B}\subset\mathbb{R}^d$（$d=1,2,3$）以均匀间距 $\Delta x$ 离散为 $N$ 个物质点。各物质点的坐标构成规则点阵，每点代表边长为 $\Delta x$ 的立方体（三维）、正方形（二维）或线段（一维），体积取 $\Delta V_i=(\Delta x)^d$。
 
-\section{拟静力分析方法}
+以键型 PMB 模型为例，将运动方程 \eqref{eq:motion} 在均匀离散下写为物质点求和形式。对物质点 $\mathbf{x}_i$，其族 $\mathcal{F}_i$ 由满足 $|\mathbf{x}_j-\mathbf{x}_i|\le\delta$ 的所有邻居点 $\mathbf{x}_j$（$j\neq i$）构成。离散运动方程为
+\begin{equation}
+  \rho_i\,\ddot{\mathbf{u}}_i^{n}
+  =\sum_{j\in\mathcal{F}_i}\mathbf{f}_{ij}^{n}\,\Delta V_j
+  +\mathbf{b}_i^{n},
+  \label{eq:disc-motion-pmb}
+\end{equation}
+其中上标 $n$ 标记第 $n$ 时间层，$\mathbf{f}_{ij}^{n}=\mathbf{f}(\boldsymbol{\eta}_{ij}^{n},\boldsymbol{\xi}_{ij})$ 为 $\mathbf{x}_i$ 与 $\mathbf{x}_j$ 之间的对力密度，$\boldsymbol{\xi}_{ij}=\mathbf{x}_j-\mathbf{x}_i$ 为参考键矢量，$\boldsymbol{\eta}_{ij}^{n}=\mathbf{u}_j^{n}-\mathbf{u}_i^{n}$ 为相对位移矢量，$\Delta V_j$ 为邻居 $\mathbf{x}_j$ 的体积。式 \eqref{eq:disc-motion-pmb} 中求和遍历族 $\mathcal{F}_i$ 内的全部物质点。
+
+对于态型模型（OSB 或 NOSB），离散运动方程取态形式。记 $\mathbf{x}_i$ 处的力态 $\underline{\mathbf{T}}_i\langle\boldsymbol{\xi}_{ij}\rangle$，$\mathbf{x}_j$ 处的力态 $\underline{\mathbf{T}}_j\langle\boldsymbol{\xi}_{ji}\rangle$（$\boldsymbol{\xi}_{ji}=-\boldsymbol{\xi}_{ij}$），则离散运动方程为
+\begin{equation}
+  \rho_i\,\ddot{\mathbf{u}}_i^{n}
+  =\sum_{j\in\mathcal{F}_i}\Bigl(
+  \underline{\mathbf{T}}_i\langle\boldsymbol{\xi}_{ij}\rangle
+  -\underline{\mathbf{T}}_j\langle\boldsymbol{\xi}_{ji}\rangle
+  \Bigr)\,\Delta V_j
+  +\mathbf{b}_i^{n},
+  \label{eq:disc-motion-state}
+\end{equation}
+其中力态 $\underline{\mathbf{T}}_i$ 由本构关系（第 6--7 章）从变形状态 $\underline{\mathbf{Y}}_i$ 计算。
+
+\begin{remark}
+  式 \eqref{eq:disc-motion-pmb} 与 \eqref{eq:disc-motion-state} 分别对应键基与态基的离散形式。二者的关键差异在于：键基的对力 $\mathbf{f}_{ij}$ 仅依赖键 $ij$ 自身的变形（成对相互作用），而态基的两个力态 $\underline{\mathbf{T}}_i\langle\boldsymbol{\xi}_{ij}\rangle$ 与 $\underline{\mathbf{T}}_j\langle\boldsymbol{\xi}_{ji}\rangle$ 分别依赖 $\mathbf{x}_i$ 与 $\mathbf{x}_j$ 各自近场域内全部键的变形。这一差异在数值实现中决定了力计算的并行化策略与内存访问模式——键基可以逐键独立计算，态基则需要先聚合变形信息再计算力态 \cite{Parks2008,SillingAskari2005}。
+\end{remark}
+
+均匀离散的网格比（mesh ratio）定义为
+\begin{equation}
+  n = \frac{\delta}{\Delta x},
+  \label{eq:disc-mesh-ratio}
+\end{equation}
+其中 $n$ 是决定离散精度与计算成本的关键无量纲参数。$n$ 过小（如 $n<2$）时，近场域内物质点数量不足，离散误差显著，且微模量标定的连续性假设被破坏；$n$ 过大时计算成本随 $O(n^d)$ 增长而精度增益递减。文献中广泛采用的经验取值为 $n=3\sim6$：Silling 与 Askari \cite{SillingAskari2005} 在最早的 PMB 数值研究中建议 $n=3$；Bobaru 等 \cite{Bobaru2009} 在收敛性研究中指出 $n=3$ 即可提供工程可接受的精度，$n\ge4$ 时误差已接近渐近区域；Bobaru 与 Hu \cite{BobaruHu2012} 在动态裂纹分支研究中系统考察了 $n$ 对裂纹路径与分支模式的影响，发现 $n=4\sim5$ 是精度与成本的较好折衷。Ha 与 Bobaru \cite{HaBobaru2010} 在二维动态断裂研究中进一步指出 $n\ge3$ 可保证动态裂纹扩展的主要特征（分支角度、分支点位置）对网格不敏感。
+
+Parks 等 \cite{Parks2008} 在 LAMMPS 分子动力学代码中实现 PD 模块时采用了均匀物质点离散，利用分子动力学已有的邻居列表（neighbor list）与 Verlet 积分器，显著降低了 PD 离散化的实现门槛。Ganzenm{\"u}ller 等 \cite{Ganzenmuller2015} 系统比较了 PD 与光滑粒子流体动力学（SPH）在离散化层面的异同，指出二者均属于无网格粒子法族，关键差异在于相互作用范围（PD 有限近场域 vs SPH 可变光滑长度）与本构结构（PD 非局部积分 vs SPH 核近似）。
+
+\textbf{邻居搜索算法。}离散运动方程 \eqref{eq:disc-motion-pmb} 或 \eqref{eq:disc-motion-state} 的每步力计算需对每个物质点遍历其族 $\mathcal{F}_i$ 内的全部邻居。对 $N$ 个物质点的系统，朴素全对全（all-pairs）搜索的复杂度为 $O(N^2)$，对大规模问题不可接受。实际计算中采用两类加速策略。其一是单元链表法（cell-linked list）：将计算域划分为边长为 $\delta$ 的均匀单元（三维为立方体），每个物质的邻居搜索仅需检查自身所在单元及其相邻单元（三维共 27 个单元）内的物质点，复杂度降至 $O(N\cdot n_c)$，其中 $n_c$ 为单元内平均物质点数。其二是 Verlet 列表法：对每个物质点预构建固定半径 $r_{\text{skin}}>\delta$ 的候选邻居列表，每隔若干时间步更新一次（当物质点位移积累超过 $r_{\text{skin}}-\delta$ 时触发更新）；每步实际力计算仅扫描候选列表中满足 $|\mathbf{x}_j-\mathbf{x}_i|\le\delta$ 的子集。两种策略可组合使用：单元链表用于构建/更新 Verlet 列表，Verlet 列表用于逐步力计算。Parks 等 \cite{Parks2008} 指出，对于三维 PMB 问题（$n\approx3$，$\delta\approx3\Delta x$），Verlet 列表的更新频率通常为每 $10\sim20$ 时间步一次，邻居搜索的摊还成本低于力计算成本的 $5\%$。
+
+Seleson 等 \cite{Seleson2009} 从分子动力学的粗粒化视角讨论了 PD 的离散问题，指出当 $\delta$ 取数个原子间距量级时，PD 可视为 MD 的连续介质粗粒化（coarse-graining）结果——这一视角为 PD 离散尺度与微观尺度的衔接提供了物理基础，也解释了为何 $n\ge3$ 的经验准则在多种材料与尺度上普遍适用：$\delta$ 必须包含足够多的微观自由度以使统计平均有意义。
+
+\emph{AI 辅助生成，需经专业审阅。}
+
+\subsection{非均匀离散与自适应细化}\label{sec:disc-nonuniform}
+
+均匀离散概念简单、实现方便，但在实际问题中常非最优。裂纹尖端、孔洞边缘、材料界面等区域存在高应变梯度或高损伤梯度，需要较高的物质点密度以解析局部响应；而远离这些特征的区域可用粗离散以节约计算资源。这就引出了非均匀离散与自适应细化两个紧密关联的主题。
+
+\textbf{非均匀离散}即采用空间变化的物质点间距 $\Delta x(\mathbf{x})$。非均匀离散下的运动方程仍取式 \eqref{eq:disc-motion-pmb} 或 \eqref{eq:disc-motion-state} 的形式，但 $\Delta V_j$ 需按实际空间分布计算（而非常数 $(\Delta x)^d$），且近场范围 $\delta$ 也可随位置变化（见 9.1.3 节）。最简单的非均匀离散是分级网格（graded mesh）：在关注区域采用较密间距，在远离区域逐渐放大间距。实现方式通常为：先定义全局均匀基准网格，再根据几何准则或误差指示子在指定区域细分。
+
+非均匀离散带来的主要挑战有三。其一，物质点体积变化使积分权重的离散近似精度不一致，对精度敏感的问题（如表面修正、裂纹成核预测）需要更细致的体积计算——例如基于 Voronoi 图确定各物质点对应的实际体积，而非简单取 $(\Delta x)^d$。其二，近场域内物质点数量随 $\Delta x$ 变化，键密度在过渡区不均匀，可能引入虚假的刚度梯度。其三，对单时间步积分（见 9.3 节），$\Delta t$ 由全场最严格的条件决定（最小 $\Delta x$，最大波速），对局部细化区的过度细化可能导致全局时间步过小而严重损害计算效率。Bobaru 等 \cite{Bobaru2009} 在一维 PD 收敛性研究中讨论了离散非均匀性对收敛率的影响；Silling \cite{Silling2011coarsening} 针对变分辨率粗化（variable-resolution coarsening）提出了基于能量守恒的粗化准则。
+
+\textbf{自适应细化}（adaptive refinement）在非均匀离散的基础上进一步引入了"随时间/载荷演进动态调整离散"的能力。其基本流程为：以初始离散运行若干时间步（或载荷步）→ 计算误差指示子（error indicator）→ 在误差超限区域加密物质点（细化）→ 在新离散上继续计算。对于动态断裂问题，误差指示子通常基于损伤场 $\varphi(\mathbf{x})$ 的梯度或键的伸长率分布——裂纹尖端附近伸长率大、损伤梯度高，需要高物质点密度；已断裂区与远场区则可保持粗离散。Dipasquale 等 \cite{Dipasquale2014} 提出了二维 PD 的自适应网格细化（adaptive grid refinement）策略，在裂纹扩展路径上动态加密物质点，证明自适应方案可在不损失断裂路径预测精度的前提下降低整体计算量约 $40\%\sim60\%$。Bobaru 与 Duangpanya \cite{BobaruDuangpanya2010} 在瞬态热传导 PD 模型中讨论了自适应细化的误差估计与实施，其误差指示子基于热通量梯度，思想可迁移至力学问题。
+
+Bessa 等 \cite{Bessa2014} 从再生核（reproducing kernel）角度对 PD 的离散化做了统一分析，指出 PD 可视为再生核粒子法（RKPM）在紧支集影响域内的特例，进而提出了基于再生条件的自适应离散准则。这一视角为 PD 离散化的误差分析与自适应策略设计提供了坚实的数学框架。
+
+自适应细化的实施面临若干数值工程问题。首先是物质点的增删与场量映射：新增物质点需从其邻居插值获得位移、速度与损伤状态，删除的物质点（粗化时合并）需将其质量与动量守恒地分配给相邻点。其次是邻居列表的重构：细化或粗化后，受影响区域的邻居关系须全部重建，大规模问题中这一开销可能显著。第三是载荷历史的继承：对于路径相关材料（如塑性、损伤累积），细化引入的新物质点缺乏应力历史，需从已有物质点合理继承以避免虚假的卸载—再加载效应。目前自适应 PD 的实现仍以研究代码为主，通用 PD 软件（如 Peridigm）对自适应离散的支持尚不成熟 \cite{Diehl2019}。
+
+Silling \cite{Silling2011coarsening} 提出的变分辨率粗化框架为该问题提供了理论基础：通过定义能量等价的粗粒化算子，在粗、细离散之间建立守恒映射，保证粗化过程中系统的总能量、线动量与角动量不变。这一框架适用于从细到粗的单向粗化，与自适应细化（双向细化—粗化）共用相同的守恒原则。
+
+非均匀离散的数值算例（演示性参数）。考虑二维平面应力 PMB 模型，材料参数：$E=30$ GPa，$\nu=1/3$，$\rho=2400$ kg/m$^3$。几何为边长为 $L=0.1$ m 的正方形板，中央含 $a=0.02$ m 的水平预置裂纹。采用两级非均匀离散：裂纹尖端附近 $|x-a/2|\le 2\delta$ 区域取 $\Delta x_1=\delta/5=4\times10^{-4}$ m（$n=5$），远场区取 $\Delta x_2=\delta/3\approx6.67\times10^{-4}$ m（$n=3$），其中 $\delta=2\times10^{-3}$ m。过渡区物质点间距按线性插值。该离散方案在裂纹尖端附近的物质点密度为远场区的约 2.8 倍，而全场总物质点数相比全细密离散减少约 $35\%$。时间步按最严苛的细密区 CFL 条件取 $\Delta t\approx5\times10^{-8}$ s（见 9.3.3 节），总模拟时长为 $2\times10^{-5}$ s。此类演示性参数来自文献中二维脆性断裂 PD 模拟的典型配置 \cite{HaBobaru2010,Diehl2019}。
+
+\emph{AI 辅助生成，需经专业审阅。}
+
+\subsection{变 horizon 与对偶影响域的实现}\label{sec:disc-variable-horizon}
+
+非均匀离散下，若近场范围 $\delta$ 也允许随位置变化（即 $\delta(\mathbf{x})$），则空间离散进入变 horizon 范畴。变 horizon 的核心困难在于成对性的破坏：经典键型理论要求 $\mathbf{x}$ 对 $\mathbf{x}'$ 的力与 $\mathbf{x}'$ 对 $\mathbf{x}$ 的力大小相等、方向相反（反作用条件 \eqref{eq:reaction}）。但当 $\delta(\mathbf{x})\neq\delta(\mathbf{x}')$ 时，可能出现单向作用——例如 $\mathbf{x}$ 的近场域包含 $\mathbf{x}'$（因 $|\mathbf{x}'-\mathbf{x}|\le\delta(\mathbf{x})$），而 $\mathbf{x}'$ 的近场域不包含 $\mathbf{x}$（因 $|\mathbf{x}-\mathbf{x}'|>\delta(\mathbf{x}')$），导致只有 $\mathbf{x}$ 计算了对 $\mathbf{x}'$ 的力，破坏了力平衡 \cite{Ren2017dualhorizon,Silling2011coarsening}。
+
+第 5 章 5.5 节已完整建立了对偶双影响域（dual-horizon）理论的数学框架——引入主影响域 $H_{\mathbf{x}}$ 与对偶影响域 $H'_{\mathbf{x}}$，修正力态以保证反作用条件的自动满足。本小节不做理论重复，仅聚焦于对偶双影响域的数值实现层面，包括邻居搜索、力计算流程与关键数据结构。
+
+\textbf{邻居搜索。}对偶影响域的邻居搜索分两阶段。第一阶段为每个物质点 $\mathbf{x}_i$ 构建主影响域邻居列表 $\mathcal{F}_i$：遍历所有满足 $|\mathbf{x}_j-\mathbf{x}_i|\le\delta_i$ 的物质点 $\mathbf{x}_j$（$j\neq i$），其中 $\delta_i=\delta(\mathbf{x}_i)$。这一阶段与均匀 $\delta$ 下的邻居搜索完全相同。第二阶段构建对偶影响域邻居列表 $\mathcal{F}'_i$：由所有以 $\mathbf{x}_i$ 为邻居的点构成，即对所有 $\mathbf{x}_j$，若 $|\mathbf{x}_i-\mathbf{x}_j|\le\delta_j$ 且 $|\mathbf{x}_i-\mathbf{x}_j|>\delta_i$（即 $\mathbf{x}_i$ 不在 $\mathbf{x}_j$ 的主影响域中但 $\mathbf{x}_j$ 的主影响域包含 $\mathbf{x}_i$），则将 $\mathbf{x}_j$ 加入 $\mathcal{F}'_i$。换言之，$\mathcal{F}'_i$ 收集的是那些"主影响域包含 $\mathbf{x}_i$ 但 $\mathbf{x}_i$ 的主影响域不包含它"的邻居。实际实现中，$\mathcal{F}'_i$ 可通过在原邻居搜索中记录"反向关系"来构建：在对所有点构建主影响域邻居列表后，扫描全场的邻居关系对 $(i,j)$，若 $j\in\mathcal{F}_i$，则在 $\mathbf{x}_j$ 的某个反向列表中记录 $i$。对均质 $\delta$ 的情况，$\mathcal{F}'_i=\emptyset$，对偶双影响域退化为经典键型理论 \cite{Ren2017dualhorizon}。
+
+\textbf{力计算。}对偶双影响域的力计算分为两类贡献。对 $(i,j)\in\mathcal{F}_i$（常规成对键），力贡献与经典键型无异：$\mathbf{f}_{ij}$ 和 $\mathbf{f}_{ji}=-\mathbf{f}_{ij}$ 分别作用于 $\mathbf{x}_i$ 和 $\mathbf{x}_j$。对 $(i,j)\in\mathcal{F}'_i$（非对称键），$\mathbf{x}_j$ 的力态 $\underline{\mathbf{T}}_j$ 包含对 $\mathbf{x}_i$ 的贡献，$\mathbf{x}_i$ 需要接收这一贡献以维持力平衡。具体而言，若 $j\in\mathcal{F}'_i$，则 $\mathbf{x}_i$ 接收来自 $\mathbf{x}_j$ 的力密度增量
+\begin{equation}
+  \mathbf{f}_{ji}^{\text{dual}}
+  =-\underline{\mathbf{T}}_j\langle\boldsymbol{\xi}_{ji}\rangle\,\Delta V_j,
+  \label{eq:disc-dual-force}
+\end{equation}
+而 $\mathbf{x}_j$ 已在自身的主循环中计算了 $\underline{\mathbf{T}}_j\langle\boldsymbol{\xi}_{ji}\rangle$ 对 $\mathbf{x}_i$ 的贡献。这样，式 \eqref{eq:disc-dual-force} 补全了非对称键的力平衡。
+
+\textbf{数值实现流程。}对偶双影响域在每个时间步内的力计算流程可概括为：第一步，遍历所有物质点，对每点的主影响域邻居计算力态（或对力）并累加至该点的力向量；第二步，遍历所有物质点的对偶影响域邻居列表，将对应的非对称键力贡献从力的"源点"传递至力的"目标点"；第三步，将两类贡献的力向量合并，完成时间积分。这一流程的额外开销主要来自对偶影响域邻居列表的构建（一次性预处理）、存储（额外内存）与第二步的力传递（每步执行）。Ren 等 \cite{Ren2017dualhorizon} 指出，在均匀 $\delta$ 情形下 $\mathcal{F}'_i=\emptyset$，第二步自动跳过，计算成本与经典键型无异；在 $\delta$ 空间变化但变化平缓的问题中，$\mathcal{F}'_i$ 的规模远小于 $\mathcal{F}_i$，额外开销可接受（通常 $<20\%$）。
+
+\textbf{数据结构。}实现对偶双影响域需要为每个物质点存储两类邻居信息：$\mathcal{F}_i$（主影响域邻居编号列表）与 $\mathcal{F}'_i$（对偶影响域邻居编号列表）。在大规模并行计算（如 MPI 区域分解）中，对偶影响域邻居可能跨越子域边界，需要额外的通信缓冲区来传递非对称键的力贡献。第 17 章将详细讨论 PD 并行计算的数据结构与通信优化。
+
+变 horizon 离散的另一实施途径是局部 $\delta$ 平滑过渡：在粗细网格交界区，令 $\delta$ 从细网格值 $\delta_{\text{fine}}$ 连续过渡到粗网格值 $\delta_{\text{coarse}}$，过渡层宽度取 $O(\max(\delta_{\text{fine}},\delta_{\text{coarse}}))$。当过渡层足够宽时，$\delta$ 的空间梯度平缓，对偶影响域 $\mathcal{F}'_i$ 的规模较小，对偶双影响域的计算开销可进一步降低。然而，过宽的过渡层丧失了变 horizon 带来的计算效率优势，实践中需在"过渡层厚度"与"计算效率"之间折衷。Bobaru 与 Hu \cite{BobaruHu2012} 指出，对于裂纹扩展等对局部离散敏感的问题，$\delta$ 的空间变化梯度不应超过 $\delta/5\Delta x$（即近场范围在每 5 个物质点内变化不超过自身的 1 倍），以避免过渡区产生虚假的波反射或裂纹路径偏折。
+
+\emph{AI 辅助生成，需经专业审阅。}
+
+\section{体积修正与积分方案}\label{sec:disc-volume}
+
+将运动方程 \eqref{eq:motion} 中的连续积分转化为离散求和时，积分测度 $\mathrm{d}V_{\mathbf{x}'}$ 被物质点体积 $\Delta V_j$ 所替代。这一近似引入了键积分离散误差（9.2.1 节），其中边界附近的误差尤为显著。体积修正通过调节积分权重（$\beta$ 因子）来减轻离散误差，表面修正在此基础上进一步补偿边界附近近场域截断引起的刚度损失（9.2.2 节）。9.2.3 节从误差分析角度讨论不同求积方案及其精度估计。
+
+\subsection{键积分离散误差与体积修正}\label{sec:disc-quadrature-error}
+
+运动方程 \eqref{eq:motion} 中积分项 $\int_{\mathcal{F}_{\mathbf{x}}}\mathbf{f}\,\mathrm{d}V_{\mathbf{x}'}$ 在离散后近似为 $\sum_{j\in\mathcal{F}_i}\mathbf{f}_{ij}\,\Delta V_j$。这一中点求积（midpoint quadrature）的局部误差为 $O(\Delta x^2)$，但全局收敛阶取决于被积函数的光滑性以及近场域边界处被积函数的截断行为。在两种情形下离散误差较为突出。
+
+\textbf{情形一：近场域边界处键的部分包含。}当邻居物质点 $\mathbf{x}_j$ 位于近场域 $H_i$ 的边界附近时（即 $|\boldsymbol{\xi}_{ij}|\approx\delta_i$），$\mathbf{x}_j$ 所代表的体积元 $\Delta V_j$ 可能只有一部分落在 $H_i$ 之内。简单地将整块 $\Delta V_j$ 赋予该键的积分贡献，等价于把近场域外的材料也计入了力的计算。这一误差在均匀离散内部较小（因为对称的和消效应），但在边界附近——特别是物体几何边界或裂纹面附近——不可忽略。
+
+\textbf{情形二：非均匀离散下体积元不规则。}当 $\Delta x$ 随位置变化时，以某物质点为中心的代表体积元可能不再是规则的立方体或正方形。此时，简单取 $\Delta V_j=(\Delta x_j)^d$ 忽略了几何边界的实际形状，在过渡区引入额外的离散误差。
+
+为处理情形一，引入体积修正因子 $\beta(\mathbf{x}_i,\mathbf{x}_j)$，如第 4 章式 \eqref{eq:volume-beta} 所定义：当 $\mathbf{x}_j\in H_i$ 时 $\beta=1$，否则 $\beta=0$。在实际离散中，$\beta$ 的取值可以直接通过几何判断（$|\mathbf{x}_j-\mathbf{x}_i|\le\delta_i$）实现——这正是大多数 PD 代码的默认行为 \cite{MadenciOterkus2014,Parks2008}。更精确的做法是对近场域边界附近的键计算部分体积修正：
+\begin{equation}
+  \beta_{ij}=
+  \frac{\text{Vol}\bigl(V_j\cap H_i\bigr)}{\Delta V_j},
+  \label{eq:vol-partial-beta}
+\end{equation}
+其中 $\text{Vol}(V_j\cap H_i)$ 为 $\mathbf{x}_j$ 的代表体积元与 $\mathbf{x}_i$ 的近场域之交集的实际体积。式 \eqref{eq:vol-partial-beta} 将 $\beta$ 从二值函数推广为 $[0,1]$ 之间的连续值，理论上可消除近场域边界处的积分截断误差。
+
+式 \eqref{eq:vol-partial-beta} 的解析计算在二维与三维情形下需处理球（或圆）与立方体（或正方形）的交集体积。以三维为例，设物质点 $\mathbf{x}_j$ 的代表体积元为以 $\mathbf{x}_j$ 为中心的边长为 $\Delta x$ 的立方体 $Q_j$，近场域 $H_i$ 为以 $\mathbf{x}_i$ 为中心、半径为 $\delta$ 的球。交集体积 $V_{ij}^{\cap}=\text{Vol}(Q_j\cap H_i)$ 可分三种情况：（a）若 $Q_j$ 完全在 $H_i$ 内，则 $V_{ij}^{\cap}=\Delta x^3$，$\beta_{ij}=1$；（b）若 $Q_j$ 完全在 $H_i$ 外，则 $V_{ij}^{\cap}=0$，$\beta_{ij}=0$；（c）若 $Q_j$ 部分在 $H_i$ 内（即 $|\mathbf{x}_j-\mathbf{x}_i|\approx\delta$），则需计算立方体与球的交集体积——这一计算涉及球面与立方体面的交线积分，解析表达式较为复杂。工程实践中常用近似：沿键方向的一维线性比例 $\beta_{ij}\approx(\delta-|\boldsymbol{\xi}_{ij}|+\Delta x/2)/\Delta x$（限制在 $[0,1]$ 内），或以数值子体积积分（将 $Q_j$ 进一步细分为 $p\times p\times p$ 个子体积，统计落入 $H_i$ 内的子体积个数占总数的比例）逼近 \cite{LeBobaru2018}。
+
+然而，精确计算交集体积在三维问题中计算量较大，通常仅在近场域边界附近按近似公式估计 \cite{LeBobaru2018,SelesonLittlewood2016}。Seleson 与 Littlewood \cite{SelesonLittlewood2016} 在网格无关性收敛研究中系统地考察了不同体积修正策略对收敛率的影响，指出部分体积修正可将收敛率从近似一阶提升至接近二阶（对光滑解）。
+
+针对情形二的非均匀离散，推荐采用基于 Voronoi 图的体积分配：对非均匀分布的物质点，构建 Voronoi 图（二维）或 Voronoi 多面体（三维），以每个物质点的 Voronoi 胞腔体积作为 $\Delta V_i$。Voronoi 胞腔自动适应物质点的空间分布，在粗细网格过渡区提供比均匀 $(\Delta x)^d$ 更准确的体积估计 \cite{Bobaru2009}。
+
+\emph{AI 辅助生成，需经专业审阅。}
+
+\subsection{表面修正的数值实现}\label{sec:disc-surface-correction}
+
+表面效应（surface effect）指边界附近物质点因其近场域 $H_{\mathbf{x}}$ 被物体几何截断（如图 \ref{fig:boundary-truncation} 所示）而导致有效刚度下降的现象。第 4 章 4.4 节系统介绍了四种表面修正方法的理论（微模量修正、体积修正、虚拟材料层、短程力修正），第 10 章将进一步讨论表面效应与非局部边界条件的耦合。本小节聚焦于微模量修正法与体积修正法的数值实现细节，这些是 PD 数值代码中最常用的两种方案 \cite{LeBobaru2018,MadenciOterkus2014}。
+
+\textbf{微模量修正法的数值实现。}回顾第 4 章式 \eqref{eq:surface-alpha} 与 \eqref{eq:surface-correction-c}：对每个物质点 $\mathbf{x}_i$，计算体积比例因子 $\alpha_i=V_{H_i}/V_{H_i^{\infty}}$（实际近场域体积与完整近场域体积之比），然后将该点的微模量放大为 $c/\alpha_i$。数值实现中，$\alpha_i$ 通过遍历 $\mathbf{x}_i$ 的邻居直接计算：
+\begin{equation}
+  \alpha_i
+  =\frac{\sum_{j\in\mathcal{F}_i}\Delta V_j}
+  {\sum_{j\in\mathcal{F}_i^{\infty}}\Delta V_j},
+  \label{eq:vol-alpha-numerical}
+\end{equation}
+其中 $\mathcal{F}_i^{\infty}$ 为以 $\mathbf{x}_i$ 为中心、$\delta$ 为半径的完整球（或圆）内所有物质点的集合（无论是否在物体 $\mathcal{B}$ 内），其体积和可由解析公式直接计算：三维 $V_{H_i^{\infty}}=\frac{4}{3}\pi\delta^3$，二维 $V_{H_i^{\infty}}=\pi\delta^2$，一维 $V_{H_i^{\infty}}=2\delta$。对内部物质点，$\mathcal{F}_i$ 与 $\mathcal{F}_i^{\infty}$ 相同（或仅因离散效应有微小差异），$\alpha_i\approx1$；对边界物质点，$\alpha_i<1$。在每一步的力计算中，当力密度涉及 $\mathbf{x}_i$ 的微模量时，以 $c/\alpha_i$ 替代 $c$。注意在键基 PMB 中，力 $\mathbf{f}_{ij}$ 的微模量通常取两端的平均，即 $c_{ij}=(c_i+c_j)/2$；实现时相应取 $c_{ij}=\frac{1}{2}(c/\alpha_i+c/\alpha_j)$ \cite{LeBobaru2018}。
+
+微模量修正法的计算代价极低：$\alpha_i$ 可在预处理阶段一次性计算并存储，每步力计算仅额外增加一次除法（或查表）。对于静态或缓慢加载问题，此法是首选的表面修正方案。但在动态冲击等波传播显著的问题中，边界附近 $c/\alpha_i$ 的空间梯度可能产生虚假波反射——因为修正使边界区域的局部刚度不均匀 \cite{LeBobaru2018,LeBobaru2018Obj}。
+
+\textbf{体积修正法的数值实现。}体积修正法的思路是保持微模量 $c$ 不变，仅调整参与积分的键集合：对于被物体几何边界截断的键，其积分权重按实际包含比例缩放。实现上，体积修正法与式 \eqref{eq:vol-partial-beta} 的 $\beta$ 因子天然兼容：在力计算中，对每条键 $ij$，其体积累积权重为 $\beta_{ij}\Delta V_j$，其中 $\beta_{ij}$ 按式 \eqref{eq:vol-partial-beta} 取值或直接按几何准则（$|\mathbf{x}_j-\mathbf{x}_i|\le\delta$ 且两点均在 $\mathcal{B}$ 内）取 0/1。
+
+体积修正法的一个数值实现细节是处理边界处物质点体积的部分截断。以二维情形为例，当方形物质点元胞被直线物体边界切割时，边界附近物质点的实际体积小于 $\Delta x^2$。Hu、Ha 与 Bobaru \cite{HuHaBobaru2012} 在含孔复合材料板的 PD 模拟中实施了基于几何切割的体积修正：对边界附近的物质点，计算其方形胞腔被物体边界（直线或圆弧）切割后的实际面积，以此面积作为 $\Delta V_i$ 参与力计算；对于孔洞边缘，部分物质点可能完全位于物体外（$\Delta V_i=0$），则将该点从计算中移除。这一处理等效于对每个边界物质点同时做"体积修正"（修正自身 $\Delta V_i$）与"邻居体积修正"（修正 $\beta_{ij}$）。
+
+\textbf{两种方法的选用建议。}微模量修正法适用于简单几何（平直边界、大尺寸物体 $L\gg\delta$）、静态或准静态问题；体积修正法更适用于复杂几何（含孔、裂纹）、动态问题，且与基于 Voronoi 的体积分配天然兼容。在许多 PD 代码（如 Peridigm）中，两种修正可同时启用：体积修正处理几何截断引起的键排除，微模量修正处理剩余键的刚度补偿 \cite{Parks2008,MadenciOterkus2014}。
+
+\textbf{数值实现算法概述。}以下给出微模量修正法在 PMB 模型中的逐时间步实现步骤（预处理 + 主循环）。预处理阶段：（1）对每个物质点 $\mathbf{x}_i$，遍历其完整近场域 $H_i^{\infty}$ 内的物质点，统计实际位于物体 $\mathcal{B}$ 内的邻居集合 $\mathcal{F}_i$；（2）按式 \eqref{eq:vol-alpha-numerical} 计算 $\alpha_i$；（3）存储 $c_i'=c/\alpha_i$ 供力计算使用。主循环每时间步：（a）对每点 $\mathbf{x}_i$ 与其邻居 $\mathbf{x}_j\in\mathcal{F}_i$，计算键的伸长率 $s_{ij}$ 与对力 $\mathbf{f}_{ij}$，其中微模量取 $c_{ij}'=\frac{1}{2}(c_i'+c_j')$；（b）按式 \eqref{eq:disc-motion-pmb} 累加至力向量；（c）按所选时间积分格式推进位移与速度。该流程的计算开销仅增加预处理中的 $\alpha_i$ 计算（一次性）与主循环中的微模量平均（每键两次除法，可预存以消除除法），对整体计算成本的影响可忽略不计。
+
+Le 与 Bobaru \cite{LeBobaru2018Obj} 在含孔板的客观性研究中指出，微模量修正法在孔边界的处理需特别小心——孔边界的物质点同时受到外边界截断与内孔边界截断的双重影响，其 $\alpha$ 值不仅取决于到外边界的距离，还取决于到孔边界的距离。对此类多连通域问题，建议采用逐点数值积分法精确计算 $V_{H_i}$（而非使用平直边界的解析估算），并配合体积修正法共同使用。
+
+\emph{AI 辅助生成，需经专业审阅。}
+
+\subsection{求积方案与误差估计}\label{sec:disc-quadrature-schemes}
+
+将运动方程从连续积分转化为离散求和可以视为一种数值求积（numerical quadrature）。本小节从求积理论角度比较若干常用方案的精度，讨论收敛性条件，并给出误差估计。
+
+\textbf{中点求积。}式 \eqref{eq:disc-motion-pmb} 直接取邻居点 $\mathbf{x}_j$ 处的被积函数值乘以该点体积 $\Delta V_j$，属中点求积（亦称矩形法）。对于内部点（近场域完整），中点求积在均匀离散下具有 $O(\Delta x^2)$ 的局部截断误差（光滑被积函数情形），但全局误差的收敛阶取决于近场域边界处被积函数的截断行为——由于被积函数在 $|\boldsymbol{\xi}|\to\delta$ 时可能不光滑衰减（取决于影响函数 $\omega$ 的选取），中点求积的全局误差可能退化至 $O(\Delta x)$。Seleson 与 Littlewood \cite{SelesonLittlewood2016} 在网格无关性收敛研究中给出的数值证据表明，中点求积 + 常数核的组合在光滑问题上的 $L_2$ 误差收敛率约为 $1.0\sim1.5$ 阶。
+
+\textbf{高斯型求积。}理论上可在每个近场域内采用高斯求积规则（Gaussian quadrature），即选取特定的求积节点与权重以提高代数精度。然而，PD 的近场域是球形（或圆形），物质点通常按 Cartesian 网格排列，在此非结构化求积域上构造高斯求积规则的代价较高。实践中极少采用。
+
+\textbf{一维解析部分积分。}在球对称情形（$\mathbf{f}$ 只依赖于 $|\boldsymbol{\xi}|$），一维化积分可解析求解以消除径向离散误差。具体而言，将面积分分解为径向积分与角向积分：角向积分解析给出 $4\pi|\boldsymbol{\xi}|^2$（三维），径向积分沿 $|\boldsymbol{\xi}|\in[0,\delta]$ 用一维数值求积。这一策略在近场域内物质点较少（$n$ 较小）时对改善精度尤为有效，但仅适用于各向同性均匀材料与简单几何。
+
+\textbf{收敛性条件。}PD 离散格式的收敛性涉及双重极限过程：$\delta\to0$（非局部→局部）与 $\Delta x\to0$（离散→连续）。为保持收敛，两极限的趋近速率须满足特定比例关系——即 $\delta/\Delta x\to\infty$（或至少保持有限常数 $n$）以保证近场域内物质点数量随 $\Delta x\to0$ 而趋于无穷，使得求和近似收敛于积分 \cite{Bobaru2009,SelesonLittlewood2016}。
+
+Bobaru 等 \cite{Bobaru2009} 区分了三类收敛路径。第一类为 $m$-收敛（$m$ 指 $\delta/\Delta x$）：固定网格比 $n=\delta/\Delta x$，同时缩小 $\delta$ 与 $\Delta x$。此时近场域内物质点数量不变，但随着 $\Delta x\to0$，离散求和以 $O(\Delta x^p)$ 的速率逼近连续积分（$p$ 取决于求积方案与被积函数光滑性），最终结果收敛于非局部连续解；再令 $\delta\to0$，非局部解收敛于经典局部解。第二类为 $\delta$-收敛：固定 $\Delta x$，缩小 $\delta$。当 $\delta$ 接近 $\Delta x$ 时（$n\to1$），近场域内物质点极少，离散误差主导；只有当 $\delta$ 远大于 $\Delta x$（$n\gg1$）时，连续非局部理论的预测才在离散结果中显现。第三类为 $\Delta x$-收敛：固定 $\delta$，缩小 $\Delta x$（即增大 $n$），可在固定非局部尺度下改善离散精度。数值实践表明，取 $n\ge3$ 且保持 $m$-收敛路径（固定 $n$，同时缩小 $\delta$ 与 $\Delta x$）可在工程精度范围内保证收敛 \cite{Bobaru2009}。Seleson 等 \cite{SelesonLittlewood2016} 进一步指出，$m$-收敛与 $\delta$-收敛在 $n\ge4$ 时的实际结果差异很小，二者均接近 $O(\Delta x^{1.5})$ 的 $L_2$ 误差收敛率；而 $n=2$ 时的 $m$-收敛因离散效应过强，收敛率降至 $O(\Delta x^{0.8})$ 以下。
+
+\textbf{误差估计。}设离散解的位移为 $\mathbf{u}^{h}$，解析解（或参考解）为 $\mathbf{u}$，则 $L_2$ 误差定义为
+\begin{equation}
+  e_{L_2}=
+  \frac{\|\mathbf{u}^{h}-\mathbf{u}\|_{L_2(\mathcal{B})}}
+  {\|\mathbf{u}\|_{L_2(\mathcal{B})}},
+  \label{eq:vol-l2-error}
+\end{equation}
+其中 $\|\cdot\|_{L_2(\mathcal{B})}$ 通常以物质点求和近似：$\|\mathbf{v}\|_{L_2}^2\approx\sum_i|\mathbf{v}_i|^2\Delta V_i$。在均匀受拉 PMB 问题中，中点求积 + 常数核 + $\beta$ 体积修正的典型 $L_2$ 位移误差为 $n=3$ 时约 $2\%\sim5\%$，$n=4$ 时约 $1\%\sim2\%$，$n=5$ 时约 $0.5\%\sim1\%$ \cite{SelesonLittlewood2016,LeBobaru2018}。需指出的是，这些数值依赖于具体的影响函数与材料参数，不应视为通用误差界，而仅作为离散参数选择的经验参考。
+
+\emph{AI 辅助生成，需经专业审阅。}
+
+\section{时域积分的显式方法}\label{sec:disc-explicit}
+
+空间离散完成后，近场动力学运动方程转化为一组常微分方程（物质点层次）：
+\begin{equation}
+  \rho_i\,\ddot{\mathbf{u}}_i(t)=\mathbf{F}_i(\mathbf{U}(t),t)+\mathbf{b}_i(t),
+  \qquad i=1,\dots,N,
+  \label{eq:exp-semi-discrete}
+\end{equation}
+其中 $\mathbf{U}(t)=\{\mathbf{u}_1(t),\dots,\mathbf{u}_N(t)\}$ 为全体物质点位移的集合，$\mathbf{F}_i$ 为离散内力向量（由键力或力态求和得到）。这是经典的二阶常微分方程组，可用多种时间积分方法求解。本节聚焦于显式方法：中心差分法（9.3.1 节）、速度 Verlet 与蛙跳格式（9.3.2 节）三类最常用格式，推导稳定性条件（9.3.3 节），讨论数值耗散与时间步选取（9.3.4 节）。显式方法的核心优势在于无需组装与求解整体刚度矩阵，每步计算直接由当前位移场通过键力/力态计算加速度→积分更新位移与速度，算法简单、内存占用小、天然并行化友好 \cite{SillingAskari2005,Parks2008}。
+
+\subsection{中心差分法}\label{sec:disc-central-difference}
+
+中心差分法（central difference method）是结构动力学中最基本的显式时间积分格式。将时间均匀离散为步长 $\Delta t$，记 $t^n=n\Delta t$（$n=0,1,2,\dots$），位移、速度与加速度在时间层 $t^n$ 上的近似值分别记为 $\mathbf{u}^n$、$\dot{\mathbf{u}}^n$、$\ddot{\mathbf{u}}^n$。
+
+中心差分法基于以下有限差分近似（二阶精度）：
+\begin{align}
+  \dot{\mathbf{u}}^{n}
+  &\approx \frac{\mathbf{u}^{n+1}-\mathbf{u}^{n-1}}{2\Delta t},
+  \label{eq:exp-cd-velocity} \\
+  \ddot{\mathbf{u}}^{n}
+  &\approx \frac{\mathbf{u}^{n+1}-2\mathbf{u}^{n}+\mathbf{u}^{n-1}}{\Delta t^{2}}.
+  \label{eq:exp-cd-acceleration}
+\end{align}
+将式 \eqref{eq:exp-cd-acceleration} 代入半离散运动方程 \eqref{eq:exp-semi-discrete}，得位移更新的显式公式：
+\begin{equation}
+  \mathbf{u}_i^{n+1}
+  =2\mathbf{u}_i^{n}-\mathbf{u}_i^{n-1}
+  +\frac{\Delta t^{2}}{\rho_i}
+  \Bigl(\mathbf{F}_i(\mathbf{U}^{n},t^{n})+\mathbf{b}_i^{n}\Bigr).
+  \label{eq:exp-cd-update}
+\end{equation}
+式 \eqref{eq:exp-cd-update} 表明，$\mathbf{u}^{n+1}$ 由 $\mathbf{u}^{n}$、$\mathbf{u}^{n-1}$ 与当前时刻的力 $\mathbf{F}_i^{n}$ 显式给出，无需迭代求解。启动该格式需要 $\mathbf{u}^{0}$ 与 $\mathbf{u}^{1}$ 两个初始条件：$\mathbf{u}^{0}$ 由初始位移场给出，$\mathbf{u}^{1}$ 可由初始速度 $\dot{\mathbf{u}}^{0}$ 经下式获得
+\begin{equation}
+  \mathbf{u}_i^{1}
+  =\mathbf{u}_i^{0}
+  +\Delta t\,\dot{\mathbf{u}}_i^{0}
+  +\frac{\Delta t^{2}}{2\rho_i}
+  \Bigl(\mathbf{F}_i(\mathbf{U}^{0},t^{0})+\mathbf{b}_i^{0}\Bigr).
+  \label{eq:exp-cd-startup}
+\end{equation}
+式 \eqref{eq:exp-cd-startup} 由泰勒展开至二阶并利用运动方程消去 $\ddot{\mathbf{u}}^{0}$ 得到，保持了 $O(\Delta t^{2})$ 的精度一致性。
+
+\begin{remark}
+  中心差分法是条件稳定的：当 $\Delta t$ 超过临界时间步 $\Delta t_{\text{cr}}$ 时，数值解发散。这一特性使中心差分法天然适用于波动传播与动态断裂等高频动力学过程——这类问题的物理时间尺度本身就要求非常小的 $\Delta t$ 以解析波传播 \cite{BelytschkoLiuMoran2000}。但对于准静态或低频主导的问题，$\Delta t_{\text{cr}}$ 的限制使计算可能需要大量时间步（见 9.4 节动力松弛法）。稳定性条件的推导见 9.3.3 节。
+\end{remark}
+
+\emph{AI 辅助生成，需经专业审阅。}
+
+\subsection{速度 Verlet 与蛙跳格式}\label{sec:disc-verlet-leapfrog}
+
+中心差分法不显式存储速度，速度仅在需要时由式 \eqref{eq:exp-cd-velocity} 后处理获得。在需要速度参与计算的场合（如速度依赖的阻尼力、损伤演化率、能量/动量诊断），速度 Verlet 格式与蛙跳格式直接以显式方式同时更新位移与速度。
+
+\textbf{速度 Verlet 格式。}速度 Verlet（velocity Verlet）格式源自分子动力学，由 Swope 等提出，后被 Parks 等引入 PD 的 LAMMPS 实现 \cite{Parks2008}。每步包括三步：
+\begin{align}
+  \mathbf{u}_i^{n+1}
+  &=\mathbf{u}_i^{n}
+  +\Delta t\,\dot{\mathbf{u}}_i^{n}
+  +\frac{\Delta t^{2}}{2\rho_i}
+  \Bigl(\mathbf{F}_i(\mathbf{U}^{n})+\mathbf{b}_i^{n}\Bigr),
+  \label{eq:exp-verlet-step1} \\[4pt]
+  \dot{\mathbf{u}}_i^{n+1}
+  &=\dot{\mathbf{u}}_i^{n}
+  +\frac{\Delta t}{2\rho_i}
+  \Bigl(\mathbf{F}_i(\mathbf{U}^{n})+\mathbf{b}_i^{n}
+  +\mathbf{F}_i(\mathbf{U}^{n+1})+\mathbf{b}_i^{n+1}\Bigr),
+  \label{eq:exp-verlet-step2}
+\end{align}
+其中第一步先以半步加速度（基于 $\mathbf{U}^{n}$ 的力）推进位移至 $\mathbf{U}^{n+1}$；第二步用 $\mathbf{U}^{n+1}$ 重新计算力（即对近场域邻域重新求和），再以两步的平均加速度更新速度。速度 Verlet 格式的时间精度为 $O(\Delta t^{2})$（位移）与 $O(\Delta t^{2})$（速度）。相较于中心差分法，速度 Verlet 每步增加了一次力计算（式 \eqref{eq:exp-verlet-step2} 需 $\mathbf{F}_i(\mathbf{U}^{n+1})$），但提供了同步的位移与速度，便于输出与诊断。该格式是 LAMMPS PD 模块的默认积分器，其稳定性与能量守恒性质已在大量分子动力学与 PD 模拟中得到验证 \cite{Parks2008}。
+
+\textbf{蛙跳格式。}蛙跳（leapfrog）格式将速度定义在半时间层 $t^{n+1/2}$：
+\begin{align}
+  \dot{\mathbf{u}}_i^{n+1/2}
+  &=\dot{\mathbf{u}}_i^{n-1/2}
+  +\frac{\Delta t}{\rho_i}
+  \Bigl(\mathbf{F}_i(\mathbf{U}^{n})+\mathbf{b}_i^{n}\Bigr),
+  \label{eq:exp-leapfrog-velocity} \\[4pt]
+  \mathbf{u}_i^{n+1}
+  &=\mathbf{u}_i^{n}
+  +\Delta t\,\dot{\mathbf{u}}_i^{n+1/2}.
+  \label{eq:exp-leapfrog-displacement}
+\end{align}
+蛙跳格式的速度与位移在时间层上错开半个时间步，每一步只需一次力计算（基于 $\mathbf{U}^{n}$），计算量约为速度 Verlet 的一半。蛙跳格式也是 $O(\Delta t^{2})$ 精度的辛（symplectic）格式，具有良好的长期能量守恒性质 \cite{BelytschkoLiuMoran2000}。启动蛙跳格式时需由 $\dot{\mathbf{u}}^{0}$ 后推半步：
+\begin{equation}
+  \dot{\mathbf{u}}_i^{-1/2}
+  =\dot{\mathbf{u}}_i^{0}
+  -\frac{\Delta t}{2\rho_i}
+  \Bigl(\mathbf{F}_i(\mathbf{U}^{0})+\mathbf{b}_i^{0}\Bigr).
+  \label{eq:exp-leapfrog-startup}
+\end{equation}
+
+\begin{table}[htbp]
+  \centering
+  \caption{三种显式时间积分格式的比较}
+  \label{tab:exp-schemes}
+  \begin{tabular}{p{0.22\textwidth}p{0.65\textwidth}}
+    \toprule
+    格式 & 主要特征 \\
+    \midrule
+    中心差分法 & 不显存速度；每步一次力计算；二阶精度；条件稳定；需 $\mathbf{u}^{0},\mathbf{u}^{1}$ 启动 \\
+    速度 Verlet  & 位移与速度同步输出；每步两次力计算；二阶精度；辛格式；需 $\mathbf{u}^{0},\dot{\mathbf{u}}^{0}$ 启动 \\
+    蛙跳格式     & 速度与位移错开半时间步；每步一次力计算；二阶精度；辛格式；需 $\mathbf{u}^{0},\dot{\mathbf{u}}^{-1/2}$ 启动 \\
+    \bottomrule
+  \end{tabular}
+\end{table}
+
+三种格式的精度均为二阶，对光滑动力学问题的长期行为差异主要体现在能量守恒上——辛格式（速度 Verlet、蛙跳）在无耗散系统中能量不随时间步漂移，中心差分法在长时间积分中可能出现微弱的能量增长（当 $\Delta t$ 接近临界值时更为明显）。在 PD 的典型应用中（动态断裂、冲击），因材料损伤引入的耗散远大于数值耗散，三种格式的差异通常不显著，选择更多地取决于代码实现习惯与后处理需求 \cite{Parks2008,SillingAskari2005}。
+
+\textbf{辛性质说明。}速度 Verlet 与蛙跳格式是辛（symplectic）积分器，即它们在相空间中保面积（二维）或保辛形式（高维）。辛性质对于长期无耗散积分（如天体力学、分子动力学平衡态模拟）至关重要——非辛格式（如中心差分法）在长时间积分中可能出现系统性能量的单调漂移。然而，在 PD 断裂模拟中，键的断裂是不可逆耗散过程，系统的能量本身就不守恒，因此辛性质的优势不如在保守系统中显著。但辛格式在 $\Delta t$ 较大（接近临界值）时比中心差分法有更好的相空间行为——中心差分法在 $\Delta t\gtrsim0.8\Delta t_{\text{cr}}$ 时可能出现虚假的高频能量增长，而辛格式在 $\Delta t\lesssim0.95\Delta t_{\text{cr}}$ 时仍保持可接受的稳定性 \cite{BelytschkoLiuMoran2000}。
+
+\textbf{格式选择建议。}中心差分法：适用于对速度信息无需求、代码最简化的场景（如教学演示、概念验证）；速度 Verlet：适用于需要与位移同步输出速度、进行能量/动量诊断的生产级代码，LAMMPS PD 模块的默认选择；蛙跳格式：适用于计算成本敏感的大规模模拟（每步一次力计算 vs Verlet 的两次），且对速度精度的需求可通过半时间层插值满足的场景。三种格式的位移轨迹在 $\Delta t\ll\Delta t_{\text{cr}}$ 时几乎重合，选择更多地取决于代码结构和后处理链而非精度差异。
+
+\emph{AI 辅助生成，需经专业审阅。}
+
+\subsection{显式方法的稳定性条件}\label{sec:disc-stability}
+
+显式时间积分格式均为条件稳定，即存在临界时间步 $\Delta t_{\text{cr}}$，当 $\Delta t\le\Delta t_{\text{cr}}$ 时数值解稳定（不增长），当 $\Delta t>\Delta t_{\text{cr}}$ 时解发散。本节从一维弹性杆的模型问题出发，推导 PD 显式积分的稳定性条件，进而推广至三维情形，并与 NOSB 的零能模式相关联。
+
+\textbf{一维模型问题与 CFL 条件。}考虑一维均匀弹性杆，运动方程的一维形式为 $\rho\ddot{u}(x,t)=c_E u_{xx}$（经典弹性）或相应的 PD 积分形式。PD 显式积分的稳定性分析可通过考虑单个键上的简谐振动来近似：设两物质点 $\mathbf{x}_i$ 与 $\mathbf{x}_j$ 由线性键连接，等效刚度 $k_{\text{eff}}$ 来自 PMB 微模量 $c$（第 4 章式 \eqref{eq:keff-pmb}）。
+
+将键 $ij$ 视为弹簧—质量系统：约化质量 $\bar{m}=\rho\Delta V/2$（键的质量由两端物质点分担），线性刚度 $k_{\text{eff}}=c\Delta V^2/|\boldsymbol{\xi}|$（PMB 对力 $\mathbf{f}=c s\,\hat{\mathbf{e}}$，$s\approx\Delta u/|\boldsymbol{\xi}|$，故 $\Delta\mathbf{f}\approx(c/|\boldsymbol{\xi}|)\Delta u\Delta V$，有效刚度为 $c\Delta V^2/|\boldsymbol{\xi}|$）。单自由度弹簧—质量系统的固有频率为 $\omega=\sqrt{k_{\text{eff}}/\bar{m}}$。中心差分法（式 \eqref{eq:exp-cd-update}）对线性振子的稳定条件为 $\omega\Delta t\le2$ \cite{BelytschkoLiuMoran2000}，此即 $\Delta t\le 2/\omega$。
+
+对离散粒子系统，系统的最高固有频率 $\omega_{\max}$ 对应于最短波长模式——两相邻物质点之间反相振荡，波长 $\lambda_{\min}=2\Delta x$。将 $\bar{m}=\rho(\Delta x)^d/2$ 与 $k_{\text{eff}}$ 代入并利用微模量—弹性模量关系（三维见式 \eqref{eq:exp-c-3d}），近似可得 $\omega_{\max}$ 的量级为 $2v_c/\Delta x$（该估计假定最高频率模式的反相振荡波长 $\lambda_{\min}=2\Delta x$ 并以连续波速 $v_c$ 估频，属保守的工程近似；严格值依赖具体离散与影响函数，见下文人工复核注记），其中 $v_c$ 为材料中的最快波速。故稳定性条件为
+\begin{equation}
+  \Delta t \le \frac{\Delta x}{v_c},
+  \label{eq:exp-cfl-1d}
+\end{equation}
+其中 $v_c$ 为材料中的纵波（压缩波）速度。对理想线弹性材料，$v_c=\sqrt{E/\rho}$（一维波速）或 $v_c=\sqrt{(K+4G/3)/\rho}$（三维膨胀波速）。该推导需作者人工复核——特别是有效刚度 $k_{\text{eff}}$ 在非均匀离散或不规则近场域下的表达式需根据具体影响函数 $\omega(|\boldsymbol{\xi}|)$ 修正。
+
+式 \eqref{eq:exp-cfl-1d} 正是经典的 CFL（Courant--Friedrichs--Lewy）条件：信息在单个时间步内传播的距离（$v_c\Delta t$）不得超过网格间距 $\Delta x$ \cite{BelytschkoLiuMoran2000}。Silling 与 Askari \cite{SillingAskari2005} 在其最早的 PD 数值研究中即采用了这一条件，并给出了三维 PMB 模型的推荐形式。
+
+\textbf{三维 PMB 显式稳定条件。}将一维分析推广至三维 PD 离散，稳定时间步须结合微模量 $c$（或等效弹性模量 $E$）、质量密度 $\rho$、近场范围 $\delta$ 与网格尺寸 $\Delta x$ 共同确定。对三维 PMB 模型，微模量 $c$ 与弹性模量 $E$ 的关系为 \cite{SillingAskari2005}
+\begin{equation}
+  c = \frac{12E}{\pi\delta^{4}},
+  \label{eq:exp-c-3d}
+\end{equation}
+（三维 PMB 微模量，与第 4 章式 \eqref{eq:rate-3d} 一致 \cite{SillingAskari2005}；若采用影响函数 $\omega(|\boldsymbol{\xi}|)$，$c$ 需按对应能量等价关系修正）。将 PMB 键的线性刚度代入稳定性分析，可得三维 PMB 的临界时间步估计为
+\begin{equation}
+  \Delta t_{\text{cr}}
+  \approx \frac{\Delta x}{c_{\max}},
+  \label{eq:exp-stability-3d}
+\end{equation}
+其中 $c_{\max}$ 为材料中的最大弹性波速（三维膨胀波速）：
+\begin{equation}
+  c_{\max}
+  =\sqrt{\frac{K+\frac{4}{3}G}{\rho}}
+  =\sqrt{\frac{E(1-\nu)}{\rho(1+\nu)(1-2\nu)}}.
+  \label{eq:exp-wave-speed}
+\end{equation}
+将式 \eqref{eq:exp-c-3d}--\eqref{eq:exp-wave-speed} 代入稳定性分析，经量纲检查：$\Delta t_{\text{cr}}$ 的量纲为 $[T]$；式 \eqref{eq:exp-stability-3d} 右端 $\Delta x/c_{\max}$ 的量纲为 $[L]/([L][T]^{-1})=[T]$，量纲一致。$\Delta t_{\text{cr}}$ 与 $\delta$ 的关系隐含于微模量 $c$ 中（式 \eqref{eq:exp-c-3d}），而式 \eqref{eq:exp-stability-3d} 显式给出的经验形式更便于实际使用。
+
+在实际数值模拟中，安全系数 $C_s\in(0,1]$ 被引入：
+\begin{equation}
+  \Delta t
+  = C_s\,\frac{\Delta x_{\min}}{c_{\max}},
+  \label{eq:exp-safe-dt}
+\end{equation}
+其中 $\Delta x_{\min}$ 为全场最小物质点间距。$C_s$ 的推荐取值取决于问题类型：线性弹性波传播问题可取 $C_s=0.8\sim1.0$；含材料损伤（键断裂）问题建议取 $C_s=0.5\sim0.8$，因为键断裂引入的非线性可能激发高频分量而降低有效稳定性边界 \cite{HaBobaru2010,BobaruHu2012}；接触、碰撞等强非线性问题甚至需降至 $C_s=0.2\sim0.5$。
+
+\textbf{网格比 $n$ 对稳定性的影响。}式 \eqref{eq:exp-safe-dt} 表面上不显含 $n=\delta/\Delta x$，但 $n$ 通过影响有效刚度间接影响稳定性。当 $n$ 较小时（如 $n=2$），近场域内键数较少，单个键的刚度贡献在空间上不够均匀，系统的最高固有频率可能高于连续估计，实际稳定边界略低于式 \eqref{eq:exp-stability-3d} 的预测。Bobaru 与 Hu \cite{BobaruHu2012} 在动态裂纹分支研究中通过数值实验给出：$n=2$ 时 $C_s$ 约需额外降低 $10\%\sim20\%$；$n\ge3$ 时式 \eqref{eq:exp-safe-dt} 的估计足够保守。这一观测与"取 $n\ge3$ 以保证离散精度"的经验一致。
+
+\textbf{NOSB 的显式稳定性与零能模式。}Warren 等 \cite{Warren2009} 对 NOSB 的显式积分做了稳定性分析，指出 NOSB 显式积分的稳定条件与 PMB 类似——仍由材料波速与网格尺寸决定，即 $\Delta t\le C_s\Delta x/c_{\max}$。然而，NOSB 面临额外的稳定性挑战：即便满足 CFL 条件，零能模式仍可能在显式积分下持续累积（因为零能模式对应的变形不产生应力响应，数值扰动不被耗散）。Silling \cite{Silling2017} 指出，本构对应（constitutive correspondence）材料本身在显式积分下对零能模式不稳定——其稳定性条件 \eqref{eq:zero-energy-stability-condition} 要求逐点正定，而对应材料恒违反这一条件（见第 7 章 7.5 节）。
+
+这意味着显式积分的 NOSB 必须配合稳定化技术才能在实际计算中正常运行。常用的稳定化方法是在 NOSB 力态 $\underline{\mathbf{T}}$ 上叠加一项与变形非均匀部分 $\underline{\mathbf{z}}$（第 7 章式 \eqref{eq:zero-energy-nullspace} 所定义的零能模式度量）成比例的耗散力或弹性回复力。记稳定化力态为 $\underline{\mathbf{T}}^{s}$，则修正后的运动方程中力态取 $\underline{\mathbf{T}}+\underline{\mathbf{T}}^{s}$。稳定化参数的选取需权衡：过弱则不足以抑制零能模式，过强则污染物理响应（尤其在裂纹尖端等高梯度区域可能过度光滑化）。Warren 等 \cite{Warren2009} 给出的稳定化参数标定方法基于等效刚度匹配，其数值实验表明合适的稳定化可使 NOSB 显式积分在满足 CFL 条件下稳定运行至断裂完成。
+
+\textbf{三维 PMB 显式稳定条件的量纲检验。}表 \ref{tab:stability-dimensional} 汇总了稳定性分析中涉及各物理量的量纲，确认 $\Delta x/c_{\max}$ 确实具有时间量纲，式 \eqref{eq:exp-stability-3d} 在量纲上自洽。
+
+\begin{table}[htbp]
+  \centering
+  \caption{三维 PMB 显式积分稳定性条件中关键量的量纲检验}
+  \label{tab:stability-dimensional}
+  \begin{tabular}{p{0.22\textwidth}p{0.65\textwidth}}
+    \toprule
+    量 & 量纲（M—质量，L—长度，T—时间） \\
+    \midrule
+    $\Delta t$ & $[T]$ \\
+    $\Delta x$ & $[L]$ \\
+    $E$（弹性模量） & $[M][L]^{-1}[T]^{-2}$ \\
+    $\rho$（密度） & $[M][L]^{-3}$ \\
+    $c_{\max}=\sqrt{E/\rho}$（波速） & $\sqrt{[M][L]^{-1}[T]^{-2}/[M][L]^{-3}}=[L][T]^{-1}$ \\
+    $\Delta x/c_{\max}$ & $[L]/([L][T]^{-1})=[T]$ \\
+    $c_{\text{PMB}}$（微模量，式\eqref{eq:exp-c-3d}） & $[M][L]^{-1}[T]^{-2}\cdot[L]^{-4}=[M][L]^{-5}[T]^{-2}$ \\
+    \bottomrule
+  \end{tabular}
+\end{table}
+
+\emph{AI 辅助生成，需经专业审阅。}
+
+\subsection{数值耗散与时间步选取}\label{sec:disc-dissipation}
+
+显式时间积分格式的理论精度为 $O(\Delta t^{2})$，但实际计算中数值耗散与数值色散会改变解的保真度。数值耗散（numerical dissipation）指高频模式能量的非物理衰减；数值色散（numerical dispersion）指不同频率分量的传播速度偏离物理波速，导致波形的畸变。
+
+\textbf{数值耗散机制。}中心差分法、速度 Verlet 与蛙跳格式在 $\Delta t=0$ 极限下均无耗散（对线性系统保持能量守恒）。在有限 $\Delta t$ 下，耗散主要来自两方面。其一，截断误差耗散：差分近似式 \eqref{eq:exp-cd-acceleration} 的截断误差为 $O(\Delta t^{2})$，在长时间积分中表现为缓慢的能量漂移。对中心差分法，这一漂移一般表现为能量增长（放大因子 $>1$ 的高频分量），长期积分可能使解发散；对辛格式（Verlet、蛙跳），截断误差表现为相空间保体积但不保能量的漂移，通常比中心差分法更为温和 \cite{BelytschkoLiuMoran2000}。其二，材料损伤耗散：PD 中键断裂使系统能量不可逆地耗散为断裂能；对含损伤的问题，材料的物理耗散远大于数值耗散，格式之间的差异在工程意义上一般可忽略。
+
+\textbf{人工阻尼与动力松弛。}对于准静态或缓慢加载问题（见 9.4 节），可在显式积分中引入人工阻尼以加速收敛至稳态。最常用的形式为质量比例阻尼（mass-proportional damping），即在式 \eqref{eq:exp-semi-discrete} 的右端加入阻尼力项 $-\eta\,\dot{\mathbf{u}}_i$：
+\begin{equation}
+  \rho_i\,\ddot{\mathbf{u}}_i(t)
+  =\mathbf{F}_i(\mathbf{U}(t),t)
+  -\eta\,\dot{\mathbf{u}}_i(t)
+  +\mathbf{b}_i(t),
+  \label{eq:exp-damped-motion}
+\end{equation}
+其中 $\eta$ 为阻尼系数（单位 kg/(m$^3\cdot$s)）。在中心差分格式下，式 \eqref{eq:exp-damped-motion} 的速度项需使用 $\dot{\mathbf{u}}^{n}$。由于中心差分法不显存速度，一个实用替代是引入速度的中心差分近似 $\dot{\mathbf{u}}_i^{n}\approx(\mathbf{u}_i^{n+1}-\mathbf{u}_i^{n-1})/(2\Delta t)$，该项在离散方程中与 $\mathbf{u}^{n+1}$ 耦合但可显式解出，得到阻尼中心差分格式：
+\begin{equation}
+  \mathbf{u}_i^{n+1}
+  =\frac{1}{1+\eta\Delta t/(2\rho_i)}
+  \Bigl[
+  2\mathbf{u}_i^{n}
+  -\Bigl(1-\frac{\eta\Delta t}{2\rho_i}\Bigr)\mathbf{u}_i^{n-1}
+  +\frac{\Delta t^{2}}{\rho_i}
+  \bigl(\mathbf{F}_i^{n}+\mathbf{b}_i^{n}\bigr)
+  \Bigr].
+  \label{eq:exp-cd-damped}
+\end{equation}
+当 $\eta=0$ 时式 \eqref{eq:exp-cd-damped} 退化为标准中心差分式 \eqref{eq:exp-cd-update}。阻尼系数的选取影响收敛速度：$\eta$ 过小则衰减缓慢，过大则过阻尼导致收敛停滞。Kilic 与 Madenci \cite{KilicMadenci2010} 的自适应动力松弛法（9.4 节）通过动态调整 $\eta$ 使系统在临界阻尼附近运行，从而达到最优收敛速度。
+
+\textbf{时间步选取。}实际计算中，$\Delta t$ 需满足三个约束：稳定性约束（$\Delta t\le\Delta t_{\text{cr}}$）、精度约束（波传播的数值色散须可控）、计算成本约束（总时间步数须可行）。三者的权衡因问题类型而异：
+
+\begin{enumerate}[label=(\arabic*), leftmargin=*]
+  \item \textbf{动态断裂问题}：物理过程的时间尺度由裂纹扩展速度（$v_{\text{crack}}\sim0.3\sim0.6\,c_R$，其中 $c_R$ 为 Rayleigh 波速）决定。稳定性约束 $\Delta t_{\text{cr}}\approx\Delta x/c_{\max}$ 通常远小于裂纹扩展的特征时间，因此 $\Delta t$ 由稳定性主导。推荐 $\Delta t = (0.5\sim0.8)\,\Delta x_{\min}/c_{\max}$。Bobaru 与 Hu \cite{BobaruHu2012} 在玻璃动态断裂模拟中采用 $\Delta t\approx2\times10^{-8}$ s（$\Delta x=2\times10^{-4}$ m，$c_{\max}\approx5\times10^{3}$ m/s，$C_s\approx0.5$），有效捕捉了裂纹分叉与分支。
+  \item \textbf{弹性波传播问题}：精度约束要求波传播在单位波长内有足够的时间采样点。通常要求每波长 $\lambda_{\min}$ 内至少有 $8\sim12$ 个时间步，即 $\Delta t\le\lambda_{\min}/(10\,c_{\max})$。当 $\Delta x/\lambda_{\min}$ 较小时（精细网格），精度约束可能比稳定性约束更严。
+  \item \textbf{准静态问题（显式+动力松弛）}：9.4 节详述，此处仅预告。显式积分求解准静态问题时 $\Delta t$ 不受物理时间尺度限制，可引入人工阻尼（质量/刚度比例阻尼）以加速稳态收敛。$\Delta t$ 的选取转为以收敛速度最优为目标，通常仍受稳定性约束，但 $C_s$ 可放宽至 $0.9\sim1.0$（无损伤情形）。
+\end{enumerate}
+
+\textbf{数值色散与波速修正。}对于弹性波传播的精细模拟，显式积分的数值色散会导致高频分量相速度低于物理值。Foster 等 \cite{Foster2010} 在黏塑性 PD 的显式积分中观察到了数值色散对冲击波剖面模拟的影响，并指出可通过对材料波速的预先修正（在波速公式中按 $\Delta t/\Delta x$ 做色散补偿）部分减轻这一效应。对于一般 PD 断裂模拟，数值色散对裂纹路径的影响通常弱于离散取向效应（即裂纹路径受物质点排列方向的影响），后者需由合适的近场范围 $\delta$ 与网格比 $n$ 共同抑制 \cite{HaBobaru2010,Diehl2019}。
+
+\textbf{数值算例（演示性参数）。}三维 PMB 均匀受拉杆动态响应。材料参数：$E=72$ GPa，$\nu=1/4$，$\rho=2700$ kg/m$^3$（铝）。几何：$L_x=0.1$ m，$L_y=L_z=0.01$ m（细长杆），均匀离散 $\Delta x=1\times10^{-3}$ m，$\delta=3.15\times10^{-3}$ m（$n\approx3.15$）。波速计算：对三维各向同性材料，膨胀波速
+\begin{equation}
+  c_{\max}
+  =\sqrt{\frac{E(1-\nu)}{\rho(1+\nu)(1-2\nu)}}
+  =\sqrt{\frac{72\times10^{9}\times0.75}{2700\times1.25\times0.5}}
+  \approx5.66\times10^{3}\ \text{m/s}.
+  \label{eq:exp-num-wave}
+\end{equation}
+由式 \eqref{eq:exp-stability-3d} 得临界时间步 $\Delta t_{\text{cr}}\approx\Delta x/c_{\max}=1\times10^{-3}/5.66\times10^{3}\approx1.77\times10^{-7}$ s。对于动态波传播问题（无损伤），取安全系数 $C_s=0.8$，则计算时间步 $\Delta t=0.8\times1.77\times10^{-7}\approx1.42\times10^{-7}$ s。左端施加 $t=0$ 时刻的速度脉冲（幅值 $10$ m/s，持续时间 $10\Delta t$），右端自由。采用速度 Verlet 格式积分至 $1\times10^{-4}$ s（约 700 步），可捕捉弹性波沿杆传播约 $0.57$ m（约 5.7 倍杆长）的反弹过程。该算例的波速 $c_{\max}\approx5.66\times10^{3}$ m/s 与铝的物理纵波波速 $c_L=\sqrt{E/\rho}\approx5.16\times10^{3}$ m/s 接近——二者差异源于三维膨胀波包含横向约束贡献（$\nu=1/4$ 时 $(1-\nu)/((1+\nu)(1-2\nu))=0.75/(1.25\times0.5)=1.2$），这是 PD 三维力学中波传播的正确物理特征。
+
+将该算例的参数代入 $n=\delta/\Delta x\approx3.15$，近场域内三维邻居点数约 $\frac{4}{3}\pi n^3\approx130$，确保力计算的统计意义。$\Delta t=1.42\times10^{-7}$ s 下，对 $N\approx10^5$ 个物质点的三维问题，每步约需 $10^7$ 次键力计算，在普通桌面计算机（8 核）上约需 $0.1\sim0.2$ s 每步，总计算时间约 $1\sim2$ 分钟——显示显式 PD 在参数选择合理时具有良好的计算可行性 \cite{Parks2008}。
+
+\textbf{数值伪影检查清单。}显式积分 PD 模拟中可能出现若干与时间积分或离散化相关的数值伪影，在结果解读时需加以甄别。其一，棋盘振荡（checkerboard oscillation）：物质点位移场出现交替正负的锯齿形模式，波长约为 $2\Delta x$。若在 PMB 中出现，通常指示 $\Delta t$ 接近 $\Delta t_{\text{cr}}$ 或 $n$ 过小（$n<3$）所致的离散不稳定性；若在 NOSB 中出现，则可能是零能模式（见 9.3.3 节 NOSB 稳定性讨论），需检查是否启用了稳定化项。其二，虚假波反射：边界附近出现非物理的应力波反射，表现为应力或速度场的振荡幅值在边界附近异常增大。可能原因为表面修正不足（见 9.2.2 节）或 $\Delta t$ 过大导致边界附近的离散误差累积。其三，裂纹路径偏折：在对称载荷下裂纹扩展方向偏离预期对称方向。除材料本身的非均匀性外，数值原因可能包括 $n$ 取值过小导致的离散各向异性（物质点 Cubic 排列的取向效应）、$\Delta t$ 偏大使裂纹尖端应力场失真、或邻居搜索截断导致的力不平衡 \cite{Diehl2019,HuHaBobaru2012}。
+
+\emph{AI 辅助生成，需经专业审阅。}
+
+\section{自适应动力松弛法}\label{sec:adr}
+
+第 7 章 7.3 节末尾预告了本章将对两类准静态求解策略做系统介绍。显式时间积分（9.3 节）在准静态问题中面临根本性困难：物理加载的时间尺度通常远大于 $\Delta t_{\text{cr}}$，若直接采用显式积分则需要数百万乃至上千万步，计算成本不可接受。然而，显式格式的优势——无需组装整体刚度矩阵、无需存储与求解线性方程组——对准静态问题同样具有吸引力。自适应动力松弛法（adaptive dynamic relaxation，ADR）正是为调和这一矛盾而发展的：在显式中心差分格式中引入人工阻尼，使系统的动能逐步耗散，位移场在虚构时间（fictitious time）中趋于静力平衡态；同时，阻尼系数与时间步根据当前系统的瞬时响应自适应更新，以最速方式收敛至稳态。Kilic 与 Madenci \cite{KilicMadenci2010} 首次将 ADR 应用于近场动力学准静态断裂模拟，是该方向的奠基性工作。本节依次介绍动力松弛的基本思想（9.4.1 节）、Gresho 自适应参数更新算法（9.4.2 节）与收敛判据及其典型应用（9.4.3 节）。
+
+\subsection{动力松弛的基本思想}\label{sec:adr-basics}
+
+动力松弛法（dynamic relaxation，DR）最早由 Otter 等在结构力学中提出，其核心思想是将静力平衡问题"嵌入"一个虚拟的动力学过程：引入人工质量、阻尼与虚构时间，让系统从初始状态出发在虚构时间中振动，通过阻尼耗散动能逐步逼近静力平衡态。Kilic 与 Madenci \cite{KilicMadenci2010} 系统回顾了 DR 法的发展并将其引入近场动力学。当系统动能趋于零时，惯性力消失，离散运动方程退化为静力平衡方程，此时的位移场即准静态解。
+
+在近场动力学框架中，动力松弛法直接作用于显式离散运动方程。回顾式 \eqref{eq:exp-semi-discrete}：$\rho_i\ddot{\mathbf{u}}_i=\mathbf{F}_i(\mathbf{U},t)+\mathbf{b}_i$。在准静态问题中，真实的加速度 $\ddot{\mathbf{u}}$（源自载荷变化引起的惯性效应）应当为零，因为我们寻求的是各载荷水平下的静力平衡构型。然而，若直接令 $\ddot{\mathbf{u}}=\mathbf{0}$ 求解非线性代数方程 $\mathbf{F}_i(\mathbf{U})+\mathbf{b}_i=\mathbf{0}$，将面临与隐式方法相同的刚度矩阵组装与迭代求解——这正是 ADR 希望避免的。
+
+ADR 的策略是保留动力学方程的形式，但将时间 $t$ 视为虚构时间（pseudo-time，不具物理意义）：在式 \eqref{eq:exp-semi-discrete} 的右端加入人工阻尼项，得到带阻尼的离散运动方程
+\begin{equation}
+  \rho_i\,\ddot{\mathbf{u}}_i
+  +\eta\,\dot{\mathbf{u}}_i
+  =\mathbf{F}_i(\mathbf{U},t)+\mathbf{b}_i,
+  \label{eq:adr-damped-motion}
+\end{equation}
+其中 $\eta$ 为阻尼系数（单位 kg/(m$^3\cdot$s)，亦称粘性阻尼系数）。式 \eqref{eq:adr-damped-motion} 与 9.3.4 节的式 \eqref{eq:exp-damped-motion} 形式相同，但物理语境完全不同：9.3.4 节中阻尼用于加速真实动力学问题向稳态的趋近，而 ADR 中阻尼是虚构动力学的核心——它使得动能随时间步数（而非物理时间）单调衰减。将式 \eqref{eq:adr-damped-motion} 代入中心差分格式（式 \eqref{eq:exp-cd-damped}），得 ADR 的位移更新公式
+\begin{equation}
+  \mathbf{u}_i^{n+1}
+  =\frac{1}{1+\eta\Delta t/(2\rho_i)}
+  \Bigl[
+  2\mathbf{u}_i^{n}
+  -\Bigl(1-\frac{\eta\Delta t}{2\rho_i}\Bigr)\mathbf{u}_i^{n-1}
+  +\frac{\Delta t^{2}}{\rho_i}
+  \bigl(\mathbf{F}_i^{n}+\mathbf{b}_i^{n}\bigr)
+  \Bigr],
+  \label{eq:adr-cd-damped}
+\end{equation}
+其中上标 $n$ 标记 ADR 迭代步（非物理时间步），$\mathbf{F}_i^{n}$ 为第 $n$ 步的离散内力向量（由键力或力态求和得到，见式 \eqref{eq:disc-motion-pmb} 或 \eqref{eq:disc-motion-state}）。当 $n\to\infty$ 且 $\mathbf{u}_i^{n+1}\to\mathbf{u}_i^{n}$（位移收敛）时，式 \eqref{eq:adr-cd-damped} 给出 $\mathbf{F}_i^{n}+\mathbf{b}_i^{n}\to\mathbf{0}$——即静力平衡方程。这一极限过程的关键是选择合适的 $\eta$ 与 $\Delta t$ 使得位移的收敛速度最大化，此即 9.4.2 节自适应参数更新的目标。
+
+ADR 相比隐式方法的核心优势在于计算结构与显式方法一致，即传承了显式积分的两大便利。其一，无需组装整体刚度矩阵：每步力计算仅涉及近场域内的键力/力态求和（式 \eqref{eq:disc-motion-pmb} 或 \eqref{eq:disc-motion-state}），计算量与显式动力学每步完全相同。其二，无需存储与求解线性方程组：位移更新式 \eqref{eq:adr-cd-damped} 是逐点显式的（$\mathbf{u}_i^{n+1}$ 仅依赖 $\mathbf{u}_i^{n},\mathbf{u}_i^{n-1}$ 以及 $\mathbf{F}_i^{n}$），不涉及任何矩阵操作。对大规模三维 PD 问题（物质点数 $O(10^5\sim10^7)$），这一优势尤为显著——隐式求解器需要存储与分解 $3N\times3N$ 的稀疏矩阵，而 ADR 的存储需求仅为每个物质点数个向量（位移、速度的历史值），与显式动力学完全同量级 \cite{KilicMadenci2010,MadenciOterkus2014}。
+
+\begin{remark}
+  ADR 的"虚构时间"概念需要与物理时间严格区分。ADR 迭代步计数器 $n$ 不代表物理时间的推进——$n$ 仅标记阻尼动力学的趋进步数。在准静态加载问题中，每个载荷增量步内部执行一次 ADR 迭代链，载荷步之间的状态（如位移、损伤）才有物理意义；ADR 迭代步内部的位移轨迹仅是该载荷水平下向平衡态的过渡路径，不具备任何物理动力学含义。这是为何 ADR 可以选用远大于物理 $\Delta t_{\text{cr}}$ 的虚构时间步——虚构时间中的"波"不传播物理信息，仅仅是数学上迭代收敛的载体 \cite{KilicMadenci2010}。
+\end{remark}
+
+\emph{AI 辅助生成，需经专业审阅。}
+
+\subsection{自适应参数更新}\label{sec:adr-gresho}
+
+ADR 的效率取决于阻尼系数 $\eta$ 与虚构时间步 $\Delta t$ 的选取。定常参数（固定的 $\eta$ 与 $\Delta t$）的动力松弛——早期结构力学中的 DR 法——存在收敛速度受初始参数选择影响大的缺陷：$\eta$ 过小则动能衰减缓慢、收敛步数多；$\eta$ 过大则过阻尼、系统趋于临界阻尼以下的蜗行衰减（overdamped creep），同样延长收敛；$\Delta t$ 过大则中心差分格式不稳定，过小则每步的收敛推进量微乎其微 \cite{KilicMadenci2010}。自适应动力松弛法正是为克服这一缺陷而提出的：在每个迭代步（或每少数步）根据系统的瞬时动力学状态（动能、势能变化率）自动更新 $\eta$ 与 $\Delta t$，使系统始终运行在最优收敛条件下。
+
+针对非线性静力有限元分析，Gresho 等提出了基于瑞利商（Rayleigh quotient）的自适应参数更新算法。Kilic 与 Madenci \cite{KilicMadenci2010} 将此算法移植到近场动力学准静态模拟中，成为 PD 中 ADR 的标准实现 \cite{MadenciOterkus2014,MadenciOterkus2016}。Gresho 算法的核心思想是将非线性系统在平衡点附近的局部行为视为等效线性弹簧—质量—阻尼系统，以瑞利商估计其瞬时固有频率，据此按临界阻尼条件设定 $\eta$ 并调整 $\Delta t$。
+
+Gresho 算法的三步迭代流程如下。
+
+\textbf{第一步：瑞利商估计瞬时频率。}第 $n$ 个 ADR 迭代步的系统瞬时频率 $\omega^{n}$ 由瑞利商（势能二次型与动能二次型之比的开方）估计：
+\begin{equation}
+  \omega^{n}
+  =\sqrt{\frac{(\mathbf{U}^{n})^{\mathrm{T}}\,\mathbf{K}^{n}\,\mathbf{U}^{n}}
+  {(\mathbf{U}^{n})^{\mathrm{T}}\,\mathbf{M}\,\mathbf{U}^{n}}},
+  \label{eq:adr-rayleigh}
+\end{equation}
+其中 $\mathbf{U}^{n}$ 为全场位移向量，$\mathbf{M}$ 为质量矩阵（对角矩阵，第 $i$ 个对角元为 $\rho_i\Delta V_i$），$\mathbf{K}^{n}$ 为当前构型下的等效割线刚度矩阵。在实际 ADR 实现中，式 \eqref{eq:adr-rayleigh} 的分子与分母无须显式构造矩阵 $\mathbf{K}^{n}$，而通过内力向量与位移向量的点积间接计算。定义当前步的"势能变化度量"
+\begin{equation}
+  P^{n}
+  =\bigl(\mathbf{U}^{n}\bigr)^{\mathrm{T}}\,\mathbf{F}_{\mathrm{int}}^{n},
+  \label{eq:adr-potential-measure}
+\end{equation}
+其中 $\mathbf{F}_{\mathrm{int}}^{n}$ 为当前构型下的内力向量（式 \eqref{eq:adr-damped-motion} 中的 $\mathbf{F}_i$ 组装为整体向量）。定义当前步的"动能度量"（以位移替代速度的二次型）
+\begin{equation}
+  Q^{n}
+  =\bigl(\mathbf{U}^{n}\bigr)^{\mathrm{T}}\,\mathbf{M}\,\mathbf{U}^{n},
+  \label{eq:adr-mass-measure}
+\end{equation}
+则 $\omega^{n}\approx\sqrt{P^{n}/Q^{n}}$。这一近似的依据是：对等效线性系统 $\mathbf{K}^{n}\mathbf{U}^{n}=\mathbf{F}_{\mathrm{int}}^{n}$，代入式 \eqref{eq:adr-rayleigh} 即得 $P^{n}/Q^{n}$。该推导需作者人工复核——特别是非线性系统的割线刚度 $\mathbf{K}^{n}$ 在远离平衡态时偏离切线刚度，$\sqrt{P^{n}/Q^{n}}$ 仅当 $\mathbf{U}^{n}$ 接近系统的低阶模态时才接近该模态的固有频率；在 ADR 迭代的早期阶段（位移场包含显著的高频振荡），该估计可能偏低，但实验表明其作为自适应调参的基础已足够稳健 \cite{KilicMadenci2010}。
+
+\textbf{第二步：自适应阻尼系数。}单自由度弹簧—质量—阻尼系统的临界阻尼条件为 $c_{\text{cr}}=2\sqrt{km}=2m\omega$（$k$ 为弹簧刚度，$m$ 为质量，$\omega=\sqrt{k/m}$ 为固有频率）。将该思想推广至多自由度系统并以局部形式施加：对每个物质点 $\mathbf{x}_i$，其等效阻尼系数取
+\begin{equation}
+  \eta_i^{n}
+  =2\,\rho_i\,\omega^{n},
+  \label{eq:adr-gresho-c}
+\end{equation}
+其中 $\rho_i$ 为物质点 $\mathbf{x}_i$ 的质量密度。式 \eqref{eq:adr-gresho-c} 可理解为"逐点临界阻尼"：每个物质点处的阻尼与该点的质量密度和系统的全局瞬时频率成正比。全场以统一的 $\omega^{n}$ 估计（由式 \eqref{eq:adr-rayleigh}--\eqref{eq:adr-mass-measure} 给出全局频率），而阻尼按各点密度分别缩放——这一处理兼顾了计算简便性与物理合理性：在均匀密度问题中，所有物质点共享同一阻尼系数 $\eta^{n}=2\rho\omega^{n}$ \cite{KilicMadenci2010}。
+
+\textbf{第三步：自适应时间步。}虚构时间步 $\Delta t^{n}$ 的选取需满足两个要求：其一，中心差分格式的稳定条件 $\omega^{n}\Delta t^{n}\le2$（见 9.3.3 节的稳定性分析）；其二，在稳定范围内尽量取大以加速收敛。Gresho 算法的推荐取值为
+\begin{equation}
+  \Delta t^{n}
+  =\frac{C_{\text{ADR}}}{\omega^{n}},
+  \label{eq:adr-gresho-dt}
+\end{equation}
+其中 $C_{\text{ADR}}$ 为 ADR 安全系数（$C_{\text{ADR}}\in(0.5,1.5)$），与 9.3.3 节式 \eqref{eq:exp-safe-dt} 中的 $C_s$ 功能类似但取值策略不同：显式动力学取 $C_s\le1$ 以确保真实波传播的稳定性；ADR 取 $C_{\text{ADR}}\ge1$ 可行是因为虚构时间中的发散（$\omega^{n}\Delta t^{n}>2$ 时中心差分格式不稳定）可在后续迭代步中通过自适应调参自行恢复（$\omega^{n}$ 随之变化、$\Delta t^{n}$ 被式 \eqref{eq:adr-gresho-dt} 重新调整），不会导致全局解的失效，因此可以取更大的步长以加速收敛 \cite{KilicMadenci2010}。
+
+\textbf{参数初始化与实现要点。}ADR 迭代的启动需要初始阻尼系数 $\eta^{0}$ 与初始时间步 $\Delta t^{0}$。在不具备先验知识的情况下，Kilic 与 Madenci 建议的初始策略为：取 $\eta^{0}=0$（纯显式动力学，无阻尼），以式 \eqref{eq:exp-safe-dt} 的 $\Delta t_{\text{cr}}$ 为 $\Delta t^{0}$（取 $C_s=1.0$），让系统先经历若干无阻尼的自由振动步以产生可检测的动能与势能变化；当检测到非零的动势能信息后（通常在第 $5\sim10$ 步），启动自适应更新式 \eqref{eq:adr-gresho-c}--\eqref{eq:adr-gresho-dt}，此后每步（或每隔 $5\sim10$ 步）更新一次 $\eta^{n}$ 与 $\Delta t^{n}$。
+
+上述三步更新公式的推导依据总结于表 \ref{tab:adr-gresho}。值得指出的是，Gresho 算法的理论推导基于线性系统的临界阻尼条件，推广至非线性系统时，式 \eqref{eq:adr-rayleigh}--\eqref{eq:adr-mass-measure} 的瑞利商估计是瞬时线性的——在每个迭代步以当前构型的割线刚度替代整体非线性系统的等效刚度。该方法在非线性不极端（切线刚度不出现强负定或不连续跳跃）的问题中表现出良好的收敛鲁棒性 \cite{KilicMadenci2010}，但在接近极限载荷点（切线刚度接近奇异）的软化问题中，$\omega^{n}$ 的估计可能急剧下降导致 $\Delta t^{n}$ 暴增——此时需要配合 9.6.2 节的载荷增量策略与 9.4.3 节的收敛判据共同使用。
+
+\begin{table}[htbp]
+  \centering
+  \caption{Gresho 自适应参数更新公式的推导依据}
+  \label{tab:adr-gresho}
+  \begin{tabular}{p{0.22\textwidth}p{0.65\textwidth}}
+    \toprule
+    更新量 & 推导依据 \\
+    \midrule
+    $\omega^{n}$（式\eqref{eq:adr-rayleigh}） & 瑞利商，以割线刚度 $\mathbf{K}^{n}$ 估计系统固有频率；分子分母以点积 $\mathbf{U}^{\mathrm{T}}\mathbf{F}_{\mathrm{int}}$ 实现免矩阵计算 \\
+    $\eta^{n}$（式\eqref{eq:adr-gresho-c}） & 临界阻尼条件 $c_{\text{cr}}=2\sqrt{km}$，推广至多自由度系统逐点取 $2\rho\omega^{n}$ \\
+    $\Delta t^{n}$（式\eqref{eq:adr-gresho-dt}） & 中心差分的稳定条件 $\omega\Delta t\le2$，乘以安全系数 $C_{\text{ADR}}$ 后取等号以最大化步长 \\
+    \bottomrule
+  \end{tabular}
+\end{table}
+
+\emph{AI 辅助生成，需经专业审阅。}
+
+\subsection{收敛判据与应用}\label{sec:adr-convergence}
+
+ADR 迭代的终止需要定量判据来判断系统是否已足够接近静力平衡态。文献中通用的两类判据为动能判据与不平衡力判据。
+
+\textbf{动能判据。}ADR 的基本收敛标志是系统的动能趋于零。定义第 $n$ 步的全场总动能
+\begin{equation}
+  E_{\text{kin}}^{n}
+  =\frac{1}{2}\sum_{i=1}^{N}\rho_i\,\Delta V_i\,
+  \lvert\dot{\mathbf{u}}_i^{n}\rvert^{2},
+  \label{eq:adr-kinetic}
+\end{equation}
+其中速度 $\dot{\mathbf{u}}_i^{n}$ 由中心差分近似 $\dot{\mathbf{u}}_i^{n}\approx(\mathbf{u}_i^{n+1}-\mathbf{u}_i^{n-1})/(2\Delta t^{n})$（或蛙跳格式的速度值）给出。由于 ADR 在收敛过程中动能可能不是单调下降（阻尼参数更新引起的短暂动能反弹），通常以当前动能与 ADR 历程中的最大动能之比作为收敛判据：
+\begin{equation}
+  \frac{E_{\text{kin}}^{n}}{\displaystyle\max_{k\le n}E_{\text{kin}}^{k}}
+  \le \varepsilon_{\text{ADR}},
+  \label{eq:adr-convergence-kinetic}
+\end{equation}
+其中 $\varepsilon_{\text{ADR}}$ 为动能容差，典型取值为 $10^{-6}\sim10^{-4}$。Kilic 与 Madenci \cite{KilicMadenci2010} 在准静态断裂模拟中取 $\varepsilon_{\text{ADR}}=10^{-6}$，Madenci 与 Oterkus \cite{MadenciOterkus2014} 建议 $\varepsilon_{\text{ADR}}=10^{-5}$ 作为工程应用的默认值。
+
+\textbf{不平衡力判据。}动能判据的局限在于：即使动能很小，系统仍可能因残余不平衡力而未真正达到平衡。更严格的收敛判据以不平衡力（out-of-balance force）的范数来衡量。定义第 $n$ 步的不平衡力向量为内力与外载之差
+\begin{equation}
+  \mathbf{R}^{n}
+  =\mathbf{F}_{\text{ext}}-\mathbf{F}_{\text{int}}^{n},
+  \label{eq:adr-residual}
+\end{equation}
+其中 $\mathbf{F}_{\text{int}}^{n}$ 为所有物质点内力的组装向量，$\mathbf{F}_{\text{ext}}$ 为外载荷的等效节点力向量（在单一载荷增量步内为常数）。不平衡力判据取相对范数形式
+\begin{equation}
+  \frac{\lVert\mathbf{R}^{n}\rVert_{2}}{\lVert\mathbf{F}_{\text{ext}}\rVert_{2}}
+  \le \varepsilon_{\text{tol}},
+  \label{eq:adr-convergence-force}
+\end{equation}
+其中 $\varepsilon_{\text{tol}}$ 为力容差，典型取值为 $10^{-8}\sim10^{-6}$，与 7.4.3 节非线性隐式求解的收敛容差式 \eqref{eq:convergence-residual} 相同量级。在实际 ADR 实现中，通常同时采用动能判据式 \eqref{eq:adr-convergence-kinetic} 与力判据式 \eqref{eq:adr-convergence-force}：当二者同时满足时，系统被认为收敛至静力平衡 \cite{KilicMadenci2010,MadenciOterkus2014}。
+
+\textbf{典型应用：准静态断裂模拟。}ADR 最重要且最成功的应用场景是准静态断裂模拟。在这一场景中，载荷以增量步（increment）的方式缓慢施加：每个载荷增量步内固定外载，执行 ADR 迭代使系统收敛至该载荷水平下的静力平衡态；收敛后检查键的断裂条件（通常是伸长率超过临界值 $s_c$），对满足断裂条件的键实施断键操作；断键后系统失去部分承载能力，需再次执行 ADR 迭代以达到新的平衡（可能在同一载荷步内，若断键后不平衡力仍高于容差）；载荷增量步以断键后达平衡的构型为起点进入下一载荷增量。这一"载荷增 $\to$ ADR 平衡 $\to$ 断键 $\to$ 再平衡"的流程，使裂纹在准静态加载下逐载荷步平稳扩展，避免了显式动力学中裂纹扩展速度受惯性效应污染的问题 \cite{KilicMadenci2010,Ni2019,Li2019}。
+
+在 ADR 准静态断裂模拟中，键的断裂时机是一个关键实施细节。与第 7 章 7.4 节隐式求解中的平滑软化策略（式 \eqref{eq:smooth-softening}）不同，ADR 通常在每个载荷步的 ADR 收敛之后、进入下一载荷增量之前一次性施加断键操作——即在该载荷步的平衡态下检查所有键的伸长率、对超限键 $\mu\leftarrow0$（式 \eqref{eq:history-variable}），然后以断键后的新构型开始下一载荷步的 ADR 迭代。这一"收敛后断键"的策略与隐式求解中断键时机的原则一致（见第 7 章 7.4 节），避免了在 ADR 迭代过程当中断键导致的残差突变与收敛震荡 \cite{KilicMadenci2010,Ni2019}。
+
+ADR 准静态断裂模拟的计算效率问题值得专门讨论。虽然 ADR 免除了刚度矩阵组装与求解，但每个载荷步内的 ADR 迭代次数（通常为 $O(10^2)\sim O(10^4)$ 步，取决于问题规模与非线性强度）乘以载荷增量步数（$O(10^1)\sim O(10^3)$），总计算步数可能仍相当可观。然而，对于裂纹缓慢扩展的问题（裂纹在多个载荷步内逐步推进），ADR 的总计算量通常远小于以物理时间步运行的显式动力学模拟——后者因受 $\Delta t_{\text{cr}}\sim O(10^{-8})$ s 的物理时间步约束，即使模拟 $10^{-3}$ s 的物理过程也需要 $O(10^5)$ 时间步，远多于 ADR 的迭代步数。9.6 节将对 ADR、显式+阻尼与隐式三种准静态策略做系统的比较。
+
+\textbf{收敛加速技巧。}为加速 ADR 的收敛，实践中可采用若干技巧。其一是质量缩放（mass scaling）：将各物质点的密度 $\rho_i$ 按局部刚度缩放，使全场的最低固有频率提升，从而在稳定条件式 \eqref{eq:adr-gresho-dt} 下可取更大的 $\Delta t^{n}$，每步的收敛推进更大。但需注意质量缩放改变了系统的质量矩阵 $\mathbf{M}$，对瑞利商式 \eqref{eq:adr-rayleigh} 的 $\omega^{n}$ 估计与临界阻尼式 \eqref{eq:adr-gresho-c} 的 $\eta^{n}$ 计算均产生影响，实践中通常与密度保持均匀或仅在低频收敛缓慢的区域做局部缩放。其二是初始位移场的合理猜测：对连续变化的载荷增量步，以上一步的收敛解作为本步 ADR 的初始猜测，可大幅减少本步的 ADR 迭代次数——因为相邻载荷水平下的平衡位形通常相差不大。其三是混合策略：在损伤事件（键断裂）发生后的前若干 ADR 步采用小的 $C_{\text{ADR}}$（如 $0.5$）以确保稳定性，待断键引起的扰动衰减后再恢复至通常的 $C_{\text{ADR}}$ \cite{MadenciOterkus2014}。
+
+ADR 在 PD 准静态模拟中的成功应用已覆盖多种问题类型：Kilic 与 Madenci \cite{KilicMadenci2010} 的原始算例包括含中心裂纹板的拉伸与含孔板的应力集中分析；Madenci 与 Oterkus \cite{MadenciOterkus2014} 将其推广至三维与复合材料层合板的准静态损伤模拟；Ni 等 \cite{Ni2019} 比较了 ADR 与隐式方法求解裂纹扩展的精度与效率，指出 ADR 在裂纹路径非光滑（如分支、曲折）问题中具有更好的鲁棒性；Li 等 \cite{Li2019} 在稳定化 NOSB 隐式框架下以 ADR 作为初始猜测生成器，显著提高了隐式 Newton 迭代的收敛概率。此外，9.6 节将系统比较 ADR 与隐式方法在准静态断裂模拟中的适用场景与性能差异。
+
+\emph{AI 辅助生成，需经专业审阅。}
+
+\section{隐式求解策略}\label{sec:imp-strategies}
+
+显式方法与 ADR 均免除了刚度矩阵组装与线性方程组求解，这一便利的代价是条件稳定（显式）或收敛的迭代性（ADR）。与之相对，隐式方法直接求解离散平衡方程，对于线弹性小变形问题一步到位获得静力平衡解，对于非线性问题以 Newton 迭代实现快速收敛。第 7 章 7.3 节--7.4 节已从 NOSB 的视角对线性与非线性隐式求解做了完整的数学推导——从离散平衡方程 \eqref{eq:implicit-equilibrium} 到整体刚度矩阵 \eqref{eq:global-system}，从 Newton 迭代格式 \eqref{eq:nr-iteration} 到切线刚度矩阵 \eqref{eq:tangent-stiffness}，从载荷增量步 \eqref{eq:load-stepping-equation} 到收敛判据 \eqref{eq:convergence-residual}。本节不做推导重复，仅从"策略选择与全局视角"对隐式方法做总览：9.5.1 节梳理线性与非线性问题的隐式求解流程及其优势与代价；9.5.2 节讨论隐式求解特有的稳定性问题——零能模式在隐式下的累积效应与断裂引起的切线刚度非正定性。
+
+\subsection{线性与非线性问题的隐式求解}\label{sec:imp-overview}
+
+\textbf{线性问题（小变形线弹性）。}当几何为小变形、本构为线弹性时，离散平衡方程组关于节点位移是线性的。将第 7 章 7.3 节的推导总括为如下流程：第一步，对每个物质点 $\mathbf{x}_j$ 按式 \eqref{eq:discrete-shape-tensor} 计算离散形状张量 $\mathbf{K}(\mathbf{x}_j)$ 并求逆；第二步，按式 \eqref{eq:discrete-grad-u}--\eqref{eq:discrete-strain} 建立"节点位移 $\to$ 应变 $\to$ 应力 $\to$ 力态"的线性链，组装为应变—位移矩阵 $\mathbf{N}(\mathbf{x}_j)$（式 \eqref{eq:strain-matrix-form}）；第三步，按族级装配规则（式 \eqref{eq:family-stiffness-block}）形成整体刚度矩阵 $\mathbf{K}_{\mathrm{glob}}$；第四步，将位移边界条件以消去自由度方式施加（式 \eqref{eq:bc-partition}--\eqref{eq:bc-eliminated}），得到缩减线性系统
+\begin{equation}
+  \mathbf{K}_{uu}\,\mathbf{U}_{u}
+  =\mathbf{F}_{u}-\mathbf{K}_{uc}\,\mathbf{U}_{c};
+  \label{eq:imp-reduced-system}
+\end{equation}
+第五步，以共轭梯度法（CG）配合 Jacobi 预条件 \eqref{eq:jacobi-precond} 求解式 \eqref{eq:imp-reduced-system}，一次性获得静力平衡位移场。对于小变形线弹性问题，$\mathbf{K}_{\mathrm{glob}}$ 为常矩阵，只需组装与分解一次，求解效率极高——Breitenfeld 等 \cite{Breitenfeld2014} 对含裂纹的二维 NOSB 线弹性问题报告了与有限元同量级的求解时间 \cite{Breitenfeld2014,BreitenfeldThesis2014}。
+
+\textbf{非线性问题。}当本构非线性（塑性、超弹性）或几何非线性（有限变形）时，平衡方程组 $\mathbf{R}(\mathbf{U})=\mathbf{F}_{\text{ext}}-\mathbf{F}_{\text{int}}(\mathbf{U})=\mathbf{0}$（式 \eqref{eq:nl-residual}）不再是线性的，须采用 Newton--Raphson 迭代。第 7 章 7.4 节给出的迭代格式为：在第 $l$ 次迭代，求解线性化系统（即式 \eqref{eq:nr-iteration}），其中切线刚度矩阵 $\mathbf{K}_{\mathrm{t}}=\partial\mathbf{F}_{\mathrm{int}}/\partial\mathbf{U}$（式 \eqref{eq:tangent-stiffness}），按族级装配（式 \eqref{eq:tangent-nosb}）形成，每迭代步根据当前构型重新组装。迭代持续至残差满足 $\lVert\mathbf{R}^{l}\rVert_{2}/\lVert\mathbf{F}_{\text{ext}}\rVert_{2}\le\varepsilon_{\text{tol}}$（式 \eqref{eq:convergence-residual}，$\varepsilon_{\text{tol}}$ 的典型取值为 $10^{-10}\sim10^{-6}$）。当载荷步较大时，还需引入载荷增量步策略（式 \eqref{eq:load-stepping-equation}）将外载分段，每段内运行 Newton 迭代至收敛。
+
+\textbf{隐式方法的优势与代价。}隐式方法的核心优势有三。其一，无条件稳定（线性问题）：对线弹性问题，隐式方法没有类 CFL 的时间步约束，求解直接给出平衡解，无需像 ADR 那样经历成百上千步虚构时间迭代。其二，可直接施加位移边界条件：位移约束以消去自由度或罚函数方式直接进入刚度矩阵与右端项（式 \eqref{eq:bc-partition}--\eqref{eq:bc-eliminated}），不需要像显式方法那样通过边界层体力近似（详见第 10 章）。其三，准静态问题无需虚构时间：隐式方法本质上就是静力平衡方程的求解器，载荷参数 $\lambda$ 直接对应物理加载水平，不存在 ADR 中虚构时间与物理加载的解耦问题 \cite{Breitenfeld2014,Littlewood2015}。
+
+这些优势的代价同样显著。首先是刚度矩阵的组装与存储：$\mathbf{K}_{\mathrm{glob}}$ 的规模为 $3N\times3N$（$N$ 为物质点数），非零元分布覆盖全近场域及跨近场域传递（族级装配使带宽约为 $2\delta$），三维问题中其存储需求可达 $O(N\cdot n^{3})$（$n=\delta/\Delta x$ 为网格比），对 $N>10^{5}$ 的问题，完整存储 $\mathbf{K}_{\mathrm{glob}}$ 对内存的压力远大于显式方法。其次是切线刚度的一致性要求：Newton 迭代以二阶速度收敛的必要条件是 $\mathbf{K}_{\mathrm{t}}$ 与残差 $\mathbf{R}$ 的线性化一致——这意味着解析 Jacobian 须与残差组装所用的应力更新算法完全协调，对复杂本构（如塑性回映算法）实现一致性切线模量（consistent tangent modulus）的推导与编码成本远高于显式方法 \cite{Hashim2020,Littlewood2015}。第三是线代数求解：每个 Newton 迭代步需求解一次 $3N\times3N$ 的稀疏线性系统（对大规模问题一次全分解即需若干秒至若干分钟），这一开销在每载荷步 $5\sim20$ 次 Newton 迭代的典型配置下可能抵消其"无条件稳定"带来的总步数优势 \cite{Breitenfeld2014}。
+
+\textbf{典型实现。}PD 中隐式求解的典型实现包括：Breitenfeld 等的 NOSB 线弹性隐式框架（二维静态裂纹问题，CG 迭代器）\cite{Breitenfeld2014,BreitenfeldThesis2014}；Littlewood 在 Peridigm 中实现的隐式准静态求解器（线性与非线性的 Newton 型框架，含稳定化力态与有限差分切线刚度）\cite{Littlewood2015}；Hashim 等的稳定化 NOSB 解析 Jacobian 与平滑软化断裂隐式求解（验证算例包括三维含裂纹板与纤维增强复合材料）\cite{Hashim2020}；Li 等的稳定化 NOSB 隐式框架（引入割线刚度以处理软化导致切线非正定）\cite{Li2019}；Ni 等的 PD 静态裂纹扩展隐式求解器 \cite{Ni2019}；以及 Ouchi 等的隐式 NOSB 流固耦合应用（含大变形与界面追踪）\cite{Ouchi2015}。这些实现证明了隐式方法在适中规模（$N\sim10^{3}\sim10^{4}$）准静态问题中的可行性与精度，但在大规模问题上的扩展性仍逊于显式方法与 ADR \cite{Diehl2019}。
+
+\emph{AI 辅助生成，需经专业审阅。}
+
+\subsection{隐式求解的稳定性与零能模式}\label{sec:imp-stability}
+
+隐式方法的"无条件稳定"性质仅对线性问题严格成立。对线弹性小变形情形，刚度矩阵 $\mathbf{K}_{\mathrm{glob}}$ 对称正定（当边界条件充分约束时），求解器给出的位移场是精确的静力平衡解，不存在任何累积误差或发散风险——这与显式方法受 CFL 条件式 \eqref{eq:exp-safe-dt} 严格限制形成鲜明对比。然而，当本构进入非线性区域（塑性屈服、损伤演化、键断裂等），隐式求解的稳定性不再自动保证，需要在以下三个层面进行控制。
+
+\textbf{非线性收敛域与载荷步控制。}Newton--Raphson 迭代的收敛域有限：若载荷步过大、初始猜测离真解太远，迭代可能发散（即使连续极限中精确解存在）。因此非线性隐式求解的稳定性首先体现为合理的载荷增量步控制。第 7 章 7.4 节式 \eqref{eq:load-stepping-equation} 的参数化外载 $\lambda\bar{\mathbf{F}}_{\text{ext}}$ 使载荷步大小可调——$\Delta\lambda=\lambda_{n+1}-\lambda_{n}$ 过小则载荷步数过多，过大则 Newton 迭代可能不收敛。自适应载荷步控制策略（在收敛顺利时加大 $\Delta\lambda$、在迭代停滞或发散时缩小 $\Delta\lambda$ 并回溯重算）是非线性隐式分析的标配技术 \cite{Littlewood2015,Hashim2020}。
+
+\textbf{断裂软化导致的切线刚度非正定性。}键的断裂（或损伤的平滑软化）使系统的有效刚度下降。当损伤积累至一定程度时，切线刚度矩阵 $\mathbf{K}_{\mathrm{t}}$ 可能丧失正定性——这对以正定性为前提的 CG 求解器是致命的。第 7 章 7.4 节已讨论了平滑软化策略（式 \eqref{eq:smooth-softening} 与式 \eqref{eq:softening-tangent}）：将键断裂替换为光滑的退化函数，使残差保持连续可微、Newton 迭代的形式收敛性得以维持；但即使采用平滑软化，当 $\mathrm{d}T_s/\mathrm{d}s<0$（退化因子的导数为负，即软化区）且断裂键占比高时，式 \eqref{eq:softening-tangent} 中 $\underline{\mathbf{T}}^{0}\otimes(\partial T_s/\partial\mathbf{u}_k)$ 的负贡献可能压倒 $T_s\partial\underline{\mathbf{T}}^{0}/\partial\mathbf{u}_k$ 的正贡献，使 $\mathbf{K}_{\mathrm{t}}$ 整体非正定。对此，Li 等提出使用割线刚度（secant stiffness）替代切线刚度以规避正定性丧失 \cite{Li2019}；Ni 等在每载荷步内限制允许断裂的键数以控制 $\mathbf{K}_{\mathrm{t}}$ 的正定性恶化 \cite{Ni2019}。这些策略的本质是在"精确 Newton 迭代（二阶收敛，但要求 $\mathbf{K}_{\mathrm{t}}$ 正定）"与"鲁棒性"之间做折衷，属于非线性隐式断裂分析中的开放性问题 \cite{Hashim2020}。
+
+\textbf{零能模式在隐式下的累积。}第 7 章 7.5 节对 NOSB 对应材料的零能模式失稳做了完整的机理分析：式 \eqref{eq:zero-energy-stability-condition} 指出对应材料恒违反逐点稳定的充分条件，式 \eqref{eq:zero-energy-nullspace} 刻画了变形梯度算子零空间的构成——满足式 \eqref{eq:zero-energy-nullspace} 的变形模式（棋盘/锯齿振荡）不产生力态响应。这一失稳在显式积分与隐式求解中均存在，但表现方式不同。在显式积分中（9.3.3 节已讨论），零能模式表现为随时间步积累而振幅增长的高频位移振荡，需要配合稳定化力态才能稳定运行。在隐式求解中，零能模式的危害体现在两个层面：其一，对线性问题，不产生力响应的零能模式使刚度矩阵 $\mathbf{K}_{\mathrm{glob}}$ 对应于零特征值的特征向量非零（刚度矩阵秩亏损），直接求解时出现奇异——这正是 Breitenfeld 等 \cite{Breitenfeld2014} 在 NOSB 隐式框架中遇到的困难。其二，对非线性问题，零能模式累积会导致迭代过程出现虚假位移振荡——与物理的塑性流动或损伤局部化相似的外观——可能使 Newton 迭代收敛至无物理意义的解，或陷入极限环而不收敛 \cite{Silling2017,Hashim2020}。
+
+因此，隐式求解的 NOSB 同样需要稳定化处理，且稳定化项需一并计入切线刚度矩阵 $\mathbf{K}_{\mathrm{t}}$ 以保证 Newton 迭代的一致性。第 7 章 7.6 节介绍了应力点法、罚函数法与键关联方法等稳定化策略：其中罚函数法（Silling 型稳定化，式 \eqref{eq:stabilization-energy}--\eqref{eq:stabilization-force}）是当前隐式实现中最常用的方案（Peridigm 中的隐式 NOSB 默认采用该方案）\cite{Littlewood2015}，其稳定化力态式 \eqref{eq:stabilization-force} 对 $\mathbf{u}_k$ 的导数需以解析或数值差分方式并入 $\mathbf{K}_{\mathrm{t}}$；键关联方法（式 \eqref{eq:bond-associated-fgrad}--\eqref{eq:bond-associated-force}）从源头消除零能模式，无需调参，但键关联变形梯度的导数计算使切线刚度的族级装配更加复杂 \cite{Chen2018}。
+
+总结而言，隐式方法的稳定性——线性无条件稳定、非线性需载荷步与平滑软化、NOSB 需稳定化处理——是使用者选择求解策略时必须全面权衡的因素。对线弹性准静态问题（如含静止裂纹的小变形应力分析），隐式方法是最佳选择；对含大量键断裂与强非线性的准静态裂纹扩展问题，ADR 的鲁棒性优势可能超过隐式方法在收敛速度上的理论优势，这正是 9.6 节准静态策略比较的核心内容之一 \cite{Ni2019,Li2019,Hashim2020}。
+
+\textbf{零能模式与表面效应的区别。}最后，需要再次强调——如同第 7 章 7.5 节注记中已指出的——零能模式与表面效应是两类不同性质的数值困难。表面效应源于边界附近近场域截断导致的有效刚度损失（第 4 章 4.4 节、本章 9.2.2 节），表现为边界区域的位移误差，属于几何离散误差；零能模式源于对应材料的本构不稳定性（变形梯度算子零空间），表现为全域高频振荡，属于材料模型层面的缺陷。在隐式求解中，二者的数值表现可能叠加——边界区域的表面效应误差在刚度矩阵中体现为局部刚度偏差，可能与零能模式的高频振荡在空间上耦合——但其修正手段独立：表面效应通过 $\alpha$ 因子（微模量修正，式 \eqref{eq:vol-alpha-numerical}）或体积修正（式 \eqref{eq:vol-partial-beta}）处理，这些修正不改变变形梯度算子的零空间结构，因此不影响零能模式的抑制。第 10 章将对边界条件与非局部表面效应做系统讨论。
+
+\emph{AI 辅助生成，需经专业审阅。}
+
+\section{拟静力分析方法}\label{sec:qs-analysis}
+
+本章前五节分别建立了显式时间积分（9.3 节）、自适应动力松弛法（9.4 节）与隐式求解策略（9.5 节）三种求解框架。在面对具体的准静态问题时——如裂纹缓慢扩展、蠕变、松弛——选择哪一种求解策略，需要在精度、鲁棒性、计算成本与实现复杂度之间权衡。本节对三种策略做系统比较并给出选择准则（9.6.1 节），进而以准静态断裂问题为例介绍完整的模拟流程（9.6.2 节），并预告第 11 章的裂纹表征与损伤场模拟。
+
+\subsection{准静态求解策略的比较与选择}\label{sec:qs-comparison}
+
+三类准静态求解策略的核心特征归纳如下。
+
+\textbf{策略一：显式动力学 + 人工阻尼（包括质量比例阻尼与刚度比例阻尼）。}该策略直接在显式动力学格式中引入阻尼项（式 \eqref{eq:exp-damped-motion}），以真实的物理时间为变量、阻尼加速动能的耗散，使得系统在载荷变化足够缓慢的极限下逼近准静态响应。其实现最为简便：只需在已有显式动力学代码的基础上增加阻尼力计算，处理流程与显式动力学完全一致。但阻尼参数的选择对结果敏感——$\eta$ 过大导致过阻尼收敛停滞，$\eta$ 过小则波动衰减缓慢——且准静态解的精度依赖加载速率的选取（加载过快则解含虚假惯性效应，加载过慢则计算步数陡增），缺乏"何时已收敛至静力平衡"的可靠判断 \cite{MadenciOterkus2014}。因此该策略主要适用于加载路径简单、对求解精度要求不高的初步分析或定性研究。
+
+\textbf{策略二：自适应动力松弛法（ADR）。}如 9.4 节详述，ADR 以虚构时间替代物理时间、以自适应 Gresho 算法自动调节阻尼系数 $\eta$ 与时间步 $\Delta t$，使系统在临界阻尼附近以最速方式趋近静力平衡。其核心优势在于鲁棒性：自适应参数更新使 ADR 对初始参数（$\eta^{0},\Delta t^{0}$）的选择不敏感——即使初始参数不佳，自适应机制也会在若干步内自动调节至最优收敛状态。此外，ADR 无需组装整体刚度矩阵、无需引入额外稳定化（对键型 PMB 而言），对键断裂等非光滑事件具有天然的适应性（断键后系统不平衡力增大→动能反弹→自适应机制自动加大阻尼加速耗散）\cite{KilicMadenci2010}。其代价是每个载荷增量步内需要 $O(10^{2})\sim O(10^{4})$ 次 ADR 迭代才能收敛——这虽然远少于显式动力学的物理时间步数，但可能多于隐式方法的载荷步 $\times$ Newton 迭代次数的总求解量 \cite{Ni2019}。
+
+\textbf{策略三：隐式方法。}如 9.5 节总览、第 7 章 7.3~7.4 节详细推导所展示的，隐式方法直接求解离散平衡方程组，对线性问题一步到位、对非线性问题以 Newton 迭代快速收敛（二阶收敛速度）。其优势在于精确性与灵活性：可直接施加位移边界条件（无需像显式或 ADR 那样通过边界虚构体力层近似），无条件稳定（对线性问题），收敛判据直接基于残差范数而非动能的间接度量。其代价在于刚度矩阵的组装、存储与求解——对大规模三维问题（$N>10^{5}$），$\mathbf{K}_{\mathrm{glob}}$ 的存储与 CG 迭代的成本可能超过 ADR 的总计算量；对 NOSB 还需配合稳定化处理；对含大量断键的断裂问题，切线刚度非正定性需额外对策（平滑软化、割线刚度等），增加了实现的复杂度 \cite{Breitenfeld2014,Hashim2020}。
+
+为便于实际选择，表 \ref{tab:qs-comparison} 按问题特征给出推荐策略。需要指出的是，该表仅为原则性指导，具体选择还取决于可用的软件工具、代码基础与使用者的经验——例如，若已有成熟的 Peridigm 隐式模块可用，则隐式方法是许多准静态问题的自然选择 \cite{Littlewood2015}；若仅有键型 PMB 的显式动力学代码，ADR 是低门槛的准静态能力扩展方案。
+
+\begin{table}[htbp]
+  \centering
+  \caption{准静态求解策略选择准则}
+  \label{tab:qs-comparison}
+  \begin{tabular}{p{0.22\textwidth}p{0.65\textwidth}}
+    \toprule
+    问题特征 & 推荐策略（理由） \\
+    \midrule
+    线弹性，小变形，无损伤 & 隐式（一步直接求解，效率最高） \\
+    线弹性，含静止裂纹 & 隐式（线性问题，刚度矩阵一次组装后可由 CG 快速求解 \cite{Breitenfeld2014}） \\
+    非线性材料，无/少断裂 & 隐式+Newton 迭代（二阶收敛，只需数十次迭代；自适应载荷步 \cite{Hashim2020}） \\
+    非线性材料，大量断裂 & ADR（非光滑断键的天然适应性，免切线刚度组装 \cite{KilicMadenci2010}） \\
+    裂纹扩展路径需要精确追踪 & ADR 或隐式+平滑软化（二者均可：ADR 路径鲁棒性较好，隐式精度可控性较好 \cite{Ni2019}） \\
+    含位移边界条件（如压痕） & 隐式（位移 BC 可直接施加，显式/ADR 需等效体力近似 \cite{Breitenfeld2014}） \\
+    三维，大规模（$N>10^{5}$） & ADR（内存与计算规模远小于隐式的矩阵求解 \cite{MadenciOterkus2014}） \\
+    已有显式动力学代码扩展 & ADR（低门槛，无需引入刚度矩阵框架 \cite{KilicMadenci2010}） \\
+    NOSB 需要防止零能模式 & 隐式+稳定化（稳定化项可纳入切线刚度；显式/ADR 下稳定化力态计算简单但稳定性分析更复杂 \cite{Hashim2020}） \\
+    \bottomrule
+  \end{tabular}
+\end{table}
+
+\textbf{计算成本的粗略比较。}设问题含 $N=10^{5}$ 个物质点，网格比 $n=3$（三维近场域内约 $\frac{4}{3}\pi n^{3}\approx113$ 个邻居），单个载荷步内达到收敛所需的不同策略的计算量级为：ADR 需约 $500\sim2000$ 次迭代（$C_{\text{ADR}}=1.0$，$\varepsilon_{\text{ADR}}=10^{-5}$，根据 Kilic 与 Madenci \cite{KilicMadenci2010} 的典型数据估计），每次迭代的力计算量约为 $N\cdot 113$ 次键力计算，总键力计算量约 $5.65\times10^{9}\sim2.26\times10^{10}$。隐式方法 Newton 迭代约 $5\sim15$ 次，每次包括一次切线组装 + CG 求解：切线组装量约为 $N\cdot 113$ 次族级块计算（量级与键力计算相当），CG 求解每迭代步的计算量约为 $N\cdot 113$ 次稀疏矩阵向量乘（每次矩阵向量乘的浮点操作与键力计算同量级），CG 迭代数约 $O(10^{2})$（取决于预条件质量），总计算量级约为 ADR 的 $0.1\sim1$ 倍。但隐式方法的理论与实现成本（Jacobian 推导、矩阵存储、CG 预条件设计等）远高于 ADR，且问题规模增大时内存与通信开销的增长速率快于 ADR。上述估计来自文献中典型参数的经验外推 \cite{Breitenfeld2014,KilicMadenci2010,Ni2019}，实际差异取决于具体问题与实现，不应视为通用定量结论。
+
+\emph{AI 辅助生成，需经专业审阅。}
+
+\subsection{准静态断裂模拟流程}\label{sec:qs-fracture}
+
+准静态断裂模拟——即在外载缓慢增加的条件下追踪裂纹的萌生与扩展——是 PD 重要的工程应用场景。本节以 ADR 与隐式方法为求解器骨架，给出准静态断裂模拟的通用流程，并讨论其中的关键实施问题。
+
+\textbf{通用流程。}准静态断裂模拟的总体流程图可概括为以下步骤：
+
+\begin{enumerate}[label=(\arabic*), leftmargin=*]
+  \item \textbf{初始化。}建立物质点离散（均匀或非均匀，见 9.1 节），计算形状张量 $\mathbf{K}$（NOSB）或预先存储邻居列表与键的参考矢量 $\boldsymbol{\xi}$（PMB）；设定材料参数（$E,\nu,\rho,s_c$ 等）与近场范围 $\delta$；设定载荷增量方案：总载荷分为 $N_{\text{step}}$ 个增量步，载荷参数 $\lambda_n=n/N_{\text{step}}$（$n=1,\dots,N_{\text{step}}$）；初始化位移场 $\mathbf{U}=\mathbf{0}$ 与键状态（$\mu_{ij}=1$ 对所有键）。
+  \item \textbf{载荷增量循环。}对第 $n$ 个载荷增量步：
+    \begin{enumerate}
+      \item 更新外载荷：$\mathbf{F}_{\text{ext}}^{n}=\lambda_n\bar{\mathbf{F}}_{\text{ext}}$（力边界）或更新指定位移 $\mathbf{U}_c^{n}$（位移边界）。
+      \item 调用求解器（ADR 或隐式 Newton 迭代）以当前构型为初始猜测，迭代至收敛（满足 9.4.3 节的动能与力判据，或 7.4.3 节的残差判据）。收敛后获得该载荷水平下的静力平衡位移场 $\mathbf{U}^{n}$。
+      \item 检查键断裂条件：遍历全场所有键，对满足 $\mu_{ij}=1$ 且 $s_{ij}\ge s_c$ 的键，设置 $\mu_{ij}=0$（并相应更新损伤变量 $\varphi(\mathbf{x})$，按式 \eqref{eq:damage-variable}）。对 NOSB，断键操作等价于将对应键的影响函数置零（$\omega_{ij}\leftarrow0$，见第 7 章 7.3.4 节）。
+      \item 若本增量步内有新键断裂，则以断键后的构型重新调用求解器至再次收敛（因为断键使系统失去部分承载能力，位移场需重新平衡）。重复断键检查与再平衡，直至本载荷增量步内无新键断裂——此即"断键—再平衡"循环。
+    \end{enumerate}
+  \item \textbf{后处理。}对所有载荷步的收敛解，输出位移场、损伤场 $\varphi(\mathbf{x})$、裂纹路径（以 $\varphi$ 的等值面或可视化技术表征，第 11 章详述）与载荷—位移曲线。
+\end{enumerate}
+
+\textbf{断键时机的施加方式。}断键是在载荷步收敛之后施加（如上述流程），还是在迭代过程中施加，是准静态断裂模拟中影响求解鲁棒性的关键选择。上述流程采用的"收敛后断键—再平衡"策略是 ADR 与隐式方法中共同推荐的做法 \cite{KilicMadenci2010,Ni2019,Hashim2020}。其理由如下：若在求解器迭代过程中施加断键，则残差（或不平衡力）在断键瞬间发生跳跃，可能导致 Newton 迭代（依赖残差的连续可微性）发散，或使 ADR 的动能大幅反弹、收敛停滞。将断键推迟至平衡态实现后，施加断键时系统处于静力平衡状态，断键引起的不平衡力是"纯净"的（不叠加迭代中间态的非物理扰动），再平衡过程的收敛预期更可预测。
+
+隐式方法中还存在另一种处理——第 7 章 7.4 节的平滑软化（式 \eqref{eq:smooth-softening}）：不直接断键，而是使键力随伸长率光滑衰减至零。平滑软化的优势是残差与切线刚度连续可微，允许在 Newton 迭代内求解含软化的平衡态而无需额外的"断键—再平衡"循环；但其退化因子 $T_s$ 的陡度参数 $\beta$ 需要标定，且在软化完成（$T_s=0$）后仍需将对应键标记为"已断"以阻止后续再承载 \cite{Hashim2020}。使用时应根据问题特性选择——裂纹路径简单、断键顺序规律时平滑软化可减少载荷步数；裂纹路径复杂、断键高度非规律时"收敛后断键—再平衡"策略更为鲁棒。
+
+\textbf{准静态断裂的难点。}准静态断裂模拟面临若干特有的困难，这些困难在不同求解策略下的表现各异。
+
+其一，软化与解的非唯一性。断裂是典型的应变软化过程：裂纹扩展时系统释放应变能、整体承载能力下降。在位移控制的加载下，软化表现为载荷—位移曲线出现下降段（snap-back）。在软化区，静力平衡方程出现多解——同一载荷水平可对应不同裂纹长度——这意味着 Newton 迭代的收敛结果依赖于初始猜测，且载荷增量步控制不能再以力增量的大小为唯一指标，而需引入弧长法（arc-length method）等路径追踪技术 \cite{Ni2019}。ADR 因以虚构时间中的动能耗散为收敛驱动，天然倾向于收敛至动能最小的解（即最近的上一个平衡态），在软化区可能自动沿载荷—位移曲线的物理分支前进而不跳转分支，这是 ADR 相对隐式 Newton 法在软化问题中的一个独特优势 \cite{KilicMadenci2010}。
+
+其二，网格依赖性（mesh dependency）。如同经典连续介质力学中含软化本构的有限元模型，PD 准静态断裂的结果（裂纹路径、极限载荷）可能对离散尺度（$\Delta x$ 与 $\delta$）有依赖性。虽然 PD 的非局部积分为裂纹面能量释放提供了内在长度尺度 $\delta$，但在准静态极限下（$\delta\to0$ 且 $\Delta x\to0$ 的 $m$-收敛路径，见 9.2.3 节），损伤带宽度趋于零、裂纹面面积收敛于几何面积，网格依赖性应在收敛极限内消失——然而实际工程计算中 $\delta$ 与 $\Delta x$ 均为有限值，网格依赖性是否存在及程度如何取决于问题类型与 $\delta/\Delta x$ 的取值 \cite{HaBobaru2010,Diehl2019}。
+
+其三，裂纹路径的数值稳定性。在准静态加载下，当两条势裂纹路径的能量释放率接近时，裂纹方向可能发生突变（路径分叉），这对求解器的数值稳定性构成挑战。ADR 的虚构时间动力学天然具有惯性，在路径分叉附近可能沿动能最小的分支继续前进而不发生虚假跳跃——其惯性效应在此处从"缺点"（需耗散）变为"优点"（路径选择的信息来源）；而隐式 Newton 法在路径分叉点附近刚度矩阵接近奇异，需要特殊的路径选择策略（如引入微小扰动探测各分支的能量释放率）\cite{Ni2019,HaBobaru2010}。
+
+\textbf{衔接第 11 章预告。}本章建立的离散化框架（空间离散 + 时间积分/求解策略）是裂纹与损伤数值模拟的"计算引擎"，而第 11 章将讨论"模拟对象"层面的问题：裂纹的几何表征（以损伤场 $\varphi$ 的等值面、裂纹面重建算法等）、损伤场的可视化与统计（损伤带宽度、裂纹长度与分支角度等几何量的提取方法）、动态裂纹追踪算法（在显式动力学步中实时识别新裂纹面并更新邻居列表），以及典型断裂模式（I 型张开、II 型剪切、混合模式）的 PD 模拟算例与实验验证 \cite{HaBobaru2010,Diehl2019,ZhangHeng2022}。本章三种准静态求解策略的选择将直接影响第 11 章中裂纹扩展模拟的精度、鲁棒性与计算效率。
+
+\emph{AI 辅助生成，需经专业审阅。}
+
+% ========== 章末收尾 ==========
+本章从空间离散与时间积分两个维度建立了近场动力学从连续理论到可计算格式的完整桥梁。空间离散层面（9.1--9.2 节），无网格物质点离散统一了均匀与非均匀情形，对偶双影响域框架解决了变 horizon 下的力平衡问题，体积修正与表面修正共同处理了离散化引入的边界误差与截断效应。时间积分与求解策略层面（9.3--9.6 节），显式格式（中心差分、速度 Verlet、蛙跳）为动态与冲击问题提供了高效的求解途径，其稳定性由 CFL 条件决定并受安全系数 $C_s$ 控制（式 \eqref{eq:exp-safe-dt}）；自适应动力松弛法通过 Gresho 自适应参数更新（式 \eqref{eq:adr-gresho-c}--\eqref{eq:adr-gresho-dt}）在临界阻尼附近以最速方式趋近静力平衡，为键型 PD 的准静态分析提供了低门槛的实现方案；隐式方法以 Newton 迭代（式 \eqref{eq:nr-iteration}）直接求解离散平衡方程组，在非线性问题中以二阶速度收敛，但需承担刚度矩阵组装、切线一致性推导与稳定化处理的实现成本；拟静力分析方法比较（表 \ref{tab:qs-comparison}）为三类策略的选择提供了问题导向的准则。
+
+本章建立的离散化框架是全书数值模拟部分的基础：第 10 章将在此框架上讨论边界条件的数值实现——位移/力/混合边界的施加方式、非局部边界层的构造、接触与界面处理——这些是使离散化框架与实际工程问题对接的关键环节。第 11 章则以本章的计算引擎为基础，转入裂纹与损伤的数值表征与模拟算法，完成全书"理论—离散化—模拟"的三段论结构。第 12 章起将进入近场动力学与有限元的耦合方法与多尺度模拟，其基础同样建立在本章的离散化框架之上。
+
+\emph{AI 辅助生成，需经专业审阅。}
+
