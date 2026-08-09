@@ -134,3 +134,39 @@
   $\varepsilon_{\mathrm{tol}}$ & 非线性迭代收敛容差 \\
   $\mathcal{B}$ & 物体所占区域 \\
 \end{longtable}
+
+\section*{第 9 章 空间离散与时间积分}
+
+{\small
+\begin{longtable}{@{}p{4.8cm}>{\raggedright\arraybackslash}p{10.2cm}@{}}
+  $\Delta t$ & 时间步长（time step），上标 $n$ 标记第 $n$ 时间层 $t^{n}=n\Delta t$ \\
+  $n=\delta/\Delta x$ & 网格比（mesh ratio），近场范围 $\delta$ 与物质点间距 $\Delta x$ 之比 \\
+  $C_s$ & 安全系数（safety factor），$\Delta t=C_s\,\Delta x_{\min}/c_{\max}$，推荐 $0.2\sim1.0$ \\
+  $\eta$ & 质量比例阻尼系数（damping coefficient），单位 kg/(m$^3\cdot$s) \\
+  $c_{\max}$ & 最大弹性波速（maximum elastic wave speed），$c_{\max}=\sqrt{E(1-\nu)/(\rho(1+\nu)(1-2\nu))}$ \\
+  $\Delta V_i$ & 物质点 $\mathbf{x}_i$ 的代表体积，均匀离散下 $\Delta V_i=(\Delta x)^{d}$ \\
+  $\mathcal{F}_i$ & 物质点 $\mathbf{x}_i$ 的族（family），由邻居点构成 \\
+  $\beta_{ij}$ & 体积修正因子（连续值），$\beta_{ij}\in[0,1]$，度量邻居物质点体积在近场域内的比例 \\
+  $\alpha_i$ & 表面修正因子（近场域体积比例，第 4 章已定义），数值实现见式 \eqref{eq:vol-alpha-numerical} \\
+  $N$ & 物质点总数 \\
+  $n_c$ & 单元链表法（cell-linked list）中单元内的平均物质点数 \\
+  $\mathbf{F}_i^{n}$ & 物质点 $\mathbf{x}_i$ 在第 $n$ 时间层的离散内力向量 \\
+  $\mathbf{U}^{n}$ & 第 $n$ 时间层（或 ADR 迭代步）的全体物质点位移向量 \\
+  $\mathbf{M}$ & 质量矩阵（对角矩阵），$M_{ii}=\rho_i\Delta V_i$ \\
+  $\mathbf{K}^{n}$ & ADR 第 $n$ 步的等效割线刚度矩阵 \\
+  $P^{n}$ & ADR 第 $n$ 步的势能变化度量，$P^{n}=(\mathbf{U}^{n})^{\mathrm{T}}\mathbf{F}_{\mathrm{int}}^{n}$ \\
+  $Q^{n}$ & ADR 第 $n$ 步的动能度量（位移二次型），$Q^{n}=(\mathbf{U}^{n})^{\mathrm{T}}\mathbf{M}\mathbf{U}^{n}$ \\
+  $\omega^{n}$ & ADR 第 $n$ 步的系统瞬时频率估计，$\omega^{n}\approx\sqrt{P^{n}/Q^{n}}$ \\
+  $\eta_i^{n}$ & ADR 第 $n$ 步物质点 $\mathbf{x}_i$ 的阻尼系数，$\eta_i^{n}=2\rho_i\omega^{n}$（临界阻尼） \\
+  $C_{\text{ADR}}$ & ADR 安全系数，$\Delta t^{n}=C_{\text{ADR}}/\omega^{n}$，推荐 $0.5\sim1.5$ \\
+  $E_{\text{kin}}^{n}$ & ADR 第 $n$ 步的全场总动能，$E_{\text{kin}}^{n}=\frac{1}{2}\sum_i\rho_i\Delta V_i\lvert\dot{\mathbf{u}}_i^{n}\rvert^{2}$ \\
+  $\varepsilon_{\text{ADR}}$ & ADR 动能收敛容差，典型 $10^{-6}\sim10^{-4}$ \\
+  $\mathbf{R}^{n}$ & 第 $n$ 步（ADR 或 Newton）的不平衡力向量，$\mathbf{R}^{n}=\mathbf{F}_{\text{ext}}-\mathbf{F}_{\text{int}}^{n}$ \\
+  $\varepsilon_{\text{tol}}$ & 力收敛容差（与第 7 章 $\varepsilon_{\mathrm{tol}}$ 同），典型 $10^{-8}\sim10^{-6}$ \\
+  $\lambda$ & 载荷参数，$\lambda\in[0,1]$，$\mathbf{F}_{\text{ext}}(\lambda)=\lambda\bar{\mathbf{F}}_{\text{ext}}$ \\
+  $N_{\text{step}}$ & 载荷增量步总数 \\
+  $\mathbf{K}_{\mathrm{t}}$ & 切线刚度矩阵（与第 7 章同），$\mathbf{K}_{\mathrm{t}}=\partial\mathbf{F}_{\mathrm{int}}/\partial\mathbf{U}$ \\
+  $\mathbf{K}_{\mathrm{glob}}$ & 整体刚度矩阵（与第 7 章同），线性隐式系统 $\mathbf{K}_{\mathrm{glob}}\mathbf{U}_{\mathrm{glob}}=\mathbf{F}_{\mathrm{ext}}$ \\
+  $\mathbf{K}_{uu},\mathbf{K}_{uc}$ & 边界条件分块后的刚度子矩阵（与第 7 章同） \\
+\end{longtable}
+}
