@@ -134,3 +134,22 @@
   $\varepsilon_{\mathrm{tol}}$ & 非线性迭代收敛容差 \\
   $\mathcal{B}$ & 物体所占区域 \\
 \end{longtable}
+
+\section*{第 11 章 裂纹与损伤的数值模拟}
+
+% 注：第11章 11.6.4 节中 m 另用作 Weibull 模量（形状参数），与第6章加权体积 m、本章网格比 m=δ/Δx 复用符号，请作者审阅时考虑是否区分。
+{\small
+\begin{tabular}{@{}p{0.22\textwidth}@{}p{0.65\textwidth}@{}}
+  $c_L$ & 纵波速，$c_L=\sqrt{E(1-\nu)/[\rho(1+\nu)(1-2\nu)]}$（式\eqref{eq:ch11-cfl}处算例） \\
+  $c_T$ & 横波速，$c_T=\sqrt{\mu/\rho}$（式\eqref{eq:ch11-rayleigh-equation}） \\
+  $c_R$ & 瑞利波速，满足特征方程式\eqref{eq:ch11-rayleigh-equation}；$\nu\approx 0.25$ 时 $c_R\approx 0.92\,c_T$ \\
+  $v_c$ & 裂纹扩展速度，上限 $v_c<c_R$（式\eqref{eq:ch11-rayleigh-limit}） \\
+  $C$ & 显式时间积分稳定性常数，CFL 条件 $\Delta t\le C\Delta x/c_{\max}$ 中的常数（式\eqref{eq:ch11-cfl}），常用取值 $0.3\sim0.7$ \\
+  $\Lambda_d$ & 动态放大因子，$\Lambda_d=K_I^{\mathrm{dyn}}/K_I^{\mathrm{stat}}$（式\eqref{eq:ch11-dynamic-amplification}） \\
+  $J^{\mathrm{PD}}$ & 非局部 J 积分（式\eqref{eq:ch11-pd-j-integral}），$\delta\to 0$ 时收敛于经典 J 积分（式\eqref{eq:ch11-classical-j}） \\
+  $K_I$，$K_{II}$ & I 型、II 型应力强度因子 \\
+  $\rho_d$ & 缺陷密度，$\rho_d=N_d/A$（式\eqref{eq:ch11-defect-density}），单位面积或体积内缺陷数目 \\
+  $\sigma_f$ & 断裂强度（Weibull 分布变量，式\eqref{eq:ch11-weibull}） \\
+  $\sigma_0$ & Weibull 特征强度（式\eqref{eq:ch11-weibull}） \\
+\end{tabular}
+}
