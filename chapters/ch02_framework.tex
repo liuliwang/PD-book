@@ -657,7 +657,7 @@
 
 在上述参数下，对力函数量级为 \textbf{$|\mathbf{f}|\sim c\cdot s\sim 10^{15}\,\mathrm{N}/\mathrm{m}^{6}$}。对两个体积均为 $10^{-9}\,\mathrm{m}^{3}$（微米尺度立方体）的物质点，其相互作用力为 \textbf{$\mathrm{d}F\sim 10^{-3}\,\mathrm{N}$}，即\textbf{毫牛量级}。这与经典理论中 $10^{6}\,\mathrm{Pa}$ 应力下、$10^{-6}\,\mathrm{m}^{2}$ 面积对应 $1\,\mathrm{N}$ 的结果相呼应，验证了量纲分析的自洽性。
 
-从表~\ref{tab:dim-analysis}还可以看出，运动方程两端均为 $\mathrm{N}/\mathrm{m}^{3}$，意味着对力函数 $\mathbf{f}$ 必须自带"两个体积除数"。$\mathbf{f}$ 可理解为"单位体积微元对单位体积微元的力密度"——正如 $\boldsymbol{\sigma}$ 描述"单位面积上的力"，$\mathbf{f}$ 描述的是"单位体积对上的力"。对力函数 $\mathrm{N}/\mathrm{m}^{6}$ 与经典应力 $\mathrm{N}/\mathrm{m}^{2}$ 的量纲差异，源于两种理论对"相互作用载体"的不同刻画，两者还可从多个维度进一步对比，见表~\ref{tab:stress-vs-pairwise-force}。由表可知，对力函数量纲 $\mathrm{N}/\mathrm{m}^{6}$ 并非偶然，而是近场动力学理论架构的数学特征。经典连续介质力学以 $\mathrm{N}/\mathrm{m}^{2}$ 为单位处理局部场，近场动力学则以 $\mathrm{N}/\mathrm{m}^{6}$ 为单位描述非局部相互作用。当近场域半径 $\delta\to 0$ 时，体积积分退化为面积分，量纲行为趋近于 $\mathrm{N}/\mathrm{m}^{2}$（详见第 7 章的微极限分析），这进一步说明 $\mathrm{N}/\mathrm{m}^{6}$ 是近场动力学在非局部框架下对经典理论的自然推广 \cite{Silling2000,SillingLehoucq2010}。
+从表~\ref{tab:dim-analysis}还可以看出，运动方程两端均为 $\mathrm{N}/\mathrm{m}^{3}$，意味着对力函数 $\mathbf{f}$ 必须自带"两个体积除数"。$\mathbf{f}$ 可理解为"单位体积微元对单位体积微元的力密度"——正如 $\boldsymbol{\sigma}$ 描述"单位面积上的力"，$\mathbf{f}$ 描述的是"单位体积对上的力"。对力函数 $\mathrm{N}/\mathrm{m}^{6}$ 与经典应力 $\mathrm{N}/\mathrm{m}^{2}$ 的量纲差异，源于两种理论对"相互作用载体"的不同刻画，两者还可从多个维度进一步对比，见表~\ref{tab:stress-vs-pairwise-force}。由表可知，对力函数量纲 $\mathrm{N}/\mathrm{m}^{6}$ 并非偶然，而是近场动力学理论架构的数学特征。经典连续介质力学以 $\mathrm{N}/\mathrm{m}^{2}$ 为单位处理局部场，近场动力学则以 $\mathrm{N}/\mathrm{m}^{6}$ 为单位描述非局部相互作用。当近场域半径 $\delta\to 0$ 时，体积积分退化为面积分，量纲行为趋近于 $\mathrm{N}/\mathrm{m}^{2}$（详见第 3 章的局部极限分析），这进一步说明 $\mathrm{N}/\mathrm{m}^{6}$ 是近场动力学在非局部框架下对经典理论的自然推广 \cite{Silling2000,SillingLehoucq2010}。
 
 \begin{table}[htbp]
   \centering
@@ -680,22 +680,132 @@
 
 \subsection{小变形线性化与微模量张量}
 
-当变形较小时，对力函数可在无应力状态 $\boldsymbol{\eta}=\mathbf{0}$ 附近作泰勒展开：
+2.3.1--2.3.3 节从约束条件、能量基础和量纲分析三个角度刻画了对力函数 $\mathbf{f}(\boldsymbol{\eta},\boldsymbol{\xi})$ 的物理内涵与数学结构。然而，一般对力函数的形式仍过于抽象，无法直接用于数值计算或解析分析。为了得到可操作的线性本构关系，本节对力函数在无应力状态 $\boldsymbol{\eta}=\mathbf{0}$ 附近作小变形线性化，引入微模量张量 $\mathbf{C}(\boldsymbol{\xi})$，建立线性近场动力学本构。
+
+这一处理与 2.2 节小变形近似中的式\eqref{eq:stretch-linear}对键伸长率的运动学线性化相呼应：式\eqref{eq:stretch-linear}回答``键如何伸长''，本节回答``伸长产生多少力''，二者合起来构成键的完整线性本构。微模量张量的显式形式将在第 4 章针对各向同性材料给出。
+
+当变形较小时，对力函数可在无应力状态 $\boldsymbol{\eta}=\mathbf{0}$ 附近作泰勒展开。将 $\mathbf{f}(\boldsymbol{\eta},\boldsymbol{\xi})$ 视为 $\boldsymbol{\eta}$ 的函数，在 $\boldsymbol{\eta}=\mathbf{0}$ 处展开到一阶，得
 \begin{equation}
   \mathbf{f}(\boldsymbol{\eta},\boldsymbol{\xi})\approx\mathbf{f}(\mathbf{0},\boldsymbol{\xi})+\frac{\partial\mathbf{f}}{\partial\boldsymbol{\eta}}\bigg|_{\boldsymbol{\eta}=\mathbf{0}}\boldsymbol{\eta}
   \label{eq:force-linearization}
 \end{equation}
-无应力状态下 $\mathbf{f}(\mathbf{0},\boldsymbol{\xi})=\mathbf{0}$（无变形则无力），故式\eqref{eq:force-linearization}第一项为零。记二阶张量
+式中右侧已忽略 $\boldsymbol{\eta}$ 的二次及更高次项。上述截断的适用条件为 $|\boldsymbol{\eta}|\ll|\boldsymbol{\xi}|$：此时 $|\boldsymbol{\eta}|^{2}$ 项相对线性项为 $O(|\boldsymbol{\eta}|/|\boldsymbol{\xi}|)$ 量级，可忽略。该条件在物理上对应小变形与小转动假设。泰勒展开式\eqref{eq:force-linearization}是后续线性化本构的数学基础。
+
+无应力状态下，键未发生任何变形，物质点间不应存在相互作用力，故 $\mathbf{f}(\mathbf{0},\boldsymbol{\xi})=\mathbf{0}$：若零变形状态下仍存在非零对力，则与``无变形则无力''的物理直觉矛盾。因此式\eqref{eq:force-linearization}第一项为零。这一结论也为后续线性化本构的建立提供了物理基础。
+
+记二阶张量
 \begin{equation}
   \mathbf{C}(\boldsymbol{\xi})=\frac{\partial\mathbf{f}}{\partial\boldsymbol{\eta}}\bigg|_{\boldsymbol{\eta}=\mathbf{0}}
   \label{eq:micro-modulus}
 \end{equation}
-为\textbf{微模量张量}（micro-modulus tensor），其物理意义是描述键的"刚度"——相对位移 $\boldsymbol{\eta}$ 引起的对力变化率。于是线性化对力为
+为\textbf{微模量张量}（micro-modulus tensor），其物理意义是描述键的``刚度''——相对位移 $\boldsymbol{\eta}$ 引起的对力变化率。于是线性化对力为
 \begin{equation}
   \mathbf{f}(\boldsymbol{\eta},\boldsymbol{\xi})\approx\mathbf{C}(\boldsymbol{\xi})\,\boldsymbol{\eta}
   \label{eq:linear-force}
 \end{equation}
-式\eqref{eq:linear-force}是线性近场动力学的基本本构关系。由反作用条件 \eqref{eq:reaction} 可证 $\mathbf{C}(-\boldsymbol{\xi})=\mathbf{C}(\boldsymbol{\xi})^{T}$，由中心力条件 \eqref{eq:central-force} 可证 $\mathbf{C}(\boldsymbol{\xi})\,\boldsymbol{\xi}=\mathbf{0}$ 时 $\mathbf{f}$ 沿键方向，这两个性质是第 4 章构造 $\mathbf{C}(\boldsymbol{\xi})$ 的约束。微模量张量的显式表达将在第 4 章针对各向同性材料给出。
+式\eqref{eq:linear-force}是线性近场动力学的基本本构关系，其适用范围为 $|\boldsymbol{\eta}|\ll|\boldsymbol{\xi}|$ 的小变形、小转动情形。
+
+式\eqref{eq:linear-force}是第 4 章键基模型（PMB，原型微弹性键基模型）的出发点。第 4 章将针对各向同性材料给出 $\mathbf{C}(\boldsymbol{\xi})$ 的显式形式——此时 $\mathbf{C}(\boldsymbol{\xi})$ 退化为仅依赖键长 $|\boldsymbol{\xi}|$ 的标量函数 $c(|\boldsymbol{\xi}|)$ 与方向张量的乘积——并建立其与经典弹性常数（杨氏模量 $E$、泊松比 $\nu$）的标定关系。该标定是连接近场动力学与经典弹性力学的关键桥梁，也是数值实现中确定材料参数的必要步骤。
+
+对于保守系统，线性化对力还可由成对势的二阶展开导出，这一途径揭示了微模量张量与成对势的内在联系。记成对势 $w$ 关于 $\boldsymbol{\eta}$ 的 Hessian 矩阵为
+\begin{equation}
+  \mathbf{H}(\boldsymbol{\xi})=\nabla_{\boldsymbol{\eta}}\nabla_{\boldsymbol{\eta}}w\big|_{\boldsymbol{\eta}=\mathbf{0}}
+  \label{eq:pairwise-hessian}
+\end{equation}
+微弹性假设下 $\mathbf{f}=\nabla_{\boldsymbol{\eta}}w$，将 $w$ 在 $\boldsymbol{\eta}=\mathbf{0}$ 处作二阶泰勒展开并逐步化简：
+\begin{align}
+  w(\boldsymbol{\eta},\boldsymbol{\xi})
+  &\approx w(\mathbf{0},\boldsymbol{\xi})+\left(\nabla_{\boldsymbol{\eta}}w\right)\big|_{\boldsymbol{\eta}=\mathbf{0}}\!\cdot\boldsymbol{\eta}+\frac{1}{2}\boldsymbol{\eta}\cdot\!\left(\nabla_{\boldsymbol{\eta}}\nabla_{\boldsymbol{\eta}}w\right)\big|_{\boldsymbol{\eta}=\mathbf{0}}\!\cdot\boldsymbol{\eta} \notag\\
+  &=w(\mathbf{0},\boldsymbol{\xi})+\mathbf{f}(\mathbf{0},\boldsymbol{\xi})\cdot\boldsymbol{\eta}+\frac{1}{2}\boldsymbol{\eta}\cdot\mathbf{H}(\boldsymbol{\xi})\cdot\boldsymbol{\eta} \quad\text{（由 $\mathbf{f}=\nabla_{\boldsymbol{\eta}}w$ 及式\eqref{eq:pairwise-hessian}）}\notag\\
+  &=w(\mathbf{0},\boldsymbol{\xi})+\frac{1}{2}\boldsymbol{\eta}\cdot\mathbf{H}(\boldsymbol{\xi})\cdot\boldsymbol{\eta} \quad\text{（由 $\mathbf{f}(\mathbf{0},\boldsymbol{\xi})=\mathbf{0}$ 无应力条件）}
+  \label{eq:pairwise-hessian-expansion}
+\end{align}
+其中第一步为二阶泰勒展开的标准形式，第二步将一阶项系数 $\nabla_{\boldsymbol{\eta}}w$ 代换为 $\mathbf{f}$（微弹性假设）、二阶项系数记为 $\mathbf{H}$（Hessian 定义），第三步由无应力条件 $\mathbf{f}(\mathbf{0},\boldsymbol{\xi})=\mathbf{0}$ 消去一阶项。对 $\boldsymbol{\eta}$ 求梯度得 $\mathbf{f}\approx\mathbf{H}(\boldsymbol{\xi})\boldsymbol{\eta}$，与式\eqref{eq:linear-force}对比可知
+\begin{equation}
+  \mathbf{C}(\boldsymbol{\xi})=\mathbf{H}(\boldsymbol{\xi})
+  \label{eq:micro-modulus-hessian}
+\end{equation}
+即微模量张量恰为成对势的 Hessian。这说明线性本构是微弹性假设在小变形条件下的自然推论。
+
+
+微模量张量 $\mathbf{C}(\boldsymbol{\xi})$ 是二阶张量，在三维情形有 $3\times 3=9$ 个分量 $C_{ij}$。分量 $C_{ij}$ 的物理意义是：键的第 $j$ 方向单位相对位移在第 $i$ 方向引起的对力分量，即
+\begin{equation}
+  C_{ij}=\frac{\partial f_{i}}{\partial\eta_{j}}\bigg|_{\boldsymbol{\eta}=\mathbf{0}}
+  \label{eq:micro-modulus-component}
+\end{equation}
+因此 $\mathbf{C}(\boldsymbol{\xi})$ 可视为键的``刚度矩阵''：它将键的相对位移矢量线性映射为对力矢量。在直角坐标系中，式\eqref{eq:micro-modulus-component}给出了微模量张量的分量表达式。
+
+对于各向同性键基材料，旋转对称性要求 $\mathbf{C}(\boldsymbol{\xi})$ 取如下形式
+\begin{equation}
+  \mathbf{C}(\boldsymbol{\xi})=a(|\boldsymbol{\xi}|)\,\mathbf{I}+b(|\boldsymbol{\xi}|)\,\hat{\boldsymbol{\xi}}\otimes\hat{\boldsymbol{\xi}}
+  \label{eq:micro-modulus-iso-form}
+\end{equation}
+其中 $\hat{\boldsymbol{\xi}}=\boldsymbol{\xi}/|\boldsymbol{\xi}|$ 为键方向的单位矢量。中心力条件进一步要求 $\mathbf{C}(\boldsymbol{\xi})$ 的值域沿 $\boldsymbol{\xi}$ 方向，由此约束 $b=0$，$\mathbf{C}(\boldsymbol{\xi})$ 退化为
+\begin{equation}
+  \mathbf{C}(\boldsymbol{\xi})=c(|\boldsymbol{\xi}|)\,\hat{\boldsymbol{\xi}}\otimes\hat{\boldsymbol{\xi}}
+  \label{eq:micro-modulus-iso-scalar}
+\end{equation}
+即仅依赖键长的标量微模量函数 $c(|\boldsymbol{\xi}|)$ 乘以方向投影算子，只有一个独立材料常数。此时材料泊松比被锁定（详见 2.4.1 节及第 4 章标定），完整推导与 $c(|\boldsymbol{\xi}|)$ 的显式形式见第 4 章。
+
+与经典连续介质力学中的弹性模量张量（四阶）相比，微模量张量 $\mathbf{C}(\boldsymbol{\xi})$ 具有鲜明的非局部特征。经典理论中，弹性模量张量描述\textbf{某一点}的材料刚度，建立应力与应变之间的局部关系；而 $\mathbf{C}(\boldsymbol{\xi})$ 描述\textbf{某一条键}的刚度，且显式依赖键的方向 $\boldsymbol{\xi}$ 和键长 $|\boldsymbol{\xi}|$。这种``以键为基本单元''的描述方式，正是近场动力学非局部理论的核心体现：材料响应不再仅由某一点的局部状态决定，而是由该点与邻居之间键的变形共同决定。这种非局部描述方式使得近场动力学能够自然地描述裂纹扩展等不连续问题。
+
+微模量张量作为线性本构的核心对象，须继承 2.3.1 节对力函数的三个基本约束——反作用条件、微弹性假设与中心力条件。以下分别推导这三组约束在 $\mathbf{C}(\boldsymbol{\xi})$ 上的体现：反作用条件给出键反转对称，微弹性假设给出自对称，中心力条件给出值域方向约束。三者的综合刻画了线性近场动力学本构的容许空间。
+
+由反作用条件\eqref{eq:reaction}可推导微模量张量的对称性质。对式\eqref{eq:reaction}两边关于 $\boldsymbol{\eta}$ 求梯度，得
+\begin{equation}
+  \frac{\partial\mathbf{f}(-\boldsymbol{\eta},-\boldsymbol{\xi})}{\partial\boldsymbol{\eta}}=-\frac{\partial\mathbf{f}(\boldsymbol{\eta},\boldsymbol{\xi})}{\partial\boldsymbol{\eta}}
+  \label{eq:reaction-derivative}
+\end{equation}
+令 $\boldsymbol{\eta}=\mathbf{0}$，对式\eqref{eq:reaction-derivative}左端应用链式法则。令 $\boldsymbol{\eta}'=-\boldsymbol{\eta}$，则
+\begin{equation}
+  \begin{split}
+    \frac{\partial\mathbf{f}(-\boldsymbol{\eta},-\boldsymbol{\xi})}{\partial\boldsymbol{\eta}}\bigg|_{\boldsymbol{\eta}=\mathbf{0}}
+    &= \frac{\partial\mathbf{f}(\boldsymbol{\eta}',-\boldsymbol{\xi})}{\partial\boldsymbol{\eta}'}\bigg|_{\boldsymbol{\eta}'=\mathbf{0}}\cdot\frac{\partial\boldsymbol{\eta}'}{\partial\boldsymbol{\eta}} \quad\text{（链式法则，$\boldsymbol{\eta}'=-\boldsymbol{\eta}$）} \\
+    &= \mathbf{C}(-\boldsymbol{\xi})\cdot(-\mathbf{I}) \quad\text{（由式\eqref{eq:micro-modulus}，$\partial\boldsymbol{\eta}'/\partial\boldsymbol{\eta}=-\mathbf{I}$）} \\
+    &= -\mathbf{C}(-\boldsymbol{\xi})
+  \end{split}
+  \label{eq:chain-rule-reaction}
+\end{equation}
+其中第二步由式\eqref{eq:micro-modulus}的定义给出（自变量取 $-\boldsymbol{\xi}$），第三步代入单位张量的负号。将式\eqref{eq:chain-rule-reaction}代入式\eqref{eq:reaction-derivative}，得 $-\mathbf{C}(-\boldsymbol{\xi})=-\mathbf{C}(\boldsymbol{\xi})$，即
+\begin{equation}
+  \mathbf{C}(-\boldsymbol{\xi})=\mathbf{C}(\boldsymbol{\xi})
+  \label{eq:micro-modulus-symmetry}
+\end{equation}
+即微模量张量关于键方向反转具有对称性。
+
+由式\eqref{eq:micro-modulus-hessian}，微弹性材料中 $\mathbf{C}(\boldsymbol{\xi})$ 即为成对势的 Hessian 矩阵。由混合偏导对称性（Schwarz 定理），Hessian 矩阵自对称，因此
+\begin{equation}
+  \mathbf{C}(\boldsymbol{\xi})=\mathbf{C}(\boldsymbol{\xi})^{\mathrm{T}}
+  \label{eq:micro-modulus-elastic-sym}
+\end{equation}
+即微弹性假设下微模量张量自动对称。结合式\eqref{eq:micro-modulus-symmetry}与式\eqref{eq:micro-modulus-elastic-sym}，得
+\begin{equation}
+  \mathbf{C}(-\boldsymbol{\xi})=\mathbf{C}(\boldsymbol{\xi})=\mathbf{C}(\boldsymbol{\xi})^{\mathrm{T}}
+  \label{eq:micro-modulus-full-sym}
+\end{equation}
+即微弹性材料中微模量张量同时满足键方向反转对称与自对称。
+
+由中心力条件\eqref{eq:central-force}可推导 $\mathbf{C}(\boldsymbol{\xi})$ 的另一约束。将中心力条件写为 $(\boldsymbol{\xi}+\boldsymbol{\eta})\times\mathbf{f}(\boldsymbol{\eta},\boldsymbol{\xi})=\mathbf{0}$，在 $\boldsymbol{\eta}=\mathbf{0}$ 处对 $\boldsymbol{\eta}$ 作一阶展开。记 $\tilde{\boldsymbol{\eta}}$ 为 $\boldsymbol{\eta}$ 的任意无穷小增量，则
+\begin{equation}
+  \tilde{\boldsymbol{\eta}}\times\mathbf{f}(\mathbf{0},\boldsymbol{\xi})+\boldsymbol{\xi}\times\left(\mathbf{C}(\boldsymbol{\xi})\,\tilde{\boldsymbol{\eta}}\right)=\mathbf{0}
+  \label{eq:central-force-variation}
+\end{equation}
+由于 $\mathbf{f}(\mathbf{0},\boldsymbol{\xi})=\mathbf{0}$，第一项为零，得
+\begin{equation}
+  \boldsymbol{\xi}\times\bigl[\mathbf{C}(\boldsymbol{\xi})\,\tilde{\boldsymbol{\eta}}\bigr]=\mathbf{0}
+  \label{eq:central-force-linear}
+\end{equation}
+式\eqref{eq:central-force-linear}对任意 $\tilde{\boldsymbol{\eta}}$ 成立，意味着 $\mathbf{C}(\boldsymbol{\xi})$ 作用任意矢量后结果均平行于 $\boldsymbol{\xi}$，即 $\mathbf{C}(\boldsymbol{\xi})$ 的值域包含于 $\mathrm{span}\,\boldsymbol{\xi}$；取 $\tilde{\boldsymbol{\eta}}$ 为各坐标基矢可知 $\mathbf{C}(\boldsymbol{\xi})$ 的每一列均为 $\boldsymbol{\xi}$ 的倍数。特别地，取 $\tilde{\boldsymbol{\eta}}=\boldsymbol{\xi}$，得
+\begin{equation}
+  \mathbf{C}(\boldsymbol{\xi})\,\boldsymbol{\xi}\parallel\boldsymbol{\xi}
+  \label{eq:micro-modulus-central}
+\end{equation}
+即 $\boldsymbol{\xi}$ 是 $\mathbf{C}(\boldsymbol{\xi})$ 的特征方向。需要强调的是，对称性 $\mathbf{C}(\boldsymbol{\xi})=\mathbf{C}(\boldsymbol{\xi})^{\mathrm{T}}$ 并非中心力条件的推论，而是微弹性假设（Hessian 对称）的结果（见前文推导）。
+
+综上，线性微弹性材料的微模量张量须同时满足三组约束：键反转对称 $\mathbf{C}(-\boldsymbol{\xi})=\mathbf{C}(\boldsymbol{\xi})$（式\eqref{eq:micro-modulus-symmetry}，来自反作用条件）、自对称 $\mathbf{C}=\mathbf{C}^{\mathrm{T}}$（式\eqref{eq:micro-modulus-elastic-sym}，来自微弹性假设的 Hessian 对称性）、值域方向约束 $\mathbf{C}(\boldsymbol{\xi})\boldsymbol{\xi}\parallel\boldsymbol{\xi}$（式\eqref{eq:micro-modulus-central}，来自中心力条件）。前两者保证线动量守恒与能量守恒的自洽性，第三者保证角动量守恒。这三组约束共同界定了线性近场动力学本构的容许空间。
+
+
+
 
 \section{近场动力学状态}
 
