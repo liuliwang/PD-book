@@ -621,7 +621,7 @@
 
 \subsection{对力函数的量纲}
 
-2.3.1 节和 2.3.2 节分别建立了对力函数 $\mathbf{f}$ 的物理图像与数学结构。在此基础上，本节通过量纲分析确定 $\mathbf{f}$ 的量纲——这是理解其物理意义的关键一步，也是第 4 章微模量标定的前提。
+2.3.1 节已由定义式\eqref{eq:pairwise-force-def}指出对力函数 $\mathbf{f}$ 的量纲为 $\mathrm{N}/\mathrm{m}^{6}$，2.3.2 节又建立了其与成对势的联系。本节在此基础上，从运动方程出发，通过量纲一致性分析系统验证这一量纲，并从数值量级与经典理论的对比两个角度加深对其物理意义的理解，为第 4 章微模量标定奠定基础。
 
 运动方程\eqref{eq:motion}两端各项的量纲必须一致，否则方程失去物理意义。左端惯性项 $\rho\ddot{\mathbf{u}}$ 的量纲为
 \begin{equation}
@@ -635,7 +635,7 @@
 \end{equation}
 即"力每体积平方"。
 
-表~\ref{tab:dim-analysis} 汇总了运动方程各项的量纲。
+表~\ref{tab:dim-analysis} 汇总了运动方程各项的量纲。由表可见，运动方程各项的量纲形成了自洽的层级结构：惯性项与体力为 $\mathrm{N}/\mathrm{m}^{3}$，对力函数为 $\mathrm{N}/\mathrm{m}^{6}$，积分后又回到 $\mathrm{N}/\mathrm{m}^{3}$。然而，$\mathrm{N}/\mathrm{m}^{6}$ 这一量纲在物理上仍较抽象，需通过具体数值建立直觉。为此，作如下量级估计。设材料密度 $\rho\sim 10^{3}\,\mathrm{kg}/\mathrm{m}^{3}$，在 $10^{6}\,\mathrm{Pa}$ 应力下经典应变约为 $10^{-3}$。取近场域半径 $\delta\sim 10^{-3}\,\mathrm{m}$，微模量 $c\sim 10^{18}\,\mathrm{N}/\mathrm{m}^{6}$（见第 4 章标定）。
 
 \begin{table}[htbp]
   \centering
@@ -653,17 +653,11 @@
   \end{tabular}
 \end{table}
 
-从表~\ref{tab:dim-analysis}可以看出，运动方程两端均为 $\mathrm{N}/\mathrm{m}^{3}$，意味着对力函数 $\mathbf{f}$ 必须自带"两个体积除数"。对力函数 $\mathbf{f}$ 的量纲 $\mathrm{N}/\mathrm{m}^{6}$ 与经典应力 $\boldsymbol{\sigma}$ 的 $\mathrm{N}/\mathrm{m}^{2}$ 存在本质差异：经典理论中，内力通过面积微元 $\mathrm{d}A$ 传递，因此量纲含 $\mathrm{m}^{2}$ 除数；而在近场动力学中，相互作用发生在两个体积微元之间，量纲须含 $\mathrm{m}^{6}$ 除数。$\mathbf{f}$ 可理解为"单位体积微元对单位体积微元的力密度"——正如 $\boldsymbol{\sigma}$ 描述"单位面积上的力"，$\mathbf{f}$ 描述的是"单位体积对上的力"。
 
-表格给出了量纲的代数关系，但抽象的 $\mathrm{N}/\mathrm{m}^{6}$ 仍需具体数值来建立直觉。
 
-为建立直观感受，考虑如下量级估计。设材料密度 $\rho\sim 10^{3}\,\mathrm{kg}/\mathrm{m}^{3}$，在 $10^{6}\,\mathrm{Pa}$ 应力下经典应变约为 $10^{-3}$。取近场域半径 $\delta\sim 10^{-3}\,\mathrm{m}$，微模量 $c\sim 10^{18}\,\mathrm{N}/\mathrm{m}^{6}$（见第 4 章标定）。
+在上述参数下，对力函数量级为 \textbf{$|\mathbf{f}|\sim c\cdot s\sim 10^{15}\,\mathrm{N}/\mathrm{m}^{6}$}。对两个体积均为 $10^{-9}\,\mathrm{m}^{3}$（微米尺度立方体）的物质点，其相互作用力为 \textbf{$\mathrm{d}F\sim 10^{-3}\,\mathrm{N}$}，即\textbf{毫牛量级}。这与经典理论中 $10^{6}\,\mathrm{Pa}$ 应力下、$10^{-6}\,\mathrm{m}^{2}$ 面积对应 $1\,\mathrm{N}$ 的结果相呼应，验证了量纲分析的自洽性。
 
-在上述参数下，对力函数量级为 \textbf{$|\mathbf{f}|\sim c\cdot s\sim 10^{15}\,\mathrm{N}/\mathrm{m}^{6}$}。对两个体积均为 $10^{-9}\,\mathrm{m}^{3}$（微米尺度立方体）的物质点，其相互作用力为 \textbf{$\mathrm{d}F\sim 10^{-3}\,\mathrm{N}$}，即\textbf{毫牛量级}。
-
-这与经典理论中 $10^{-6}\,\mathrm{m}^{2}$ 面积上受力 $1\,\mathrm{N}$ 的量级一致，验证了量纲分析的自洽性。
-
-对力函数与经典应力的本质差异，还可从多个维度进一步对比，见表~\ref{tab:stress-vs-pairwise-force}。
+从表~\ref{tab:dim-analysis}还可以看出，运动方程两端均为 $\mathrm{N}/\mathrm{m}^{3}$，意味着对力函数 $\mathbf{f}$ 必须自带"两个体积除数"。$\mathbf{f}$ 可理解为"单位体积微元对单位体积微元的力密度"——正如 $\boldsymbol{\sigma}$ 描述"单位面积上的力"，$\mathbf{f}$ 描述的是"单位体积对上的力"。对力函数 $\mathrm{N}/\mathrm{m}^{6}$ 与经典应力 $\mathrm{N}/\mathrm{m}^{2}$ 的量纲差异，源于两种理论对"相互作用载体"的不同刻画，两者还可从多个维度进一步对比，见表~\ref{tab:stress-vs-pairwise-force}。由表可知，对力函数量纲 $\mathrm{N}/\mathrm{m}^{6}$ 并非偶然，而是近场动力学理论架构的数学特征。经典连续介质力学以 $\mathrm{N}/\mathrm{m}^{2}$ 为单位处理局部场，近场动力学则以 $\mathrm{N}/\mathrm{m}^{6}$ 为单位描述非局部相互作用。当近场域半径 $\delta\to 0$ 时，体积积分退化为面积分，量纲行为趋近于 $\mathrm{N}/\mathrm{m}^{2}$（详见第 7 章的微极限分析），这进一步说明 $\mathrm{N}/\mathrm{m}^{6}$ 是近场动力学在非局部框架下对经典理论的自然推广 \cite{Silling2000,SillingLehoucq2010}。
 
 \begin{table}[htbp]
   \centering
@@ -675,18 +669,14 @@
     \midrule
     相互作用对象 & 点与无穷小邻域 & 点与有限距离内所有点 \\
     描述方式 & 应力张量 $\boldsymbol{\sigma}$ & 对力函数 $\mathbf{f}$ \\
-    量纲 & $\mathrm{N}/\mathrm{m}^{2}$（力/面积） & $\mathrm{N}/\mathrm{m}^{6}$（力/体积$^2$）\\
     作用载体 & 面积微元 $\mathrm{d}A$ & 体积微元对 $\mathrm{d}V\mathrm{d}V'$ \\
+    量纲 & $\mathrm{N}/\mathrm{m}^{2}$（力/面积） & $\mathrm{N}/\mathrm{m}^{6}$（力/体积$^2$）\\
     局部性 & 局部（$\delta\to 0$） & 非局部（有限 $\delta$）\\
     \bottomrule
   \end{tabular}
 \end{table}
 
-\begin{remark}
-  对力函数的量纲 $\mathrm{N}/\mathrm{m}^{6}$ 并非偶然，而是PD理论架构的数学签名。分子动力学（MD）以 $\mathrm{N}$ 为单位处理离散原子，经典连续介质力学以 $\mathrm{N}/\mathrm{m}^{2}$ 为单位处理局部场，而PD的量纲 $\mathrm{N}/\mathrm{m}^{6}$ 恰好介于两者之间，反映了它兼具连续介质与非局部双重特征。当近场域半径 $\delta\to 0$ 时，体积积分退化为面积分，量纲行为趋近于 $\mathrm{N}/\mathrm{m}^{2}$（详见第 7 章的微极限分析），这进一步说明 $\mathrm{N}/\mathrm{m}^{6}$ 是PD在非局部框架下对经典理论的自然推广 \cite{Silling2000,SillingLehoucq2010}。
-\end{remark}
 
-本节部分内容经 AI 辅助生成，需经专业审阅。
 
 \subsection{小变形线性化与微模量张量}
 
