@@ -10,11 +10,12 @@
 ## 项目概览
 
 专著《近场动力学理论与数值方法》的 LaTeX 书籍项目（ctexbook，A4，11pt）。
-章节完成度参差：ch01–ch07 与 ch09 为完整章节（约 400–1000 行，是写作新章节时的范例）；ch08、ch10–ch19 目前仅为十余行占位骨架；附录 appA–appE 为占位空文件（动手前先 Read 确认行数）。ch09（空间离散与时间积分）最近完成，主题直接衔接 ch10（边界条件）；ch04 的 6 节结构（假设→微势→PMB→率定→表面效应→局限）与 ch09 的 6 节结构（无网格离散→体积修正→显式积分→自适应动力松弛→隐式策略→拟静力分析）及每节末尾的 AI 声明样式值得沿用。ch05（键型改进模型）已完整，撰写相关章节前先 Read 其目录避免主题重复（如 dual-horizon 理论在 5.5 节，后续章节只做数值实现层面衔接）。
+
+章节完成度参差：ch01–ch10 为完整章节（数百至上千行，是写作新章节时的范例）；ch11–ch19 目前仅为十余行占位骨架；附录 appA–appE 为占位空文件。ch09（空间离散与时间积分）、ch10（边界条件与表面效应处理）为近期完成章节，其节结构与每节末尾的 AI 声明样式值得沿用；ch04（键型模型）的 6 节结构是撰写键型相关章节的范例。
 
 ## 编译
 
-必须用 XeLaTeX（ctexbook + 中文）。TeX 发行版：MiKTeX 26.5。以下命令顺序即 `.vscode/settings.json` 中 latex-workshop 的 recipe「完整编译 (含参考文献)」；autoBuild/autoClean 均为 never，不会自动编译清理。
+必须用 XeLaTeX（ctexbook + 中文）。TeX 发行版：MiKTeX（本机 `xelatex --version` 实测 25.12）。以下命令顺序即 `.vscode/settings.json` 中 latex-workshop 的 recipe「完整编译 (含参考文献)」；autoBuild/autoClean 均为 never，不会自动编译清理。
 
 ```powershell
 xelatex main.tex
@@ -141,6 +142,8 @@ xelatex main.tex
 
 ## Git 约定
 
+- 远程**只有 `upstream`**（https://github.com/liuliwang/PD-book.git），**无 `origin`**；本地 `main` 跟踪 `upstream/main`，拉取用 `git pull upstream main`
+- 章节细化在独立工作分支上进行，命名惯例 `shuaiyangfu-No.Xrefine`（如 `shuaiyangfu-No.8refine`），完成后合并回 `main`
 - 提交时只 stage 源文件（`.tex`/`.bib` 等）
 - 不要自动 commit/push
 - 编译产物（`*.aux`/`*.log`/`*.pdf`/`*.bbl` 等）与 `.omo/` 已被 `.gitignore` 忽略，勿手动 stage

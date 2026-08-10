@@ -135,6 +135,64 @@
   $\mathcal{B}$ & 物体所占区域 \\
 \end{longtable}
 
+\section*{本构模型专题（第 8 章）}
+
+\begin{longtable}{@{}p{4.8cm}>{\raggedright\arraybackslash}p{10.2cm}@{}}
+  $\Psi(\mathbf{F})$ & 超弹性应变能密度函数（参考构型单位体积），$\mathbf{P}=\partial\Psi/\partial\mathbf{F}$ \\
+  $\mathbf{C}$ & 右 Cauchy--Green 张量，$\mathbf{C}=\mathbf{F}^{\mathrm{T}}\mathbf{F}$ \\
+  $\mathbf{E}$ & Green--Lagrange 应变张量，$\mathbf{E}=\tfrac{1}{2}(\mathbf{C}-\mathbf{I})$ \\
+  $\mathbf{S}$ & 第二类 Piola--Kirchhoff 应力张量，$\mathbf{S}=2\,\partial\Psi/\partial\mathbf{C}$，$\mathbf{P}=\mathbf{F}\mathbf{S}$ \\
+  $I_1,I_2,I_3$ & 右 Cauchy--Green 张量的三个主不变量，$I_3=J^{2}$ \\
+  $\lambda,\mu$ & Lam\'e 常数（$\mu$ 亦为剪切模量） \\
+  $C_{10},C_{01}$ & Mooney--Rivlin 模型材料常数，$2(C_{10}+C_{01})=\mu$ \\
+  $\kappa$ & 体积模量 \\
+  $\mathbb{C}$ & 材料切线模量张量（四阶），$\mathbb{C}=\partial\mathbf{P}/\partial\mathbf{F}$ \\
+  $G(t)$ & 剪切松弛模量（$G_{0}$ 瞬时值，$G_{\infty}$ 平衡值） \\
+  $K(t)$ & 体积松弛模量 \\
+  $\mathbf{s}$，$\mathbf{e}$ & 偏应力张量、偏应变张量，$\mathbf{s}=\boldsymbol{\sigma}-\tfrac{1}{3}(\operatorname{tr}\boldsymbol{\sigma})\mathbf{I}$ \\
+  $\tau_{R}$ & 松弛时间，$\tau_{R}=\eta/E$ \\
+  $E$，$\eta$ & 弹簧模量、阻尼器黏度（Maxwell/Kelvin--Voigt 模型） \\
+  $\mathbf{h}^{n}$ & 黏弹性记忆项（历史应变递推向量） \\
+  $\boldsymbol{\varepsilon}^{e}$，$\boldsymbol{\varepsilon}^{vp}$ & 弹性应变、黏塑性应变 \\
+  $\gamma$ & 黏性参数（Perzyna 流动系数） \\
+  $f(\boldsymbol{\sigma},\boldsymbol{q})$ & 屈服函数（$\boldsymbol{q}$ 为内变量） \\
+  $\langle\cdot\rangle$ & Macaulay 括号（$\langle x\rangle=x$ 若 $x>0$，否则 $0$） \\
+  $\sigma_{e}$，$\sigma_{y}$ & von Mises 等效应力、屈服应力 \\
+  $J_{2}$ & 偏应力第二不变量，$J_{2}=\tfrac{1}{2}\mathbf{s}:\mathbf{s}$ \\
+  $\varepsilon^{c}$，$\boldsymbol{\varepsilon}^{c}$ & 蠕变应变（标量/张量），$\boldsymbol{\varepsilon}^{c}$ 为偏量 \\
+  $B$，$n$ & Norton 幂律材料常数（应力指数 $n$） \\
+  $D$ & 损伤变量，$D\in[0,1]$（$D=0$ 完好，$D=1$ 失效） \\
+  $\tilde{\sigma}$ & 有效应力，$\tilde{\sigma}=\sigma/(1-D)$ \\
+  $A$，$q$，$q_{1}$，$q_{2}$ & 损伤演化材料常数（Kachanov--Rabotnov / Liu--Murakami） \\
+  $C_{m}$，$n_{2}$ & Liu--Murakami 蠕变材料常数 \\
+  $\sigma_{1}$ & 最大主应力 \\
+  $D_{\mathrm{cr}}$ & 临界损伤（材料失效判据，通常取 $0.99$） \\
+  $\mathbf{m}^{\alpha}$，$\mathbf{n}^{\alpha}$ & 第 $\alpha$ 滑移系的滑移方向单位矢量、滑移面法向单位矢量 \\
+  $\mathbf{P}^{\alpha}$ & 第 $\alpha$ 滑移系的 Schmid 张量，$\mathbf{P}^{\alpha}=\mathbf{m}^{\alpha}\otimes\mathbf{n}^{\alpha}$（对称部分 $\mathbf{P}^{\alpha}_{\mathrm{sym}}$） \\
+  $\tau^{\alpha}$ & 第 $\alpha$ 滑移系的分切应力（resolved shear stress），$\tau^{\alpha}=\boldsymbol{\sigma}:\mathbf{P}^{\alpha}_{\mathrm{sym}}$ \\
+  $\tau_{c}^{\alpha}$ & 第 $\alpha$ 滑移系的临界分切应力（滑移阻力） \\
+  $\dot{\gamma}^{\alpha}$ & 第 $\alpha$ 滑移系的滑移率（剪应变率） \\
+  $\mathbf{F}^{\mathrm{e}}$，$\mathbf{F}^{\mathrm{p}}$ & 变形梯度的弹性部分、塑性部分（乘法分解 $\mathbf{F}=\mathbf{F}^{\mathrm{e}}\mathbf{F}^{\mathrm{p}}$） \\
+  $\mathbf{L}^{\mathrm{p}}$ & 塑性速度梯度，$\mathbf{L}^{\mathrm{p}}=\dot{\mathbf{F}}^{\mathrm{p}}(\mathbf{F}^{\mathrm{p}})^{-1}=\sum_{\alpha}\dot{\gamma}^{\alpha}\,\mathbf{m}^{\alpha}\otimes\mathbf{n}^{\alpha}$ \\
+  $\mathbf{R}_{0}$ & 晶格取向矩阵（晶体坐标系到全局坐标系的旋转） \\
+  $\dot{\gamma}_{0}$，$N$ & 幂律滑移率参考值、率敏感指数 \\
+  $h_{\alpha\beta}$ & 滑移硬化模量矩阵（自硬化 $h_{\alpha\alpha}$，潜硬化 $h_{\alpha\beta}$，$\alpha\neq\beta$） \\
+  $q$ & 潜硬化比（潜硬化与自硬化之比，典型值 $1\sim1.4$） \\
+  $g^{\alpha}$ & 第 $\alpha$ 滑移系当前滑移阻力（硬化内变量，$\dot{g}^{\alpha}=\sum_{\beta}h_{\alpha\beta}|\dot{\gamma}^{\beta}|$） \\
+  $\tilde{\mathbf{F}}$，$\tilde{\boldsymbol{\sigma}}$ & 晶格系中的变形梯度、由晶格弹性本构求得的 Cauchy 应力（$\tilde{\mathbf{F}}=\mathbf{F}\mathbf{R}_{0}$ 单边右乘，$\tilde{\boldsymbol{\sigma}}$ 因当前基在全局系而即全局基应力 $\boldsymbol{\sigma}=\tilde{\boldsymbol{\sigma}}$） \\
+  $\mathbf{R}^{\mathrm{e}}$，$\mathbf{U}^{\mathrm{e}}$ & 弹性变形梯度的极分解：晶格旋转张量、弹性右伸长张量（$\mathbf{F}^{\mathrm{e}}=\mathbf{R}^{\mathrm{e}}\mathbf{U}^{\mathrm{e}}$） \\
+  $\mathbf{R}_{0}^{(g)}$ & 第 $g$ 个晶粒的取向矩阵（取向场 $\mathbf{R}_{0}(\mathbf{x})$ 在晶粒 $\Omega_{g}$ 上的取值） \\
+  $\sigma_{\mathrm{HEL}}$，$P_{\mathrm{HEL}}$ & Hugoniot 弹性极限（HEL）处的等效应力、压力 \\
+  $P^{*}$，$T^{*}$ & 归一化压力、归一化最大拉伸静水压力，$P^{*}=P/P_{\mathrm{HEL}}$，$T^{*}=T/P_{\mathrm{HEL}}$ \\
+  $\sigma^{*}$，$\dot{\varepsilon}^{*}$ & 归一化等效应力、归一化应变率，$\sigma^{*}=\sigma/\sigma_{\mathrm{HEL}}$，$\dot{\varepsilon}^{*}=\dot{\varepsilon}/\dot{\varepsilon}_{0}$（$\dot{\varepsilon}_{0}=1~\mathrm{s}^{-1}$） \\
+  $A$，$B$，$C$，$M$，$N$ & JH-2 强度模型常数：完好强度系数 $A$、断裂强度系数 $B$、应变率系数 $C$、压力指数 $M$、$N$（与 8.3 节 Kachanov 损伤常数 $A$、Norton 常数 $B$ 记号相同，按所在小节语境区分） \\
+  $D_{1}$，$D_{2}$ & JH-2 损伤演化常数 \\
+  $K_{1}$，$K_{2}$，$K_{3}$ & JH-2 多项式状态方程系数（$K_{1}$ 为初始体积模量） \\
+  $\mu_{\mathrm{v}}$ & 体积压缩比，$\mu_{\mathrm{v}}=\rho/\rho_{0}-1$（JH-2 状态方程自变量，与剪切模量 $\mu$ 区分） \\
+  $\beta$ & JH-2 体积膨胀（bulking）能量转化分数，$0\le\beta\le1$（与第 7 章稳定化参数 $\beta$ 记号不同） \\
+  $D$ & JH-2 模型损伤变量，$D\in[0,1]$，由等效塑性应变累积定义（式\eqref{eq:jh2-damage}），与 8.3.2 节 Kachanov 型蠕变损伤 $D$（式\eqref{eq:creep-damage-def}）记号相同但物理机制不同 \\
+\end{longtable}
+
 \section*{第 9 章 空间离散与时间积分}
 
 {\small
