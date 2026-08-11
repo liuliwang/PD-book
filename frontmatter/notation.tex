@@ -227,4 +227,33 @@
   $\mathbf{K}_{\mathrm{glob}}$ & 整体刚度矩阵（与第 7 章同），线性隐式系统 $\mathbf{K}_{\mathrm{glob}}\mathbf{U}_{\mathrm{glob}}=\mathbf{F}_{\mathrm{ext}}$ \\
   $\mathbf{K}_{uu},\mathbf{K}_{uc}$ & 边界条件分块后的刚度子矩阵（与第 7 章同） \\
 \end{longtable}
+
+\section*{第 10 章 边界条件与表面效应处理}
+
+{\small
+\begin{tabular}{@{}p{0.22\textwidth}@{}p{0.65\textwidth}@{}}
+  $\bar{\mathbf{u}}$ & 给定边界位移（prescribed boundary displacement），式\eqref{eq:penalty-body-force} \\
+  $k$ & penalty 反馈系数，量纲 N/m$^{5}$（式\eqref{eq:penalty-body-force}）；区别于第 6 章体积模量 $k$ \\
+  $\mathcal{B}_{\delta}^{\text{bdy}}$ & 边界薄层（boundary layer），厚度一般取 $\delta$（式\eqref{eq:penalty-body-force}） \\
+  $\mathbf{x}_{\text{proj}}$ & 边界薄层内点在表面上的投影点（式\eqref{eq:virtual-layer-extrap}） \\
+  $\tilde{\mathbf{x}}$ & 虚拟节点（ghost node）位置（式\eqref{eq:virtual-layer-extrap}） \\
+  $\mathbf{x}_{\text{int}}$ & 边界内侧最近的真实节点（式\eqref{eq:virtual-layer-extrap}） \\
+  $A_{i}$ & 边界面上节点 $i$ 分担的面积（式\eqref{eq:ch10-bc-traction-force}） \\
+  $V_{i}$ & 节点 $i$ 的参考体积（式\eqref{eq:ch10-bc-traction-force}） \\
+  $V_{i}^{\text{eff}}$ & 表面节点 $i$ 的实际近场域体积（修正体积，式\eqref{eq:ch10-corrected-body-force}） \\
+  $\phi_{\delta}(r)$ & 集中力正则化核函数，特征尺度 $\delta$，$\int_{\mathcal{B}}\phi_{\delta}\,\mathrm{d}V=1$（式\eqref{eq:ch10-regularized-force}）；区别于损伤变量 $\varphi$ \\
+  $\mathbf{F}$ & 集中力矢量（式\eqref{eq:ch10-regularized-force}）；区别于第 6 章变形梯度 $\mathbf{F}$ \\
+  $L_{t}$ & 面力沿表面变化的特征尺度（10.2.4 节收敛性讨论） \\
+  $\gamma$ & 短程力修正标定参数（式\eqref{eq:ch10-short-range-force}）；区别于第 7 章稳定化参数 $\gamma$ \\
+  $d_{\text{bdy}}(\mathbf{x})$ & 物质点 $\mathbf{x}$ 到边界的距离（式\eqref{eq:ch10-short-range-force}） \\
+  $\mathbf{f}_{c}(\mathbf{x}_{d},\mathbf{x}_{r})$ & 接触力密度（contact force density），量纲 N/m$^{6}$（三维）（式\eqref{eq:ch10-contact-force}） \\
+  $c_{c}$ & 接触刚度系数，量纲 N/m$^{7}$（三维）或 N/m$^{4}$（二维，单位厚度）（式\eqref{eq:ch10-contact-force}） \\
+  $r_{c}$ & 接触截止距离，通常 $r_{c}\sim\Delta x$（式\eqref{eq:ch10-contact-force}） \\
+  $\mathcal{N}_{\text{int}}(\mathbf{x})$，$\mathcal{N}_{\text{ext}}(\mathbf{x})$ & 同物体邻居列表、跨物体邻居列表（10.5.2 节） \\
+  $\mathcal{D}^{\boldsymbol{\alpha}}f(\mathbf{x})$ & PDDO 微分算子，非局部近似 $n$ 阶导数（式\eqref{eq:pdo-operator}） \\
+  $g^{(\boldsymbol{\alpha})}(|\boldsymbol{\xi}|)$ & PDDO 权函数（式\eqref{eq:pdo-operator}）；区别于第 4 章标量力函数 $g$ \\
+  $\alpha(\mathbf{x}_{i})$ & 表面修正因子离散形式，$\alpha=V_{H_{\mathbf{x}_{i}}}/V_{H_{\mathbf{x}_{i}}^{\infty}}$（式\eqref{eq:ch10-alpha-discrete}）；第 4 章 $\alpha(\mathbf{x})$ 的离散实现 \\
+  $\beta_{ij}$ & 体积修正因子离散形式，$\beta_{ij}\in\{1,0\}$（式\eqref{eq:ch10-beta-discrete}）；第 4 章 $\beta(\mathbf{x},\mathbf{x}')$ 的离散实现 \\
+  $V_{H_{\mathbf{x}_{i}}^{\infty}}$ & 完整（无限域）近场域体积，三维 $\frac{4}{3}\pi\delta^{3}$、二维 $\pi\delta^{2}$（式\eqref{eq:ch10-alpha-volume-sum}）；与第 4 章 $\alpha$ 定义中的 $V_{H_{\mathbf{x}}^{\infty}}$ 一致 \\
+\end{tabular}
 }
