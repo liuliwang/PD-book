@@ -8,10 +8,8 @@
 -->
 
 ## 项目概览
-
 专著《近场动力学理论与数值方法》的 LaTeX 书籍项目（ctexbook，A4，11pt）。
-章节完成度参差：ch01、ch02、ch03、ch04、ch06、ch07 为完整章节（数百行，是写作新章节时的范例）；ch05、ch08–ch19 目前仅为十余行占位骨架；附录 appA–appE 为占位空文件（动手前先 Read 确认行数）。ch04（键型模型）最近完成，主题直接衔接 ch05（键型改进模型），是撰写 ch05 的首选范例；ch04 的 6 节结构（假设→微势→PMB→率定→表面效应→局限）与每节末尾的 AI 声明样式值得沿用。
-
+章节完成度参差：ch01–ch10 为完整章节（数百至上千行，是写作新章节时的范例）；ch11–ch19 目前仅为十余行占位骨架；附录 appA–appE 为占位空文件。ch09（空间离散与时间积分）、ch10（边界条件与表面效应处理）为近期完成章节，其节结构与每节末尾的 AI 声明样式值得沿用；ch04 的 6 节结构（假设→微势→PMB→率定→表面效应→局限）是撰写键型相关章节的范例。ch05（键型改进模型）已完整，撰写相关章节前先 Read 其目录避免主题重复（如 dual-horizon 理论在 5.5 节，后续章节只做数值实现层面衔接）。
 ## 编译
 
 必须用 XeLaTeX（ctexbook + 中文）。TeX 发行版：MiKTeX（本机 `xelatex --version` 实测 25.12）。以下命令顺序即 `.vscode/settings.json` 中 latex-workshop 的 recipe「完整编译 (含参考文献)」；autoBuild/autoClean 均为 never，不会自动编译清理。
@@ -90,8 +88,7 @@ xelatex main.tex
 - **文献引用**：引用须给出准确 `bibliography.bib` 中的 cite key，禁止编造文献；禁止模糊引用；**cite 键的语义须与文献实际内容一致**——键名易误导（如 HaBobaru2010 实为玻璃板动态分叉、KilicAgwaiMadenci2009 实为拉伸层合板渐进损伤，均非冲击），引用前按文献主题核实；2026-08 ch11 写作曾修正 4 处想当然引用
 - **逻辑链**：因果链须完整，每个结论前须有足够前提支撑；禁止"显而易见""容易证明"等省略
 - **数值算例**：给出完整参数（材料常数、horizon δ、网格尺寸、时间步长等），数据来源须可溯源
-- **责任边界**：输出数学/物理内容时须声明"AI 辅助生成，需经专业审阅"；不得替代作者做物理假设或理论判断。实践格式：每节末尾加一行 `\emph{AI 辅助生成，需经专业审阅。}`（ch03、ch04 均已采用，新章节沿用）
-
+- **责任边界**：输出数学/物理内容时须声明"AI 辅助生成，需经专业审阅"；不得替代作者做物理假设或理论判断。实践格式：每节末尾加一行 \emph{AI 辅助生成，需经专业审阅。}（ch03、ch04、ch09、ch10 等完整章节均已采用，新章节沿用）
 #### AI 自查清单
 
 生成每节后，AI 须通检：
@@ -133,7 +130,7 @@ xelatex main.tex
 
 ## 文献与可复现性
 
-- **参考文献**：统一由 `bibliography.bib` 管理（138 条）；当前 `main.tex` 用 `\bibliographystyle{plain}`（非 GB/T 7714），若切换 GB/T 7714 须更换 bibstyle 并引入 `gbt7714` 宏包
+- **参考文献**：统一由 `bibliography.bib` 管理（124 条）；当前 `main.tex` 用 `\bibliographystyle{plain}`（非 GB/T 7714），若切换 GB/T 7714 须更换 bibstyle 并引入 `gbt7714` 宏包
 - **编译质量门禁**：xelatex + bibtex 无 error；无 undefined reference/citation 警告
 - **已知警告（非本次改动引入，勿误判）**：ch05_bond_improved.tex 引用了 3 个 bib 中不存在的 cite key——`DianaCasolo2019`、`WangZhouShou2017`、`WangZhouWang2018`（bibtex 报 warning，属既有问题，修复方式为补录条目或改引，2026-08 全链编译确认）；ch03_ccm_pd.tex 行 291 节标题含数学符号导致 hyperref "Token not allowed in PDF string" 警告 4 处（无害）。验证其他章节改动时，若全链编译仍见上述警告，属正常基线，重点核查新增内容是否引入新的 undefined citation/reference。
 - **编译前清理**：完整验证前先删除残留 `*.aux`/`*.bbl`/`*.blg`/`*.log` 再全链重跑；脏 aux 会导致 bibtex 报 "File ended while scanning" 等连锁假错误（2026-08 实测，干净重跑即消失）
