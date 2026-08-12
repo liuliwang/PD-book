@@ -707,12 +707,7 @@
 
 式\eqref{eq:linear-force}是第 4 章键基模型（PMB，原型微弹性键基模型）的出发点。第 4 章将针对各向同性材料给出 $\mathbf{C}(\boldsymbol{\xi})$ 的显式形式——此时 $\mathbf{C}(\boldsymbol{\xi})$ 退化为仅依赖键长 $|\boldsymbol{\xi}|$ 的标量函数 $c(|\boldsymbol{\xi}|)$ 与方向张量的乘积——并建立其与经典弹性常数（杨氏模量 $E$、泊松比 $\nu$）的标定关系。该标定是连接近场动力学与经典弹性力学的关键桥梁，也是数值实现中确定材料参数的必要步骤。
 
-对于保守系统，线性化对力还可由成对势的二阶展开导出，这一途径揭示了微模量张量与成对势的内在联系。记成对势 $w$ 关于 $\boldsymbol{\eta}$ 的 Hessian 矩阵为
-\begin{equation}
-  \mathbf{H}(\boldsymbol{\xi})=\nabla_{\boldsymbol{\eta}}\nabla_{\boldsymbol{\eta}}w\big|_{\boldsymbol{\eta}=\mathbf{0}}
-  \label{eq:pairwise-hessian}
-\end{equation}
-微弹性假设下 $\mathbf{f}=\nabla_{\boldsymbol{\eta}}w$，将 $w$ 在 $\boldsymbol{\eta}=\mathbf{0}$ 处作二阶泰勒展开并逐步化简：
+对于保守系统，线性化对力还可由成对势的二阶展开导出，这一途径揭示了微模量张量与成对势的内在联系。微弹性假设下 $\mathbf{f}=\nabla_{\boldsymbol{\eta}}w$，将 $w$ 在 $\boldsymbol{\eta}=\mathbf{0}$ 处作二阶泰勒展开并逐步化简：
 \begin{align}
   w(\boldsymbol{\eta},\boldsymbol{\xi})
   &\approx w(\mathbf{0},\boldsymbol{\xi})+\left(\nabla_{\boldsymbol{\eta}}w\right)\big|_{\boldsymbol{\eta}=\mathbf{0}}\!\cdot\boldsymbol{\eta}+\frac{1}{2}\boldsymbol{\eta}\cdot\!\left(\nabla_{\boldsymbol{\eta}}\nabla_{\boldsymbol{\eta}}w\right)\big|_{\boldsymbol{\eta}=\mathbf{0}}\!\cdot\boldsymbol{\eta} \notag\\
@@ -720,32 +715,19 @@
   &=w(\mathbf{0},\boldsymbol{\xi})+\frac{1}{2}\boldsymbol{\eta}\cdot\mathbf{H}(\boldsymbol{\xi})\cdot\boldsymbol{\eta} \quad\text{（由 $\mathbf{f}(\mathbf{0},\boldsymbol{\xi})=\mathbf{0}$ 无应力条件）}
   \label{eq:pairwise-hessian-expansion}
 \end{align}
-其中第一步为二阶泰勒展开的标准形式，第二步将一阶项系数 $\nabla_{\boldsymbol{\eta}}w$ 代换为 $\mathbf{f}$（微弹性假设）、二阶项系数记为 $\mathbf{H}$（Hessian 定义），第三步由无应力条件 $\mathbf{f}(\mathbf{0},\boldsymbol{\xi})=\mathbf{0}$ 消去一阶项。对 $\boldsymbol{\eta}$ 求梯度得 $\mathbf{f}\approx\mathbf{H}(\boldsymbol{\xi})\boldsymbol{\eta}$，与式\eqref{eq:linear-force}对比可知
+
+
+
+其中，第一步为二阶泰勒展开的标准形式，第二步将一阶项系数 $\nabla_{\boldsymbol{\eta}}w$ 代换为 $\mathbf{f}$（微弹性假设）、二阶项系数记为 $\mathbf{H}$（Hessian 定义），记成对势 $w$ 关于 $\boldsymbol{\eta}$ 的 Hessian 矩阵为
+\begin{equation}
+  \mathbf{H}(\boldsymbol{\xi})=\nabla_{\boldsymbol{\eta}}\nabla_{\boldsymbol{\eta}}w\big|_{\boldsymbol{\eta}=\mathbf{0}}
+  \label{eq:pairwise-hessian}
+\end{equation}第三步由无应力条件 $\mathbf{f}(\mathbf{0},\boldsymbol{\xi})=\mathbf{0}$ 消去一阶项。对 $\boldsymbol{\eta}$ 求梯度得 $\mathbf{f}\approx\mathbf{H}(\boldsymbol{\xi})\boldsymbol{\eta}$，与式\eqref{eq:linear-force}对比可知
 \begin{equation}
   \mathbf{C}(\boldsymbol{\xi})=\mathbf{H}(\boldsymbol{\xi})
   \label{eq:micro-modulus-hessian}
 \end{equation}
 即微模量张量恰为成对势的 Hessian。这说明线性本构是微弹性假设在小变形条件下的自然推论。
-
-
-微模量张量 $\mathbf{C}(\boldsymbol{\xi})$ 是二阶张量，在三维情形有 $3\times 3=9$ 个分量 $C_{ij}$。分量 $C_{ij}$ 的物理意义是：键的第 $j$ 方向单位相对位移在第 $i$ 方向引起的对力分量，即
-\begin{equation}
-  C_{ij}=\frac{\partial f_{i}}{\partial\eta_{j}}\bigg|_{\boldsymbol{\eta}=\mathbf{0}}
-  \label{eq:micro-modulus-component}
-\end{equation}
-因此 $\mathbf{C}(\boldsymbol{\xi})$ 可视为键的``刚度矩阵''：它将键的相对位移矢量线性映射为对力矢量。在直角坐标系中，式\eqref{eq:micro-modulus-component}给出了微模量张量的分量表达式。
-
-对于各向同性键基材料，旋转对称性要求 $\mathbf{C}(\boldsymbol{\xi})$ 取如下形式
-\begin{equation}
-  \mathbf{C}(\boldsymbol{\xi})=a(|\boldsymbol{\xi}|)\,\mathbf{I}+b(|\boldsymbol{\xi}|)\,\hat{\boldsymbol{\xi}}\otimes\hat{\boldsymbol{\xi}}
-  \label{eq:micro-modulus-iso-form}
-\end{equation}
-其中 $\hat{\boldsymbol{\xi}}=\boldsymbol{\xi}/|\boldsymbol{\xi}|$ 为键方向的单位矢量。中心力条件进一步要求 $\mathbf{C}(\boldsymbol{\xi})$ 的值域沿 $\boldsymbol{\xi}$ 方向，由此约束 $b=0$，$\mathbf{C}(\boldsymbol{\xi})$ 退化为
-\begin{equation}
-  \mathbf{C}(\boldsymbol{\xi})=c(|\boldsymbol{\xi}|)\,\hat{\boldsymbol{\xi}}\otimes\hat{\boldsymbol{\xi}}
-  \label{eq:micro-modulus-iso-scalar}
-\end{equation}
-即仅依赖键长的标量微模量函数 $c(|\boldsymbol{\xi}|)$ 乘以方向投影算子，只有一个独立材料常数。此时材料泊松比被锁定（详见 2.4.1 节及第 4 章标定），完整推导与 $c(|\boldsymbol{\xi}|)$ 的显式形式见第 4 章。
 
 与经典连续介质力学中的弹性模量张量（四阶）相比，微模量张量 $\mathbf{C}(\boldsymbol{\xi})$ 具有鲜明的非局部特征。经典理论中，弹性模量张量描述\textbf{某一点}的材料刚度，建立应力与应变之间的局部关系；而 $\mathbf{C}(\boldsymbol{\xi})$ 描述\textbf{某一条键}的刚度，且显式依赖键的方向 $\boldsymbol{\xi}$ 和键长 $|\boldsymbol{\xi}|$。这种``以键为基本单元''的描述方式，正是近场动力学非局部理论的核心体现：材料响应不再仅由某一点的局部状态决定，而是由该点与邻居之间键的变形共同决定。这种非局部描述方式使得近场动力学能够自然地描述裂纹扩展等不连续问题。
 
@@ -811,22 +793,22 @@
 
 2.1 至 2.3 节建立的是键基（bond-based）近场动力学理论：相互作用以键为单位，每条键由一个对力函数 $\mathbf{f}(\boldsymbol{\eta},\boldsymbol{\xi})$ 描述。键基理论形式简洁、物理直观，但有一个本质局限：各向同性线性键基材料只能描述泊松比为 $1/4$（二维为 $1/3$）的材料，无法刻画任意泊松比的各向同性体。为突破这一限制，Silling 等人提出了态型（state-based）近场动力学 \cite{Silling2007}，把"键到键"的二体力推广为"点到场"的非局部相互作用。本节作为引论，介绍态型理论的基本概念与动机；态的严格数学表述、代数运算、本构分类等内容见 6.1 节。
 
-\subsection{键基理论的局限}
+\subsection{从键基到态型：动机与过渡}
 
-键基对力 $\mathbf{f}(\boldsymbol{\eta},\boldsymbol{\xi})$ 只依赖单条键的相对位移 $\boldsymbol{\eta}$，与该物质点其他键的变形无关。这意味着每条键独立承担自己的恢复力，键与键之间无耦合。对线性各向同性材料，这一限制导致一个固定的泊松比。
+键基对力 $\mathbf{f}(\boldsymbol{\eta},\boldsymbol{\xi})$ 只依赖单条键的相对位移 $\boldsymbol{\eta}$，与该物质点其他键的变形无关。这意味着每条键独立承担自己的恢复力，键与键之间无耦合。对线性各向同性材料，这一限制导致泊松比被锁定为 $1/4$（三维）或 $1/3$（二维平面应力），详见式\eqref{eq:poisson-limit}。这一限制可表述为
 
-考虑均匀各向同性变形 $\boldsymbol{\varepsilon}=\varepsilon\,\mathbf{I}$（$\varepsilon$ 为体应变，$\mathbf{I}$ 为单位张量），由式\eqref{eq:stretch-uniform} 键伸长率为 $s=\varepsilon$。线性化对力 \eqref{eq:linear-force} 沿键方向，模 $|\mathbf{f}|=C(|\boldsymbol{\xi}|)\,\varepsilon\,|\boldsymbol{\xi}|$（$C$ 为微模量标量函数，各向同性假设下只依赖 $|\boldsymbol{\xi}|$）。横向与纵向响应由同一 $C$ 决定，无法独立调节，导致泊松比被锁定为
 \begin{equation}
   \nu_{\text{键基}}=\frac{1}{4}\quad(\text{三维}),\qquad \nu_{\text{键基}}=\frac{1}{3}\quad(\text{二维平面应力})
   \label{eq:poisson-limit}
 \end{equation}
-式\eqref{eq:poisson-limit}是键基理论的标志性局限 \cite{Silling2000}。其物理根源在于：键基对力无法区分"体积变形"与"形状变形"，因为每条键只感知自身的伸长率，不知道邻居键的总体变形状态。实际材料（如金属 $\nu\approx 0.3$、橡胶 $\nu\approx 0.5$）大多不满足式\eqref{eq:poisson-limit}，因此键基理论虽适合作为入门和定性分析，但对定量预测有本质不足。
+
+其物理根源在于：键基对力无法区分"体积变形"与"形状变形"，因为每条键只感知自身的伸长率，不知道邻居键的总体变形状态。实际材料（如金属 $\nu\approx 0.3$、橡胶 $\nu\approx 0.5$）大多不满足这一限制，因此键基理论虽适合作为入门和定性分析，但对定量预测有本质不足。
+
+为突破上述局限，需要将"键到键"的二体力推广为"点到场"的非局部映射：物质点 $\mathbf{x}$ 对邻居 $\mathbf{x}'$ 的力不仅依赖该键自身的变形，还依赖 $\mathbf{x}$ 的整个变形状态。这一推广通过引入\emph{态}（state）的概念实现。
 
 \subsection{态的概念与基本定义}
 
-态型理论的核心思想是：把"键到键"的二体力 $\mathbf{f}(\boldsymbol{\eta},\boldsymbol{\xi})$ 推广为"点到场"的映射 $\underline{\mathbf{T}}\langle\boldsymbol{\xi}\rangle$，使得物质点 $\mathbf{x}$ 对邻居 $\mathbf{x}'$ 的力不仅依赖该键自身的 $\boldsymbol{\eta}$，还依赖 $\mathbf{x}$ 的整个变形状态。这一推广通过引入\emph{态}（state）的概念实现。
-
-态是一个把键矢量 $\boldsymbol{\xi}$ 映射为矢量的函数，记为 $\underline{A}\langle\boldsymbol{\xi}\rangle$，其中下划线表示态、尖括号内为自变量键矢量。两个基本态是：
+需要特别强调的是，态不是矢量，而是把键矢量 $\boldsymbol{\xi}$ 映射为矢量的函数，记为 $\underline{A}\langle\boldsymbol{\xi}\rangle$，其中下划线表示态、尖括号内为自变量键矢量。态型理论中，物质点 $\mathbf{x}$ 对邻居 $\mathbf{x}'$ 的力不再仅依赖该键自身的 $\boldsymbol{\eta}$，而是依赖 $\mathbf{x}$ 的整个变形状态。两个基本态是：
 
 \begin{itemize}
   \item \textbf{变形态}（deformation state）$\underline{\mathbf{Y}}$：把参考键 $\boldsymbol{\xi}$ 映射为变形后键 $\boldsymbol{\xi}+\boldsymbol{\eta}$，即 $\underline{\mathbf{Y}}\langle\boldsymbol{\xi}\rangle=\mathbf{y}(\mathbf{x}+\boldsymbol{\xi})-\mathbf{y}(\mathbf{x})$。变形态完全描述了物质点 $\mathbf{x}$ 的局部变形几何。
@@ -860,21 +842,35 @@
   \label{fig:state-concept}
 \end{figure}
 
-力态依赖整个变形态这一性质，使态型本构能够区分体积变形与偏斜变形：物质点 $\mathbf{x}$ 的所有键的变形模式（如均匀膨胀、单轴拉伸、剪切）作为整体输入本构函数，输出相应的力态分布。这使态型理论能够描述任意泊松比的各向同性材料以及各向异性材料，第 6 章将给出常规态型（ordinary state-based）本构的完整理论。
+力态依赖整个变形态这一性质，使态型本构能够区分体积变形与偏斜变形：物质点 $\mathbf{x}$ 的所有键的变形模式（如均匀膨胀、单轴拉伸、剪切）作为整体输入本构函数，输出相应的力态分布。这使态型理论能够描述任意泊松比的各向同性材料以及各向异性材料，第 6 章将给出常规态型（ordinary state-based，简称 OSB）本构的完整理论。
 
 \subsection{态型运动方程}
 
 用态表示的运动方程为
-\[
+\begin{equation}
   \rho(\mathbf{x})\,\ddot{\mathbf{u}}(\mathbf{x},t)=\int_{\mathcal{H}_{\mathbf{x}}}\Bigl[\underline{\mathbf{T}}\langle\boldsymbol{\xi}\rangle-\underline{\mathbf{T}}'\langle-\boldsymbol{\xi}\rangle\Bigr]\,\mathrm{d}V'+\mathbf{b}(\mathbf{x},t)
-\]
-其中 $\underline{\mathbf{T}}\langle\boldsymbol{\xi}\rangle$ 为 $\mathbf{x}$ 的力态在键 $\boldsymbol{\xi}$ 处的取值，$\underline{\mathbf{T}}'\langle-\boldsymbol{\xi}\rangle$ 为邻居 $\mathbf{x}'$ 的力态在反向键 $-\boldsymbol{\xi}$ 处的取值（即 $\mathbf{x}$ 对 $\mathbf{x}'$ 的力态）。两者之差的体积积分给出 $\mathbf{x}$ 受到的净非局部力密度。该方程的严格形式与各项含义见 6.1 节式\eqref{eq:state-motion}。
+  \label{eq:state-motion-ch02}
+\end{equation}
+其中 $\underline{\mathbf{T}}\langle\boldsymbol{\xi}\rangle$ 为物质点 $\mathbf{x}$ 的力态在键 $\boldsymbol{\xi}$ 处的取值，即 $\mathbf{x}$ 对邻居 $\mathbf{x}'$ 的作用力密度；$\underline{\mathbf{T}}'\langle-\boldsymbol{\xi}\rangle$ 为邻居 $\mathbf{x}'$ 的力态在反向键 $-\boldsymbol{\xi}$ 处的取值，即 $\mathbf{x}'$ 对 $\mathbf{x}$ 的反作用力密度。两者之差的体积积分给出 $\mathbf{x}$ 受到的净非局部力密度，加上体力 $\mathbf{b}(\mathbf{x},t)$ 后等于惯性力。
 
-键基理论是态型理论的特例。取力态为
-\[
+与键基运动方程\eqref{eq:motion}相比，式\eqref{eq:state-motion-ch02}中的"力态差" $\underline{\mathbf{T}}\langle\boldsymbol{\xi}\rangle-\underline{\mathbf{T}}'\langle-\boldsymbol{\xi}\rangle$ 代替了单力 $\mathbf{f}$，这一形式变化看似微小，意义却深远：它把"成对力"解耦为两个独立的"单端力态"，使本构函数可以独立地依赖每端的变形状态。这一解耦是态型理论突破泊松比限制的数学根源，也是 2.6 节守恒律证明需要重新审视的起点 \cite{Silling2007,SillingLehoucq2010}。
+
+\subsection{键基作为态型的特例}
+
+键基理论可以视为态型理论的一个特例。取力态为
+\begin{equation}
   \underline{\mathbf{T}}\langle\boldsymbol{\xi}\rangle=\tfrac{1}{2}\,\mathbf{f}(\boldsymbol{\eta},\boldsymbol{\xi})
+  \label{eq:bb-state-special}
+\end{equation}
+其中 $\mathbf{f}$ 为键基对力函数，系数 $1/2$ 的物理意义是"每键被两点共享"：在态型表述中，$\mathbf{x}$ 对键的贡献为 $\underline{\mathbf{T}}\langle\boldsymbol{\xi}\rangle=\mathbf{f}/2$，$\mathbf{x}'$ 对同一键的贡献为 $\underline{\mathbf{T}}'\langle-\boldsymbol{\xi}\rangle=-\mathbf{f}/2$（由反作用条件\eqref{eq:reaction}）。将式\eqref{eq:bb-state-special}代入态型运动方程\eqref{eq:state-motion-ch02}，得
+\[
+  \underline{\mathbf{T}}\langle\boldsymbol{\xi}\rangle-\underline{\mathbf{T}}'\langle-\boldsymbol{\xi}\rangle
+  =\frac{\mathbf{f}}{2}-\left(-\frac{\mathbf{f}}{2}\right)
+  =\mathbf{f}(\boldsymbol{\eta},\boldsymbol{\xi})
 \]
-代入态型运动方程，利用反作用条件 \eqref{eq:reaction} 即可还原键基运动方程 \eqref{eq:motion}。系数 $1/2$ 的来源仍是"每键被两点共享"：在态型表述中，$\mathbf{x}$ 贡献 $\underline{\mathbf{T}}\langle\boldsymbol{\xi}\rangle=\mathbf{f}/2$，$\mathbf{x}'$ 贡献 $\underline{\mathbf{T}}'\langle-\boldsymbol{\xi}\rangle=-\mathbf{f}/2$，两者之差为 $\mathbf{f}$，与键基方程一致。值得指出的是，态型运动方程中"力态差" $\underline{\mathbf{T}}\langle\boldsymbol{\xi}\rangle-\underline{\mathbf{T}}'\langle-\boldsymbol{\xi}\rangle$ 代替了键基方程中的单力 $\mathbf{f}$，这一形式变化看似微小，意义却深远：它把"成对力"解耦为两个独立的"单端力态"，使本构函数可以独立地依赖每端的变形状态。这一解耦是态型理论突破泊松比限制的数学根源，也是 2.6 节守恒律证明需要重新审视的起点 \cite{Silling2007,SillingLehoucq2010}。
+右端正是键基运动方程\eqref{eq:motion}中的对力项。这说明键基方程是态型方程在力态取式\eqref{eq:bb-state-special}时的自然退化。
+
+上述推导的物理含义是：当力态仅依赖单条键的变形（即 $\underline{\mathbf{T}}$ 退化为键基 $\mathbf{f}$）时，态型理论退化为键基理论。换言之，键基理论是态型理论的子集。态型通过允许力态依赖整个变形状态——而非单条键——实现了对键基的推广。2.5 节将在此基础上建立应变能密度与力态的 Fr\'echet 导数关系；第 6 章则给出常规态型（OSB）与非寻常态型（non-ordinary state-based，简称 NOSB）本构的完整理论。
 
 \section{应变能密度与能量守恒}
 
