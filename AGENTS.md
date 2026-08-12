@@ -21,6 +21,9 @@ xelatex main.tex
 xelatex main.tex
 ```
 
+- **验证用命令**（QA/编译门禁场景，快速失败）：`xelatex -interaction=nonstopmode -halt-on-error main.tex`；检查 `main.log` 中 `undefined` 计数为 0、结尾出现 `Output written on main.pdf`。latex-workshop 工具参数为 `-synctex=1 -interaction=nonstopmode -file-line-error`（无 `-halt-on-error`，编辑器内编译不会快速失败）。
+- **格式化**：`editor.formatOnSave: false`，保存不自动格式化；LaTeX 格式化用 latexindent，需显式触发。
+
 ## 文件组织
 
 `main.tex` 是唯一入口，仅含 `\input` 语句——**编辑章节文件，不要改 main.tex 的结构**。
@@ -34,6 +37,8 @@ xelatex main.tex
 | `bibliography.bib`      | BibTeX 文献库                        |
 | `figures/`              | CC-BY 论文插图、TikZ 自绘图          |
 
+注：`frontmatter/preface.tex` 目前为占位（2 行），`notation.tex` 是实体符号表（百余行）；写作前先 Read 确认。
+
 ## 排版规则
 
 - **文档类**：`ctexbook`，UTF8，A4，11pt（`main.tex` 定义）
@@ -45,6 +50,7 @@ xelatex main.tex
 - **图注**：`caption` 包，`font=small`，`labelsep=quad`（编号与文字间空格，无冒号）
 - **代码环境**：`listings` 包（`frame=single`、`breaklines`、左行号）
 - **链接颜色**：`hyperref` 已配置 colorlinks，PDF 中交叉引用/文献链接为蓝色（预期行为，勿当错误）
+- **Overfull**：preamble 已设 `\emergencystretch=2em` 吸收极端溢出；轻微 Overfull 警告属预期，仅当严重破版时才处理
 
 ### 插图
 
@@ -98,6 +104,7 @@ xelatex main.tex
 - [ ] 引用文献准确，无编造 cite key
 - [ ] 因果链无跳跃，无"显而易见"式省略
 - [ ] 数值算例参数完整，数据来源可溯源
+- [ ] 标题名实相符：节与子节标题准确概括实际内容，避免标题范围大于或小于正文
 
 ### 章节模式
 

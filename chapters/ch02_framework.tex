@@ -243,7 +243,7 @@
 
 
 
-\subsection{运动方程总览}
+\subsection{运动方程的形式}
 
 以物质点视角，近场动力学的运动方程可以写为
 \begin{equation}
@@ -320,28 +320,27 @@
   \begin{tikzpicture}[scale=1.2]
     % 参考键
     \filldraw (0,0) circle (2.5pt) node[below left] {$\mathbf{x}$};
-    \filldraw (3,0) circle (2.5pt) node[above right] {$\mathbf{x}'$};
+    \filldraw (3,0) circle (2.5pt) node[below left] {$\mathbf{x}'$};
     \draw[thick] (0,0) -- (3,0);
-    \node[above] at (1.5,0) {$\boldsymbol{\xi}$};
+    \node[below] at (1.5,0) {$\boldsymbol{\xi}$};
     % 变形后位置
     \filldraw[red] (0.2,0.1) circle (2pt) node[below left, red] {$\mathbf{y}$};
     \filldraw[red] (3.6,1.4) circle (2pt) node[above right, red] {$\mathbf{y}'$};
     \draw[thick, red] (0.2,0.1) -- (3.6,1.4);
-    \node[red, above] at (1.9,0.75) {$\boldsymbol{\xi}+\boldsymbol{\eta}$};
+    \node[red, above] at (1.9,0.85) {$\boldsymbol{\xi}+\boldsymbol{\eta}$};
     % 轴向分量 η_∥
-    \draw[blue, thick, -{Stealth}] (3,0) -- (3.55,0);
-    \node[blue, above] at (3.27,0) {$\boldsymbol{\eta}_{\parallel}$};
+    \draw[blue, thick, -{Stealth}] (3,0) -- (3.6,0);
+    \node[blue, below] at (3.7,-0.4) {$\boldsymbol{\eta}_{\parallel}$};
     % 偏斜分量 η_⊥
-    \draw[orange!80!black, thick, -{Stealth}] (3.55,0) -- (3.6,1.4);
-    \node[orange!80!black, right] at (3.55,0.7) {$\boldsymbol{\eta}_{\perp}$};
+    \draw[orange!80!black, thick, -{Stealth}] (3.6,0) -- (3.6,1.4);
+    \node[orange!80!black, right] at (3.65,0.7) {$\boldsymbol{\eta}_{\perp}$};
     % 完整相对位移 η
     \draw[gray, dashed, thick, -{Stealth}] (3,0) -- (3.6,1.4);
-    \node[gray, right] at (3.6,0.35) {$\boldsymbol{\eta}$};
+    \node[gray, left] at (3.3,0.7) {$\boldsymbol{\eta}$};
     % 辅助虚线
     \draw[gray, dashed] (0.2,0.1) -- (3,0);
-    \draw[gray, dashed] (3.55,0) -- (3.6,1.4);
   \end{tikzpicture}
-  \caption{相对位移的轴向—偏斜分解，$\boldsymbol{\eta}_{\parallel}$ 沿参考键方向改变键长，$\boldsymbol{\eta}_{\perp}$ 垂直于键方向引起偏转}
+  \caption{相对位移的轴向—偏斜分解}
   \label{fig:bond-decomp}
 \end{figure}
 
@@ -416,9 +415,9 @@
 
 \section{受力描述与运动方程}
 
-2.1 节建立了物质点、键、近场域与族四个几何概念，2.2 节在此基础上给出了键变形的运动学描述。然而，仅有几何描述还不足以判断材料如何响应外力——我们还需要回答"物质点之间如何相互作用"以及"这些相互作用如何决定物质点的运动"这两个核心问题。本节从物理意义与数学结构两个角度，系统阐述对力函数应满足的约束条件（2.3.1），进而引入成对势描述微弹性材料的本构关系（2.3.2），最后讨论运动方程的量纲一致性（2.3.3）与小变形线性化形式（2.3.4），为第 4 章键基模型的建立奠定力学基础。
+2.1 节建立了物质点、键、近场域与族四个几何概念，2.2 节在此基础上给出了键变形的运动学描述。然而，仅有几何描述还不足以判断材料如何响应外力——我们还需要回答"物质点之间如何相互作用"以及"这些相互作用如何决定物质点的运动"这两个核心问题。本节从物理意义与数学结构两个角度，系统阐述对力函数应满足的约束条件（2.3.1），进而引入成对势描述微弹性材料的本构关系（2.3.2），最后讨论对力函数的量纲（2.3.3）与小变形线性化形式（2.3.4），为第 4 章键基模型的建立奠定力学基础。
 
-\subsection{对力函数的物理意义}
+\subsection{对力函数的约束条件}
 
 在经典连续介质力学中，应力描述的是单位面积上的内力（量纲 $\mathrm{N}/\mathrm{m}^{2}$）。而在近场动力学中，相互作用发生在两个物质点之间，因此需要引入\textbf{对力函数} $\mathbf{f}(\boldsymbol{\eta},\boldsymbol{\xi})$ 来描述单位体积对单位体积的力密度。若物质点 $\mathbf{x}$ 与 $\mathbf{x}'$ 处的体积微元分别为 $\mathrm{d}V_{\mathbf{x}}$ 和 $\mathrm{d}V_{\mathbf{x}'}$，则两点间的相互作用力为
 \begin{equation}
@@ -439,7 +438,7 @@
 \end{equation}
 该条件要求对力方向与变形后键的方向 $\boldsymbol{\xi}+\boldsymbol{\eta}$ 共线。从物理上看，反作用条件只保证成对力等大反向，但并不禁止对力含有垂直于键方向的分量。若存在这种横向分量，虽然两力仍彼此平衡，但作用线不共线，会形成一个力偶矩，使键两端物质点产生相对转动的趋势（图\ref{fig:central-force}）。中心力条件通过对力方向加以限制，消除了横向分量及其产生的力偶矩，从而保证角动量守恒。这一条件的严格数学推导将在 2.6 节给出。
 
-从几何角度看，中心力条件意味着对力可写为
+从向量代数可知，两个非零向量的叉积为零当且仅当它们平行（共线）。因此中心力条件\eqref{eq:central-force}意味着对力矢量 $\mathbf{f}$ 与变形后的键矢量 $\boldsymbol{\xi}+\boldsymbol{\eta}$ 平行，即存在某个标量函数使得 $\mathbf{f}$ 可写成该方向上的力。将这一方向用单位矢量 $\frac{\boldsymbol{\xi}+\boldsymbol{\eta}}{|\boldsymbol{\xi}+\boldsymbol{\eta}|}$ 表示，则对力可分解为该方向与力大小的乘积。从几何角度看，中心力条件意味着对力可写为
 \begin{equation}
   \mathbf{f}(\boldsymbol{\eta},\boldsymbol{\xi})=\frac{\boldsymbol{\xi}+\boldsymbol{\eta}}{|\boldsymbol{\xi}+\boldsymbol{\eta}|}\,g(|\boldsymbol{\xi}+\boldsymbol{\eta}|,\boldsymbol{\xi})
   \label{eq:central-force-form}
@@ -451,39 +450,81 @@
   \begin{tikzpicture}[scale=1.0]
     % (a) 非中心力：横向分量形成力偶矩
     \begin{scope}
-      \filldraw (0,0) circle (2.5pt) node[below left] {$\mathbf{x}$};
-      \filldraw (3,0) circle (2.5pt) node[below right] {$\mathbf{x}'$};
-      \draw[thick] (0,0) -- (3,0);
-      \node[above] at (1.5,0) {$\boldsymbol{\xi}+\boldsymbol{\eta}$};
-      \draw[-{Stealth}, ultra thick, blue] (0,0) -- ++(0.8,0.6) node[above, blue] {$\mathbf{f}$};
-      \draw[-{Stealth}, ultra thick, blue] (3,0) -- ++(-0.8,0.6) node[above, blue] {$-\mathbf{f}$};
-      \draw[red, thick, ->] (1.5,-0.6) arc[start angle=-90, end angle=90, radius=0.5];
-      \node[red] at (1.5,-1.3) {力偶矩};
-      \node at (1.5,-1.9) {（a）非中心力：产生力偶矩};
+      % 关键坐标点：A/B 为键两端物质点，H/V 为力的水平/横向分量终点
+      \coordinate (A) at (0,0);
+      \coordinate (B) at (3,0);
+      \coordinate (H) at (0.8,0);
+      \coordinate (V) at (0.8,0.6);
+      % 物质点与变形后键
+      \filldraw (A) circle (2.5pt) node[below left] {$\mathbf{x}$};
+      \filldraw (B) circle (2.5pt) node[below right] {$\mathbf{x}'$};
+      \draw[thick] (A) -- (B);
+      \node[above] at (1.5,0.9) {$\boldsymbol{\xi}+\boldsymbol{\eta}$};
+      % 力的分解：水平分量（沿键方向，灰色虚线）+ 横向分量（垂直键方向，红色虚线）
+      \draw[gray, dashed, thin] (A) -- (H);
+      \draw[red, dashed, thin] (H) -- (V);
+      % 力与键方向的夹角（小弧示意）
+      \draw[gray, thin] (0.22,0) arc[start angle=0, end angle=37, radius=0.22];
+      % 非中心力：与键方向成约 37° 角，两作用线平行但不共线，形成力偶
+      \draw[-{Stealth}, ultra thick, blue] (A) -- (V) node[above, blue] {$\mathbf{f}$};
+      \draw[-{Stealth}, ultra thick, blue] (B) -- ++(-0.8,-0.6) node[below, blue] {$-\mathbf{f}$};
+      % 力偶矩：环绕键中点两侧的红色双弧，示意键两端产生相对转动趋势
+      \draw[red, thick, ->] (1.02,0.15) .. controls (1.15,0.75) and (1.85,0.75) .. (1.98,0.15);
+      \draw[red, thick, ->] (1.98,-0.15) .. controls (1.85,-0.75) and (1.15,-0.75) .. (1.02,-0.15);
+      \node[red] at (1.5,-1.05) {力偶矩};
+      \node at (1.5,-1.9) {（a）非中心力：横向分量产生力偶矩};
     \end{scope}
     % (b) 中心力：沿键方向，力矩为零
     \begin{scope}[xshift=5.5cm]
       \filldraw (0,0) circle (2.5pt) node[below left] {$\mathbf{x}$};
       \filldraw (3,0) circle (2.5pt) node[below right] {$\mathbf{x}'$};
       \draw[thick] (0,0) -- (3,0);
-      \node[above] at (1.5,0) {$\boldsymbol{\xi}+\boldsymbol{\eta}$};
-      \draw[-{Stealth}, ultra thick, blue] (0,0) -- ++(1.2,0) node[above, blue] {$\mathbf{f}$};
-      \draw[-{Stealth}, ultra thick, blue] (3,0) -- ++(-1.2,0) node[above, blue] {$-\mathbf{f}$};
+      \node[above=3pt] at (1.5,0) {$\boldsymbol{\xi}+\boldsymbol{\eta}$};
+      % 中心力：沿键方向对称，f 标注在箭头中段正下方，避免与键上方标注重叠
+      \draw[-{Stealth}, ultra thick, blue] (0,0) -- ++(1.2,0);
+      \node[blue, below=2pt] at (0.6,0) {$\mathbf{f}$};
+      \draw[-{Stealth}, ultra thick, blue] (3,0) -- ++(-1.2,0);
+      \node[blue, below=2pt] at (2.4,0) {$-\mathbf{f}$};
       \node at (1.5,-1.9) {（b）中心力：力矩为零};
     \end{scope}
   \end{tikzpicture}
-  \caption{中心力条件的物理意义：(a) 非中心力产生力偶矩，导致角动量不守恒；(b) 中心力沿变形后键方向，力矩为零，角动量守恒}
+  \caption{中心力条件的物理意义：(a) 非中心力含有垂直于键方向的横向分量，两力作用线平行而不共线，形成力偶矩，导致角动量不守恒；(b) 中心力沿变形后键方向，无横向分量，力矩为零，角动量守恒}
   \label{fig:central-force}
 \end{figure}
 
+上述约束条件仅规定了对力函数应满足的基本物理限制，但尚未回答一个根本问题：对力从何而来？在经典弹性力学中，应力由应变能密度对变形的导数给出；类似地，若近场动力学中的相互作用也能由某个势能函数导出，则能量守恒、本构关系的建立将具备更严格的数学基础。为此，本节引入微弹性材料假设，建立成对势的概念，并讨论其对称性、物理意义与数学结构。
+
 \subsection{微弹性材料与成对势}
 
-并非所有对力函数都能从势能导出。若存在标量势函数 $w(\boldsymbol{\eta},\boldsymbol{\xi})$，使得对力函数可表示为其关于相对位移 $\boldsymbol{\eta}$ 的梯度
+在 2.3.1 节中，对力函数 $\mathbf{f}$ 仅由反作用条件和中心力条件约束，其具体形式尚未确定。若进一步要求对力可由某个标量势函数导出，则称该材料为\textbf{微弹性材料}（microelastic material）\cite{Silling2000}。
+这一假设的重要性在于：它不仅使对力的数学形式更具体，而且为后续能量守恒律（2.5 节）的建立、守恒量的严格证明（2.6 节）以及键基本构模型的构造（第 4 章）提供了必要的数学前提。
+
+具体而言，微弹性材料要求存在标量势函数 $w(\boldsymbol{\eta},\boldsymbol{\xi})$，使得对力函数可表示为其关于相对位移 $\boldsymbol{\eta}$ 的梯度
 \begin{equation}
   \mathbf{f}(\boldsymbol{\eta},\boldsymbol{\xi})=\nabla_{\boldsymbol{\eta}} w(\boldsymbol{\eta},\boldsymbol{\xi})
   \label{eq:pairwise-force-potential}
 \end{equation}
-则称该材料为\textbf{微弹性材料}（microelastic material）\cite{Silling2000}。这里的"微"指相互作用发生在键（微观）尺度，"弹性"指变形过程可逆、存在恢复势能。这一定义与经典弹性力学中"弹性体存在应变能密度"的提法完全平行：经典理论中，应力由应变能密度对变形的导数给出；近场动力学中，对力由成对势对相对位移的导数给出。
+这里的"微"指相互作用发生在键（微观）尺度，"弹性"指变形过程可逆、存在恢复势能。这一定义与经典弹性力学中"弹性体存在应变能密度"的提法完全平行：经典理论中，应力由应变能密度对变形的导数给出；近场动力学中，对力由成对势对相对位移的导数给出。
+式中 $\nabla_{\boldsymbol{\eta}}$ 表示对标量函数 $w$ 关于矢量自变量 $\boldsymbol{\eta}$ 的梯度，其分量为 $(\nabla_{\boldsymbol{\eta}} w)_i = \partial w / \partial \eta_i$（$i=1,2,3$）。由于 $w$ 是标量，$\nabla_{\boldsymbol{\eta}} w$ 是矢量。由式\eqref{eq:pairwise-force-potential}，成对势的量纲满足 $[w]=[\mathbf{f}]\cdot[\boldsymbol{\eta}]$：2.3.1 节已给出 $[\mathbf{f}]=\mathrm{N}/\mathrm{m}^6$（力每体积平方），相对位移的量纲为 $[\boldsymbol{\eta}]=\mathrm{m}$，故 $[w]=\mathrm{N}/\mathrm{m}^5$，即单位参考体积平方上的势能。据此，$[\nabla_{\boldsymbol{\eta}} w]=[w]/[\boldsymbol{\eta}]=\mathrm{N}/\mathrm{m}^6$，与对力函数 $\mathbf{f}$ 的量纲一致。
+
+需要指出的是，式\eqref{eq:pairwise-force-potential}并非对力函数的普遍性质，而是对 $\mathbf{f}$ 施加的一个额外约束。若 $\mathbf{f}=\nabla_{\boldsymbol{\eta}}w$，则由混合偏导的对称性（Schwarz 定理）可知 $\nabla_{\boldsymbol{\eta}}\times\mathbf{f}=\mathbf{0}$，即对力场在 $\boldsymbol{\eta}$ 空间中必须无旋。反之，若对力场有旋（$\nabla_{\boldsymbol{\eta}}\times\mathbf{f}\neq\mathbf{0}$），则不可能找到标量势 $w$ 使 $\mathbf{f}=\nabla_{\boldsymbol{\eta}}w$；因此无旋是矢量场能够表示为标量势梯度的必要条件。因此，并非所有满足反作用条件与中心力条件的对力函数都能从势能导出，微弹性材料只是对力函数空间中一个重要的子集；不满足该条件的对力函数对应非保守的相互作用，无法建立相应的势能描述。
+
+为清晰展示这一对应关系，表~\ref{tab:classical-peridynamics} 对比了经典弹性力学与近场动力学中的核心概念。
+
+\begin{table}[htbp]
+  \centering
+  \caption{经典弹性力学与近场动力学的对应关系}
+  \label{tab:classical-peridynamics}
+  \begin{tabular}{p{0.28\textwidth}p{0.28\textwidth}p{0.28\textwidth}}
+    \toprule
+    & 经典弹性力学 & 近场动力学 \\
+    \midrule
+    基本描述对象 & 应变张量 $\boldsymbol{\varepsilon}$ & 键的相对位移 $\boldsymbol{\eta}$ \\
+    势能 & 应变能密度 $W(\boldsymbol{\varepsilon})$ & 成对势 $w(\boldsymbol{\eta},\boldsymbol{\xi})$ \\
+    导出力 & 应力 $\boldsymbol{\sigma}=\partial W/\partial\boldsymbol{\varepsilon}$ & 对力 $\mathbf{f}=\nabla_{\boldsymbol{\eta}} w$ \\
+    \bottomrule
+  \end{tabular}
+\end{table}
 
 成对势须满足两个基本对称性。其一是\textbf{客观性}（objectivity），要求势能不依赖于观察者的坐标系选择，对任意旋转张量 $\mathbf{R}$ 均有
 \begin{equation}
@@ -495,98 +536,279 @@
   w(-\boldsymbol{\eta},-\boldsymbol{\xi})=w(\boldsymbol{\eta},\boldsymbol{\xi})
   \label{eq:potential-symmetry}
 \end{equation}
-交换对称性保证了由式\eqref{eq:pairwise-force-potential}导出的对力自动满足反作用条件\eqref{eq:reaction}，如图\ref{fig:pairwise-potential}所示：成对势 $w$ 在键两端对称，导出的对力 $\mathbf{f}$ 沿变形后键方向作用（蓝色箭头）。结合式\eqref{eq:central-force-form}可知，微弹性材料的对力自动满足中心力条件。
+交换对称性保证了由式\eqref{eq:pairwise-force-potential}导出的对力自动满足反作用条件\eqref{eq:reaction}。具体而言，对式\eqref{eq:potential-symmetry}两边关于 $\boldsymbol{\eta}$ 求梯度并令 $\boldsymbol{\eta}\to-\boldsymbol{\eta}$，得
+\begin{equation}
+  \nabla_{\boldsymbol{\eta}} w(-\boldsymbol{\eta},-\boldsymbol{\xi}) = -\nabla_{\boldsymbol{\eta}} w(\boldsymbol{\eta},\boldsymbol{\xi})
+  \label{eq:reaction-from-symmetry}
+\end{equation}
+即 $\mathbf{f}(-\boldsymbol{\eta},-\boldsymbol{\xi})=-\mathbf{f}(\boldsymbol{\eta},\boldsymbol{\xi})$，这正是反作用条件\eqref{eq:reaction}。
+
+关于中心力条件，需对成对势的形式作进一步限定。由客观性\eqref{eq:potential-objectivity}可知，$w$ 对任意旋转 $\mathbf{R}$ 满足 $w(\mathbf{R}\boldsymbol{\eta},\mathbf{R}\boldsymbol{\xi})=w(\boldsymbol{\eta},\boldsymbol{\xi})$。这一性质的含义需要仔细解读：若两个矢量对 $(\boldsymbol{\eta}_1,\boldsymbol{\xi}_1)$ 与 $(\boldsymbol{\eta}_2,\boldsymbol{\xi}_2)$ 可以通过某个旋转相互转化，即存在正交张量 $\mathbf{R}$ 使得 $\boldsymbol{\eta}_1=\mathbf{R}\boldsymbol{\eta}_2$ 且 $\boldsymbol{\xi}_1=\mathbf{R}\boldsymbol{\xi}_2$，则由客观性\eqref{eq:potential-objectivity}立得 $w(\boldsymbol{\eta}_1,\boldsymbol{\xi}_1)=w(\boldsymbol{\eta}_2,\boldsymbol{\xi}_2)$。换言之，$w$ 在旋转轨道上的值恒定不变：将整个矢量对 $(\boldsymbol{\eta},\boldsymbol{\xi})$ 绕任意轴旋转，$w$ 的值不变——这如同一根橡皮筋，无论你把整只手怎么转，它的弹性势能只取决于自身长度，不会因观察视角改变。因此，$w$ 只能依赖旋转下保持不变的量（不变量），诸如矢量在固定坐标轴上的投影这类会随坐标系转动而变化的量，都不能出现在 $w$ 的自变量中。那么，这样的独立不变量有几个？在三维空间中，$(\boldsymbol{\eta},\boldsymbol{\xi})$ 共有六个分量；但将整个系统绕任意轴旋转时，$w$ 的值不变——这意味着六个分量中，只有旋转后保持不变的组合才能决定 $w$。由于绕三个独立轴的旋转恰好消去三个自由度，因此这样的独立组合只有 $6-3=3$ 个，它们就是旋转不变量，可取为
+\begin{equation}
+  I_1=|\boldsymbol{\xi}|,\quad I_2=|\boldsymbol{\eta}|,\quad I_3=\boldsymbol{\xi}\cdot\boldsymbol{\eta}
+  \label{eq:rotation-invariants}
+\end{equation}
+这三个量之所以是``独立''的，是因为：给定 $I_1,I_2,I_3$，矢量对 $(\boldsymbol{\eta},\boldsymbol{\xi})$ 在旋转意义下被完全确定——先取长度分别为 $I_1$ 与 $I_2$ 的两个矢量，使其夹角满足 $I_3=\boldsymbol{\xi}\cdot\boldsymbol{\eta}$，再通过旋转调整整体方位，即可得到任一具有相同不变量的矢量对。读者也可选择其他等价的不变量组，例如以 $|\boldsymbol{\xi}+\boldsymbol{\eta}|$、$|\boldsymbol{\xi}-\boldsymbol{\eta}|$ 和 $\boldsymbol{\xi}\cdot\boldsymbol{\eta}$ 为基，它们与 $I_1,I_2,I_3$ 之间可以相互表示；但无论选取哪组不变量，满足客观性的最一般成对势都是等价的。
+
+由于 $w$ 在旋转轨道上的值相同，而每个轨道又被 $(I_1,I_2,I_3)$ 唯一标记，因此 $w$ 的值完全由这三个不变量决定。换言之，$w$ 可以表示为以不变量 $(I_1,I_2,I_3)$ 为自变量的新函数。为与原来的函数 $w(\boldsymbol{\eta},\boldsymbol{\xi})$ 相区分，这个新函数记为 $\hat{w}(I_1,I_2,I_3)$。因此满足客观性的成对势可一般性地写为 $w=\hat{w}(I_1,I_2,I_3)$。交换对称性\eqref{eq:potential-symmetry}要求 $w$ 在 $(\boldsymbol{\eta},\boldsymbol{\xi})\to(-\boldsymbol{\eta},-\boldsymbol{\xi})$ 下保持不变；由于三个不变量 $I_1, I_2, I_3$ 均在该变换下不变（$|\boldsymbol{\xi}|$ 和 $|\boldsymbol{\eta}|$ 为模长，$\boldsymbol{\xi}\cdot\boldsymbol{\eta}$ 中两矢量同时反号时点积不变），故交换对称性不施加额外的约束。
+
+要使导出的对力满足中心力条件，需让 $\nabla_{\boldsymbol{\eta}}w$ 的方向与 $\boldsymbol{\xi}+\boldsymbol{\eta}$ 一致。注意到 $|\boldsymbol{\xi}+\boldsymbol{\eta}|$ 可由上述三个不变量表示为 $|\boldsymbol{\xi}+\boldsymbol{\eta}|=\sqrt{I_1^2+2I_3+I_2^2}$，因此若 $w$ 仅以 $|\boldsymbol{\xi}+\boldsymbol{\eta}|$ 和 $|\boldsymbol{\xi}|$ 为自变量，即
+\begin{equation}
+  w(\boldsymbol{\eta},\boldsymbol{\xi}) = \hat{w}\bigl(|\boldsymbol{\xi}+\boldsymbol{\eta}|,\,|\boldsymbol{\xi}|\bigr)
+  \label{eq:potential-bond-length}
+\end{equation}
+则由链式法则，利用
+\[
+  \nabla_{\boldsymbol{\eta}}|\boldsymbol{\xi}+\boldsymbol{\eta}| = \frac{\boldsymbol{\xi}+\boldsymbol{\eta}}{|\boldsymbol{\xi}+\boldsymbol{\eta}|}
+\]
+得
+\begin{equation}
+  \mathbf{f}(\boldsymbol{\eta},\boldsymbol{\xi}) = \nabla_{\boldsymbol{\eta}} w = \frac{\partial \hat{w}}{\partial |\boldsymbol{\xi}+\boldsymbol{\eta}|}\,\frac{\boldsymbol{\xi}+\boldsymbol{\eta}}{|\boldsymbol{\xi}+\boldsymbol{\eta}|}
+  \label{eq:central-force-derivation}
+\end{equation}
+此时 $\mathbf{f}$ 与 $\boldsymbol{\xi}+\boldsymbol{\eta}$ 共线，故中心力条件\eqref{eq:central-force}自动满足。如图\ref{fig:pairwise-potential}所示，成对势 $w$ 的上述形式保证了对力 $\mathbf{f}$ 沿变形后键方向作用（蓝色箭头），同时满足反作用条件和中心力条件。键基模型（第 4 章）所采用的成对势均属此类。
 
 \begin{figure}[htbp]
   \centering
   \begin{tikzpicture}[scale=1.0]
-    % 物质点对
+    % 参考构型（变形前）
     \filldraw (0,0) circle (3pt) node[below] {$\mathbf{x}$};
     \filldraw (4,0) circle (3pt) node[below] {$\mathbf{x}'$};
-    \draw[thick] (0,0) -- (4,0);
-    \node[above] at (2,0) {$\boldsymbol{\xi}$};
+    \draw[thick, dashed, gray] (0,0) -- (4,0);
+    \node[above, gray] at (2,0) {$\boldsymbol{\xi}$};
     % 变形后位置
     \filldraw[red] (0.3,0.2) circle (2.5pt) node[above left, red] {$\mathbf{y}$};
     \filldraw[red] (4.4,0.8) circle (2.5pt) node[above right, red] {$\mathbf{y}'$};
-    \draw[thick, red] (0.3,0.2) -- (4.4,0.8);
-    \node[red, above] at (2.35,0.5) {$\boldsymbol{\xi}+\boldsymbol{\eta}$};
-    % 力的方向（沿变形后键方向）
-    \draw[-{Stealth}, ultra thick, blue] (0.3,0.2) -- ++(4.1,0.6) node[midway, above, blue] {$\mathbf{f}$};
-    \draw[-{Stealth}, ultra thick, blue] (4.4,0.8) -- ++(-4.1,-0.6) node[midway, below, blue] {$-\mathbf{f}$};
-    % 势函数标注
-    \node[align=center] at (6.5, 0.4) {成对势\\ $w(\boldsymbol{\eta},\boldsymbol{\xi})$};
-    \draw[->, dashed] (5.8,0.4) -- (3.5,0.3);
+    \draw[ultra thick, red] (0.3,0.2) -- (4.4,0.8);
+    \node[red, above] at (2.35,0.65) {$\boldsymbol{\xi}+\boldsymbol{\eta}$};
+    % 变形矢量 η（新增）
+    \draw[-{Stealth}, densely dotted, purple] (0,0) -- (0.3,0.2)
+      node[midway, left, yshift=-0.1cm, purple] {$\boldsymbol{\eta}$};
+    % 对力（分离显示，避免重叠）
+    \draw[-{Stealth}, ultra thick, blue] (0.3,0.25) -- ++(3.5,0.5)
+      node[pos=0.35, above, blue] {$\mathbf{f}$};
+    \draw[-{Stealth}, ultra thick, blue] (4.4,0.75) -- ++(-3.5,-0.5)
+      node[midway, below, blue] {$-\mathbf{f}$};
+    % 势函数注释框
+    \node[draw, rectangle, rounded corners, fill=white, align=center]
+      (potential) at (6.5, 0.4) {成对势\\ $w(\boldsymbol{\eta},\boldsymbol{\xi})$};
+    \draw[->, dashed] (potential.west) -- (3.0, 0.7);
   \end{tikzpicture}
   \caption{微弹性材料中，成对势 $w$ 在键两端对称，导出的对力 $\mathbf{f}$ 沿变形后键方向并满足反作用条件}
   \label{fig:pairwise-potential}
 \end{figure}
 
-应变能密度定义为物质点 $\mathbf{x}$ 与其族内所有邻居的成对势之和
+\begin{example}[线性微弹性材料]
+  最简单的微弹性材料对应成对势
+  \begin{equation}
+    w(\boldsymbol{\eta},\boldsymbol{\xi}) = \frac{1}{2}\,c(|\boldsymbol{\xi}|)\,s^{2}\,|\boldsymbol{\xi}|
+    \label{eq:linear-potential}
+  \end{equation}
+  其中 $s=(|\boldsymbol{\xi}+\boldsymbol{\eta}|-|\boldsymbol{\xi}|)/|\boldsymbol{\xi}|$ 为键伸长率，$c(|\boldsymbol{\xi}|)$ 为仅依赖参考键长的微模量函数。由式\eqref{eq:pairwise-force-potential}得对力
+  \begin{equation}
+    \mathbf{f}(\boldsymbol{\eta},\boldsymbol{\xi}) = c(|\boldsymbol{\xi}|)\,s\,\frac{\boldsymbol{\xi}+\boldsymbol{\eta}}{|\boldsymbol{\xi}+\boldsymbol{\eta}|}
+    \label{eq:linear-microelastic-force}
+  \end{equation}
+  即沿变形后键方向的线性弹簧力，其大小与伸长率成正比。该形式将在第 4 章键基模型中广泛应用。
+\end{example}
+
+有了成对势，可以定义物质点 $\mathbf{x}$ 的应变能密度。与经典弹性力学类似，应变能密度是物质点与其族内所有邻居的成对势之和。为避免每条键被重复计算，取半值：
 \begin{equation}
   W(\mathbf{x},t)=\frac{1}{2}\int_{\mathcal{F}_{\mathbf{x}}} w\bigl(\boldsymbol{\eta}(\mathbf{x}',\mathbf{x},t),\boldsymbol{\xi}\bigr)\,\mathrm{d}V'
   \label{eq:strain-energy}
 \end{equation}
-式中系数 $1/2$ 是因为每条键被两个物质点共享，各计一半以避免重复。$W$ 的深入讨论（包括能量平衡、正定性、与第 6 章态型应变能密度的衔接）见 2.5 节。
+式中系数 $1/2$ 的物理原因是：键 $(\mathbf{x},\mathbf{x}')$ 同时属于物质点 $\mathbf{x}$ 和 $\mathbf{x}'$ 的族，若两点各计 $w$，则总能量中该键被重复计算；各计 $w/2$ 恰好抵消重复。$W$ 的深入讨论（包括能量平衡、正定性、与第 6 章态型应变能密度的衔接）见 2.5 节。
 
-\subsection{运动方程的量纲分析}
+\subsection{对力函数的量纲}
 
-运动方程\eqref{eq:motion}的两端各项必须量纲一致。左端惯性项 $\rho\ddot{\mathbf{u}}$ 的量纲为
+2.3.1 节已由定义式\eqref{eq:pairwise-force-def}指出对力函数 $\mathbf{f}$ 的量纲为 $\mathrm{N}/\mathrm{m}^{6}$，2.3.2 节又建立了其与成对势的联系。本节在此基础上，从运动方程出发，通过量纲一致性分析系统验证这一量纲，并从数值量级与经典理论的对比两个角度加深对其物理意义的理解，为第 4 章微模量标定奠定基础。
+
+运动方程\eqref{eq:motion}两端各项的量纲必须一致，否则方程失去物理意义。左端惯性项 $\rho\ddot{\mathbf{u}}$ 的量纲为
 \begin{equation}
   [\rho\ddot{\mathbf{u}}]=\frac{\mathrm{kg}}{\mathrm{m}^{3}}\cdot\frac{\mathrm{m}}{\mathrm{s}^{2}}=\frac{\mathrm{N}}{\mathrm{m}^{3}}
   \label{eq:dim-inertia}
 \end{equation}
-即力密度（单位体积的力）。体力密度 $\mathbf{b}$ 的量纲与之相同，为 $\mathrm{N}/\mathrm{m}^{3}$。右端积分项为对力的体积积分，为使方程两边量纲一致，对力函数 $\mathbf{f}$ 的量纲须为
+即单位体积的惯性力（力密度）。体力密度 $\mathbf{b}$ 的量纲与之相同，为 $\mathrm{N}/\mathrm{m}^{3}$。右端是在近场域 $H_{\mathbf{x}}$ 上的体积积分，积分会引入一个体积量纲，因此为使方程两端均为 $\mathrm{N}/\mathrm{m}^{3}$，对力函数 $\mathbf{f}$ 的量纲须为
 \begin{equation}
   [\mathbf{f}]=\frac{\mathrm{N}}{\mathrm{m}^{6}}
   \label{eq:dim-force}
 \end{equation}
 即"力每体积平方"。
 
-这一量纲与经典连续介质力学中应力（$\mathrm{N}/\mathrm{m}^{2}$）有本质区别，反映了近场动力学非局部描述的固有特征：经典理论中，应力描述的是单位面积上的内力；而近场动力学中，对力描述的是单位体积平方上的非局部相互作用力密度。
+表~\ref{tab:dim-analysis} 汇总了运动方程各项的量纲。由表可见，运动方程各项的量纲形成了自洽的层级结构：惯性项与体力为 $\mathrm{N}/\mathrm{m}^{3}$，对力函数为 $\mathrm{N}/\mathrm{m}^{6}$，积分后又回到 $\mathrm{N}/\mathrm{m}^{3}$。然而，$\mathrm{N}/\mathrm{m}^{6}$ 这一量纲在物理上仍较抽象，需通过具体数值建立直觉。为此，作如下量级估计。设材料密度 $\rho\sim 10^{3}\,\mathrm{kg}/\mathrm{m}^{3}$，在 $10^{6}\,\mathrm{Pa}$ 应力下经典应变约为 $10^{-3}$。取近场域半径 $\delta\sim 10^{-3}\,\mathrm{m}$，微模量 $c\sim 10^{18}\,\mathrm{N}/\mathrm{m}^{6}$（见第 4 章标定）。
 
-\begin{remark}
-  运动方程 \eqref{eq:motion} 在形式上与分子动力学方程相似，但二者有本质区别：分子动力学处理离散原子间的二体力，力以 $\mathrm{N}$ 为单位；近场动力学处理连续介质中物质点间的非局部相互作用，力以 $\mathrm{N}/\mathrm{m}^{6}$ 为单位，并通过对体积积分得到力密度。这种"连续+非局部"的混合特征使近场动力学既能像分子动力学一样处理不连续性，又能像连续介质力学一样与宏观观测接轨 \cite{Silling2000,SillingLehoucq2010}。
-\end{remark}
+\begin{table}[htbp]
+  \centering
+  \caption{运动方程\eqref{eq:motion}各项的量纲分析}
+  \label{tab:dim-analysis}
+  \begin{tabular}{llcl}
+    \toprule
+    项 & 表达式 & 量纲 & 物理意义 \\
+    \midrule
+    惯性项 & $\rho\ddot{\mathbf{u}}$ & $\mathrm{N}/\mathrm{m}^{3}$ & 单位体积惯性力（力密度）\\
+    体力 & $\mathbf{b}$ & $\mathrm{N}/\mathrm{m}^{3}$ & 单位体积外力（力密度）\\
+    对力 & $\mathbf{f}$ & $\mathrm{N}/\mathrm{m}^{6}$ & 单位体积对单位体积的力密度\\
+    积分后 & $\int\mathbf{f}\,\mathrm{d}V'$ & $\mathrm{N}/\mathrm{m}^{3}$ & 单位体积总非局部力\\
+    \bottomrule
+  \end{tabular}
+\end{table}
+
+
+
+在上述参数下，对力函数量级为 \textbf{$|\mathbf{f}|\sim c\cdot s\sim 10^{15}\,\mathrm{N}/\mathrm{m}^{6}$}。对两个体积均为 $10^{-9}\,\mathrm{m}^{3}$（微米尺度立方体）的物质点，其相互作用力为 \textbf{$\mathrm{d}F\sim 10^{-3}\,\mathrm{N}$}，即\textbf{毫牛量级}。这与经典理论中 $10^{6}\,\mathrm{Pa}$ 应力下、$10^{-6}\,\mathrm{m}^{2}$ 面积对应 $1\,\mathrm{N}$ 的结果相呼应，验证了量纲分析的自洽性。
+
+从表~\ref{tab:dim-analysis}还可以看出，运动方程两端均为 $\mathrm{N}/\mathrm{m}^{3}$，意味着对力函数 $\mathbf{f}$ 必须自带"两个体积除数"。$\mathbf{f}$ 可理解为"单位体积微元对单位体积微元的力密度"——正如 $\boldsymbol{\sigma}$ 描述"单位面积上的力"，$\mathbf{f}$ 描述的是"单位体积对上的力"。对力函数 $\mathrm{N}/\mathrm{m}^{6}$ 与经典应力 $\mathrm{N}/\mathrm{m}^{2}$ 的量纲差异，源于两种理论对"相互作用载体"的不同刻画，两者还可从多个维度进一步对比，见表~\ref{tab:stress-vs-pairwise-force}。由表可知，对力函数量纲 $\mathrm{N}/\mathrm{m}^{6}$ 并非偶然，而是近场动力学理论架构的数学特征。经典连续介质力学以 $\mathrm{N}/\mathrm{m}^{2}$ 为单位处理局部场，近场动力学则以 $\mathrm{N}/\mathrm{m}^{6}$ 为单位描述非局部相互作用。当近场域半径 $\delta\to 0$ 时，体积积分退化为面积分，量纲行为趋近于 $\mathrm{N}/\mathrm{m}^{2}$（详见第 3 章的局部极限分析），这进一步说明 $\mathrm{N}/\mathrm{m}^{6}$ 是近场动力学在非局部框架下对经典理论的自然推广 \cite{Silling2000,SillingLehoucq2010}。
+
+\begin{table}[htbp]
+  \centering
+  \caption{经典连续介质力学与近场动力学中"内力描述"的对比}
+  \label{tab:stress-vs-pairwise-force}
+  \begin{tabular}{p{0.25\textwidth}p{0.30\textwidth}p{0.30\textwidth}}
+    \toprule
+    特征 & 经典连续介质力学 & 近场动力学 \\
+    \midrule
+    相互作用对象 & 点与无穷小邻域 & 点与有限距离内所有点 \\
+    描述方式 & 应力张量 $\boldsymbol{\sigma}$ & 对力函数 $\mathbf{f}$ \\
+    作用载体 & 面积微元 $\mathrm{d}A$ & 体积微元对 $\mathrm{d}V\mathrm{d}V'$ \\
+    量纲 & $\mathrm{N}/\mathrm{m}^{2}$（力/面积） & $\mathrm{N}/\mathrm{m}^{6}$（力/体积$^2$）\\
+    局部性 & 局部（$\delta\to 0$） & 非局部（有限 $\delta$）\\
+    \bottomrule
+  \end{tabular}
+\end{table}
+
+
 
 \subsection{小变形线性化与微模量张量}
 
-当变形较小时，对力函数可在无应力状态 $\boldsymbol{\eta}=\mathbf{0}$ 附近作泰勒展开：
+2.3.1--2.3.3 节从约束条件、能量基础和量纲分析三个角度刻画了对力函数 $\mathbf{f}(\boldsymbol{\eta},\boldsymbol{\xi})$ 的物理内涵与数学结构。然而，一般对力函数的形式仍过于抽象，无法直接用于数值计算或解析分析。为了得到可操作的线性本构关系，本节对力函数在无应力状态 $\boldsymbol{\eta}=\mathbf{0}$ 附近作小变形线性化，引入微模量张量 $\mathbf{C}(\boldsymbol{\xi})$，建立线性近场动力学本构。
+
+这一处理与 2.2 节小变形近似中的式\eqref{eq:stretch-linear}对键伸长率的运动学线性化相呼应：式\eqref{eq:stretch-linear}回答``键如何伸长''，本节回答``伸长产生多少力''，二者合起来构成键的完整线性本构。微模量张量的显式形式将在第 4 章针对各向同性材料给出。
+
+当变形较小时，对力函数可在无应力状态 $\boldsymbol{\eta}=\mathbf{0}$ 附近作泰勒展开。将 $\mathbf{f}(\boldsymbol{\eta},\boldsymbol{\xi})$ 视为 $\boldsymbol{\eta}$ 的函数，在 $\boldsymbol{\eta}=\mathbf{0}$ 处展开到一阶，得
 \begin{equation}
   \mathbf{f}(\boldsymbol{\eta},\boldsymbol{\xi})\approx\mathbf{f}(\mathbf{0},\boldsymbol{\xi})+\frac{\partial\mathbf{f}}{\partial\boldsymbol{\eta}}\bigg|_{\boldsymbol{\eta}=\mathbf{0}}\boldsymbol{\eta}
   \label{eq:force-linearization}
 \end{equation}
-无应力状态下 $\mathbf{f}(\mathbf{0},\boldsymbol{\xi})=\mathbf{0}$（无变形则无力），故式\eqref{eq:force-linearization}第一项为零。记二阶张量
+式中右侧已忽略 $\boldsymbol{\eta}$ 的二次及更高次项。上述截断的适用条件为 $|\boldsymbol{\eta}|\ll|\boldsymbol{\xi}|$：此时 $|\boldsymbol{\eta}|^{2}$ 项相对线性项为 $O(|\boldsymbol{\eta}|/|\boldsymbol{\xi}|)$ 量级，可忽略。该条件在物理上对应小变形与小转动假设。泰勒展开式\eqref{eq:force-linearization}是后续线性化本构的数学基础。
+
+无应力状态下，键未发生任何变形，物质点间不应存在相互作用力，故 $\mathbf{f}(\mathbf{0},\boldsymbol{\xi})=\mathbf{0}$：若零变形状态下仍存在非零对力，则与``无变形则无力''的物理直觉矛盾。因此式\eqref{eq:force-linearization}第一项为零。这一结论也为后续线性化本构的建立提供了物理基础。
+
+记二阶张量
 \begin{equation}
   \mathbf{C}(\boldsymbol{\xi})=\frac{\partial\mathbf{f}}{\partial\boldsymbol{\eta}}\bigg|_{\boldsymbol{\eta}=\mathbf{0}}
   \label{eq:micro-modulus}
 \end{equation}
-为\textbf{微模量张量}（micro-modulus tensor），其物理意义是描述键的"刚度"——相对位移 $\boldsymbol{\eta}$ 引起的对力变化率。于是线性化对力为
+为\textbf{微模量张量}（micro-modulus tensor），其物理意义是描述键的``刚度''——相对位移 $\boldsymbol{\eta}$ 引起的对力变化率。于是线性化对力为
 \begin{equation}
   \mathbf{f}(\boldsymbol{\eta},\boldsymbol{\xi})\approx\mathbf{C}(\boldsymbol{\xi})\,\boldsymbol{\eta}
   \label{eq:linear-force}
 \end{equation}
-式\eqref{eq:linear-force}是线性近场动力学的基本本构关系。由反作用条件 \eqref{eq:reaction} 可证 $\mathbf{C}(-\boldsymbol{\xi})=\mathbf{C}(\boldsymbol{\xi})^{T}$，由中心力条件 \eqref{eq:central-force} 可证 $\mathbf{C}(\boldsymbol{\xi})\,\boldsymbol{\xi}=\mathbf{0}$ 时 $\mathbf{f}$ 沿键方向，这两个性质是第 4 章构造 $\mathbf{C}(\boldsymbol{\xi})$ 的约束。微模量张量的显式表达将在第 4 章针对各向同性材料给出。
+式\eqref{eq:linear-force}是线性近场动力学的基本本构关系，其适用范围为 $|\boldsymbol{\eta}|\ll|\boldsymbol{\xi}|$ 的小变形、小转动情形。
+
+式\eqref{eq:linear-force}是第 4 章键基模型（PMB，原型微弹性键基模型）的出发点。第 4 章将针对各向同性材料给出 $\mathbf{C}(\boldsymbol{\xi})$ 的显式形式——此时 $\mathbf{C}(\boldsymbol{\xi})$ 退化为仅依赖键长 $|\boldsymbol{\xi}|$ 的标量函数 $c(|\boldsymbol{\xi}|)$ 与方向张量的乘积——并建立其与经典弹性常数（杨氏模量 $E$、泊松比 $\nu$）的标定关系。该标定是连接近场动力学与经典弹性力学的关键桥梁，也是数值实现中确定材料参数的必要步骤。
+
+对于保守系统，线性化对力还可由成对势的二阶展开导出，这一途径揭示了微模量张量与成对势的内在联系。微弹性假设下 $\mathbf{f}=\nabla_{\boldsymbol{\eta}}w$，将 $w$ 在 $\boldsymbol{\eta}=\mathbf{0}$ 处作二阶泰勒展开并逐步化简：
+\begin{align}
+  w(\boldsymbol{\eta},\boldsymbol{\xi})
+  &\approx w(\mathbf{0},\boldsymbol{\xi})+\left(\nabla_{\boldsymbol{\eta}}w\right)\big|_{\boldsymbol{\eta}=\mathbf{0}}\!\cdot\boldsymbol{\eta}+\frac{1}{2}\boldsymbol{\eta}\cdot\!\left(\nabla_{\boldsymbol{\eta}}\nabla_{\boldsymbol{\eta}}w\right)\big|_{\boldsymbol{\eta}=\mathbf{0}}\!\cdot\boldsymbol{\eta} \notag\\
+  &=w(\mathbf{0},\boldsymbol{\xi})+\mathbf{f}(\mathbf{0},\boldsymbol{\xi})\cdot\boldsymbol{\eta}+\frac{1}{2}\boldsymbol{\eta}\cdot\mathbf{H}(\boldsymbol{\xi})\cdot\boldsymbol{\eta} \quad\text{（由 $\mathbf{f}=\nabla_{\boldsymbol{\eta}}w$ 及式\eqref{eq:pairwise-hessian}）}\notag\\
+  &=w(\mathbf{0},\boldsymbol{\xi})+\frac{1}{2}\boldsymbol{\eta}\cdot\mathbf{H}(\boldsymbol{\xi})\cdot\boldsymbol{\eta} \quad\text{（由 $\mathbf{f}(\mathbf{0},\boldsymbol{\xi})=\mathbf{0}$ 无应力条件）}
+  \label{eq:pairwise-hessian-expansion}
+\end{align}
+
+
+
+其中，第一步为二阶泰勒展开的标准形式，第二步将一阶项系数 $\nabla_{\boldsymbol{\eta}}w$ 代换为 $\mathbf{f}$（微弹性假设）、二阶项系数记为 $\mathbf{H}$（Hessian 定义），记成对势 $w$ 关于 $\boldsymbol{\eta}$ 的 Hessian 矩阵为
+\begin{equation}
+  \mathbf{H}(\boldsymbol{\xi})=\nabla_{\boldsymbol{\eta}}\nabla_{\boldsymbol{\eta}}w\big|_{\boldsymbol{\eta}=\mathbf{0}}
+  \label{eq:pairwise-hessian}
+\end{equation}第三步由无应力条件 $\mathbf{f}(\mathbf{0},\boldsymbol{\xi})=\mathbf{0}$ 消去一阶项。对 $\boldsymbol{\eta}$ 求梯度得 $\mathbf{f}\approx\mathbf{H}(\boldsymbol{\xi})\boldsymbol{\eta}$，与式\eqref{eq:linear-force}对比可知
+\begin{equation}
+  \mathbf{C}(\boldsymbol{\xi})=\mathbf{H}(\boldsymbol{\xi})
+  \label{eq:micro-modulus-hessian}
+\end{equation}
+即微模量张量恰为成对势的 Hessian。这说明线性本构是微弹性假设在小变形条件下的自然推论。
+
+与经典连续介质力学中的弹性模量张量（四阶）相比，微模量张量 $\mathbf{C}(\boldsymbol{\xi})$ 具有鲜明的非局部特征。经典理论中，弹性模量张量描述\textbf{某一点}的材料刚度，建立应力与应变之间的局部关系；而 $\mathbf{C}(\boldsymbol{\xi})$ 描述\textbf{某一条键}的刚度，且显式依赖键的方向 $\boldsymbol{\xi}$ 和键长 $|\boldsymbol{\xi}|$。这种``以键为基本单元''的描述方式，正是近场动力学非局部理论的核心体现：材料响应不再仅由某一点的局部状态决定，而是由该点与邻居之间键的变形共同决定。这种非局部描述方式使得近场动力学能够自然地描述裂纹扩展等不连续问题。
+
+微模量张量作为线性本构的核心对象，须继承 2.3.1 节对力函数的三个基本约束——反作用条件、微弹性假设与中心力条件。以下分别推导这三组约束在 $\mathbf{C}(\boldsymbol{\xi})$ 上的体现：反作用条件给出键反转对称，微弹性假设给出自对称，中心力条件给出值域方向约束。三者的综合刻画了线性近场动力学本构的容许空间。
+
+由反作用条件\eqref{eq:reaction}可推导微模量张量的对称性质。对式\eqref{eq:reaction}两边关于 $\boldsymbol{\eta}$ 求梯度，得
+\begin{equation}
+  \frac{\partial\mathbf{f}(-\boldsymbol{\eta},-\boldsymbol{\xi})}{\partial\boldsymbol{\eta}}=-\frac{\partial\mathbf{f}(\boldsymbol{\eta},\boldsymbol{\xi})}{\partial\boldsymbol{\eta}}
+  \label{eq:reaction-derivative}
+\end{equation}
+令 $\boldsymbol{\eta}=\mathbf{0}$，对式\eqref{eq:reaction-derivative}左端应用链式法则。令 $\boldsymbol{\eta}'=-\boldsymbol{\eta}$，则
+\begin{equation}
+  \begin{split}
+    \frac{\partial\mathbf{f}(-\boldsymbol{\eta},-\boldsymbol{\xi})}{\partial\boldsymbol{\eta}}\bigg|_{\boldsymbol{\eta}=\mathbf{0}}
+    &= \frac{\partial\mathbf{f}(\boldsymbol{\eta}',-\boldsymbol{\xi})}{\partial\boldsymbol{\eta}'}\bigg|_{\boldsymbol{\eta}'=\mathbf{0}}\cdot\frac{\partial\boldsymbol{\eta}'}{\partial\boldsymbol{\eta}} \quad\text{（链式法则，$\boldsymbol{\eta}'=-\boldsymbol{\eta}$）} \\
+    &= \mathbf{C}(-\boldsymbol{\xi})\cdot(-\mathbf{I}) \quad\text{（由式\eqref{eq:micro-modulus}，$\partial\boldsymbol{\eta}'/\partial\boldsymbol{\eta}=-\mathbf{I}$）} \\
+    &= -\mathbf{C}(-\boldsymbol{\xi})
+  \end{split}
+  \label{eq:chain-rule-reaction}
+\end{equation}
+其中第二步由式\eqref{eq:micro-modulus}的定义给出（自变量取 $-\boldsymbol{\xi}$），第三步代入单位张量的负号。将式\eqref{eq:chain-rule-reaction}代入式\eqref{eq:reaction-derivative}，得 $-\mathbf{C}(-\boldsymbol{\xi})=-\mathbf{C}(\boldsymbol{\xi})$，即
+\begin{equation}
+  \mathbf{C}(-\boldsymbol{\xi})=\mathbf{C}(\boldsymbol{\xi})
+  \label{eq:micro-modulus-symmetry}
+\end{equation}
+即微模量张量关于键方向反转具有对称性。
+
+由式\eqref{eq:micro-modulus-hessian}，微弹性材料中 $\mathbf{C}(\boldsymbol{\xi})$ 即为成对势的 Hessian 矩阵。由混合偏导对称性（Schwarz 定理），Hessian 矩阵自对称，因此
+\begin{equation}
+  \mathbf{C}(\boldsymbol{\xi})=\mathbf{C}(\boldsymbol{\xi})^{\mathrm{T}}
+  \label{eq:micro-modulus-elastic-sym}
+\end{equation}
+即微弹性假设下微模量张量自动对称。结合式\eqref{eq:micro-modulus-symmetry}与式\eqref{eq:micro-modulus-elastic-sym}，得
+\begin{equation}
+  \mathbf{C}(-\boldsymbol{\xi})=\mathbf{C}(\boldsymbol{\xi})=\mathbf{C}(\boldsymbol{\xi})^{\mathrm{T}}
+  \label{eq:micro-modulus-full-sym}
+\end{equation}
+即微弹性材料中微模量张量同时满足键方向反转对称与自对称。
+
+由中心力条件\eqref{eq:central-force}可推导 $\mathbf{C}(\boldsymbol{\xi})$ 的另一约束。将中心力条件写为 $(\boldsymbol{\xi}+\boldsymbol{\eta})\times\mathbf{f}(\boldsymbol{\eta},\boldsymbol{\xi})=\mathbf{0}$，在 $\boldsymbol{\eta}=\mathbf{0}$ 处对 $\boldsymbol{\eta}$ 作一阶展开。记 $\tilde{\boldsymbol{\eta}}$ 为 $\boldsymbol{\eta}$ 的任意无穷小增量，则
+\begin{equation}
+  \tilde{\boldsymbol{\eta}}\times\mathbf{f}(\mathbf{0},\boldsymbol{\xi})+\boldsymbol{\xi}\times\left(\mathbf{C}(\boldsymbol{\xi})\,\tilde{\boldsymbol{\eta}}\right)=\mathbf{0}
+  \label{eq:central-force-variation}
+\end{equation}
+由于 $\mathbf{f}(\mathbf{0},\boldsymbol{\xi})=\mathbf{0}$，第一项为零，得
+\begin{equation}
+  \boldsymbol{\xi}\times\bigl[\mathbf{C}(\boldsymbol{\xi})\,\tilde{\boldsymbol{\eta}}\bigr]=\mathbf{0}
+  \label{eq:central-force-linear}
+\end{equation}
+式\eqref{eq:central-force-linear}对任意 $\tilde{\boldsymbol{\eta}}$ 成立，意味着 $\mathbf{C}(\boldsymbol{\xi})$ 作用任意矢量后结果均平行于 $\boldsymbol{\xi}$，即 $\mathbf{C}(\boldsymbol{\xi})$ 的值域包含于 $\mathrm{span}\,\boldsymbol{\xi}$；取 $\tilde{\boldsymbol{\eta}}$ 为各坐标基矢可知 $\mathbf{C}(\boldsymbol{\xi})$ 的每一列均为 $\boldsymbol{\xi}$ 的倍数。特别地，取 $\tilde{\boldsymbol{\eta}}=\boldsymbol{\xi}$，得
+\begin{equation}
+  \mathbf{C}(\boldsymbol{\xi})\,\boldsymbol{\xi}\parallel\boldsymbol{\xi}
+  \label{eq:micro-modulus-central}
+\end{equation}
+即 $\boldsymbol{\xi}$ 是 $\mathbf{C}(\boldsymbol{\xi})$ 的特征方向。需要强调的是，对称性 $\mathbf{C}(\boldsymbol{\xi})=\mathbf{C}(\boldsymbol{\xi})^{\mathrm{T}}$ 并非中心力条件的推论，而是微弹性假设（Hessian 对称）的结果（见前文推导）。
+
+综上，线性微弹性材料的微模量张量须同时满足三组约束：键反转对称 $\mathbf{C}(-\boldsymbol{\xi})=\mathbf{C}(\boldsymbol{\xi})$（式\eqref{eq:micro-modulus-symmetry}，来自反作用条件）、自对称 $\mathbf{C}=\mathbf{C}^{\mathrm{T}}$（式\eqref{eq:micro-modulus-elastic-sym}，来自微弹性假设的 Hessian 对称性）、值域方向约束 $\mathbf{C}(\boldsymbol{\xi})\boldsymbol{\xi}\parallel\boldsymbol{\xi}$（式\eqref{eq:micro-modulus-central}，来自中心力条件）。前两者保证线动量守恒与能量守恒的自洽性，第三者保证角动量守恒。这三组约束共同界定了线性近场动力学本构的容许空间。
+
+
+
 
 \section{近场动力学状态}
 
 2.1 至 2.3 节建立的是键基（bond-based）近场动力学理论：相互作用以键为单位，每条键由一个对力函数 $\mathbf{f}(\boldsymbol{\eta},\boldsymbol{\xi})$ 描述。键基理论形式简洁、物理直观，但有一个本质局限：各向同性线性键基材料只能描述泊松比为 $1/4$（二维为 $1/3$）的材料，无法刻画任意泊松比的各向同性体。为突破这一限制，Silling 等人提出了态型（state-based）近场动力学 \cite{Silling2007}，把"键到键"的二体力推广为"点到场"的非局部相互作用。本节作为引论，介绍态型理论的基本概念与动机；态的严格数学表述、代数运算、本构分类等内容见 6.1 节。
 
-\subsection{键基理论的局限}
+\subsection{从键基到态型：动机与过渡}
 
-键基对力 $\mathbf{f}(\boldsymbol{\eta},\boldsymbol{\xi})$ 只依赖单条键的相对位移 $\boldsymbol{\eta}$，与该物质点其他键的变形无关。这意味着每条键独立承担自己的恢复力，键与键之间无耦合。对线性各向同性材料，这一限制导致一个固定的泊松比。
+键基对力 $\mathbf{f}(\boldsymbol{\eta},\boldsymbol{\xi})$ 只依赖单条键的相对位移 $\boldsymbol{\eta}$，与该物质点其他键的变形无关。这意味着每条键独立承担自己的恢复力，键与键之间无耦合。对线性各向同性材料，这一限制导致泊松比被锁定为 $1/4$（三维）或 $1/3$（二维平面应力），详见式\eqref{eq:poisson-limit}。这一限制可表述为
 
-考虑均匀各向同性变形 $\boldsymbol{\varepsilon}=\varepsilon\,\mathbf{I}$（$\varepsilon$ 为体应变，$\mathbf{I}$ 为单位张量），由式\eqref{eq:stretch-uniform} 键伸长率为 $s=\varepsilon$。线性化对力 \eqref{eq:linear-force} 沿键方向，模 $|\mathbf{f}|=C(|\boldsymbol{\xi}|)\,\varepsilon\,|\boldsymbol{\xi}|$（$C$ 为微模量标量函数，各向同性假设下只依赖 $|\boldsymbol{\xi}|$）。横向与纵向响应由同一 $C$ 决定，无法独立调节，导致泊松比被锁定为
 \begin{equation}
   \nu_{\text{键基}}=\frac{1}{4}\quad(\text{三维}),\qquad \nu_{\text{键基}}=\frac{1}{3}\quad(\text{二维平面应力})
   \label{eq:poisson-limit}
 \end{equation}
-式\eqref{eq:poisson-limit}是键基理论的标志性局限 \cite{Silling2000}。其物理根源在于：键基对力无法区分"体积变形"与"形状变形"，因为每条键只感知自身的伸长率，不知道邻居键的总体变形状态。实际材料（如金属 $\nu\approx 0.3$、橡胶 $\nu\approx 0.5$）大多不满足式\eqref{eq:poisson-limit}，因此键基理论虽适合作为入门和定性分析，但对定量预测有本质不足。
+
+其物理根源在于：键基对力无法区分"体积变形"与"形状变形"，因为每条键只感知自身的伸长率，不知道邻居键的总体变形状态。实际材料（如金属 $\nu\approx 0.3$、橡胶 $\nu\approx 0.5$）大多不满足这一限制，因此键基理论虽适合作为入门和定性分析，但对定量预测有本质不足。
+
+为突破上述局限，需要将"键到键"的二体力推广为"点到场"的非局部映射：物质点 $\mathbf{x}$ 对邻居 $\mathbf{x}'$ 的力不仅依赖该键自身的变形，还依赖 $\mathbf{x}$ 的整个变形状态。这一推广通过引入\emph{态}（state）的概念实现。
 
 \subsection{态的概念与基本定义}
 
-态型理论的核心思想是：把"键到键"的二体力 $\mathbf{f}(\boldsymbol{\eta},\boldsymbol{\xi})$ 推广为"点到场"的映射 $\underline{\mathbf{T}}\langle\boldsymbol{\xi}\rangle$，使得物质点 $\mathbf{x}$ 对邻居 $\mathbf{x}'$ 的力不仅依赖该键自身的 $\boldsymbol{\eta}$，还依赖 $\mathbf{x}$ 的整个变形状态。这一推广通过引入\emph{态}（state）的概念实现。
-
-态是一个把键矢量 $\boldsymbol{\xi}$ 映射为矢量的函数，记为 $\underline{A}\langle\boldsymbol{\xi}\rangle$，其中下划线表示态、尖括号内为自变量键矢量。两个基本态是：
+需要特别强调的是，态不是矢量，而是把键矢量 $\boldsymbol{\xi}$ 映射为矢量的函数，记为 $\underline{A}\langle\boldsymbol{\xi}\rangle$，其中下划线表示态、尖括号内为自变量键矢量。态型理论中，物质点 $\mathbf{x}$ 对邻居 $\mathbf{x}'$ 的力不再仅依赖该键自身的 $\boldsymbol{\eta}$，而是依赖 $\mathbf{x}$ 的整个变形状态。两个基本态是：
 
 \begin{itemize}
   \item \textbf{变形态}（deformation state）$\underline{\mathbf{Y}}$：把参考键 $\boldsymbol{\xi}$ 映射为变形后键 $\boldsymbol{\xi}+\boldsymbol{\eta}$，即 $\underline{\mathbf{Y}}\langle\boldsymbol{\xi}\rangle=\mathbf{y}(\mathbf{x}+\boldsymbol{\xi})-\mathbf{y}(\mathbf{x})$。变形态完全描述了物质点 $\mathbf{x}$ 的局部变形几何。
@@ -620,21 +842,35 @@
   \label{fig:state-concept}
 \end{figure}
 
-力态依赖整个变形态这一性质，使态型本构能够区分体积变形与偏斜变形：物质点 $\mathbf{x}$ 的所有键的变形模式（如均匀膨胀、单轴拉伸、剪切）作为整体输入本构函数，输出相应的力态分布。这使态型理论能够描述任意泊松比的各向同性材料以及各向异性材料，第 6 章将给出常规态型（ordinary state-based）本构的完整理论。
+力态依赖整个变形态这一性质，使态型本构能够区分体积变形与偏斜变形：物质点 $\mathbf{x}$ 的所有键的变形模式（如均匀膨胀、单轴拉伸、剪切）作为整体输入本构函数，输出相应的力态分布。这使态型理论能够描述任意泊松比的各向同性材料以及各向异性材料，第 6 章将给出常规态型（ordinary state-based，简称 OSB）本构的完整理论。
 
 \subsection{态型运动方程}
 
 用态表示的运动方程为
-\[
+\begin{equation}
   \rho(\mathbf{x})\,\ddot{\mathbf{u}}(\mathbf{x},t)=\int_{\mathcal{H}_{\mathbf{x}}}\Bigl[\underline{\mathbf{T}}\langle\boldsymbol{\xi}\rangle-\underline{\mathbf{T}}'\langle-\boldsymbol{\xi}\rangle\Bigr]\,\mathrm{d}V'+\mathbf{b}(\mathbf{x},t)
-\]
-其中 $\underline{\mathbf{T}}\langle\boldsymbol{\xi}\rangle$ 为 $\mathbf{x}$ 的力态在键 $\boldsymbol{\xi}$ 处的取值，$\underline{\mathbf{T}}'\langle-\boldsymbol{\xi}\rangle$ 为邻居 $\mathbf{x}'$ 的力态在反向键 $-\boldsymbol{\xi}$ 处的取值（即 $\mathbf{x}$ 对 $\mathbf{x}'$ 的力态）。两者之差的体积积分给出 $\mathbf{x}$ 受到的净非局部力密度。该方程的严格形式与各项含义见 6.1 节式\eqref{eq:state-motion}。
+  \label{eq:state-motion-ch02}
+\end{equation}
+其中 $\underline{\mathbf{T}}\langle\boldsymbol{\xi}\rangle$ 为物质点 $\mathbf{x}$ 的力态在键 $\boldsymbol{\xi}$ 处的取值，即 $\mathbf{x}$ 对邻居 $\mathbf{x}'$ 的作用力密度；$\underline{\mathbf{T}}'\langle-\boldsymbol{\xi}\rangle$ 为邻居 $\mathbf{x}'$ 的力态在反向键 $-\boldsymbol{\xi}$ 处的取值，即 $\mathbf{x}'$ 对 $\mathbf{x}$ 的反作用力密度。两者之差的体积积分给出 $\mathbf{x}$ 受到的净非局部力密度，加上体力 $\mathbf{b}(\mathbf{x},t)$ 后等于惯性力。
 
-键基理论是态型理论的特例。取力态为
-\[
+与键基运动方程\eqref{eq:motion}相比，式\eqref{eq:state-motion-ch02}中的"力态差" $\underline{\mathbf{T}}\langle\boldsymbol{\xi}\rangle-\underline{\mathbf{T}}'\langle-\boldsymbol{\xi}\rangle$ 代替了单力 $\mathbf{f}$，这一形式变化看似微小，意义却深远：它把"成对力"解耦为两个独立的"单端力态"，使本构函数可以独立地依赖每端的变形状态。这一解耦是态型理论突破泊松比限制的数学根源，也是 2.6 节守恒律证明需要重新审视的起点 \cite{Silling2007,SillingLehoucq2010}。
+
+\subsection{键基作为态型的特例}
+
+键基理论可以视为态型理论的一个特例。取力态为
+\begin{equation}
   \underline{\mathbf{T}}\langle\boldsymbol{\xi}\rangle=\tfrac{1}{2}\,\mathbf{f}(\boldsymbol{\eta},\boldsymbol{\xi})
+  \label{eq:bb-state-special}
+\end{equation}
+其中 $\mathbf{f}$ 为键基对力函数，系数 $1/2$ 的物理意义是"每键被两点共享"：在态型表述中，$\mathbf{x}$ 对键的贡献为 $\underline{\mathbf{T}}\langle\boldsymbol{\xi}\rangle=\mathbf{f}/2$，$\mathbf{x}'$ 对同一键的贡献为 $\underline{\mathbf{T}}'\langle-\boldsymbol{\xi}\rangle=-\mathbf{f}/2$（由反作用条件\eqref{eq:reaction}）。将式\eqref{eq:bb-state-special}代入态型运动方程\eqref{eq:state-motion-ch02}，得
+\[
+  \underline{\mathbf{T}}\langle\boldsymbol{\xi}\rangle-\underline{\mathbf{T}}'\langle-\boldsymbol{\xi}\rangle
+  =\frac{\mathbf{f}}{2}-\left(-\frac{\mathbf{f}}{2}\right)
+  =\mathbf{f}(\boldsymbol{\eta},\boldsymbol{\xi})
 \]
-代入态型运动方程，利用反作用条件 \eqref{eq:reaction} 即可还原键基运动方程 \eqref{eq:motion}。系数 $1/2$ 的来源仍是"每键被两点共享"：在态型表述中，$\mathbf{x}$ 贡献 $\underline{\mathbf{T}}\langle\boldsymbol{\xi}\rangle=\mathbf{f}/2$，$\mathbf{x}'$ 贡献 $\underline{\mathbf{T}}'\langle-\boldsymbol{\xi}\rangle=-\mathbf{f}/2$，两者之差为 $\mathbf{f}$，与键基方程一致。值得指出的是，态型运动方程中"力态差" $\underline{\mathbf{T}}\langle\boldsymbol{\xi}\rangle-\underline{\mathbf{T}}'\langle-\boldsymbol{\xi}\rangle$ 代替了键基方程中的单力 $\mathbf{f}$，这一形式变化看似微小，意义却深远：它把"成对力"解耦为两个独立的"单端力态"，使本构函数可以独立地依赖每端的变形状态。这一解耦是态型理论突破泊松比限制的数学根源，也是 2.6 节守恒律证明需要重新审视的起点 \cite{Silling2007,SillingLehoucq2010}。
+右端正是键基运动方程\eqref{eq:motion}中的对力项。这说明键基方程是态型方程在力态取式\eqref{eq:bb-state-special}时的自然退化。
+
+上述推导的物理含义是：当力态仅依赖单条键的变形（即 $\underline{\mathbf{T}}$ 退化为键基 $\mathbf{f}$）时，态型理论退化为键基理论。换言之，键基理论是态型理论的子集。态型通过允许力态依赖整个变形状态——而非单条键——实现了对键基的推广。2.5 节将在此基础上建立应变能密度与力态的 Fr\'echet 导数关系；第 6 章则给出常规态型（OSB）与非寻常态型（non-ordinary state-based，简称 NOSB）本构的完整理论。
 
 \section{应变能密度与能量守恒}
 
