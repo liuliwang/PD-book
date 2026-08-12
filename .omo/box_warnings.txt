@@ -1,0 +1,33 @@
+﻿Underfull \vbox (badness 10000) has occurred while \output is active []
+Underfull \vbox (badness 10000) has occurred while \output is active []
+Underfull \hbox (badness 4441) in paragraph at lines 373--373
+Underfull \hbox (badness 1838) in paragraph at lines 184--185
+Overfull \hbox (2.66551pt too wide) in paragraph at lines 450--460
+Underfull \hbox (badness 10000) in paragraph at lines 547--547
+Underfull \hbox (badness 10000) in paragraph at lines 548--548
+Underfull \hbox (badness 4899) in paragraph at lines 548--548
+Underfull \hbox (badness 4899) in paragraph at lines 550--550
+Overfull \hbox (59.5535pt too wide) in paragraph at lines 884--893
+Underfull \vbox (badness 7012) has occurred while \output is active []
+Underfull \hbox (badness 10000) in paragraph at lines 1107--1107
+Underfull \hbox (badness 1418) in paragraph at lines 1109--1110
+Overfull \hbox (42.92812pt too wide) in paragraph at lines 1100--1112
+Underfull \vbox (badness 10000) has occurred while \output is active []
+Underfull \hbox (badness 10000) in paragraph at lines 1212--1212
+Underfull \hbox (badness 10000) in paragraph at lines 1212--1212
+Underfull \hbox (badness 1509) in paragraph at lines 1214--1214
+Underfull \hbox (badness 10000) in paragraph at lines 1215--1215
+Underfull \hbox (badness 10000) in paragraph at lines 1215--1215
+Underfull \hbox (badness 10000) in paragraph at lines 1215--1215
+Underfull \hbox (badness 1117) in paragraph at lines 1215--1215
+Underfull \hbox (badness 10000) in paragraph at lines 1216--1216
+Underfull \hbox (badness 10000) in paragraph at lines 1217--1217
+Underfull \hbox (badness 1509) in paragraph at lines 1217--1217
+Underfull \hbox (badness 10000) in paragraph at lines 1217--1218
+Underfull \hbox (badness 10000) in paragraph at lines 1218--1218
+Overfull \hbox (46.3922pt too wide) in paragraph at lines 1210--1222
+Underfull \hbox (badness 10000) in paragraph at lines 358--358
+Underfull \vbox (badness 10000) has occurred while \output is active []
+Underfull \hbox (badness 4899) in paragraph at lines 639--639
+Underfull \hbox (badness 4899) in paragraph at lines 642--642
+Underfull \hbox (badness 1460) in paragraph at lines 643--643

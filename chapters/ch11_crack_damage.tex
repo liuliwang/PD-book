@@ -219,7 +219,7 @@ v_c<c_R,
 
 数值算例中，参数的选择须满足式\eqref{eq:ch11-cfl}且兼顾计算效率。以典型脆性材料（PMMA，$E\approx 3\;\mathrm{GPa}$，$\rho\approx 1200\;\mathrm{kg}/\mathrm{m}^3$）为例，纵波速 $c_L=\sqrt{E(1-\nu)/[\rho(1+\nu)(1-2\nu)]}\approx 1830\;\mathrm{m}/\mathrm{s}$（取 $\nu=0.3$）；取 $\Delta x=1\;\mathrm{mm}$、$C=0.5$，则 $\Delta t\leq 0.5\times 10^{-3}/1830\approx 2.7\times 10^{-7}\;\mathrm{s}$。动态断裂模拟通常需要数万至数十万个时间步，计算成本较高，因此时间步长的选取须在稳定性与效率之间取得平衡。Bobaru 与 Hu \cite{BobaruHu2012} 指出，过大的 $\Delta t$ 不仅导致失稳，还会使裂纹扩展速度的估计出现系统性偏高；过小的 $\Delta t$ 则使计算时间不可接受，且可能放大高频数值噪声。
 
-\subsection{m/δ收敛与裂纹路径收敛}\label{sec:ch11-m-convergence}
+\subsection{m/\texorpdfstring{$\delta$}{delta}收敛与裂纹路径收敛}\label{sec:ch11-m-convergence}
 
 动态断裂模拟的收敛性分析涉及两个相互关联的参数：近场范围 $\delta$ 与网格尺寸 $\Delta x$。二者的比值 $m=\delta/\Delta x$（每个近场域内的物质点数目的度量）是控制数值精度的关键无量纲参数。本节区分两种收敛模式：$m$-收敛（固定 $\delta$、增大 $m$）与 $\delta$-收敛（固定 $m$、减小 $\delta$），并讨论裂纹路径收敛作为动态断裂模拟特有判据的物理意义。
 

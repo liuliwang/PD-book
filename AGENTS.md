@@ -9,7 +9,7 @@
 
 ## 项目概览
 专著《近场动力学理论与数值方法》的 LaTeX 书籍项目（ctexbook，A4，11pt）。
-章节完成度参差：ch01–ch10 为完整章节（数百至上千行，是写作新章节时的范例）；ch11–ch19 目前仅为十余行占位骨架；附录 appA–appE 为占位空文件。ch09（空间离散与时间积分）、ch10（边界条件与表面效应处理）为近期完成章节，其节结构与每节末尾的 AI 声明样式值得沿用；ch04 的 6 节结构（假设→微势→PMB→率定→表面效应→局限）是撰写键型相关章节的范例。ch05（键型改进模型）已完整，撰写相关章节前先 Read 其目录避免主题重复（如 dual-horizon 理论在 5.5 节，后续章节只做数值实现层面衔接）。
+章节完成度参差：ch01–ch11 为完整章节（数百至上千行，是写作新章节时的范例）；ch12–ch19 目前仅为十余行占位骨架；附录 appA–appE 为占位空文件。ch09（空间离散与时间积分）、ch10（边界条件与表面效应处理）为近期完成章节，其节结构与每节末尾的 AI 声明样式值得沿用；ch04 的 6 节结构（假设→微势→PMB→率定→表面效应→局限）是撰写键型相关章节的范例。ch05（键型改进模型）已完整，撰写相关章节前先 Read 其目录避免主题重复（如 dual-horizon 理论在 5.5 节，后续章节只做数值实现层面衔接）。ch11（裂纹与损伤的数值模拟，465 行）包含动态断裂、相场模型、裂纹追踪等内容，撰写 ch12+ 数值方法章节时注意衔接。
 ## 编译
 
 必须用 XeLaTeX（ctexbook + 中文）。TeX 发行版：MiKTeX（本机 `xelatex --version` 实测 25.12）。以下命令顺序即 `.vscode/settings.json` 中 latex-workshop 的 recipe「完整编译 (含参考文献)」；autoBuild/autoClean 均为 never，不会自动编译清理。
@@ -51,6 +51,11 @@ xelatex main.tex
 - **代码环境**：`listings` 包（`frame=single`、`breaklines`、左行号）
 - **链接颜色**：`hyperref` 已配置 colorlinks，PDF 中交叉引用/文献链接为蓝色（预期行为，勿当错误）
 - **Overfull**：preamble 已设 `\emergencystretch=2em` 吸收极端溢出；轻微 Overfull 警告属预期，仅当严重破版时才处理
+
+### 特殊字符处理
+
+- **章节标题中的希腊字母/数学符号**：必须用 `\texorpdfstring{$\delta$}{delta}` 包裹。裸 Unicode 字符（如 `δ`）会导致 "Missing character: There is no δ in font [lmroman12-bold]" 警告。已有先例：ch03 用 `\texorpdfstring{$\sigma^{\mathrm{PD}}$}{sigma PD}`，ch11 用 `\texorpdfstring{$\delta$}{delta}`
+- **PDF 书签**：`hyperref` 无法渲染数学符号，`\texorpdfstring` 的第二个参数提供纯文本替代
 
 ### 插图
 
@@ -139,7 +144,7 @@ xelatex main.tex
 
 - **参考文献**：统一由 `bibliography.bib` 管理（124 条）；当前 `main.tex` 用 `\bibliographystyle{plain}`（非 GB/T 7714），若切换 GB/T 7714 须更换 bibstyle 并引入 `gbt7714` 宏包
 - **编译质量门禁**：xelatex + bibtex 无 error；无 undefined reference/citation 警告
-- **已知警告（非本次改动引入，勿误判）**：ch05_bond_improved.tex 引用了 3 个 bib 中不存在的 cite key——`DianaCasolo2019`、`WangZhouShou2017`、`WangZhouWang2018`（bibtex 报 warning，属既有问题，修复方式为补录条目或改引，2026-08 全链编译确认）；ch03_ccm_pd.tex 行 291 节标题含数学符号导致 hyperref "Token not allowed in PDF string" 警告 4 处（无害）。验证其他章节改动时，若全链编译仍见上述警告，属正常基线，重点核查新增内容是否引入新的 undefined citation/reference。
+- **已知警告（非本次改动引入，勿误判）**：ch03_ccm_pd.tex 行 291 节标题含数学符号导致 hyperref "Token not allowed in PDF string" 警告 4 处（无害）。验证其他章节改动时，若全链编译仍见上述警告，属正常基线，重点核查新增内容是否引入新的 undefined citation/reference。
 - **编译前清理**：完整验证前先删除残留 `*.aux`/`*.bbl`/`*.blg`/`*.log` 再全链重跑；脏 aux 会导致 bibtex 报 "File ended while scanning" 等连锁假错误（2026-08 实测，干净重跑即消失）
 - **编译验证执行方式**：涉及 xelatex 编译验证的 QA 任务（如最终编译检查、F-wave 验证），**由当前会话直接本地执行**，不委托子代理。原因：章节文件（`chNN_*.tex`）不能单独编译，必须由 `main.tex` 入口编译；子代理可能编译错误文件、PowerShell 环境差异导致阻塞、或未按格式输出 `VERDICT` 导致 boulder 暂停。
 

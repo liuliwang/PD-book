@@ -1,0 +1,67 @@
+{
+  "schema_version": 2,
+  "active_work_id": "fix-problems-panel-94fc2c15",
+  "works": {
+    "fix-problems-panel-94fc2c15": {
+      "work_id": "fix-problems-panel-94fc2c15",
+      "active_plan": "D:\\PD-book\\.omo\\plans\\fix-problems-panel.md",
+      "plan_name": "fix-problems-panel",
+      "status": "completed",
+      "started_at": "2026-08-12T12:55:08.004Z",
+      "updated_at": "2026-08-12T13:04:51.544Z",
+      "session_ids": [
+        "opencode:ses_009fd2981ffe2IJxBDq9ijygnT"
+      ],
+      "session_origins": {
+        "opencode:ses_009fd2981ffe2IJxBDq9ijygnT": "direct"
+      },
+      "agent": "atlas",
+      "task_sessions": {
+        "todo:1": {
+          "task_key": "todo:1",
+          "task_label": "1",
+          "task_title": "`bibliography.bib`: 删除第 1748–1758 行格式错误块（嵌套条目 WangZhouShou2017/DianaCasolo2019）- expect BibTeX parse error 消除",
+          "session_id": "opencode:ses_009f0f5dbffe2p2hf5MslvZBoF",
+          "agent": "Sisyphus-Junior",
+          "category": "quick",
+          "updated_at": "2026-08-12T13:03:54.007Z",
+          "started_at": "2026-08-12T13:03:15.365Z",
+          "status": "completed",
+          "ended_at": "2026-08-12T13:03:54.007Z",
+          "elapsed_ms": 38642
+        }
+      },
+      "ended_at": "2026-08-12T13:04:51.544Z",
+      "elapsed_ms": 583540
+    }
+  },
+  "active_plan": "D:\\PD-book\\.omo\\plans\\fix-problems-panel.md",
+  "started_at": "2026-08-12T12:55:08.004Z",
+  "status": "completed",
+  "updated_at": "2026-08-12T13:04:51.544Z",
+  "session_ids": [
+    "opencode:ses_009fd2981ffe2IJxBDq9ijygnT"
+  ],
+  "session_origins": {
+    "opencode:ses_009fd2981ffe2IJxBDq9ijygnT": "direct"
+  },
+  "plan_name": "fix-problems-panel",
+  "task_sessions": {
+    "todo:1": {
+      "task_key": "todo:1",
+      "task_label": "1",
+      "task_title": "`bibliography.bib`: 删除第 1748–1758 行格式错误块（嵌套条目 WangZhouShou2017/DianaCasolo2019）- expect BibTeX parse error 消除",
+      "session_id": "opencode:ses_009f0f5dbffe2p2hf5MslvZBoF",
+      "agent": "Sisyphus-Junior",
+      "category": "quick",
+      "updated_at": "2026-08-12T13:03:54.007Z",
+      "started_at": "2026-08-12T13:03:15.365Z",
+      "status": "completed",
+      "ended_at": "2026-08-12T13:03:54.007Z",
+      "elapsed_ms": 38642
+    }
+  },
+  "agent": "atlas",
+  "ended_at": "2026-08-12T13:04:51.544Z",
+  "elapsed_ms": 583540
+}

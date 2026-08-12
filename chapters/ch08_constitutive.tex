@@ -881,9 +881,9 @@ JH-2 模型是 Johnson--Holmquist 系列模型的第二代。第一代模型 JH-
   \small
   \caption{常用装甲陶瓷的 JH-2 Hugoniot 弹性极限与状态方程参数（$\sigma_{\mathrm{HEL}}$、$P_{\mathrm{HEL}}$ 为 HEL 处的等效应力与压力，$T$ 为最大拉伸静水压力，$K_{1}$、$K_{2}$、$K_{3}$ 为多项式状态方程系数，$\beta$ 为体积膨胀能量转化分数）\cite{JohnsonHolmquist1999,HolmquistJohnson2002,HolmquistTempletonBishnoi2001}}
   \label{tab:jh2-eos-params}
-  \begin{tabular}{lcccccccc}
+  \begin{tabular}{l>{\raggedright\arraybackslash}p{1.1cm}>{\raggedright\arraybackslash}p{1.1cm}>{\raggedright\arraybackslash}p{1.1cm}>{\raggedright\arraybackslash}p{1.1cm}>{\raggedright\arraybackslash}p{1.1cm}>{\raggedright\arraybackslash}p{1.1cm}>{\raggedright\arraybackslash}p{1.1cm}>{\raggedright\arraybackslash}p{1.1cm}}
     \toprule
-    材料 & HEL $(\mathrm{GPa})$ & $\sigma_{\mathrm{HEL}}~(\mathrm{GPa})$ & $P_{\mathrm{HEL}}~(\mathrm{GPa})$ & $T~(\mathrm{GPa})$ & $K_{1}~(\mathrm{GPa})$ & $K_{2}~(\mathrm{GPa})$ & $K_{3}~(\mathrm{GPa})$ & $\beta$ \\
+    材料 & \shortstack{HEL\\$(\mathrm{GPa})$} & \shortstack{$\sigma_{\mathrm{HEL}}$\\$(\mathrm{GPa})$} & \shortstack{$P_{\mathrm{HEL}}$\\$(\mathrm{GPa})$} & \shortstack{$T$\\$(\mathrm{GPa})$} & \shortstack{$K_{1}$\\$(\mathrm{GPa})$} & \shortstack{$K_{2}$\\$(\mathrm{GPa})$} & \shortstack{$K_{3}$\\$(\mathrm{GPa})$} & $\beta$ \\
     \midrule
     碳化硼 B$_{4}$C & $19.0$ & $15.4$ & $8.71$ & $0.26$ & $233$ & $-593$ & $2800$ & $1.0$ \\
     碳化硅 SiC & $14.6$ & $13.0$ & $5.90$ & $0.37$ & $205$ & $0$ & $0$ & $1.0$ \\
@@ -1097,7 +1097,7 @@ JH-2 在近场动力学中的实现已有多个代表性工作。Lai 等 2018 �
   \small
   \caption{本章各本构在本构对应框架中的统一实现模式（$\mathbf{F}$ 为非局部变形梯度，$\boldsymbol{\alpha}$ 为内变量集合，输出为 Cauchy 应力 $\boldsymbol{\sigma}$ 或第一类 Piola--Kirchhoff 应力 $\mathbf{P}$，内变量更新均为显式格式）}
   \label{tab:fd-constitutive-summary}
-  \begin{tabular}{p{2.6cm}p{4.4cm}p{4.0cm}p{1.9cm}p{2.0cm}}
+  \begin{tabular}{>{\raggedright\arraybackslash}p{1.6cm}>{\raggedright\arraybackslash}p{4.2cm}>{\raggedright\arraybackslash}p{3.2cm}>{\raggedright\arraybackslash}p{1.9cm}>{\raggedright\arraybackslash}p{2.0cm}}
     \toprule
     本构（节） & 应力响应函数 $\hat{\boldsymbol{\sigma}}$ & 内变量 $\boldsymbol{\alpha}$ & 输出应力 & 更新格式 \\
     \midrule
@@ -1207,7 +1207,7 @@ JH-2 在近场动力学中的实现已有多个代表性工作。Lai 等 2018 �
   \small
   \caption{本章各本构的适用性对比}
   \label{tab:fd-comparison}
-  \begin{tabular}{p{2.2cm}p{2.4cm}p{2.5cm}p{2.5cm}p{2.2cm}p{2.8cm}}
+  \begin{tabular}{>{\raggedright\arraybackslash}p{1.4cm}>{\raggedright\arraybackslash}p{2.3cm}>{\raggedright\arraybackslash}p{2.3cm}>{\raggedright\arraybackslash}p{2.3cm}>{\raggedright\arraybackslash}p{2.0cm}>{\raggedright\arraybackslash}p{2.3cm}}
     \toprule
     本构 & 适用材料 & 载荷特征 & 时间尺度/应变率 & 内变量/实现成本 & 典型应用场景 \\
     \midrule
