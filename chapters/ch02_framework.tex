@@ -791,31 +791,97 @@
 
 \section{近场动力学状态}
 
-2.1 至 2.3 节建立的是键基（bond-based）近场动力学理论：相互作用以键为单位，每条键由一个对力函数 $\mathbf{f}(\boldsymbol{\eta},\boldsymbol{\xi})$ 描述。键基理论形式简洁、物理直观，但有一个本质局限：各向同性线性键基材料只能描述泊松比为 $1/4$（二维为 $1/3$）的材料，无法刻画任意泊松比的各向同性体。为突破这一限制，Silling 等人提出了态型（state-based）近场动力学 \cite{Silling2007}，把"键到键"的二体力推广为"点到场"的非局部相互作用。本节作为引论，介绍态型理论的基本概念与动机；态的严格数学表述、代数运算、本构分类等内容见 6.1 节。
+2.1 至 2.3 节建立的是键基（bond-based）近场动力学理论：相互作用以键为单位，每条键由一个对力函数 $\mathbf{f}(\boldsymbol{\eta},\boldsymbol{\xi})$ 描述，运动方程取对力密度在近场域上的积分形式。键基理论形式简洁、物理直观，但有一个本质局限：各向同性线性键基材料只能描述泊松比为 $1/4$（二维为 $1/3$）的材料，无法刻画任意泊松比的各向同性体。为突破这一限制，Silling 等人提出了态型（state-based）近场动力学 \cite{Silling2007}，把"键到键"的二体力推广为"点到场"的非局部相互作用。本节首先剖析键基理论局限性在成对势结构上的根源，说明引入态的必要性（2.4.1 节）；继而给出态的概念与基本定义，引入变形态与力态两个基本对象（2.4.2 节）；在此基础上建立态型运动方程，并阐明"力态差"代替单力这一形式变化的含义（2.4.3 节）；最后证明键基运动方程是态型方程在特殊力态下的自然退化（2.4.4 节）。态的严格数学表述、代数运算、本构分类等内容见 6.1 节；本节建立的态型表述与记号，是 2.5 节应变能密度的态型推广及其能量分析的基础。
 
 \subsection{从键基到态型：动机与过渡}
 
-键基对力 $\mathbf{f}(\boldsymbol{\eta},\boldsymbol{\xi})$ 只依赖单条键的相对位移 $\boldsymbol{\eta}$，与该物质点其他键的变形无关。这意味着每条键独立承担自己的恢复力，键与键之间无耦合。对线性各向同性材料，这一限制导致泊松比被锁定为 $1/4$（三维）或 $1/3$（二维平面应力），详见式\eqref{eq:poisson-limit}。这一限制可表述为
+键基对力 $\mathbf{f}(\boldsymbol{\eta},\boldsymbol{\xi})$ 只依赖单条键的相对位移 $\boldsymbol{\eta}$，与该物质点其他键的变形无关。这意味着每条键独立承担自己的恢复力，键与键之间无耦合。对线性各向同性材料，这一限制导致泊松比被锁定为 $1/4$（三维）或 $1/3$（二维平面应力），其严格推导见本节下文。这一限制可表述为
 
 \begin{equation}
   \nu_{\text{键基}}=\frac{1}{4}\quad(\text{三维}),\qquad \nu_{\text{键基}}=\frac{1}{3}\quad(\text{二维平面应力})
   \label{eq:poisson-limit}
 \end{equation}
 
-其物理根源在于：键基对力无法区分"体积变形"与"形状变形"，因为每条键只感知自身的伸长率，不知道邻居键的总体变形状态。实际材料（如金属 $\nu\approx 0.3$、橡胶 $\nu\approx 0.5$）大多不满足这一限制，因此键基理论虽适合作为入门和定性分析，但对定量预测有本质不足。
+\begin{figure}[htbp]
+  \centering
+  \begin{tikzpicture}[scale=0.85]
+    % 中心物质点
+    \filldraw (0,0) circle (3pt) node[below] {$\mathbf{x}$};
+    % 参考键（灰虚线，l₀=1.8cm）
+    \foreach \a in {0, 45, 90, 135, 180, 225, 270, 315} {
+      \draw[gray, dashed] (0,0) -- ({1.8*cos(\a)}, {1.8*sin(\a)});
+      \filldraw[gray] ({1.8*cos(\a)}, {1.8*sin(\a)}) circle (2pt);
+    }
+    % 变形键（红色实线，s=ε₁₁cos²θ，ε₁₁=0.3）
+    % 0°: s=ε₁₁, deformed length = 2.34
+    \draw[red, thick] (0,0) -- (2.34, 0);
+    \filldraw[red] (2.34, 0) circle (2pt);
+    % 45°: s=ε₁₁/2, deformed length = 1.464
+    \draw[red, thick] (0,0) -- (1.464, 1.464);
+    \filldraw[red] (1.464, 1.464) circle (2pt);
+    % 90°: s=0, no deformed bond (reference only)
+    % 135°: s=ε₁₁/2, deformed length = 1.464
+    \draw[red, thick] (0,0) -- (-1.464, 1.464);
+    \filldraw[red] (-1.464, 1.464) circle (2pt);
+    % 180°: s=ε₁₁, deformed length = 2.34
+    \draw[red, thick] (0,0) -- (-2.34, 0);
+    \filldraw[red] (-2.34, 0) circle (2pt);
+    % 225°: s=ε₁₁/2, deformed length = 1.464
+    \draw[red, thick] (0,0) -- (-1.464, -1.464);
+    \filldraw[red] (-1.464, -1.464) circle (2pt);
+    % 270°: s=0, no deformed bond (reference only)
+    % 315°: s=ε₁₁/2, deformed length = 1.464
+    \draw[red, thick] (0,0) -- (1.464, -1.464);
+    \filldraw[red] (1.464, -1.464) circle (2pt);
+    % 标注各键伸长率
+    \node[right, font=\small] at (2.34, 0) {$s=\varepsilon_{11}$};
+    \node[above right, font=\small] at (1.464, 1.464) {$s=\varepsilon_{11}/2$};
+    \node[above right, font=\small] at (0, 1.8) {$s=0$};
+    \node[above left, font=\small] at (-1.464, 1.464) {$s=\varepsilon_{11}/2$};
+    \node[left, font=\small] at (-2.34, 0) {$s=\varepsilon_{11}$};
+    \node[below left, font=\small] at (-1.464, -1.464) {$s=\varepsilon_{11}/2$};
+    \node[below right, font=\small] at (1.464, -1.464) {$s=\varepsilon_{11}/2$};
+    % 伸长率公式
+    \node[above, font=\small, dashed] at (0, 2.5) {$s=\varepsilon_{11}\cos^2\theta$};
+    % 单轴拉伸方向箭头（arrows.meta 已在文件头声明）
+    \draw[<->, thick] (-2.8, -2.3) -- (2.8, -2.3)
+      node[midway, below] {$\varepsilon_{11}$};
+  \end{tikzpicture}
+  \caption{键基模型泊松比锁定的直观机制：单轴拉伸 $\varepsilon_{11}$ 下各方向键伸长率 $s\approx\varepsilon_{11}\cos^2\theta$（式\eqref{eq:stretch-uniform}的图示）}
+  \label{fig:poisson-lock}
+\end{figure}
 
-为突破上述局限，需要将"键到键"的二体力推广为"点到场"的非局部映射：物质点 $\mathbf{x}$ 对邻居 $\mathbf{x}'$ 的力不仅依赖该键自身的变形，还依赖 $\mathbf{x}$ 的整个变形状态。这一推广通过引入\emph{态}（state）的概念实现。
+为直观理解这一锁定的机制，考虑均匀单轴拉伸 $\varepsilon_{11}$ 的情形。由式\eqref{eq:stretch-uniform}，键的伸长率 $s\approx\boldsymbol{\xi}\cdot\boldsymbol{\varepsilon}\cdot\boldsymbol{\xi}/|\boldsymbol{\xi}|^2=\varepsilon_{11}\cos^2\theta$，仅取决于键方向与拉伸方向的夹角：$0^\circ$ 键伸长最大，$45^\circ$ 键伸长为一半，$90^\circ$ 横向键伸长率为零（图\ref{fig:poisson-lock}）。横向键对拉伸方向的变形"视而不见"，而每条键只沿自身方向传递与自身伸长率成正比的中心力（2.3.1 节中心力条件），键与键之间互不耦合——这正是键基模型只含单一弹性参数的几何根源：体积变形与剪切变形都只能通过同一微模量函数 $c(r)$ 描述，两类变形无法独立调控，泊松比随之锁定。这一锁定的严格推导可沿两条路径展开：其一，本节以下用能量法直接给出（应变能密度系数对比，得二者比例锁定）；其二，基于近场动力学应力张量 $\sigma^{\mathrm{PD}}$ 的推导见第 3 章 3.3 节——3.3.2 节给出 Lam\'e 常数对应表\ref{tab:pd-ccm-correspond}，3.3.3 节剖析其根源并附图\ref{fig:iso-decomp}。工程后果剖析见第 4 章 4.6.1 节。实际材料（如金属 $\nu\approx 0.3$、橡胶 $\nu\approx 0.5$）大多不满足这一限制，因此键基理论虽适合作为入门和定性分析，但对定量预测有本质不足。
+
+上述直观机制可由能量法严格化。考虑均匀变形 $\mathbf{u}(\mathbf{x})=\boldsymbol{\varepsilon}\cdot\mathbf{x}$，由式\eqref{eq:strain-energy}与式\eqref{eq:linear-potential}，键基应变能密度 $W=\frac{1}{2}\int_{\mathcal{F}_{\mathbf{x}}}w\,\mathrm{d}V'=\frac{1}{4}\int_{\mathcal{F}_{\mathbf{x}}}c(|\boldsymbol{\xi}|)s^{2}|\boldsymbol{\xi}|\,\mathrm{d}V'$（系数 $1/4$ 来自式\eqref{eq:strain-energy}的半值修正与式\eqref{eq:linear-potential}的成对势系数各计一半）。将式\eqref{eq:stretch-uniform}代入，$s\approx\boldsymbol{\xi}\cdot\boldsymbol{\varepsilon}\cdot\boldsymbol{\xi}/|\boldsymbol{\xi}|^{2}=\hat{\boldsymbol{\xi}}\cdot\boldsymbol{\varepsilon}\cdot\hat{\boldsymbol{\xi}}$（$\hat{\boldsymbol{\xi}}=\boldsymbol{\xi}/|\boldsymbol{\xi}|$ 为键方向单位矢量），并采用球坐标 $\mathrm{d}V'=r^{2}\,\mathrm{d}r\,\mathrm{d}\Omega$（$r=|\boldsymbol{\xi}|$），得 $W=\frac{1}{4}\left[\int_{0}^{\delta}c(r)\,r^{3}\,\mathrm{d}r\right]\left[\int_{\Omega}(\hat{\boldsymbol{\xi}}\cdot\boldsymbol{\varepsilon}\cdot\hat{\boldsymbol{\xi}})^{2}\,\mathrm{d}\Omega\right]$。球面积分可由四阶矩引理求出（证明见第 3 章 3.3.1 节）：
+\begin{equation}
+  \int_{\Omega}(\hat{\boldsymbol{\xi}}\cdot\boldsymbol{\varepsilon}\cdot\hat{\boldsymbol{\xi}})^{2}\,\mathrm{d}\Omega = \frac{4\pi}{15}\left[(\operatorname{tr}\boldsymbol{\varepsilon})^{2}+2\,\boldsymbol{\varepsilon}:\boldsymbol{\varepsilon}\right]
+  \label{eq:sphere-quartic}
+\end{equation}
+代回并记 $R_{3}=\int_{0}^{\delta}c(r)r^{3}\,\mathrm{d}r$（微模量的三阶径向矩；第 3 章 3.3.1 节中的 $R=\int_{0}^{\delta}c(r)r^{4}\,\mathrm{d}r$ 为四阶矩，阶数不同，注意区分），则键基应变能密度仅含单一参数 $R_{3}$：
+\begin{equation}
+  W = \frac{\pi R_{3}}{15}\left[(\operatorname{tr}\boldsymbol{\varepsilon})^{2}+2\,\boldsymbol{\varepsilon}:\boldsymbol{\varepsilon}\right]
+  \label{eq:pd-lame-energy}
+\end{equation}
+与经典各向同性弹性体 $W=\frac{1}{2}\lambda(\operatorname{tr}\boldsymbol{\varepsilon})^{2}+\mu\,\boldsymbol{\varepsilon}:\boldsymbol{\varepsilon}$（$\lambda$ 为 Lam\'e 第一常数，$\mu$ 为剪切模量）逐项对照，比较系数得 $\lambda_{\text{键基}}=\frac{2\pi R_{3}}{15}=\mu_{\text{键基}}$（比例 $\lambda:\mu=1:1$），故三维泊松比
+\begin{equation}
+  \nu = \frac{\lambda}{2(\lambda+\mu)} = \frac{1}{4}
+  \label{eq:nu-energy}
+\end{equation}
+平面应力情形重复上述计算可得 $\nu=1/3$（对应推导见第 4 章 4.4.2 节），与式\eqref{eq:poisson-limit}一致。为突破上述局限，需要将"键到键"的二体力推广为"点到场"的非局部映射：物质点 $\mathbf{x}$ 对邻居 $\mathbf{x}'$ 的力不仅依赖该键自身的变形，还依赖 $\mathbf{x}$ 的整个变形状态。这一推广通过引入\emph{态}（state）的概念实现。
 
 \subsection{态的概念与基本定义}
 
-需要特别强调的是，态不是矢量，而是把键矢量 $\boldsymbol{\xi}$ 映射为矢量的函数，记为 $\underline{A}\langle\boldsymbol{\xi}\rangle$，其中下划线表示态、尖括号内为自变量键矢量。态型理论中，物质点 $\mathbf{x}$ 对邻居 $\mathbf{x}'$ 的力不再仅依赖该键自身的 $\boldsymbol{\eta}$，而是依赖 $\mathbf{x}$ 的整个变形状态。两个基本态是：
+需要特别强调的是，态不是矢量，而是把键矢量 $\boldsymbol{\xi}$ 映射为矢量的函数，记为 $\underline{\mathbf{A}}\langle\boldsymbol{\xi}\rangle$，其中下划线表示态、尖括号内为自变量键矢量。态型理论中，物质点 $\mathbf{x}$ 对邻居 $\mathbf{x}'$ 的力不再仅依赖该键自身的 $\boldsymbol{\eta}$，而是依赖 $\mathbf{x}$ 的整个变形状态。两个基本态是：
 
 \begin{itemize}
-  \item \textbf{变形态}（deformation state）$\underline{\mathbf{Y}}$：把参考键 $\boldsymbol{\xi}$ 映射为变形后键 $\boldsymbol{\xi}+\boldsymbol{\eta}$，即 $\underline{\mathbf{Y}}\langle\boldsymbol{\xi}\rangle=\mathbf{y}(\mathbf{x}+\boldsymbol{\xi})-\mathbf{y}(\mathbf{x})$。变形态完全描述了物质点 $\mathbf{x}$ 的局部变形几何。
-  \item \textbf{力态}（force state）$\underline{\mathbf{T}}$：把参考键 $\boldsymbol{\xi}$ 映射为 $\mathbf{x}'$ 对 $\mathbf{x}$ 的力密度矢量。力态是本构关系的输出，由变形态经本构函数决定：$\underline{\mathbf{T}}=\underline{\hat{\mathbf{T}}}(\underline{\mathbf{Y}})$。
+  \item \emph{变形态}（deformation state）$\underline{\mathbf{Y}}$：把参考键 $\boldsymbol{\xi}$ 映射为变形后键 $\boldsymbol{\xi}+\boldsymbol{\eta}$，即 $\underline{\mathbf{Y}}\langle\boldsymbol{\xi}\rangle=\mathbf{y}(\mathbf{x}+\boldsymbol{\xi},t)-\mathbf{y}(\mathbf{x},t)$。变形态完全描述了物质点 $\mathbf{x}$ 的局部变形几何。
+  \item \emph{力态}（force state）$\underline{\mathbf{T}}$：把参考键 $\boldsymbol{\xi}$ 映射为 $\mathbf{x}'$ 对 $\mathbf{x}$ 的力密度矢量。力态是本构关系的输出，由变形态经本构函数决定：$\underline{\mathbf{T}}=\hat{\underline{\mathbf{T}}}(\underline{\mathbf{Y}})$。
 \end{itemize}
 
-图\ref{fig:state-concept}直观地展示了这一对应关系：灰色虚线给出参考构型中的各条键，变形态 $\underline{\mathbf{Y}}$ 把参考键 $\boldsymbol{\xi}$ 映射为变形后键（红色实线），力态 $\underline{\mathbf{T}}$ 则把参考键映射为相应的力密度矢量（橙色箭头），二者经本构函数 $\underline{\hat{\mathbf{T}}}$ 相关联。
+为行文简洁，本节书写态时省略定义点与时间参数 $\mathbf{x},t$；完整记号形如 $\underline{\mathbf{Y}}[\mathbf{x},t]\langle\boldsymbol{\xi}\rangle$，其严格定义与代数运算见 6.1 节。
+
+图\ref{fig:state-concept}直观地展示了这一对应关系：灰色虚线给出参考构型中的各条键，变形态 $\underline{\mathbf{Y}}$ 把参考键 $\boldsymbol{\xi}$ 映射为变形后键（红色实线），力态 $\underline{\mathbf{T}}$ 则把参考键映射为相应的力密度矢量（橙色箭头），二者经本构函数 $\hat{\underline{\mathbf{T}}}$ 相关联。
 
 \begin{figure}[htbp]
   \centering
@@ -832,13 +898,26 @@
       \draw[red, thick] (0,0) -- (\b, \c);
       \filldraw[red] (\b, \c) circle (2pt);
     }
-    % 标注两个特定键
-    \draw[->, thick, blue] (2.5, 1.8) -- (3.5, 1.8) node[right, blue] {$\underline{\mathbf{Y}}\langle\boldsymbol{\xi}\rangle$};
-    \draw[->, thick, orange!80!black] (2.5, 1.8) -- (3.5, 2.5) node[right, orange!80!black] {$\underline{\mathbf{T}}\langle\boldsymbol{\xi}\rangle$};
-    \node[align=center, gray] at (-4, 0) {参考构型\\（虚线）};
-    \node[align=center, red] at (4.5, -1.5) {变形构型\\（实线）};
+    % 高亮 45° 键对：参考键（灰虚线）与变形键（红实线）共享起点 (0,0)
+    \draw[gray, dashed, very thick] (0,0) -- (1.414, 1.414);
+    \draw[red, very thick] (0,0) -- (1.7, 1.6);
+    % 变形态箭头：把参考键 xi 映射为变形后键 xi+eta（起点与键对共享 (0,0)，终点为变形键末端）
+    \draw[->, thick, blue] (0,0) -- (1.7, 1.6) node[pos=0.55, below right, blue, font=\small] {$\underline{\mathbf{Y}}\langle\boldsymbol{\xi}\rangle=\boldsymbol{\xi}+\boldsymbol{\eta}$};
+    \filldraw[red] (1.7, 1.6) circle (3pt);
+    % 力态箭头：把参考键映射为力密度矢量（从变形键末端沿其方向延伸，起点与 Y 箭头起点不同）
+    \draw[->, very thick, orange!80!black] (1.7, 1.6) -- (2.35, 2.2) node[right, orange!80!black, font=\small] {$\underline{\mathbf{T}}\langle\boldsymbol{\xi}\rangle$};
+    % 下行：本构映射示意，本构函数把变形态映射为力态
+    \begin{scope}[yshift=-4.2cm]
+      \draw[red, very thick] (0,0) -- (1.7, 1.6) node[pos=0.45, above, red, font=\small] {$\underline{\mathbf{Y}}\langle\boldsymbol{\xi}\rangle$};
+      \filldraw[red] (1.7, 1.6) circle (2pt);
+      \draw[->, very thick, black!70] (2.3, 0.8) -- (3.6, 0.8) node[midway, above, font=\small] {$\hat{\underline{\mathbf{T}}}$（本构函数）};
+      \draw[->, very thick, orange!80!black] (3.6, 0.8) -- (4.6, 1.55) node[right, orange!80!black, font=\small] {$\underline{\mathbf{T}}\langle\boldsymbol{\xi}\rangle$};
+      \node[align=center, black!70, font=\small] at (2.95, -1.2) {本构映射};
+    \end{scope}
+    \node[align=center, gray] at (-4, 0) {参考键\\（灰色虚线）};
+    \node[align=center, red] at (4.5, -1.5) {变形键\\（红色实线）};
   \end{tikzpicture}
-  \caption{态型理论中，变形态 $\underline{\mathbf{Y}}$ 把参考键映射为变形后键，力态 $\underline{\mathbf{T}}$ 把参考键映射为力密度矢量。力态依赖整个变形态，而非单条键}
+  \caption{态型理论中，变形态 $\underline{\mathbf{Y}}$ 把参考键 $\boldsymbol{\xi}$ 映射为变形后键 $\boldsymbol{\xi}+\boldsymbol{\eta}$（红色实线），力态 $\underline{\mathbf{T}}$ 把参考键映射为力密度矢量（橙色箭头）；下行示意本构函数 $\hat{\underline{\mathbf{T}}}$ 把变形态映射为力态。力态依赖整个变形态，而非单条键。蓝色箭头与红色变形键重合，表明变形态的输出正是变形后键 $\boldsymbol{\xi}+\boldsymbol{\eta}$}
   \label{fig:state-concept}
 \end{figure}
 
@@ -848,7 +927,7 @@
 
 用态表示的运动方程为
 \begin{equation}
-  \rho(\mathbf{x})\,\ddot{\mathbf{u}}(\mathbf{x},t)=\int_{\mathcal{H}_{\mathbf{x}}}\Bigl[\underline{\mathbf{T}}\langle\boldsymbol{\xi}\rangle-\underline{\mathbf{T}}'\langle-\boldsymbol{\xi}\rangle\Bigr]\,\mathrm{d}V'+\mathbf{b}(\mathbf{x},t)
+  \rho(\mathbf{x})\,\ddot{\mathbf{u}}(\mathbf{x},t)=\int_{H_{\mathbf{x}}}\Bigl[\underline{\mathbf{T}}\langle\boldsymbol{\xi}\rangle-\underline{\mathbf{T}}'\langle-\boldsymbol{\xi}\rangle\Bigr]\,\mathrm{d}V'+\mathbf{b}(\mathbf{x},t)
   \label{eq:state-motion-ch02}
 \end{equation}
 其中 $\underline{\mathbf{T}}\langle\boldsymbol{\xi}\rangle$ 为物质点 $\mathbf{x}$ 的力态在键 $\boldsymbol{\xi}$ 处的取值，即 $\mathbf{x}$ 对邻居 $\mathbf{x}'$ 的作用力密度；$\underline{\mathbf{T}}'\langle-\boldsymbol{\xi}\rangle$ 为邻居 $\mathbf{x}'$ 的力态在反向键 $-\boldsymbol{\xi}$ 处的取值，即 $\mathbf{x}'$ 对 $\mathbf{x}$ 的反作用力密度。两者之差的体积积分给出 $\mathbf{x}$ 受到的净非局部力密度，加上体力 $\mathbf{b}(\mathbf{x},t)$ 后等于惯性力。
@@ -862,7 +941,7 @@
   \underline{\mathbf{T}}\langle\boldsymbol{\xi}\rangle=\tfrac{1}{2}\,\mathbf{f}(\boldsymbol{\eta},\boldsymbol{\xi})
   \label{eq:bb-state-special}
 \end{equation}
-其中 $\mathbf{f}$ 为键基对力函数，系数 $1/2$ 的物理意义是"每键被两点共享"：在态型表述中，$\mathbf{x}$ 对键的贡献为 $\underline{\mathbf{T}}\langle\boldsymbol{\xi}\rangle=\mathbf{f}/2$，$\mathbf{x}'$ 对同一键的贡献为 $\underline{\mathbf{T}}'\langle-\boldsymbol{\xi}\rangle=-\mathbf{f}/2$（由反作用条件\eqref{eq:reaction}）。将式\eqref{eq:bb-state-special}代入态型运动方程\eqref{eq:state-motion-ch02}，得
+其中 $\mathbf{f}$ 为键基对力函数，系数 $1/2$ 的物理意义是"每键被两点共享"：在态型表述中，$\mathbf{x}$ 对键的贡献为 $\underline{\mathbf{T}}\langle\boldsymbol{\xi}\rangle=\mathbf{f}/2$；反作用条件\eqref{eq:reaction}在态表述下取形式 $\underline{\mathbf{T}}'\langle-\boldsymbol{\xi}\rangle=-\underline{\mathbf{T}}\langle\boldsymbol{\xi}\rangle$，故 $\mathbf{x}'$ 对同一键的贡献为 $\underline{\mathbf{T}}'\langle-\boldsymbol{\xi}\rangle=-\mathbf{f}/2$。将式\eqref{eq:bb-state-special}代入态型运动方程\eqref{eq:state-motion-ch02}，得
 \[
   \underline{\mathbf{T}}\langle\boldsymbol{\xi}\rangle-\underline{\mathbf{T}}'\langle-\boldsymbol{\xi}\rangle
   =\frac{\mathbf{f}}{2}-\left(-\frac{\mathbf{f}}{2}\right)
@@ -870,7 +949,9 @@
 \]
 右端正是键基运动方程\eqref{eq:motion}中的对力项。这说明键基方程是态型方程在力态取式\eqref{eq:bb-state-special}时的自然退化。
 
-上述推导的物理含义是：当力态仅依赖单条键的变形（即 $\underline{\mathbf{T}}$ 退化为键基 $\mathbf{f}$）时，态型理论退化为键基理论。换言之，键基理论是态型理论的子集。态型通过允许力态依赖整个变形状态——而非单条键——实现了对键基的推广。2.5 节将在此基础上建立应变能密度与力态的 Fr\'echet 导数关系；第 6 章则给出常规态型（OSB）与非寻常态型（non-ordinary state-based，简称 NOSB）本构的完整理论。
+上述推导的物理含义是：当力态仅依赖单条键的变形（即 $\underline{\mathbf{T}}$ 退化为键基 $\mathbf{f}$）时，态型理论退化为键基理论。换言之，键基理论是态型理论的子集。态型通过允许力态依赖整个变形状态——而非单条键——实现了对键基的推广。2.5 节将在此基础上建立应变能密度与力态的 Fr\'echet 导数关系；第 6 章则给出常规态型（OSB）本构的完整理论，非常规态型（non-ordinary state-based，简称 NOSB）本构的完整理论见第 7 章。
+
+\emph{AI 辅助生成，需经专业审阅。}
 
 \section{应变能密度与能量守恒}
 
@@ -878,7 +959,7 @@
 
 \subsection{应变能密度的物理意义}
 
-应变能密度 $W(\mathbf{x},t)=\frac{1}{2}\int_{\mathcal{H}_{\mathbf{x}}}w\,\mathrm{d}V'$ 表示物质点 $\mathbf{x}$ 与其族内所有邻居的成对势之和（每键计半）。其物理意义可从两个角度理解：
+应变能密度 $W(\mathbf{x},t)=\frac{1}{2}\int_{H_{\mathbf{x}}}w\,\mathrm{d}V'$ 表示物质点 $\mathbf{x}$ 与其族内所有邻居的成对势之和（每键计半）。其物理意义可从两个角度理解：
 
 从微观角度，$W$ 是物质点 $\mathbf{x}$ 储存的"键能"密度，每条键 $(\mathbf{x},\mathbf{x}')$ 贡献 $w/2$（另 $w/2$ 计入 $\mathbf{x}'$ 的 $W$）。变形使键伸长或缩短，$w$ 随之变化，$W$ 的变化率即为应变能的变化率。
 
@@ -900,7 +981,7 @@
 \end{equation}
 式\eqref{eq:energy-balance}左端两项分别为动能变化率与应变能变化率，右端为外力（体力）的功率。其物理意义为：外力对物体做功的功率，等于动能与应变能之和的变化率——即机械能守恒。
 
-式\eqref{eq:energy-balance}的推导核心在于：运动方程积分中的成对力项 $\int_{\mathcal{B}}\int_{\mathcal{H}_{\mathbf{x}}}\mathbf{f}\cdot\dot{\mathbf{u}}(\mathbf{x})\,\mathrm{d}V'\mathrm{d}V$ 在反作用条件 \eqref{eq:reaction} 与成对势对称性 \eqref{eq:potential-symmetry} 下可改写为 $\frac{\mathrm{d}}{\mathrm{d}t}\int_{\mathcal{B}}W\,\mathrm{d}V$。这一改写的严格证明见 2.6 节。
+式\eqref{eq:energy-balance}的推导核心在于：运动方程积分中的成对力项 $\int_{\mathcal{B}}\int_{H_{\mathbf{x}}}\mathbf{f}\cdot\dot{\mathbf{u}}(\mathbf{x})\,\mathrm{d}V'\mathrm{d}V$ 在反作用条件 \eqref{eq:reaction} 与成对势对称性 \eqref{eq:potential-symmetry} 下可改写为 $\frac{\mathrm{d}}{\mathrm{d}t}\int_{\mathcal{B}}W\,\mathrm{d}V$。这一改写的严格证明见 2.6 节。
 
 \subsection{正定性与稳定性}
 
@@ -913,7 +994,7 @@
 
 正定性是稳定性（stability）的必要而非充分条件。更严格的稳定性条件要求：对任意位移场 $\mathbf{u}$（满足边界条件），$\int_{\mathcal{B}}W\,\mathrm{d}V$ 的二阶变分非负。线性化下，这一条件等价于微模量 $\mathbf{C}(\boldsymbol{\xi})$（式\eqref{eq:micro-modulus}）满足
 \begin{equation}
-  \int_{\mathcal{B}}\int_{\mathcal{H}_{\mathbf{x}}}\boldsymbol{\eta}\cdot\mathbf{C}(\boldsymbol{\xi})\,\boldsymbol{\eta}\,\mathrm{d}V'\mathrm{d}V\geq 0
+  \int_{\mathcal{B}}\int_{H_{\mathbf{x}}}\boldsymbol{\eta}\cdot\mathbf{C}(\boldsymbol{\xi})\,\boldsymbol{\eta}\,\mathrm{d}V'\mathrm{d}V\geq 0
   \label{eq:stability}
 \end{equation}
 式\eqref{eq:stability}是近场动力学线性稳定性的判据。对常规态型本构，稳定性分析涉及力态对变形态的二阶变分，其完整理论见文献 \cite{Silling2017}。材料失稳（如屈曲、剪切带）对应 $W$ 的二阶变分出现负特征值，是近场动力学分析材料破坏与不稳定性的能量基础。需要指出的是，能量平衡 \eqref{eq:energy-balance} 与正定性 \eqref{eq:positive-definite} 一起，构成了近场动力学能量分析的两条主线：前者保证机械能守恒，后者保证平衡稳定。二者均依赖成对势的对称性 \eqref{eq:potential-symmetry}，而对称性又与反作用条件 \eqref{eq:reaction} 等价——这揭示了近场动力学各公理之间的内在联系：动量守恒（反作用）、能量守恒（对称势）、稳定性（正定势）环环相扣。
@@ -937,16 +1018,16 @@
 \begin{proof}
   对运动方程 \eqref{eq:motion} 在 $\mathcal{B}$ 上积分
   \begin{equation}
-    \int_{\mathcal{B}}\rho\,\ddot{\mathbf{u}}\,\mathrm{d}V=\underbrace{\int_{\mathcal{B}}\int_{\mathcal{H}_{\mathbf{x}}}\mathbf{f}(\boldsymbol{\eta},\boldsymbol{\xi})\,\mathrm{d}V'\mathrm{d}V}_{\displaystyle I}+\int_{\mathcal{B}}\mathbf{b}\,\mathrm{d}V
+    \int_{\mathcal{B}}\rho\,\ddot{\mathbf{u}}\,\mathrm{d}V=\underbrace{\int_{\mathcal{B}}\int_{H_{\mathbf{x}}}\mathbf{f}(\boldsymbol{\eta},\boldsymbol{\xi})\,\mathrm{d}V'\mathrm{d}V}_{\displaystyle I}+\int_{\mathcal{B}}\mathbf{b}\,\mathrm{d}V
     \label{eq:momentum-integral}
   \end{equation}
-  只需证成对项 $I=\mathbf{0}$。在 $I$ 中作换元 $\mathbf{x}\leftrightarrow\mathbf{x}'$（即 $\boldsymbol{\xi}\to-\boldsymbol{\xi}$，$\boldsymbol{\eta}\to-\boldsymbol{\eta}$），积分区域由 $\mathcal{H}_{\mathbf{x}}$ 变为 $\mathcal{H}_{\mathbf{x}'}$ 但覆盖的物质点对不变，故
+  只需证成对项 $I=\mathbf{0}$。在 $I$ 中作换元 $\mathbf{x}\leftrightarrow\mathbf{x}'$（即 $\boldsymbol{\xi}\to-\boldsymbol{\xi}$，$\boldsymbol{\eta}\to-\boldsymbol{\eta}$），积分区域由 $H_{\mathbf{x}}$ 变为 $H_{\mathbf{x}'}$ 但覆盖的物质点对不变，故
   \[
-    I=\int_{\mathcal{B}}\int_{\mathcal{H}_{\mathbf{x}}}\mathbf{f}(-\boldsymbol{\eta},-\boldsymbol{\xi})\,\mathrm{d}V'\mathrm{d}V
+    I=\int_{\mathcal{B}}\int_{H_{\mathbf{x}}}\mathbf{f}(-\boldsymbol{\eta},-\boldsymbol{\xi})\,\mathrm{d}V'\mathrm{d}V
   \]
   由反作用条件 \eqref{eq:reaction}，$\mathbf{f}(-\boldsymbol{\eta},-\boldsymbol{\xi})=-\mathbf{f}(\boldsymbol{\eta},\boldsymbol{\xi})$，故
   \[
-    I=-\int_{\mathcal{B}}\int_{\mathcal{H}_{\mathbf{x}}}\mathbf{f}(\boldsymbol{\eta},\boldsymbol{\xi})\,\mathrm{d}V'\mathrm{d}V=-I
+    I=-\int_{\mathcal{B}}\int_{H_{\mathbf{x}}}\mathbf{f}(\boldsymbol{\eta},\boldsymbol{\xi})\,\mathrm{d}V'\mathrm{d}V=-I
   \]
   即 $2I=\mathbf{0}$，$I=\mathbf{0}$。代入式\eqref{eq:momentum-integral}得
   \[
@@ -974,25 +1055,25 @@
 \begin{proof}
   角动量定义为 $\mathbf{L}=\int_{\mathcal{B}}\rho\,\mathbf{y}\times\dot{\mathbf{u}}\,\mathrm{d}V$，其中 $\mathbf{y}=\mathbf{x}+\mathbf{u}$。对时间求导（注意 $\dot{\mathbf{y}}=\dot{\mathbf{u}}$，$\mathbf{y}\times\dot{\mathbf{y}}$ 项为零）
   \begin{equation}
-    \dot{\mathbf{L}}=\int_{\mathcal{B}}\rho\,\mathbf{y}\times\ddot{\mathbf{u}}\,\mathrm{d}V=\int_{\mathcal{B}}\mathbf{y}\times\Bigl[\int_{\mathcal{H}_{\mathbf{x}}}\mathbf{f}\,\mathrm{d}V'+\mathbf{b}\Bigr]\mathrm{d}V
+    \dot{\mathbf{L}}=\int_{\mathcal{B}}\rho\,\mathbf{y}\times\ddot{\mathbf{u}}\,\mathrm{d}V=\int_{\mathcal{B}}\mathbf{y}\times\Bigl[\int_{H_{\mathbf{x}}}\mathbf{f}\,\mathrm{d}V'+\mathbf{b}\Bigr]\mathrm{d}V
     \label{eq:angular-rate}
   \end{equation}
   记成对力矩项
   \[
-    \mathbf{M}=\int_{\mathcal{B}}\int_{\mathcal{H}_{\mathbf{x}}}\mathbf{y}(\mathbf{x})\times\mathbf{f}(\boldsymbol{\eta},\boldsymbol{\xi})\,\mathrm{d}V'\mathrm{d}V
+    \mathbf{M}=\int_{\mathcal{B}}\int_{H_{\mathbf{x}}}\mathbf{y}(\mathbf{x})\times\mathbf{f}(\boldsymbol{\eta},\boldsymbol{\xi})\,\mathrm{d}V'\mathrm{d}V
   \]
   作换元 $\mathbf{x}\leftrightarrow\mathbf{x}'$（$\boldsymbol{\xi}\to-\boldsymbol{\xi}$，$\boldsymbol{\eta}\to-\boldsymbol{\eta}$，$\mathbf{y}(\mathbf{x})\to\mathbf{y}(\mathbf{x}')=\mathbf{y}+\boldsymbol{\xi}+\boldsymbol{\eta}$），并利用反作用条件
   \begin{equation}
-    \mathbf{M}=\int_{\mathcal{B}}\int_{\mathcal{H}_{\mathbf{x}}}\mathbf{y}(\mathbf{x}')\times\mathbf{f}(-\boldsymbol{\eta},-\boldsymbol{\xi})\,\mathrm{d}V'\mathrm{d}V=-\int_{\mathcal{B}}\int_{\mathcal{H}_{\mathbf{x}}}\mathbf{y}(\mathbf{x}')\times\mathbf{f}(\boldsymbol{\eta},\boldsymbol{\xi})\,\mathrm{d}V'\mathrm{d}V
+    \mathbf{M}=\int_{\mathcal{B}}\int_{H_{\mathbf{x}}}\mathbf{y}(\mathbf{x}')\times\mathbf{f}(-\boldsymbol{\eta},-\boldsymbol{\xi})\,\mathrm{d}V'\mathrm{d}V=-\int_{\mathcal{B}}\int_{H_{\mathbf{x}}}\mathbf{y}(\mathbf{x}')\times\mathbf{f}(\boldsymbol{\eta},\boldsymbol{\xi})\,\mathrm{d}V'\mathrm{d}V
     \label{eq:moment-symmetry}
   \end{equation}
   将式\eqref{eq:moment-symmetry}与原式相加
   \[
-    2\mathbf{M}=\int_{\mathcal{B}}\int_{\mathcal{H}_{\mathbf{x}}}\bigl[\mathbf{y}(\mathbf{x})-\mathbf{y}(\mathbf{x}')\bigr]\times\mathbf{f}(\boldsymbol{\eta},\boldsymbol{\xi})\,\mathrm{d}V'\mathrm{d}V
+    2\mathbf{M}=\int_{\mathcal{B}}\int_{H_{\mathbf{x}}}\bigl[\mathbf{y}(\mathbf{x})-\mathbf{y}(\mathbf{x}')\bigr]\times\mathbf{f}(\boldsymbol{\eta},\boldsymbol{\xi})\,\mathrm{d}V'\mathrm{d}V
   \]
   注意 $\mathbf{y}(\mathbf{x}')-\mathbf{y}(\mathbf{x})=\boldsymbol{\xi}+\boldsymbol{\eta}$（式\eqref{eq:deformed-bond}），故 $\mathbf{y}(\mathbf{x})-\mathbf{y}(\mathbf{x}')=-(\boldsymbol{\xi}+\boldsymbol{\eta})$，从而
   \begin{equation}
-    2\mathbf{M}=-\int_{\mathcal{B}}\int_{\mathcal{H}_{\mathbf{x}}}(\boldsymbol{\xi}+\boldsymbol{\eta})\times\mathbf{f}(\boldsymbol{\eta},\boldsymbol{\xi})\,\mathrm{d}V'\mathrm{d}V
+    2\mathbf{M}=-\int_{\mathcal{B}}\int_{H_{\mathbf{x}}}(\boldsymbol{\xi}+\boldsymbol{\eta})\times\mathbf{f}(\boldsymbol{\eta},\boldsymbol{\xi})\,\mathrm{d}V'\mathrm{d}V
     \label{eq:moment-central}
   \end{equation}
   由中心力条件 \eqref{eq:central-force}，$(\boldsymbol{\xi}+\boldsymbol{\eta})\times\mathbf{f}=\mathbf{0}$，故 $\mathbf{M}=\mathbf{0}$。代入式\eqref{eq:angular-rate}得
@@ -1021,16 +1102,16 @@
 \begin{proof}
   动能变化率为
   \[
-    \dot{K}=\int_{\mathcal{B}}\rho\,\dot{\mathbf{u}}\cdot\ddot{\mathbf{u}}\,\mathrm{d}V=\int_{\mathcal{B}}\dot{\mathbf{u}}(\mathbf{x})\cdot\Bigl[\int_{\mathcal{H}_{\mathbf{x}}}\mathbf{f}\,\mathrm{d}V'+\mathbf{b}\Bigr]\mathrm{d}V
+    \dot{K}=\int_{\mathcal{B}}\rho\,\dot{\mathbf{u}}\cdot\ddot{\mathbf{u}}\,\mathrm{d}V=\int_{\mathcal{B}}\dot{\mathbf{u}}(\mathbf{x})\cdot\Bigl[\int_{H_{\mathbf{x}}}\mathbf{f}\,\mathrm{d}V'+\mathbf{b}\Bigr]\mathrm{d}V
   \]
-  分离成对功率项 $\mathbf{P}=\int_{\mathcal{B}}\int_{\mathcal{H}_{\mathbf{x}}}\dot{\mathbf{u}}(\mathbf{x})\cdot\mathbf{f}\,\mathrm{d}V'\mathrm{d}V$ 与外力功率 $\int_{\mathcal{B}}\mathbf{b}\cdot\dot{\mathbf{u}}\,\mathrm{d}V$。对 $\mathbf{P}$ 作换元 $\mathbf{x}\leftrightarrow\mathbf{x}'$，利用反作用条件
+  分离成对功率项 $\mathbf{P}=\int_{\mathcal{B}}\int_{H_{\mathbf{x}}}\dot{\mathbf{u}}(\mathbf{x})\cdot\mathbf{f}\,\mathrm{d}V'\mathrm{d}V$ 与外力功率 $\int_{\mathcal{B}}\mathbf{b}\cdot\dot{\mathbf{u}}\,\mathrm{d}V$。对 $\mathbf{P}$ 作换元 $\mathbf{x}\leftrightarrow\mathbf{x}'$，利用反作用条件
   \begin{equation}
-    \mathbf{P}=\int_{\mathcal{B}}\int_{\mathcal{H}_{\mathbf{x}}}\dot{\mathbf{u}}(\mathbf{x}')\cdot\mathbf{f}(-\boldsymbol{\eta},-\boldsymbol{\xi})\,\mathrm{d}V'\mathrm{d}V=-\int_{\mathcal{B}}\int_{\mathcal{H}_{\mathbf{x}}}\dot{\mathbf{u}}(\mathbf{x}')\cdot\mathbf{f}\,\mathrm{d}V'\mathrm{d}V
+    \mathbf{P}=\int_{\mathcal{B}}\int_{H_{\mathbf{x}}}\dot{\mathbf{u}}(\mathbf{x}')\cdot\mathbf{f}(-\boldsymbol{\eta},-\boldsymbol{\xi})\,\mathrm{d}V'\mathrm{d}V=-\int_{\mathcal{B}}\int_{H_{\mathbf{x}}}\dot{\mathbf{u}}(\mathbf{x}')\cdot\mathbf{f}\,\mathrm{d}V'\mathrm{d}V
     \label{eq:power-symmetry}
   \end{equation}
   将式\eqref{eq:power-symmetry}与原式相加
   \begin{equation}
-    2\mathbf{P}=\int_{\mathcal{B}}\int_{\mathcal{H}_{\mathbf{x}}}\bigl[\dot{\mathbf{u}}(\mathbf{x})-\dot{\mathbf{u}}(\mathbf{x}')\bigr]\cdot\mathbf{f}\,\mathrm{d}V'\mathrm{d}V=-\int_{\mathcal{B}}\int_{\mathcal{H}_{\mathbf{x}}}\dot{\boldsymbol{\eta}}\cdot\mathbf{f}\,\mathrm{d}V'\mathrm{d}V
+    2\mathbf{P}=\int_{\mathcal{B}}\int_{H_{\mathbf{x}}}\bigl[\dot{\mathbf{u}}(\mathbf{x})-\dot{\mathbf{u}}(\mathbf{x}')\bigr]\cdot\mathbf{f}\,\mathrm{d}V'\mathrm{d}V=-\int_{\mathcal{B}}\int_{H_{\mathbf{x}}}\dot{\boldsymbol{\eta}}\cdot\mathbf{f}\,\mathrm{d}V'\mathrm{d}V
     \label{eq:power-eta}
   \end{equation}
   其中 $\dot{\boldsymbol{\eta}}=\dot{\mathbf{u}}(\mathbf{x}')-\dot{\mathbf{u}}(\mathbf{x})$ 为相对速度。由 $\mathbf{f}=\partial w/\partial\boldsymbol{\eta}$（式\eqref{eq:pairwise-force-potential}）及链式法则
@@ -1039,7 +1120,7 @@
   \]
   最后一个等号利用 $\boldsymbol{\xi}$ 为参考构型固定量、$w$ 仅通过 $\boldsymbol{\eta}$ 依赖时间。代入式\eqref{eq:power-eta}
   \begin{equation}
-    \mathbf{P}=-\frac{1}{2}\int_{\mathcal{B}}\int_{\mathcal{H}_{\mathbf{x}}}\dot{w}\,\mathrm{d}V'\mathrm{d}V=-\frac{\mathrm{d}}{\mathrm{d}t}\Bigl[\frac{1}{2}\int_{\mathcal{B}}\int_{\mathcal{H}_{\mathbf{x}}}w\,\mathrm{d}V'\mathrm{d}V\Bigr]=-\dot{U}
+    \mathbf{P}=-\frac{1}{2}\int_{\mathcal{B}}\int_{H_{\mathbf{x}}}\dot{w}\,\mathrm{d}V'\mathrm{d}V=-\frac{\mathrm{d}}{\mathrm{d}t}\Bigl[\frac{1}{2}\int_{\mathcal{B}}\int_{H_{\mathbf{x}}}w\,\mathrm{d}V'\mathrm{d}V\Bigr]=-\dot{U}
     \label{eq:power-strain}
   \end{equation}
   其中最后一步用了式\eqref{eq:strain-energy}。综合得 $\dot{K}=\mathbf{P}+\int\mathbf{b}\cdot\dot{\mathbf{u}}\,\mathrm{d}V=-\dot{U}+\int\mathbf{b}\cdot\dot{\mathbf{u}}\,\mathrm{d}V$，移项即式\eqref{eq:energy-theorem}。
