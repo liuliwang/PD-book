@@ -182,3 +182,17 @@ xelatex main.tex
 - 禁止包含：历史记录、变更日志、动态信息、个人笔记、行号引用
 - 项目介绍/变更历史等文档性内容请另立文件（当前仓库尚无 README.md、CHANGELOG.md）；工作记录写入 `.omo/notepads/` 对应目录
 - 修改本文件须经团队 review
+
+## Agent skills
+
+### Issue tracker
+
+Issues and specs for this repo live as GitHub issues, managed with the `gh` CLI. See `docs/agents/issue-tracker.md`.
+
+### Triage labels
+
+Default five-role labels: `needs-triage`, `needs-info`, `ready-for-agent`, `ready-for-human`, `wontfix`. See `docs/agents/triage-labels.md`.
+
+### Domain docs
+
+Single-context layout: `CONTEXT.md` + `docs/adr/` at the repo root. See `docs/agents/domain.md`.
