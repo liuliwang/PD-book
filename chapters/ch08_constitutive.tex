@@ -597,6 +597,7 @@ Kachanov--Rabotnov 模型形式简洁，但存在数值上的病态应力敏感�
 
 \begin{table}[htbp]
   \centering
+  \small
   \caption{常见金属晶体结构的滑移系 \cite{Roters2010}}
   \label{tab:cp-slip-systems}
   \begin{tabular}{lccl}
@@ -881,7 +882,7 @@ JH-2 模型是 Johnson--Holmquist 系列模型的第二代。第一代模型 JH-
   \small
   \caption{常用装甲陶瓷的 JH-2 Hugoniot 弹性极限与状态方程参数（$\sigma_{\mathrm{HEL}}$、$P_{\mathrm{HEL}}$ 为 HEL 处的等效应力与压力，$T$ 为最大拉伸静水压力，$K_{1}$、$K_{2}$、$K_{3}$ 为多项式状态方程系数，$\beta$ 为体积膨胀能量转化分数）\cite{JohnsonHolmquist1999,HolmquistJohnson2002,HolmquistTempletonBishnoi2001}}
   \label{tab:jh2-eos-params}
-  \begin{tabular}{l>{\raggedright\arraybackslash}p{1.1cm}>{\raggedright\arraybackslash}p{1.1cm}>{\raggedright\arraybackslash}p{1.1cm}>{\raggedright\arraybackslash}p{1.1cm}>{\raggedright\arraybackslash}p{1.1cm}>{\raggedright\arraybackslash}p{1.1cm}>{\raggedright\arraybackslash}p{1.1cm}>{\raggedright\arraybackslash}p{1.1cm}}
+  \begin{tabular}{l>{\raggedright\arraybackslash}p{0.07\textwidth}>{\raggedright\arraybackslash}p{0.07\textwidth}>{\raggedright\arraybackslash}p{0.07\textwidth}>{\raggedright\arraybackslash}p{0.07\textwidth}>{\raggedright\arraybackslash}p{0.07\textwidth}>{\raggedright\arraybackslash}p{0.07\textwidth}>{\raggedright\arraybackslash}p{0.07\textwidth}>{\raggedright\arraybackslash}p{0.07\textwidth}}
     \toprule
     材料 & \shortstack{HEL\\$(\mathrm{GPa})$} & \shortstack{$\sigma_{\mathrm{HEL}}$\\$(\mathrm{GPa})$} & \shortstack{$P_{\mathrm{HEL}}$\\$(\mathrm{GPa})$} & \shortstack{$T$\\$(\mathrm{GPa})$} & \shortstack{$K_{1}$\\$(\mathrm{GPa})$} & \shortstack{$K_{2}$\\$(\mathrm{GPa})$} & \shortstack{$K_{3}$\\$(\mathrm{GPa})$} & $\beta$ \\
     \midrule
@@ -1097,7 +1098,7 @@ JH-2 在近场动力学中的实现已有多个代表性工作。Lai 等 2018 �
   \small
   \caption{本章各本构在本构对应框架中的统一实现模式（$\mathbf{F}$ 为非局部变形梯度，$\boldsymbol{\alpha}$ 为内变量集合，输出为 Cauchy 应力 $\boldsymbol{\sigma}$ 或第一类 Piola--Kirchhoff 应力 $\mathbf{P}$，内变量更新均为显式格式）}
   \label{tab:fd-constitutive-summary}
-  \begin{tabular}{>{\raggedright\arraybackslash}p{1.6cm}>{\raggedright\arraybackslash}p{4.2cm}>{\raggedright\arraybackslash}p{3.2cm}>{\raggedright\arraybackslash}p{1.9cm}>{\raggedright\arraybackslash}p{2.0cm}}
+  \begin{tabular}{>{\raggedright\arraybackslash}p{0.10\textwidth}>{\raggedright\arraybackslash}p{0.28\textwidth}>{\raggedright\arraybackslash}p{0.20\textwidth}>{\raggedright\arraybackslash}p{0.12\textwidth}>{\raggedright\arraybackslash}p{0.13\textwidth}}
     \toprule
     本构（节） & 应力响应函数 $\hat{\boldsymbol{\sigma}}$ & 内变量 $\boldsymbol{\alpha}$ & 输出应力 & 更新格式 \\
     \midrule
@@ -1207,7 +1208,7 @@ JH-2 在近场动力学中的实现已有多个代表性工作。Lai 等 2018 �
   \small
   \caption{本章各本构的适用性对比}
   \label{tab:fd-comparison}
-  \begin{tabular}{>{\raggedright\arraybackslash}p{1.4cm}>{\raggedright\arraybackslash}p{2.3cm}>{\raggedright\arraybackslash}p{2.3cm}>{\raggedright\arraybackslash}p{2.3cm}>{\raggedright\arraybackslash}p{2.0cm}>{\raggedright\arraybackslash}p{2.3cm}}
+  \begin{tabular}{>{\raggedright\arraybackslash}p{0.09\textwidth}>{\raggedright\arraybackslash}p{0.15\textwidth}>{\raggedright\arraybackslash}p{0.15\textwidth}>{\raggedright\arraybackslash}p{0.15\textwidth}>{\raggedright\arraybackslash}p{0.13\textwidth}>{\raggedright\arraybackslash}p{0.15\textwidth}}
     \toprule
     本构 & 适用材料 & 载荷特征 & 时间尺度/应变率 & 内变量/实现成本 & 典型应用场景 \\
     \midrule

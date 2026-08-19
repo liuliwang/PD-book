@@ -513,9 +513,10 @@
 
 \begin{table}[htbp]
   \centering
+  \small
   \caption{经典弹性力学与近场动力学的对应关系}
   \label{tab:classical-peridynamics}
-  \begin{tabular}{p{0.28\textwidth}p{0.28\textwidth}p{0.28\textwidth}}
+  \begin{tabular}{>{\raggedright\arraybackslash}p{0.28\textwidth}>{\raggedright\arraybackslash}p{0.28\textwidth}>{\raggedright\arraybackslash}p{0.28\textwidth}}
     \toprule
     & 经典弹性力学 & 近场动力学 \\
     \midrule
@@ -639,6 +640,7 @@
 
 \begin{table}[htbp]
   \centering
+  \small
   \caption{运动方程\eqref{eq:motion}各项的量纲分析}
   \label{tab:dim-analysis}
   \begin{tabular}{llcl}
@@ -661,9 +663,10 @@
 
 \begin{table}[htbp]
   \centering
+  \small
   \caption{经典连续介质力学与近场动力学中"内力描述"的对比}
   \label{tab:stress-vs-pairwise-force}
-  \begin{tabular}{p{0.25\textwidth}p{0.30\textwidth}p{0.30\textwidth}}
+  \begin{tabular}{>{\raggedright\arraybackslash}p{0.25\textwidth}>{\raggedright\arraybackslash}p{0.30\textwidth}>{\raggedright\arraybackslash}p{0.30\textwidth}}
     \toprule
     特征 & 经典连续介质力学 & 近场动力学 \\
     \midrule
@@ -872,56 +875,178 @@
 
 \subsection{态的概念与基本定义}
 
-需要特别强调的是，态不是矢量，而是把键矢量 $\boldsymbol{\xi}$ 映射为矢量的函数，记为 $\underline{\mathbf{A}}\langle\boldsymbol{\xi}\rangle$，其中下划线表示态、尖括号内为自变量键矢量。态型理论中，物质点 $\mathbf{x}$ 对邻居 $\mathbf{x}'$ 的力不再仅依赖该键自身的 $\boldsymbol{\eta}$，而是依赖 $\mathbf{x}$ 的整个变形状态。两个基本态是：
+所谓"态"，是将物质点 $\mathbf{x}$ 族内所有键的信息打包为一个整体的数学工具——它是一个函数，而非单个矢量。形象地说，可以把态想象成一张"表格"：族内每根键占据一行，记录该键的某个物理量；给定任意键矢量 $\boldsymbol{\xi}$，按行标签查表即可读出对应物理量值 $\underline{\mathbf{A}}\langle\boldsymbol{\xi}\rangle$，此即态的"读表规则"。两个基本态正是这种表格的两种具体形式：\emph{变形态} $\underline{\mathbf{Y}}$ 是一张"变形快照表"，记录族内每根键变形后的几何状态，回答"族如何变形？"；\emph{力态} $\underline{\mathbf{T}}$ 是一张"力分布表"，记录族内每根键上的力密度，回答"族如何施力？"。两者经本构关系 $\underline{\mathbf{T}}=\hat{\underline{\mathbf{T}}}(\underline{\mathbf{Y}})$ 关联：变形态作为运动学输入，经本构函数 $\hat{\underline{\mathbf{T}}}$ 映射为力态这一力学输出。态型（state-based，第 1 章亦称态基）理论中，态函数把键矢量 $\boldsymbol{\xi}$ 映射为矢量，记为 $\underline{\mathbf{A}}\langle\boldsymbol{\xi}\rangle$，其中下划线表示态、尖括号内为自变量键矢量。态的严格代数定义与运算规则将在 6.1 节给出，此处先建立直观图景。两个基本态是：
 
-\begin{itemize}
-  \item \emph{变形态}（deformation state）$\underline{\mathbf{Y}}$：把参考键 $\boldsymbol{\xi}$ 映射为变形后键 $\boldsymbol{\xi}+\boldsymbol{\eta}$，即 $\underline{\mathbf{Y}}\langle\boldsymbol{\xi}\rangle=\mathbf{y}(\mathbf{x}+\boldsymbol{\xi},t)-\mathbf{y}(\mathbf{x},t)$。变形态完全描述了物质点 $\mathbf{x}$ 的局部变形几何。
-  \item \emph{力态}（force state）$\underline{\mathbf{T}}$：把参考键 $\boldsymbol{\xi}$ 映射为 $\mathbf{x}'$ 对 $\mathbf{x}$ 的力密度矢量。力态是本构关系的输出，由变形态经本构函数决定：$\underline{\mathbf{T}}=\hat{\underline{\mathbf{T}}}(\underline{\mathbf{Y}})$。
-\end{itemize}
+变形态（deformation state）$\underline{\mathbf{Y}}$ 是运动学量：它把参考键 $\boldsymbol{\xi}$ 映射为变形后键 $\boldsymbol{\xi}+\boldsymbol{\eta}$，即
+\begin{equation}
+  \underline{\mathbf{Y}}\langle\boldsymbol{\xi}\rangle=\mathbf{y}(\mathbf{x}+\boldsymbol{\xi},t)-\mathbf{y}(\mathbf{x},t)
+  \label{eq:state-deformation-ch02}
+\end{equation}
+其中 $\boldsymbol{\eta}=\mathbf{u}(\mathbf{x}+\boldsymbol{\xi},t)-\mathbf{u}(\mathbf{x},t)$ 为相对位移。变形态完全描述了物质点 $\mathbf{x}$ 的局部变形几何——它是态型理论的几何输入，回答"族如何变形？"。
 
-为行文简洁，本节书写态时省略定义点与时间参数 $\mathbf{x},t$；完整记号形如 $\underline{\mathbf{Y}}[\mathbf{x},t]\langle\boldsymbol{\xi}\rangle$，其严格定义与代数运算见 6.1 节。
+力态（force state）$\underline{\mathbf{T}}$ 是力学量：它把参考键 $\boldsymbol{\xi}$ 映射为 $\mathbf{x}'$ 对 $\mathbf{x}$ 的力密度矢量。力态是本构关系的输出，由变形态经本构函数决定：
+\begin{equation}
+  \underline{\mathbf{T}}=\hat{\underline{\mathbf{T}}}(\underline{\mathbf{Y}})
+  \label{eq:state-force-ch02}
+\end{equation}
+力态的量纲与键型理论中的对力密度相同（三维情形为 $\mathrm{N/m^{6}}$）。它是态型理论的力学输出，回答"族如何施力？"。
 
-图\ref{fig:state-concept}直观地展示了这一对应关系：灰色虚线给出参考构型中的各条键，变形态 $\underline{\mathbf{Y}}$ 把参考键 $\boldsymbol{\xi}$ 映射为变形后键（红色实线），力态 $\underline{\mathbf{T}}$ 则把参考键映射为相应的力密度矢量（橙色箭头），二者经本构函数 $\hat{\underline{\mathbf{T}}}$ 相关联。
+为行文简洁，本节书写态时省略定义点与时间参数 $\mathbf{x},t$。完整记号采用三重符号约定：下划线 $\underline{\;}$\,表示态函数，方括号 $[\mathbf{x},t]$ 标记定义参数（材料点与时刻），尖括号 $\langle\cdot\rangle$ 表示态对其自变量——键矢量的求值。以变形态为例，完整记号为 $\underline{\mathbf{Y}}[\mathbf{x},t]\langle\boldsymbol{\xi}\rangle$，其严格定义与代数运算见 6.1 节。表\,\ref{tab:state-yt-comparison}汇总了两个基本态的核心属性。
+此处需区分两个层次：该表是元属性对照表，比较两个态的角色、自变量、定义域、来源、维度等属性；态本身则是数据表，逐键记录该族中每条键的物理量数值。前者回答"这些态是什么"，后者回答"这个族长什么样"。
+
+\begin{table}[htbp]
+  \centering
+  \small
+  \caption{变形态与力态的基本属性对照}
+  \label{tab:state-yt-comparison}
+  \begin{tabular}{>{\raggedright\arraybackslash}p{0.18\textwidth}>{\raggedright\arraybackslash}p{0.32\textwidth}>{\raggedright\arraybackslash}p{0.32\textwidth}}
+    \toprule
+    项目 & 变形态 $\underline{\mathbf{Y}}$ & 力态 $\underline{\mathbf{T}}$ \\
+    \midrule
+    角色 & 运动学量：几何输入 & 力学量：力学输出 \\
+    自变量 & 键矢量 $\boldsymbol{\xi}$ & 键矢量 $\boldsymbol{\xi}$ \\
+    值域 & 变形后键矢量 $\boldsymbol{\xi}+\boldsymbol{\eta}$ & 力密度矢量 \\
+    来源 & 运动学定义（位移场） & 本构函数 $\hat{\underline{\mathbf{T}}}$ 的输出 \\
+    量纲 & 长度 & 力密度 $\mathrm{N/m^{6}}$ \\
+    回答的问题 & 族如何变形？ & 族如何施力？ \\
+    \bottomrule
+      \end{tabular}
+\end{table}
+
+变形态与力态是同一批键上的两张表：两表以相同的键矢量 $\boldsymbol{\xi}$ 为行标签，行数、行序一致，只是每行填写的物理量不同——$\underline{\mathbf{Y}}$ 的行内是该键变形后的键矢量 $\boldsymbol{\xi}+\boldsymbol{\eta}$，$\underline{\mathbf{T}}$ 的行内是该键的力密度。两表行结构的一致，是本构函数 $\hat{\underline{\mathbf{T}}}$ 能按式\eqref{eq:state-force-ch02}把整个 $\underline{\mathbf{Y}}$ 关联到整个 $\underline{\mathbf{T}}$ 的前提；且 $\underline{\mathbf{T}}$ 在某一行上的取值由 $\underline{\mathbf{Y}}$ 的全部行共同决定，具体见下文算例中的表\ref{tab:state-yt-data}。
+
+图\ref{fig:state-concept-simple}以三根键为例展示变形态的映射。灰色虚线为参考构型中的键，红色实线为变形后的键；蓝色箭头表示变形态 $\underline{\mathbf{Y}}$ 的输出，它与红色变形键重合——这正说明变形态的输出就是变形后键 $\boldsymbol{\xi}+\boldsymbol{\eta}$。各键下方标注的伸长率分别为：沿拉伸方向 $s_1=0.1$、横向 $s_2=0$、反向 $s_3=0.1$，具体计算见下例。
+
+\begin{figure}[htbp]
+  \centering
+  \begin{tikzpicture}[scale=1.0]
+    % 中心点
+    \filldraw (0,0) circle (3pt) node[below] {$\mathbf{x}$};
+    % 参考构型（灰色虚线键，3 根）
+    \draw[gray, dashed] (0,0) -- (2, 0);
+    \filldraw[gray] (2, 0) circle (2pt);
+    \draw[gray, dashed] (0,0) -- (0, 2);
+    \filldraw[gray] (0, 2) circle (2pt);
+    \draw[gray, dashed] (0,0) -- (-2, 0);
+    \filldraw[gray] (-2, 0) circle (2pt);
+    % 变形构型（红色实线键）
+    \draw[red, thick] (0,0) -- (2.2, 0);
+    \filldraw[red] (2.2, 0) circle (2pt);
+    \draw[red, thick] (0,0) -- (0, 2);
+    \filldraw[red] (0, 2) circle (2pt);
+    \draw[red, thick] (0,0) -- (-2.2, 0);
+    \filldraw[red] (-2.2, 0) circle (2pt);
+    % 变形态箭头 Y⟨ξ⟩（蓝色，沿 0° 键）
+    \draw[->, thick, blue] (0,0) -- (2.2, 0) node[pos=0.55, above, blue, font=\small] {$\underline{\mathbf{Y}}\langle\boldsymbol{\xi}\rangle$};
+    % 标注各键
+    \node[below right, font=\small] at (1, -0.1) {$\boldsymbol{\xi}_1$};
+    \node[above left, font=\small] at (-0.1, 1) {$\boldsymbol{\xi}_2$};
+    \node[below left, font=\small] at (-1, -0.1) {$\boldsymbol{\xi}_3$};
+    % 伸长率标注
+    \path (0,0) -- (2.2, 0) node[pos=0.75, below, font=\small] {$s_1=0.1$};
+    \path (0,0) -- (0, 2) node[pos=0.75, right, font=\small] {$s_2=0$};
+    \path (0,0) -- (-2.2, 0) node[pos=0.75, below, font=\small] {$s_3=0.1$};
+    % 注释：省略底部键
+    \node[below, font=\footnotesize, gray] at (0, -0.8) {（为清晰起见，此处仅显示族内 3 根键）};
+  \end{tikzpicture}
+  \caption{单轴拉伸下三根键的变形态映射示意。灰色虚线为参考键，红色实线为变形后键，蓝色箭头为变形态 $\underline{\mathbf{Y}}$ 的输出。}
+  \label{fig:state-concept-simple}
+\end{figure}
+
+\begin{example}[单轴拉伸下三根键的变形态与力态取值]
+  考虑二维均匀单轴拉伸场 $u_1=\varepsilon_{11}x_1$、$u_2=0$（$\varepsilon_{11}=0.1$ 为示意值，键长取单位长度）。考察物质点 $\mathbf{x}$ 族内三根键的变形态取值。
+
+  \textbf{键1}：$\boldsymbol{\xi}_1=(1,0)$（沿拉伸方向）。相对位移 $\boldsymbol{\eta}_1=(0.1,0)$，变形态 $\underline{\mathbf{Y}}\langle\boldsymbol{\xi}_1\rangle=(1.1,0)$，伸长率 $s_1=0.1$。
+
+  \textbf{键2}：$\boldsymbol{\xi}_2=(0,1)$（垂直于拉伸方向）。相对位移 $\boldsymbol{\eta}_2=(0,0)$，变形态 $\underline{\mathbf{Y}}\langle\boldsymbol{\xi}_2\rangle=(0,1)$，伸长率 $s_2=0$。
+
+  \textbf{键3}：$\boldsymbol{\xi}_3=(-1,0)$（反向拉伸方向）。相对位移 $\boldsymbol{\eta}_3=(-0.1,0)$，变形态 $\underline{\mathbf{Y}}\langle\boldsymbol{\xi}_3\rangle=(-1.1,0)$，伸长率 $s_3=0.1$。
+
+  将上述三键排成三行，连同力态 $\underline{\mathbf{T}}$ 在对应键上的取值（数值仅示意），汇总于表\ref{tab:state-yt-data}。
+
+  \begin{table}[htbp]
+    \centering
+    \small
+    \caption{单轴拉伸下三根键的变形态与力态取值}
+    \label{tab:state-yt-data}
+    \begin{tabular}{>{\raggedright\arraybackslash}p{0.08\textwidth}>{\raggedright\arraybackslash}p{0.16\textwidth}>{\raggedright\arraybackslash}p{0.22\textwidth}>{\raggedright\arraybackslash}p{0.10\textwidth}>{\raggedright\arraybackslash}p{0.22\textwidth}}
+      \toprule
+      键 & 键矢量 $\boldsymbol{\xi}$ & 变形态 $\underline{\mathbf{Y}}\langle\boldsymbol{\xi}\rangle$ & 伸长率 $s$ & 力态 $\underline{\mathbf{T}}\langle\boldsymbol{\xi}\rangle$ \\
+      \midrule
+      键1 & $(1,0)$ & $(1.1,0)$ & $0.1$ & $(1.0,0)$ \\
+      键2 & $(0,1)$ & $(0,1)$ & $0$ & $(0,-0.5)$ \\
+      键3 & $(-1,0)$ & $(-1.1,0)$ & $0.1$ & $(1.0,0)$ \\
+      \bottomrule
+    \end{tabular}
+  \end{table}
+
+  三根键的变形态取值完整记录了该物质点族内的变形几何：沿拉伸方向的键伸长、横向键保持原长、反向键同样伸长。这一信息以"表格"形式打包为变形态 $\underline{\mathbf{Y}}$，供本构函数处理。\emph{本例数据为教学示意；力态列取值的量级与方向须经专业复核。}
+\end{example}
+
+回到上述例子：键2（横向键）的伸长率 $s_2=0$，即变形态在该键上的取值与参考构型完全相同。然而，对于泊松比 $\nu>0$ 的真实材料（如金属 $\nu\approx0.3$），横向键在单轴拉伸下仍然会受到压缩力——该力不可能来自键2自身的变形（因为 $s_2=0$），只能来自对族内其他键变形（如键1 伸长）的整体依赖。这正是力态 $\underline{\mathbf{T}}$ 依赖整族变形态 $\underline{\mathbf{Y}}$ 而非单根键的直观体现，也回应了 2.4.1 节中"突破泊松比 $\nu=1/4$ 锁定"的动机（式\eqref{eq:poisson-limit}）。键基理论中对力函数 $\mathbf{f}(\boldsymbol{\eta},\boldsymbol{\xi})$（2.3 节）只是力态在特定退化情形下的表现：2.4.4 节将给出 $\underline{\mathbf{T}}\langle\boldsymbol{\xi}\rangle=\tfrac{1}{2}\mathbf{f}$ 的精确关系，其中系数 $1/2$ 反映"每键被两个端点共享"的物理事实。
+
+图\ref{fig:state-concept}更完整地展示了态型理论的核心对应关系。图中灰色虚线为参考构型中的各条键，红色实线为变形后的键；蓝色箭头表示变形态 $\underline{\mathbf{Y}}$ 的输出，它与红色变形键重合——这正说明变形态的输出就是变形后键 $\boldsymbol{\xi}+\boldsymbol{\eta}$。橙色箭头表示力态 $\underline{\mathbf{T}}$ 在该键上的取值，即力密度矢量。图的下半部分示意本构函数 $\hat{\underline{\mathbf{T}}}$ 把变形态映射为力态的过程。
 
 \begin{figure}[htbp]
   \centering
   \begin{tikzpicture}[scale=0.95]
+    % === 上半部分：参考键与变形键（4 根键） ===
     % 中心点
     \filldraw (0,0) circle (3pt) node[below] {$\mathbf{x}$};
-    % 参考构型（虚线键）
-    \foreach \a in {0, 45, 90, 135, 180, 225, 270, 315} {
+    % 参考键（灰色虚线）：0°, 45°, 90°, 180°
+    \foreach \a in {0, 45, 90, 180} {
       \draw[gray, dashed] (0,0) -- ({2*cos(\a)}, {2*sin(\a)});
       \filldraw[gray] ({2*cos(\a)}, {2*sin(\a)}) circle (2pt);
     }
-    % 变形构型（实线键，变形后）
-    \foreach \a/\b/\c in {0/2.3/0.3, 45/1.7/1.6, 90/0.4/2.2, 135/-1.4/1.5, 180/-2.2/0.2, 225/-1.6/-1.3, 270/0.3/-2.1, 315/1.8/-1.2} {
-      \draw[red, thick] (0,0) -- (\b, \c);
-      \filldraw[red] (\b, \c) circle (2pt);
-    }
-    % 高亮 45° 键对：参考键（灰虚线）与变形键（红实线）共享起点 (0,0)
-    \draw[gray, dashed, very thick] (0,0) -- (1.414, 1.414);
-    \draw[red, very thick] (0,0) -- (1.7, 1.6);
-    % 变形态箭头：把参考键 xi 映射为变形后键 xi+eta（起点与键对共享 (0,0)，终点为变形键末端）
-    \draw[->, thick, blue] (0,0) -- (1.7, 1.6) node[pos=0.55, below right, blue, font=\small] {$\underline{\mathbf{Y}}\langle\boldsymbol{\xi}\rangle=\boldsymbol{\xi}+\boldsymbol{\eta}$};
+    % 变形键（红色实线）
+    \draw[red, thick] (0,0) -- (2.2, 0.2);
+    \filldraw[red] (2.2, 0.2) circle (2pt);
+    \draw[red, thick] (0,0) -- (1.7, 1.6);
     \filldraw[red] (1.7, 1.6) circle (3pt);
-    % 力态箭头：把参考键映射为力密度矢量（从变形键末端沿其方向延伸，起点与 Y 箭头起点不同）
-    \draw[->, very thick, orange!80!black] (1.7, 1.6) -- (2.35, 2.2) node[right, orange!80!black, font=\small] {$\underline{\mathbf{T}}\langle\boldsymbol{\xi}\rangle$};
-    % 下行：本构映射示意，本构函数把变形态映射为力态
-    \begin{scope}[yshift=-4.2cm]
-      \draw[red, very thick] (0,0) -- (1.7, 1.6) node[pos=0.45, above, red, font=\small] {$\underline{\mathbf{Y}}\langle\boldsymbol{\xi}\rangle$};
-      \filldraw[red] (1.7, 1.6) circle (2pt);
-      \draw[->, very thick, black!70] (2.3, 0.8) -- (3.6, 0.8) node[midway, above, font=\small] {$\hat{\underline{\mathbf{T}}}$（本构函数）};
-      \draw[->, very thick, orange!80!black] (3.6, 0.8) -- (4.6, 1.55) node[right, orange!80!black, font=\small] {$\underline{\mathbf{T}}\langle\boldsymbol{\xi}\rangle$};
-      \node[align=center, black!70, font=\small] at (2.95, -1.2) {本构映射};
+    \draw[red, thick] (0,0) -- (0.3, 2.1);
+    \filldraw[red] (0.3, 2.1) circle (2pt);
+    \draw[red, thick] (0,0) -- (-2.1, 0.2);
+    \filldraw[red] (-2.1, 0.2) circle (2pt);
+    % === 高亮 45° 键对的标注 ===
+    % 参考键 ξ 标注（灰色，位于参考端点附近）
+    \node[gray, font=\small] at (1.28, 1.32) {$\boldsymbol{\xi}$};
+    % 变形态蓝色箭头 Y⟨ξ⟩ = ξ+η，与红色变形键重合
+    \draw[->, thick, blue] (0,0) -- (1.7, 1.6) node[pos=0.5, below right, blue, font=\small] {$\underline{\mathbf{Y}}\langle\boldsymbol{\xi}\rangle$};
+    % 相对位移 η 标注：从参考端点指向变形端点，闭合三角形 ξ+η = Y⟨ξ⟩
+    \draw[->, gray, thick, shorten <=1pt, shorten >=1pt] (1.414, 1.414) -- (1.7, 1.6) node[midway, above, gray, font=\footnotesize] {$\boldsymbol{\eta}$};
+    % 力态橙色箭头：从变形键末端出发
+    \draw[->, very thick, orange!80!black, shorten <=1pt] (1.7, 1.6) -- (2.35, 2.15) node[right, orange!80!black, font=\small] {$\underline{\mathbf{T}}\langle\boldsymbol{\xi}\rangle$};
+    % 键标签
+    \node[below right, font=\small] at (1, -0.1) {$\boldsymbol{\xi}_1$};
+    \node[above left, font=\small] at (-0.1, 1) {$\boldsymbol{\xi}_2$};
+    \node[below left, font=\small] at (-1, -0.1) {$\boldsymbol{\xi}_3$};
+    % 弯箭头：从高亮键区域指向下行流程图
+    \draw[->, dashed, gray] (0.5, -0.5) to[bend right=30] (0.5, -3.9);
+    % === 下半部分：本构映射流程图 ===
+    \begin{scope}[yshift=-4.0cm]
+      % Y 输出（蓝色箭头）
+      \draw[->, thick, blue] (0,0) -- (2.0, 0) node[midway, above, font=\small] {$\underline{\mathbf{Y}}\langle\boldsymbol{\xi}\rangle$};
+      % T̂ 本构函数（黑色箭头 + 框）
+      \draw[->, very thick, black!70] (2.0, 0) -- (3.5, 0);
+      \node[draw, rounded corners=2pt, inner sep=2pt, font=\small] at (2.75, 0) {$\hat{\underline{\mathbf{T}}}$};
+      % T 输出（橙色箭头）
+      \draw[->, very thick, orange!80!black] (3.5, 0) -- (5.0, 0) node[midway, above, font=\small] {$\underline{\mathbf{T}}\langle\boldsymbol{\xi}\rangle$};
+      % 流程图标签
+      \node[below, font=\small, black!60] at (2.75, -0.5) {本构映射};
     \end{scope}
-    \node[align=center, gray] at (-4, 0) {参考键\\（灰色虚线）};
-    \node[align=center, red] at (4.5, -1.5) {变形键\\（红色实线）};
+    % === 图例（左下角，用 TikZ 线型预览） ===
+    \begin{scope}[shift={(-4.2, -1.0)}]
+      \draw[gray, dashed] (0,0) -- (0.8, 0) node[right, font=\small] {参考键};
+      \draw[red, thick] (0, -0.45) -- (0.8, -0.45) node[right, font=\small] {变形键};
+      \draw[->, thick, blue] (0, -0.9) -- (0.8, -0.9) node[right, font=\small] {变形态 $\underline{\mathbf{Y}}$};
+      \draw[->, very thick, orange!80!black] (0, -1.35) -- (0.8, -1.35) node[right, font=\small] {力态 $\underline{\mathbf{T}}$};
+    \end{scope}
   \end{tikzpicture}
-  \caption{态型理论中，变形态 $\underline{\mathbf{Y}}$ 把参考键 $\boldsymbol{\xi}$ 映射为变形后键 $\boldsymbol{\xi}+\boldsymbol{\eta}$（红色实线），力态 $\underline{\mathbf{T}}$ 把参考键映射为力密度矢量（橙色箭头）；下行示意本构函数 $\hat{\underline{\mathbf{T}}}$ 把变形态映射为力态。力态依赖整个变形态，而非单条键。蓝色箭头与红色变形键重合，表明变形态的输出正是变形后键 $\boldsymbol{\xi}+\boldsymbol{\eta}$}
+  \caption{态型理论中变形态与力态的对应关系：$\underline{\mathbf{Y}}$ 把参考键映射为变形后键，$\underline{\mathbf{T}}$ 把参考键映射为力密度矢量，二者经本构函数 $\hat{\underline{\mathbf{T}}}$ 关联}
   \label{fig:state-concept}
 \end{figure}
 
-力态依赖整个变形态这一性质，使态型本构能够区分体积变形与偏斜变形：物质点 $\mathbf{x}$ 的所有键的变形模式（如均匀膨胀、单轴拉伸、剪切）作为整体输入本构函数，输出相应的力态分布。这使态型理论能够描述任意泊松比的各向同性材料以及各向异性材料，第 6 章将给出常规态型（ordinary state-based，简称 OSB）本构的完整理论。
+力态依赖整个变形态这一性质，使态型本构能够区分体积变形与偏斜变形：物质点 $\mathbf{x}$ 的所有键的变形模式（如均匀膨胀、单轴拉伸、剪切）作为整体输入本构函数，输出相应的力态分布。这使态型理论能够描述任意泊松比的各向同性材料以及各向异性材料。态的代数运算（如态的点积、伸长态的分解等）将在 6.1 节严格给出，第 6 章将建立常规态型（ordinary state-based，简称 OSB）本构的完整理论；下一小节（2.4.3 节）先给出用态表示的运动方程。
 
 \subsection{态型运动方程}
 

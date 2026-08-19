@@ -5,14 +5,18 @@
 作用域：仅指导 AI 行为，非项目文档，非变更日志
 维护者：全体协作者，修改需人工 review
 禁止内容：历史变更记录、动态状态信息、行号引用、个人工作笔记
+内容判据：条目必须影响 agent 行为；agent 不犯错即无需知道的信息不写入
+重建约束：/init-deep（--create-new）与 /init 生成新 AGENTS.md 时，须先读本文件并保留已有有效指导，仅补充缺失项；禁止全删重建
 -->
 
 ## 项目概览
+
 专著《近场动力学理论与数值方法》的 LaTeX 书籍项目（ctexbook，A4，11pt）。
-章节完成度参差：ch01–ch11 为完整章节（数百至上千行，是写作新章节时的范例）；ch12–ch19 目前仅为十余行占位骨架；附录 appA–appE 为占位空文件。ch09（空间离散与时间积分）、ch10（边界条件与表面效应处理）为近期完成章节，其节结构与每节末尾的 AI 声明样式值得沿用；ch04 的 6 节结构（假设→微势→PMB→率定→表面效应→局限）是撰写键型相关章节的范例。ch05（键型改进模型）已完整，撰写相关章节前先 Read 其目录避免主题重复（如 dual-horizon 理论在 5.5 节，后续章节只做数值实现层面衔接）。ch11（裂纹与损伤的数值模拟，465 行）包含动态断裂、相场模型、裂纹追踪等内容，撰写 ch12+ 数值方法章节时注意衔接。
+章节完成度参差：ch01–ch11 为完整章节（是写作新章节时的范例）；ch12–ch19 为骨架章节（仅有节标题框架），撰写前需先 Read 其目录确认已有结构；附录 appA–appE 为占位空文件。ch09（空间离散与时间积分）、ch10（边界条件与表面效应处理）为近期完成章节，其节结构与每节末尾的 AI 声明样式值得沿用；ch04 的 6 节结构（假设→微势→PMB→率定→表面效应→局限）是撰写键型相关章节的范例。ch05（键型改进模型）已完整，撰写相关章节前先 Read 其目录避免主题重复（如 dual-horizon 理论在 5.5 节，后续章节只做数值实现层面衔接）。撰写 ch12–ch19 数值方法章节前先 Read 相邻章节目录避免主题重复，注意与 ch11（裂纹与损伤的数值模拟）内容的衔接。
+
 ## 编译
 
-必须用 XeLaTeX（ctexbook + 中文）。TeX 发行版：MiKTeX（本机 `xelatex --version` 实测 25.12）。以下命令顺序即 `.vscode/settings.json` 中 latex-workshop 的 recipe「完整编译 (含参考文献)」；autoBuild/autoClean 均为 never，不会自动编译清理。
+必须用 XeLaTeX（ctexbook + 中文）。TeX 发行版：MiKTeX（本机 `xelatex --version` 实测版本）。以下命令顺序即 `.vscode/settings.json` 中 latex-workshop 的 recipe「完整编译 (含参考文献)」；autoBuild/autoClean 均为 never，不会自动编译清理。
 
 ```powershell
 xelatex main.tex
@@ -26,7 +30,7 @@ xelatex main.tex
 
 ## 文件组织
 
-`main.tex` 是唯一入口，仅含 `\input` 语句——**编辑章节文件，不要改 main.tex 的结构**。
+`main.tex` 是唯一入口，仅含 `\input` 语句——**编辑章节文件内容，不要改 main.tex 的现有结构；新增章节/附录时需在 main.tex 中追加对应的 `\input` 语句**。
 
 | 位置                      | 内容                                 |
 | ------------------------- | ------------------------------------ |
@@ -37,7 +41,7 @@ xelatex main.tex
 | `bibliography.bib`      | BibTeX 文献库                        |
 | `figures/`              | CC-BY 论文插图、TikZ 自绘图          |
 
-注：`frontmatter/preface.tex` 目前为占位（2 行），`notation.tex` 是实体符号表（百余行）；写作前先 Read 确认。
+注：`frontmatter/preface.tex` 目前为占位文件，`notation.tex` 是实体符号表；写作前先 Read 确认。
 
 ## 排版规则
 
@@ -65,14 +69,16 @@ xelatex main.tex
   - 宽度通常 `width=0.9\textwidth`
 - **图注**：标题式，不超过 300 字；正文解释而非图注解释
 - **一图一主题**：多主题拆分为独立 `figure`
-- **图文对应**：定义→见图→解释；多子图 (a)(b) 描述嵌入对应概念定义处
+- **图文对应**：先文字引入（如"如图X所示..."）→ 再展示图；多子图 (a)(b) 描述嵌入对应概念定义处
 
 ### 表格
 
 - **三线表**：用 `booktabs`（`\toprule`/`\midrule`/`\bottomrule`），禁止竖线
-- **短表**：`tabular`，列宽 `p{0.22\textwidth}p{0.65\textwidth}`
+- **表内字号**：与表名（caption）字号同步，用 `\small`（在 `\begin{table}` 后、`tabular` 前声明；`longtable` 同）
+- **短表**：`tabular`，列宽用 `\textwidth` 相对宽度（如 `p{0.22\textwidth}p{0.65\textwidth}`），与正文宽度一致；多列表每个 p 列带 `>{\raggedright\arraybackslash}`
 - **长表**：`longtable`，列宽 `p{4.8cm}>{\raggedright\arraybackslash}p{10.2cm}`（防 Overfull）
-- **表注**：表下方小字标注数据来源，表须有编号且正文有 `\ref` 引用
+- **l/c 列**：仅限符号/参数取值表（短内容无需换行）
+- **数据来源标注**：caption 内用 `\cite{}` 标注（ch08 先例），无冒号；表须有编号且正文有 `\ref` 引用
 
 ### 编号与引用
 
@@ -96,10 +102,11 @@ xelatex main.tex
 
 - **数学推导**：每步标注依据（定义/定理/变换），不得跳过关键步骤；生成新公式后须明确提示"该推导需作者人工复核"
 - **术语一致**：引入新术语须首次定义并检查与 `frontmatter/notation.tex` 冲突；统一使用约定术语
-- **文献引用**：引用须给出准确 `bibliography.bib` 中的 cite key，禁止编造文献；禁止模糊引用；**cite 键的语义须与文献实际内容一致**——键名易误导（如 HaBobaru2010 实为玻璃板动态分叉、KilicAgwaiMadenci2009 实为拉伸层合板渐进损伤，均非冲击），引用前按文献主题核实；2026-08 ch11 写作曾修正 4 处想当然引用
+- **文献引用**：引用须给出准确 `bibliography.bib` 中的 cite key，禁止编造文献；禁止模糊引用；**cite 键的语义须与文献实际内容一致**——键名易误导（如 HaBobaru2010 实为玻璃板动态分叉、KilicAgwaiMadenci2009 实为拉伸层合板渐进损伤，均非冲击），引用前按文献主题核实
 - **逻辑链**：因果链须完整，每个结论前须有足够前提支撑；禁止"显而易见""容易证明"等省略
 - **数值算例**：给出完整参数（材料常数、horizon δ、网格尺寸、时间步长等），数据来源须可溯源
-- **责任边界**：输出数学/物理内容时须声明"AI 辅助生成，需经专业审阅"；不得替代作者做物理假设或理论判断。实践格式：每节末尾加一行 \emph{AI 辅助生成，需经专业审阅。}（ch03、ch04、ch09、ch10 等完整章节均已采用，新章节沿用）
+- **责任边界**：输出数学/物理内容时须声明"AI 辅助生成，需经专业审阅"；不得替代作者做物理假设或理论判断。实践格式：每节末尾加一行 \emph{AI 辅助生成，需经专业审阅。}（新章节沿用；存量章节中 ch05–ch08 为纯审阅修订，无需补加）
+
 #### AI 自查清单
 
 生成每节后，AI 须通检：
@@ -135,26 +142,25 @@ xelatex main.tex
 
 1. **逻辑自洽**：重读被修改推导所在节的前后文（节级导言、相关定义、前后公式），核查新插入或修改的推导步骤与上下文衔接无跳跃、无自相矛盾；公式的物理意义与正文表述一致
 2. **推导正确**：对修改或新增的每一步推导逐一验证——代数展开、化简、代入、积分、求导须完整复核，必要时用数值或符号计算交叉验证（如代入极限情形、量纲检查）；推导所引用的公式（`\eqref{}`）须确实包含所依赖的结论
-3. **编号与引用顺序**：公式/图/表编号按章递增、无跳号重号；每个 `\ref`/`\eqref` 都有对应 `\label`（可用 grep 核对，防悬空引用）；交叉引用的编号与正文实际位置一致。注意：**`\label{}` 未被正文引用是允许的**（教科书惯例，公式编号供读者与后续章节引用；ch04 有 29 个、ch07 有 26 个、ch09 有 18 个未引用 label，勿当作错误）
+3. **编号与引用顺序**：公式/图/表编号按章递增、无跳号重号；每个 `\ref`/`\eqref` 都有对应 `\label`（可用 grep 核对，防悬空引用）；交叉引用的编号与正文实际位置一致。注意：**`\label{}` 未被正文引用是允许的**（教科书惯例，公式编号供读者与后续章节引用；勿当作错误）
 4. **无遗留错误**：通读改动区域，确认无未定义的变量、无前后不一致的量符号、无与上文矛盾的表述、无未完成的句子
-
-先例（2026-08）：第 6 章细化审查中确认三处推导错误——G₀ 三维积分缺方位角 `2π` 因子、经典塑性乘子分子 `3μ` 应为 `2μ`、`ν=1/4` 时 `E=3k/2` 误写为 `9k/2`——均在编译前核查中验证并修正。
 
 ## 文献与可复现性
 
-- **参考文献**：统一由 `bibliography.bib` 管理（124 条）；当前 `main.tex` 用 `\bibliographystyle{plain}`（非 GB/T 7714），若切换 GB/T 7714 须更换 bibstyle 并引入 `gbt7714` 宏包
+- **参考文献**：统一由 `bibliography.bib` 管理；当前 `main.tex` 用 `\bibliographystyle{plain}`（非 GB/T 7714），若切换 GB/T 7714 须更换 bibstyle 并引入 `gbt7714` 宏包
 - **编译质量门禁**：xelatex + bibtex 无 error；无 undefined reference/citation 警告
-- **已知警告（非本次改动引入，勿误判）**：ch03_ccm_pd.tex 行 291 节标题含数学符号导致 hyperref "Token not allowed in PDF string" 警告 4 处（无害）。验证其他章节改动时，若全链编译仍见上述警告，属正常基线，重点核查新增内容是否引入新的 undefined citation/reference。
-- **编译前清理**：完整验证前先删除残留 `*.aux`/`*.bbl`/`*.blg`/`*.log` 再全链重跑；脏 aux 会导致 bibtex 报 "File ended while scanning" 等连锁假错误（2026-08 实测，干净重跑即消失）
+- **已知警告（非本次改动引入，勿误判）**：节标题含数学符号时 hyperref 可能报 "Token not allowed in PDF string" 警告，属于无害警告；若需消除，用 `\texorpdfstring` 包裹数学符号并提供纯文本替代。验证其他章节改动时，若全链编译仍见上述警告，属正常基线，重点核查新增内容是否引入新的 undefined citation/reference。
+- **编译前清理**：完整验证前先删除残留 `*.aux`/`*.bbl`/`*.blg`/`*.log` 再全链重跑；脏 aux 会导致 bibtex 报 "File ended while scanning" 等连锁假错误，干净重跑即可消除
 - **编译验证执行方式**：涉及 xelatex 编译验证的 QA 任务（如最终编译检查、F-wave 验证），**由当前会话直接本地执行**，不委托子代理。原因：章节文件（`chNN_*.tex`）不能单独编译，必须由 `main.tex` 入口编译；子代理可能编译错误文件、PowerShell 环境差异导致阻塞、或未按格式输出 `VERDICT` 导致 boulder 暂停。
 
 ## Git 约定
 
-- 远程**只有 `upstream`**（https://github.com/liuliwang/PD-book.git），**无 `origin`**；本地 `main` 跟踪 `upstream/main`，拉取用 `git pull upstream main`
-- 章节细化在独立工作分支上进行，命名惯例 `shuaiyangfu-No.Xrefine`（如 `shuaiyangfu-No.8refine`），完成后合并回 `main`
+- 远程**只有 `origin`**（https://github.com/liuliwang/PD-book.git）；本地 `main` 跟踪 `origin/main`，拉取用 `git pull origin main`
+- 章节细化在独立工作分支上进行，完成后合并回 `main`
 - 提交时只 stage 源文件（`.tex`/`.bib` 等）
 - 不要自动 commit/push
 - 编译产物（`*.aux`/`*.log`/`*.pdf`/`*.bbl` 等）与 `.omo/` 已被 `.gitignore` 忽略，勿手动 stage
+- AI 会话不得创建临时性分支；
 
 ## 写作格式禁忌（写入 .tex 时强制）
 
